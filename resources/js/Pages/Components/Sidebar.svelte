@@ -36,7 +36,7 @@
         // Create a form element to submit the logout request
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = route('admin.auth.logout');
+        form.action = route('auth.logout');
         
         // Add CSRF token
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
