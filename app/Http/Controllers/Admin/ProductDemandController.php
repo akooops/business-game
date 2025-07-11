@@ -17,9 +17,6 @@ class ProductDemandController extends Controller
      */
     public function index(Request $request)
     {
-        $perPage = IndexService::limitPerPage($request->query('perPage', 10));
-        $page = IndexService::checkPageIfNull($request->query('page', 1));
-
         // Filter parameters
         $productId = IndexService::checkIfSearchEmpty($request->query('product_id'));
         

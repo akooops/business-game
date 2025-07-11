@@ -49,6 +49,14 @@
           .select2-container .select2-selection--single .select2-selection__clear{
               cursor: pointer !important;
           }
+
+          .dark .select2-container .select2-selection--single{
+            background-color: #000 !important;
+          }
+
+          .dark .select2-container--default .select2-selection--single .select2-selection__clear{
+            color: #fff !important;
+          }
           
           .note-editable{
             background-color: #fff

@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             
             // Recipe details
-            $table->integer('step')->default(1);
             $table->float('quantity', 13, 3)->default(1.0);
 
             // Foreign keys

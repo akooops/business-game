@@ -530,7 +530,20 @@
 
                                                             <div class="kt-menu-separator"></div>
                                                             {/if}
-                                                            
+
+                                                            {#if hasPermission('admin.product-recipes.index')}
+                                                            <div class="kt-menu-item">
+                                                                <a class="kt-menu-link" href={route('admin.product-recipes.index', { product_id: product.id, product_name: product.name })}>
+                                                                    <span class="kt-menu-icon">
+                                                                        <i class="ki-filled ki-abstract"></i>
+                                                                    </span>
+                                                                    <span class="kt-menu-title">Recipes</span>
+                                                                </a>
+                                                            </div>
+
+                                                            <div class="kt-menu-separator"></div>
+                                                            {/if}
+                                                                
                                                             {#if hasPermission('admin.products.show')}
                                                             <div class="kt-menu-item">
                                                                 <a class="kt-menu-link" href={route('admin.products.show', { product: product.id })}>

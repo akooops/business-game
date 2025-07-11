@@ -13,6 +13,10 @@
         if (url.includes('/admin/dashboard') || url === '/admin' || url === '/admin/') {
             return 'dashboard';
         }
+        if (url.includes('/admin/products') || url.includes('/admin/product-recipes') || url.includes('/admin/product-demand')) {
+            return 'products';
+        }
+
         // Add more route-to-section mappings here as needed
         return 'dashboard'; // default fallback
     }
@@ -93,6 +97,21 @@
                     </span>
                     <span class="kt-tooltip" data-kt-tooltip-content="true">
                         User Management
+                    </span>
+                </button>
+                {/if}
+
+                {#if hasPermission('admin.products.index')}
+                <button 
+                    class="kt-btn kt-btn-icon kt-btn-ghost rounded-md size-9 border border-transparent hover:bg-background hover:[&_i]:text-primary hover:border-border {activeSection === 'products' ? 'bg-background [&_i]:text-primary border-border' : ''}" 
+                    data-kt-tooltip="" 
+                    data-kt-tooltip-placement="right"
+                    on:click={() => setActiveSection('products')}>
+                    <span class="kt-menu-icon">
+                        <i class="ki-outline ki-handcart text-lg"></i>
+                    </span>
+                    <span class="kt-tooltip" data-kt-tooltip-content="true">
+                        Products Management
                     </span>
                 </button>
                 {/if}
@@ -247,6 +266,52 @@
                 </div>
                 {/if}
 
+                <!-- Products Management Section -->
+                {#if activeSection === 'products'}
+                <div class="mb-3">
+                    <h3 class="text-xs text-muted-foreground uppercase ps-2.5 mb-2.5">
+                        Products Management
+                    </h3>
+                    {#if hasPermission('admin.products.index')}
+                    <div class="kt-menu-item">
+                        <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute('admin.products.index') ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.products.index')}>
+                            <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
+                                <i class="ki-outline ki-handcart"></i>
+                            </span>
+                            <span class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono ms-2">
+                                Products
+                            </span>
+                        </a>
+                    </div>
+                    {/if}
+
+                    {#if hasPermission('admin.product-recipes.index')}
+                    <div class="kt-menu-item">
+                        <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute('admin.product-recipes.index') ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.product-recipes.index')}>
+                            <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
+                                <i class="ki-outline ki-element-11"></i>
+                            </span>
+                            <span class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono ms-2">
+                                Product Recipes
+                            </span>
+                        </a>
+                    </div>
+                    {/if}
+
+                    {#if hasPermission('admin.product-demand.index')}
+                    <div class="kt-menu-item">
+                        <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute('admin.product-demand.index') ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.product-demand.index')}>
+                            <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
+                                <i class="ki-outline ki-chart-line"></i>
+                            </span>
+                            <span class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono ms-2">
+                                Product Demand
+                            </span>
+                        </a>
+                    </div>
+                    {/if}
+                </div>
+                {/if}
             </div>
             <!-- End of Sidebar Menu -->
         </div>

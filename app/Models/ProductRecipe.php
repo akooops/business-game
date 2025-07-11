@@ -36,9 +36,4 @@ class ProductRecipe extends Model
     {
         return $query->where('material_id', $material);
     }
-
-    public function scopeStep($query, $step)
-    {
-        return $query->where('step', $step);
-    }
 }

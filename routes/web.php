@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\RolesController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Admin\ProductsController;
 use App\Http\Controllers\Admin\ProductDemandController;
+use App\Http\Controllers\Admin\ProductRecipesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -76,10 +77,15 @@ Route::prefix('admin')->middleware(['auth', 'handle.inertia'])->group(function (
     
     // Product Demand
     Route::get('product-demand', [ProductDemandController::class, 'index'])->middleware('check.permission:admin.product-demand.index')->name('admin.product-demand.index');
-    Route::get('product-demand/{product}', [ProductDemandController::class, 'getDemandData'])->middleware('check.permission:admin.product-demand.show')->name('admin.product-demand.show');
     Route::post('product-demand', [ProductDemandController::class, 'store'])->middleware('check.permission:admin.product-demand.store')->name('admin.product-demand.store');
     Route::patch('product-demand/{productDemand}', [ProductDemandController::class, 'update'])->middleware('check.permission:admin.product-demand.update')->name('admin.product-demand.update');
     Route::delete('product-demand/{productDemand}', [ProductDemandController::class, 'destroy'])->middleware('check.permission:admin.product-demand.destroy')->name('admin.product-demand.destroy');
+    
+    // Product Recipe
+    Route::get('product-recipes', [ProductRecipesController::class, 'index'])->middleware('check.permission:admin.product-recipes.index')->name('admin.product-recipes.index');
+    Route::post('product-recipes', [ProductRecipesController::class, 'store'])->middleware('check.permission:admin.product-recipes.store')->name('admin.product-recipes.store');
+    Route::patch('product-recipes/{productRecipe}', [ProductRecipesController::class, 'update'])->middleware('check.permission:admin.product-recipes.update')->name('admin.product-recipes.update');
+    Route::delete('product-recipes/{productRecipe}', [ProductRecipesController::class, 'destroy'])->middleware('check.permission:admin.product-recipes.destroy')->name('admin.product-recipes.destroy');
 });
 
 
