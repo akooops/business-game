@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('product_demands', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained()->onDelete('cascade');
+
+            // Gameweek
             $table->integer('gameweek');
 
             // Demand fields
@@ -30,6 +31,9 @@ return new class extends Migration
             $table->float('fluctuation_factor', 13, 3)->default(1.0);
             $table->integer('research_time_days')->default(0);
             
+            // Foreign keys
+            $table->foreignId('product_id')->constrained()->onDelete('cascade');
+
             $table->timestamps();
         });
     }

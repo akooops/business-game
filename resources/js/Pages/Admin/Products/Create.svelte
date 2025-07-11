@@ -1,0 +1,343 @@
+<script>
+    import AdminLayout from '../../Layouts/AdminLayout.svelte';
+    import { onMount, tick } from 'svelte';
+    import { router } from '@inertiajs/svelte';
+
+    // Define breadcrumbs for this page
+    const breadcrumbs = [
+        {
+            title: 'Products',
+            url: route('admin.products.index'),
+            active: false
+        },
+        {
+            title: 'Create',
+            url: route('admin.products.create'),
+            active: true
+        }
+    ];
+    
+    const pageTitle = 'Create Product';
+
+    // Product types options
+    const productTypes = [
+        { value: 'raw_material', label: 'Raw Material' },
+        { value: 'component', label: 'Component' },
+        { value: 'finished_product', label: 'Finished Product' }
+    ];
+
+    // Form data
+    let form = {
+        name: '',
+        description: '',
+        type: 'raw_material',
+        elasticity_coefficient: 1.0,
+        shelf_life_days: '',
+        has_expiration: false,
+        measurement_unit: '',
+        file: null
+    };
+
+    // Form errors
+    let errors = {};
+
+    // Loading state
+    let loading = false;
+
+    // File preview
+    let filePreview = null;
+
+    // Handle file input change
+    function handleFileChange(event) {
+        const file = event.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+            form.file = file;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                filePreview = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    // Handle expiration toggle
+    function handleExpirationToggle() {
+        form.has_expiration = !form.has_expiration;
+        if (!form.has_expiration) {
+            form.shelf_life_days = '';
+        }
+    }
+
+    // Handle form submission
+    function handleSubmit() {
+        loading = true;
+        
+        const formData = new FormData();
+        
+        // Add form fields
+        Object.keys(form).forEach(key => {
+            if (form[key] !== null && form[key] !== '') {
+                if (key === 'file' && form.file) {
+                    formData.append(key, form.file);
+                } else if (key === 'has_expiration') {
+                    formData.append(key, form[key] ? '1' : '0');
+                } else if (key !== 'file') {
+                    formData.append(key, form[key]);
+                }
+            }
+        });
+
+        router.post(route('admin.products.store'), formData, {
+            onError: (err) => {
+                errors = err;
+                loading = false;
+            },
+            onFinish: () => {
+                loading = false;
+            }
+        });
+    }
+
+    // Initialize components after mount
+    onMount(async () => {
+        await tick();
+    });
+</script>
+
+<svelte:head>
+    <title>Business Game - {pageTitle}</title>
+</svelte:head>
+
+<AdminLayout {breadcrumbs} {pageTitle}>
+    <!-- Container -->
+    <div class="kt-container-fixed">
+        <div class="grid gap-5 lg:gap-7.5">
+            <!-- Product Header -->
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div class="flex flex-col gap-1">
+                    <h1 class="text-2xl font-bold text-mono">Create New Product</h1>
+                    <p class="text-sm text-secondary-foreground">
+                        Add a new product to your simulation inventory
+                    </p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <a href="{route('admin.products.index')}" class="kt-btn kt-btn-outline">
+                        <i class="ki-filled ki-arrow-left text-base"></i>
+                        Back to Products
+                    </a>
+                </div>
+            </div>
+
+            <!-- Form -->
+            <form on:submit|preventDefault={handleSubmit} class="grid gap-5 lg:gap-7.5">
+                <!-- Basic Information Card -->
+                <div class="kt-card">
+                    <div class="kt-card-header">
+                        <h4 class="kt-card-title">Basic Information</h4>
+                    </div>
+                    <div class="kt-card-content">
+                        <div class="grid gap-4">
+                            <!-- Product Name -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-medium text-mono" for="name">
+                                    Product Name <span class="text-destructive">*</span>
+                                </label>
+                                <input
+                                    id="name"
+                                    type="text"
+                                    class="kt-input {errors.name ? 'kt-input-error' : ''}"
+                                    placeholder="Enter product name"
+                                    bind:value={form.name}
+                                />
+                                {#if errors.name}
+                                    <p class="text-sm text-destructive">{errors.name}</p>
+                                {/if}
+                            </div>
+
+                            <!-- Description -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-medium text-mono" for="description">
+                                    Description
+                                </label>
+                                <textarea
+                                    id="description"
+                                    class="kt-textarea {errors.description ? 'kt-input-error' : ''}"
+                                    placeholder="Enter product description"
+                                    rows="3"
+                                    bind:value={form.description}
+                                ></textarea>
+                                {#if errors.description}
+                                    <p class="text-sm text-destructive">{errors.description}</p>
+                                {/if}
+                            </div>
+
+                            <!-- Product Type -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-medium text-mono" for="type">
+                                    Product Type <span class="text-destructive">*</span>
+                                </label>
+                                <select
+                                    id="type"
+                                    class="kt-select {errors.type ? 'kt-select-error' : ''}"
+                                    bind:value={form.type}
+                                >
+                                    {#each productTypes as type}
+                                        <option value={type.value}>{type.label}</option>
+                                    {/each}
+                                </select>
+                                {#if errors.type}
+                                    <p class="text-sm text-destructive">{errors.type}</p>
+                                {/if}
+                            </div>
+
+                            <!-- Measurement Unit -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-medium text-mono" for="measurement_unit">
+                                    Measurement Unit <span class="text-destructive">*</span>
+                                </label>
+                                <input
+                                    id="measurement_unit"
+                                    type="text"
+                                    class="kt-input {errors.measurement_unit ? 'kt-input-error' : ''}"
+                                    placeholder="e.g., kg, liter, piece, ton"
+                                    bind:value={form.measurement_unit}
+                                />
+                                {#if errors.measurement_unit}
+                                    <p class="text-sm text-destructive">{errors.measurement_unit}</p>
+                                {/if}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Business Properties Card -->
+                <div class="kt-card">
+                    <div class="kt-card-header">
+                        <h4 class="kt-card-title">Business Properties</h4>
+                    </div>
+                    <div class="kt-card-content">
+                        <div class="grid gap-4">
+                            <!-- Elasticity Coefficient -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-medium text-mono" for="elasticity_coefficient">
+                                    Elasticity Coefficient <span class="text-destructive">*</span>
+                                </label>
+                                <input
+                                    id="elasticity_coefficient"
+                                    type="number"
+                                    step="0.1"
+                                    min="0"
+                                    class="kt-input {errors.elasticity_coefficient ? 'kt-input-error' : ''}"
+                                    placeholder="1.0"
+                                    bind:value={form.elasticity_coefficient}
+                                />
+                                <p class="text-xs text-secondary-foreground">
+                                    Demand/Price sensitivity factor (higher = more sensitive to price changes)
+                                </p>
+                                {#if errors.elasticity_coefficient}
+                                    <p class="text-sm text-destructive">{errors.elasticity_coefficient}</p>
+                                {/if}
+                            </div>
+
+                            <!-- Has Expiration -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-medium text-mono">
+                                    Product Expiration
+                                </label>
+                                <div class="flex items-center gap-3">
+                                    <input 
+                                        class="kt-switch" 
+                                        type="checkbox" 
+                                        id="has_expiration" 
+                                        bind:checked={form.has_expiration}
+                                    />
+                                    <label class="kt-label cursor-pointer" for="has_expiration">
+                                        This product has an expiration date
+                                    </label>
+                                </div>
+                                {#if errors.has_expiration}
+                                    <p class="text-sm text-destructive">{errors.has_expiration}</p>
+                                {/if}
+                            </div>
+
+                            <!-- Shelf Life Days (conditional) -->
+                            {#if form.has_expiration}
+                                <div class="flex flex-col gap-2">
+                                    <label class="text-sm font-medium text-mono" for="shelf_life_days">
+                                        Shelf Life (Days) <span class="text-destructive">*</span>
+                                    </label>
+                                    <input
+                                        id="shelf_life_days"
+                                        type="number"
+                                        min="1"
+                                        class="kt-input {errors.shelf_life_days ? 'kt-input-error' : ''}"
+                                        placeholder="30"
+                                        bind:value={form.shelf_life_days}
+                                    />
+                                    {#if errors.shelf_life_days}
+                                        <p class="text-sm text-destructive">{errors.shelf_life_days}</p>
+                                    {/if}
+                                </div>
+                            {/if}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Image Card -->
+                <div class="kt-card">
+                    <div class="kt-card-header">
+                        <h4 class="kt-card-title">Product Image</h4>
+                    </div>
+                    <div class="kt-card-content">
+                        <div class="grid gap-4">
+                            <!-- File Upload Section -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-medium text-mono" for="file">
+                                    Upload Image
+                                </label>
+                                <input
+                                    id="file"
+                                    type="file"
+                                    class="kt-input"
+                                    accept="image/*"
+                                    on:change={handleFileChange}
+                                />
+                                <p class="text-xs text-secondary-foreground">
+                                    Supported formats: JPG, JPEG, PNG, WebP
+                                </p>
+                                {#if filePreview}
+                                    <div class="mt-2">
+                                        <img src={filePreview} alt="Preview" class="w-32 h-32 object-cover rounded-lg border" />
+                                    </div>
+                                {/if}
+                                {#if errors.file}
+                                    <p class="text-sm text-destructive">{errors.file}</p>
+                                {/if}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="flex items-center justify-end gap-3">
+                    <a href="{route('admin.products.index')}" class="kt-btn kt-btn-outline">
+                        Cancel
+                    </a>
+                    <button
+                        type="submit"
+                        class="kt-btn kt-btn-primary"
+                        disabled={loading}
+                    >
+                        {#if loading}
+                            <i class="ki-outline ki-loading text-base animate-spin"></i>
+                            Creating...
+                        {:else}
+                            <i class="ki-filled ki-plus text-base"></i>
+                            Create Product
+                        {/if}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</AdminLayout> 

@@ -4,20 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\URL;
+use App\Traits\HasFiles;
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, HasFiles;
 
     protected $guarded = ['id'];
 
     protected $casts = [
         'elasticity_coefficient' => 'decimal:3',
-        'has_expiration' => 'boolean',
-        'requires_rd' => 'boolean',
+        'has_expiration' => 'boolean'
     ];
 
-    protected $appends = ['type_name'];
+    protected $appends = ['type_name', 'image_url'];
 
     // Product types
     const TYPE_RAW_MATERIAL = 'raw_material';
@@ -25,6 +26,11 @@ class Product extends Model
     const TYPE_FINISHED_PRODUCT = 'finished_product';
 
     //Relations
+    public function image()
+    {
+        return $this->morphOne(File::class, 'model')->where('is_main', 1);
+    }
+
     public function demands()
     {
         return $this->hasMany(ProductDemand::class)->orderBy('gameweek', 'asc');
@@ -60,5 +66,10 @@ class Product extends Model
             self::TYPE_FINISHED_PRODUCT => 'Finished Product',
             default => $this->type
         };
+    }
+
+    public function getImageUrlAttribute()
+    {
+        return ($this->image) ? $this->image->url : URL::to('assets/images/default-product-image.jpg');
     }
 }

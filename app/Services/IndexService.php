@@ -8,7 +8,12 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class IndexService
 {
-    public function handlePagination($data)
+    /**
+     * Handle the pagination
+     * @param LengthAwarePaginator $data
+     * @return array
+     */
+    public static function handlePagination($data)
     {
         return [
             'perPage' => $data->perPage(),
@@ -19,11 +24,17 @@ class IndexService
             'from' => ($data->firstItem() === null) ? 0 : $data->firstItem(),
             'to' => ($data->lastItem() === null) ? 0 : $data->lastItem(),
             'total' => $data->total(),
-            'pages' => $this->pages($data->currentPage(), $data->lastPage()),
+            'pages' => self::pages($data->currentPage(), $data->lastPage()),
         ];
     }
 
-    private function pages($currentPage, $totalPages)
+    /**
+     * Handle the pagination pages
+     * @param int $currentPage
+     * @param int $totalPages
+     * @return array
+     */
+    private static function pages($currentPage, $totalPages)
     {
         $maxVisiblePages = 5; 
 
@@ -53,43 +64,92 @@ class IndexService
     }
 
 
-    public function limitPerPage($value)
+    /**
+     * Limit the per page
+     * @param int $value
+     * @return int
+     */
+    public static function limitPerPage($value)
     {
         return max(1, min(250, $value));
     }
 
-    public function checkPageIfNull($value)
+    /**
+     * Check if the page is null
+     * @param int $value
+     * @return int
+     */
+    public static function checkPageIfNull($value)
     {
         return ($value === null || !is_numeric($value)) ? 1 : $value;
     }
 
-    public function checkIfSearchEmpty($value)
+    /**
+     * Check if the search is empty
+     * @param string $value
+     * @return string
+     */
+    public static function checkIfSearchEmpty($value)
     {
         return (empty($value) ? null : $value);
     }
 
-    public function checkIfEmpty($value)
+    /**
+     * Check if the value is empty
+     * @param string $value
+     * @return string
+     */
+    public static function checkIfEmpty($value)
     {
         return (empty($value) ? null : $value);
     }
 
-    public function checkIfBoolEmpty($value)
+    /**
+     * Check if the value is a boolean
+     * @param string $value
+     * @return bool
+     */
+    public static function checkIfBoolean($value)
     {
-        if (empty($value)) {
+        if ($value === null || $value === '') {
             return null;
         }
         
-        $lowercaseValue = strtolower($value);
-        if ($lowercaseValue === 'true' || $lowercaseValue === '1' || $lowercaseValue === true || $lowercaseValue === 1) {
+        $lowercaseValue = strtolower((string) $value);
+        if ($lowercaseValue === 'true' || $lowercaseValue === '1' || $value === true || $value === 1) {
             return true;
-        } elseif ($lowercaseValue === 'false' || $lowercaseValue === '0' || $lowercaseValue === false || $lowercaseValue === 0) {
+        } elseif ($lowercaseValue === 'false' || $lowercaseValue === '0' || $value === false || $value === 0) {
             return false;
         }
         
         return null;
     }
 
-    public function checkIfEnumHasValue($value, string $enumClass)
+    /**
+     * Check if the value is a valid number
+     * @param string $value
+     * @return float|null
+     */
+    public static function checkIfNumber($value)
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+        
+        if (is_numeric($value)) {
+            return (float) $value;
+        }
+        
+        return null;
+    }
+
+    /**
+     * Check if the value is a valid enum value
+     * @param string $value
+     * @param string $enumClass
+     * @return string
+     */
+    public static function checkIfEnumHasValue($value, string $enumClass)
     {
         if (empty($value)) {
             return null;
@@ -105,7 +165,12 @@ class IndexService
         return null;
     }
 
-    public function checkValidDate($date)
+    /**
+     * Check if the date is valid
+     * @param string $date
+     * @return string
+     */
+    public static function checkValidDate($date)
     {
         try {
             $parsedDate = Carbon::parse($date);

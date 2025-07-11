@@ -13,18 +13,22 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
+
+            // Product details
             $table->string('name');
             $table->text('description')->nullable();
             $table->enum('type', ['raw_material', 'component', 'finished_product']);
 
+            // Elasticity coefficient for demand adjustments
             $table->float('elasticity_coefficient', 13, 3)->default(1.000);
 
+            // Shelf life and expiration
             $table->integer('shelf_life_days')->nullable();
             $table->boolean('has_expiration')->default(false);
 
+            // Measurement unit
             $table->string('measurement_unit')->default('unit');
-
-            $table->boolean('requires_rd')->default(false);
+            
             $table->timestamps();
         });
     }

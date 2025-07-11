@@ -21,6 +21,20 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Configure morph map for polymorphic relationships
+        Relation::morphMap([
+            'user' => 'App\\Models\\User',
+            'product' => 'App\\Models\\Product',
+            'product_recipe' => 'App\\Models\\ProductRecipe',
+            'product_demand' => 'App\\Models\\ProductDemand',
+            'file' => 'App\\Models\\File',
+            'role' => 'App\\Models\\Role',
+            'permission' => 'App\\Models\\Permission',
+            'user_role' => 'App\\Models\\UserRole',
+            'role_permission' => 'App\\Models\\RolePermission',
+            // Add more models as needed
+        ]);
+
         Blade::if('haspermission', function ($permission) {
             if (!config('app.enable_permissions')) {
                 return true;

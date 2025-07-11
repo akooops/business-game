@@ -1,11 +1,12 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PermissionsController;
 use App\Http\Controllers\Admin\RolesController;
 use App\Http\Controllers\Admin\UsersController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\ProductsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -62,6 +63,15 @@ Route::prefix('admin')->middleware(['auth', 'handle.inertia'])->group(function (
     Route::get('users/{user}/edit', [UsersController::class, 'edit'])->middleware('check.permission:admin.users.update')->name('admin.users.edit');
     Route::patch('users/{user}', [UsersController::class, 'update'])->middleware('check.permission:admin.users.update')->name('admin.users.update');
     Route::delete('users/{user}', [UsersController::class, 'destroy'])->middleware('check.permission:admin.users.destroy')->name('admin.users.destroy');
+
+    // Products
+    Route::get('products', [ProductsController::class, 'index'])->middleware('check.permission:admin.products.index')->name('admin.products.index');
+    Route::get('products/create', [ProductsController::class, 'create'])->middleware('check.permission:admin.products.store')->name('admin.products.create');
+    Route::post('products', [ProductsController::class, 'store'])->middleware('check.permission:admin.products.store')->name('admin.products.store');
+    Route::get('products/{product}', [ProductsController::class, 'show'])->middleware('check.permission:admin.products.show')->name('admin.products.show');
+    Route::get('products/{product}/edit', [ProductsController::class, 'edit'])->middleware('check.permission:admin.products.update')->name('admin.products.edit');
+    Route::patch('products/{product}', [ProductsController::class, 'update'])->middleware('check.permission:admin.products.update')->name('admin.products.update');
+    Route::delete('products/{product}', [ProductsController::class, 'destroy'])->middleware('check.permission:admin.products.destroy')->name('admin.products.destroy');
 });
 
 
