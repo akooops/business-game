@@ -103,7 +103,7 @@
       </style>
 
     </head>
-    <body class="antialiased flex h-full text-base text-foreground bg-background [--header-height:60px] [--sidebar-width:290px] {{ !in_array(request()->route()->getName(), ['auth.login', 'auth.register']) ? 'bg-muted!' : '' }} lg:overflow-hidden">
+    <body class="antialiased flex h-full text-base text-foreground bg-background [--header-height:60px] [--sidebar-width:290px] bg-muted! lg:overflow-hidden">
       <!-- Theme Mode -->
         <script>
             const defaultThemeMode = 'light';
