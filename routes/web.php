@@ -10,7 +10,7 @@ use App\Http\Controllers\Admin\ProductsController;
 use App\Http\Controllers\Admin\ProductDemandController;
 use App\Http\Controllers\Admin\ProductRecipesController;
 use App\Http\Controllers\Admin\ProductionLinesController;
-
+use App\Http\Controllers\Admin\EmployeeProfilesController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -96,6 +96,16 @@ Route::prefix('admin')->middleware(['auth', 'handle.inertia'])->group(function (
     Route::get('production-lines/{productionLine}/edit', [ProductionLinesController::class, 'edit'])->middleware('check.permission:admin.production-lines.update')->name('admin.production-lines.edit');
     Route::patch('production-lines/{productionLine}', [ProductionLinesController::class, 'update'])->middleware('check.permission:admin.production-lines.update')->name('admin.production-lines.update');
     Route::delete('production-lines/{productionLine}', [ProductionLinesController::class, 'destroy'])->middleware('check.permission:admin.production-lines.destroy')->name('admin.production-lines.destroy');
+
+    // Employee Profiles
+    Route::get('employee-profiles', [EmployeeProfilesController::class, 'index'])->middleware('check.permission:admin.employee-profiles.index')->name('admin.employee-profiles.index');
+    Route::get('employee-profiles/create', [EmployeeProfilesController::class, 'create'])->middleware('check.permission:admin.employee-profiles.store')->name('admin.employee-profiles.create');
+    Route::post('employee-profiles', [EmployeeProfilesController::class, 'store'])->middleware('check.permission:admin.employee-profiles.store')->name('admin.employee-profiles.store');
+    Route::get('employee-profiles/{employeeProfile}', [EmployeeProfilesController::class, 'show'])->middleware('check.permission:admin.employee-profiles.show')->name('admin.employee-profiles.show');
+    Route::get('employee-profiles/{employeeProfile}/edit', [EmployeeProfilesController::class, 'edit'])->middleware('check.permission:admin.employee-profiles.update')->name('admin.employee-profiles.edit');
+    Route::patch('employee-profiles/{employeeProfile}', [EmployeeProfilesController::class, 'update'])->middleware('check.permission:admin.employee-profiles.update')->name('admin.employee-profiles.update');
+    Route::delete('employee-profiles/{employeeProfile}', [EmployeeProfilesController::class, 'destroy'])->middleware('check.permission:admin.employee-profiles.destroy')->name('admin.employee-profiles.destroy');
+
 });
 
 

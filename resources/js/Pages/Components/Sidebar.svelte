@@ -16,6 +16,9 @@
         if (url.includes('/admin/products') || url.includes('/admin/product-recipes') || url.includes('/admin/product-demand')) {
             return 'products';
         }
+        if (url.includes('/admin/employee-profiles')) {
+            return 'employees';
+        }
 
         // Add more route-to-section mappings here as needed
         return 'dashboard'; // default fallback
@@ -112,6 +115,21 @@
                     </span>
                     <span class="kt-tooltip" data-kt-tooltip-content="true">
                         Production Management
+                    </span>
+                </button>
+                {/if}
+
+                {#if hasPermission('admin.employee-profiles.index')}
+                <button 
+                    class="kt-btn kt-btn-icon kt-btn-ghost rounded-md size-9 border border-transparent hover:bg-background hover:[&_i]:text-primary hover:border-border {activeSection === 'employees' ? 'bg-background [&_i]:text-primary border-border' : ''}" 
+                    data-kt-tooltip="" 
+                    data-kt-tooltip-placement="right"
+                    on:click={() => setActiveSection('employees')}>
+                    <span class="kt-menu-icon">
+                        <i class="ki-outline ki-users text-lg"></i>
+                    </span>
+                    <span class="kt-tooltip" data-kt-tooltip-content="true">
+                        HR Management
                     </span>
                 </button>
                 {/if}
@@ -325,6 +343,28 @@
                     {/if}
                 </div>
                 {/if}
+
+                <!-- Employee Profiles Management Section -->
+                {#if activeSection === 'employees'}
+                <div class="mb-3">
+                    <h3 class="text-xs text-muted-foreground uppercase ps-2.5 mb-2.5">
+                        HR Management
+                    </h3>
+                    {#if hasPermission('admin.employee-profiles.index')}
+                    <div class="kt-menu-item">
+                        <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute('admin.employee-profiles.index') ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.employee-profiles.index')}>
+                            <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
+                                <i class="ki-outline ki-users"></i>
+                            </span> 
+                            <span class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono ms-2">
+                                Employee Profiles
+                            </span>
+                        </a>
+                    </div>
+                    {/if}
+                </div>
+                {/if}
+
             </div>
             <!-- End of Sidebar Menu -->
         </div>

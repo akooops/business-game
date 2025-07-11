@@ -478,7 +478,7 @@
 
                 <!-- Form Actions -->
                 <div class="flex items-center justify-end gap-3">
-                    <a href="{route('admin.production-lines.show', { productionLine: productionLine.id })}" class="kt-btn kt-btn-outline">
+                    <a href="{route('admin.production-lines.index')}" class="kt-btn kt-btn-outline">
                         Cancel
                     </a>
                     <button type="submit" class="kt-btn kt-btn-primary" disabled={loading}>
