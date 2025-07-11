@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\PermissionsController;
 use App\Http\Controllers\Admin\RolesController;
 use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Admin\ProductsController;
+use App\Http\Controllers\Admin\ProductDemandController;
 
 /*
 |--------------------------------------------------------------------------
@@ -72,6 +73,13 @@ Route::prefix('admin')->middleware(['auth', 'handle.inertia'])->group(function (
     Route::get('products/{product}/edit', [ProductsController::class, 'edit'])->middleware('check.permission:admin.products.update')->name('admin.products.edit');
     Route::patch('products/{product}', [ProductsController::class, 'update'])->middleware('check.permission:admin.products.update')->name('admin.products.update');
     Route::delete('products/{product}', [ProductsController::class, 'destroy'])->middleware('check.permission:admin.products.destroy')->name('admin.products.destroy');
+    
+    // Product Demand
+    Route::get('product-demand', [ProductDemandController::class, 'index'])->middleware('check.permission:admin.product-demand.index')->name('admin.product-demand.index');
+    Route::get('product-demand/{product}', [ProductDemandController::class, 'getDemandData'])->middleware('check.permission:admin.product-demand.show')->name('admin.product-demand.show');
+    Route::post('product-demand', [ProductDemandController::class, 'store'])->middleware('check.permission:admin.product-demand.store')->name('admin.product-demand.store');
+    Route::patch('product-demand/{productDemand}', [ProductDemandController::class, 'update'])->middleware('check.permission:admin.product-demand.update')->name('admin.product-demand.update');
+    Route::delete('product-demand/{productDemand}', [ProductDemandController::class, 'destroy'])->middleware('check.permission:admin.product-demand.destroy')->name('admin.product-demand.destroy');
 });
 
 
