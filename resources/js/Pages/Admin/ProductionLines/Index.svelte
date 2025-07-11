@@ -1,27 +1,28 @@
 <script>
     import AdminLayout from '../../Layouts/AdminLayout.svelte';
     import Pagination from '../../Components/Pagination.svelte';
+    import Select2 from '../../Components/Forms/Select2.svelte';
     import { onMount, tick } from 'svelte';
     import { page } from '@inertiajs/svelte'
 
     // Define breadcrumbs for this page
     const breadcrumbs = [
         {
-            title: 'Products',
-            url: route('admin.products.index'),
+            title: 'Production Lines',
+            url: route('admin.production-lines.index'),
             active: false
         },
         {
             title: 'Index',
-            url: route('admin.products.index'),
+            url: route('admin.production-lines.index'),
             active: true
         }
     ];
     
-    const pageTitle = 'Products';
+    const pageTitle = 'Production Lines';
 
     // Reactive variables
-    let products = [];
+    let productionLines = [];
     let pagination = {};
     let loading = true;
     let search = '';
@@ -31,36 +32,17 @@
     let showFilters = false;
 
     // Filter variables
-    let typeFilter = '';
-    let hasExpirationFilter = '';
-    let elasticityMin = '';
-    let elasticityMax = '';
-    let shelfLifeMin = '';
-    let shelfLifeMax = '';
+    let areaMin = '';
+    let areaMax = '';
+    let productFilter = '';
+    let stepsMin = '';
+    let stepsMax = '';
 
-    // Product types mapping
-    const productTypes = {
-        'raw_material': 'Raw Material',
-        'component': 'Component',
-        'finished_product': 'Finished Product'
-    };
+    // Select2 component reference
+    let productSelectComponent;
 
-    // Product type badge colors
-    function getProductTypeBadgeClass(type) {
-        switch(type) {
-            case 'raw_material':
-                return 'kt-badge kt-badge-outline kt-badge-success kt-badge-sm';
-            case 'component':
-                return 'kt-badge kt-badge-outline kt-badge-warning kt-badge-sm';
-            case 'finished_product':
-                return 'kt-badge kt-badge-outline kt-badge-primary kt-badge-sm';
-            default:
-                return 'kt-badge kt-badge-outline kt-badge-sm';
-        }
-    }
-
-    // Fetch products data
-    async function fetchProducts() {
+    // Fetch production lines data
+    async function fetchProductionLines() {
         loading = true;
         try {
             const params = new URLSearchParams({
@@ -70,33 +52,30 @@
             });
             
             // Add filter parameters
-            if (typeFilter) {
-                params.append('type', typeFilter);
+            if (areaMin) {
+                params.append('area_min', areaMin);
             }
-            if (hasExpirationFilter) {
-                params.append('has_expiration', hasExpirationFilter);
+            if (areaMax) {
+                params.append('area_max', areaMax);
             }
-            if (elasticityMin) {
-                params.append('elasticity_min', elasticityMin);
+            if (productFilter) {
+                params.append('product_id', productFilter);
             }
-            if (elasticityMax) {
-                params.append('elasticity_max', elasticityMax);
+            if (stepsMin) {
+                params.append('steps_min', stepsMin);
             }
-            if (shelfLifeMin) {
-                params.append('shelf_life_min', shelfLifeMin);
-            }
-            if (shelfLifeMax) {
-                params.append('shelf_life_max', shelfLifeMax);
+            if (stepsMax) {
+                params.append('steps_max', stepsMax);
             }
             
-            const response = await fetch(route('admin.products.index') + '?' + params.toString(), {
+            const response = await fetch(route('admin.production-lines.index') + '?' + params.toString(), {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             });
             
             const data = await response.json();
-            products = data.products;
+            productionLines = data.productionLines;
             pagination = data.pagination;
             
             // Wait for DOM to update, then initialize menus
@@ -105,7 +84,7 @@
                 window.KTMenu.init();
             }
         } catch (error) {
-            console.error('Error fetching products:', error);
+            console.error('Error fetching production lines:', error);
         } finally {
             loading = false;
         }
@@ -121,7 +100,7 @@
         // Set new timeout for 500ms
         searchTimeout = setTimeout(() => {
             currentPage = 1;
-            fetchProducts();
+            fetchProductionLines();
         }, 500);
     }
 
@@ -135,7 +114,7 @@
     function goToPage(page) {
         if (page && page !== currentPage) {
             currentPage = page;
-            fetchProducts();
+            fetchProductionLines();
         }
     }
 
@@ -143,25 +122,42 @@
     function handlePerPageChange(newPerPage) {
         perPage = newPerPage;
         currentPage = 1;
-        fetchProducts();
+        fetchProductionLines();
     }
 
     // Handle filter changes
     function handleFilterChange() {
         currentPage = 1;
-        fetchProducts();
+        fetchProductionLines();
+    }
+
+    // Handle product selection
+    function handleProductSelect(event) {
+        productFilter = event.detail.value;
+        handleFilterChange();
+    }
+
+    // Handle product clear
+    function handleProductClear() {
+        productFilter = '';
+        handleFilterChange();
     }
 
     // Clear all filters
     function clearAllFilters() {
-        typeFilter = '';
-        hasExpirationFilter = '';
-        elasticityMin = '';
-        elasticityMax = '';
-        shelfLifeMin = '';
-        shelfLifeMax = '';
+        areaMin = '';
+        areaMax = '';
+        productFilter = '';
+        stepsMin = '';
+        stepsMax = '';
         currentPage = 1;
-        fetchProducts();
+        
+        // Clear the Select2 component
+        if (productSelectComponent) {
+            productSelectComponent.clear();
+        }
+        
+        fetchProductionLines();
     }
 
     // Toggle filters visibility
@@ -169,9 +165,9 @@
         showFilters = !showFilters;
     }
 
-    // Delete product
-    async function deleteProduct(productId) {
-        if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
+    // Delete production line
+    async function deleteProductionLine(productionLineId) {
+        if (!confirm('Are you sure you want to delete this production line? This action cannot be undone.')) {
             return;
         }
 
@@ -180,7 +176,7 @@
             formData.append('_method', 'DELETE');
             formData.append('_token', document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'));
 
-            const response = await fetch(route('admin.products.destroy', { product: productId }), {
+            const response = await fetch(route('admin.production-lines.destroy', { productionLine: productionLineId }), {
                 method: 'POST',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
@@ -192,16 +188,16 @@
                 // Show success toast
                 KTToast.show({
                     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                    message: "Product deleted successfully!",
+                    message: "Production line deleted successfully!",
                     variant: "success",
                     position: "bottom-right",
                 });
 
-                // Refresh the products list
-                fetchProducts();
+                // Refresh the production lines list
+                fetchProductionLines();
             } else {
                 const errorData = await response.json().catch(() => ({}));
-                const errorMessage = errorData.message || 'Error deleting product. Please try again.';
+                const errorMessage = errorData.message || 'Error deleting production line. Please try again.';
                 
                 KTToast.show({
                     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
@@ -211,19 +207,19 @@
                 });
             }
         } catch (error) {
-            console.error('Error deleting product:', error);
+            console.error('Error deleting production line:', error);
             
             KTToast.show({
-                    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                    message: "Network error. Please check your connection and try again.",
-                    variant: "destructive",
-                    position: "bottom-right",
+                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
+                message: "Network error. Please check your connection and try again.",
+                variant: "destructive",
+                position: "bottom-right",
             });
         }
     }
 
     onMount(() => {
-        fetchProducts();
+        fetchProductionLines();
     });
 
     // Flash message handling
@@ -247,27 +243,25 @@
     <!-- Container -->
     <div class="kt-container-fixed">
         <div class="grid gap-5 lg:gap-7.5">
-            <!-- Product Header -->
+            <!-- Production Lines Header -->
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div class="flex flex-col gap-1">
-                    <h1 class="text-2xl font-bold text-mono">Products Management</h1>
+                    <h1 class="text-2xl font-bold text-mono">Production Lines Management</h1>
                     <p class="text-sm text-secondary-foreground">
-                        Manage your simulation products inventory
+                        Manage your production lines and manufacturing processes
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
-                    {#if hasPermission('admin.products.store')}
-                    <a href="{route('admin.products.create')}" class="kt-btn kt-btn-primary">
+                    {#if hasPermission('admin.production-lines.store')}
+                    <a href="{route('admin.production-lines.create')}" class="kt-btn kt-btn-primary">
                         <i class="ki-filled ki-plus text-base"></i>
-                        Add New Product
+                        Add New Production Line
                     </a>
                     {/if}
                 </div>                      
             </div>
 
-
-
-            <!-- Products Table -->
+            <!-- Production Lines Table -->
             <div class="kt-card">
                 <div class="kt-card-header">
                     <div class="kt-card-toolbar">
@@ -277,7 +271,7 @@
                                 <input 
                                     type="text" 
                                     class="kt-input" 
-                                    placeholder="Search products..." 
+                                    placeholder="Search production lines..." 
                                     bind:value={search}
                                     on:input={handleSearchInput}
                                 />
@@ -293,7 +287,7 @@
                             </button>
                             
                             <!-- Clear Filters Button -->
-                            {#if typeFilter || hasExpirationFilter || elasticityMin || elasticityMax || shelfLifeMin || shelfLifeMax}
+                            {#if areaMin || areaMax || productFilter || stepsMin || stepsMax}
                                 <button 
                                     class="kt-btn kt-btn-ghost kt-btn-sm"
                                     on:click={clearAllFilters}
@@ -310,71 +304,16 @@
                 {#if showFilters}
                     <div class="kt-card-body border-t border-gray-200 p-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                            <!-- Product Properties -->
+                            <!-- Area Range -->
                             <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Product Properties</h4>                                    
-                                <!-- Product type -->
-                                <select 
-                                    class="kt-select w-full" 
-                                    bind:value={typeFilter}
-                                    on:change={handleFilterChange}
-                                >
-                                    <option value="">All Products</option>
-                                    <option value="raw_material">Raw Materials</option>
-                                    <option value="component">Components</option>
-                                    <option value="finished_product">Finished Products</option>
-                                </select>
-                            </div>
-
-                            <!-- Has expiration -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Has expiration</h4>                                    
-                                <!-- Has expiration -->
-                                <select 
-                                    class="kt-select w-full" 
-                                    bind:value={hasExpirationFilter}
-                                    on:change={handleFilterChange}
-                                >
-                                    <option value="">All Products</option>
-                                    <option value="1">Yes</option>
-                                    <option value="0">No</option>
-                                </select>
-                            </div>                     
-                            
-                            <!-- Shelf Life Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Shelf Life (Days)</h4>
+                                <h4 class="text-sm font-medium text-gray-700">Area Required (sq m)</h4>
                                 
                                 <div class="flex gap-2">
                                     <input 
                                         type="number" 
                                         class="kt-input flex-1" 
-                                        placeholder="Min Days" 
-                                        bind:value={shelfLifeMin}
-                                        on:input={handleFilterChange}
-                                        min="1"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max Days" 
-                                        bind:value={shelfLifeMax}
-                                        on:input={handleFilterChange}
-                                        min="1"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Elasticity Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Elasticity Coefficient</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min" 
-                                        bind:value={elasticityMin}
+                                        placeholder="Min Area" 
+                                        bind:value={areaMin}
                                         on:input={handleFilterChange}
                                         step="0.1"
                                         min="0"
@@ -382,13 +321,92 @@
                                     <input 
                                         type="number" 
                                         class="kt-input flex-1" 
-                                        placeholder="Max" 
-                                        bind:value={elasticityMax}
+                                        placeholder="Max Area" 
+                                        bind:value={areaMax}
                                         on:input={handleFilterChange}
                                         step="0.1"
                                         min="0"
                                     />
                                 </div>
+                            </div>
+
+                            <!-- Steps Count Range -->
+                            <div class="space-y-2">
+                                <h4 class="text-sm font-medium text-gray-700">Number of Steps</h4>
+                                
+                                <div class="flex gap-2">
+                                    <input 
+                                        type="number" 
+                                        class="kt-input flex-1" 
+                                        placeholder="Min Steps" 
+                                        bind:value={stepsMin}
+                                        on:input={handleFilterChange}
+                                        min="1"
+                                    />
+                                    <input 
+                                        type="number" 
+                                        class="kt-input flex-1" 
+                                        placeholder="Max Steps" 
+                                        bind:value={stepsMax}
+                                        on:input={handleFilterChange}
+                                        min="1"
+                                    />
+                                </div>
+                            </div>
+
+                            <!-- Product Filter -->
+                            <div class="space-y-2">
+                                <h4 class="text-sm font-medium text-gray-700">Product Output</h4>
+                                <Select2
+                                    bind:this={productSelectComponent}
+                                    id="product-filter"
+                                    placeholder="Search products..."
+                                    bind:value={productFilter}
+                                    on:select={handleProductSelect}
+                                    on:clear={handleProductClear}
+                                    ajax={{
+                                        url: route('admin.products.index'),
+                                        dataType: 'json',
+                                        delay: 300,
+                                        data: function(params) {
+                                            return {
+                                                search: params.term,
+                                                perPage: 10
+                                            };
+                                        },
+                                        processResults: function(data) {
+                                            return {
+                                                results: data.products.map(product => ({
+                                                    id: product.id,
+                                                    text: `${product.name}`,
+                                                    name: product.name,
+                                                    type: product.type,
+                                                    type_name: product.type_name,
+                                                    image_url: product.image_url
+                                                }))
+                                            };
+                                        },
+                                        cache: true
+                                    }}
+                                    templateResult={function(data) {
+                                        if (data.loading) return data.text;
+                                        
+                                        const $elem = globalThis.$('<div class="flex items-center gap-3">' +
+                                            '<div class="flex items-center justify-center size-8 shrink-0 rounded bg-accent/50">' +
+                                            (data.image_url ? '<img src="' + data.image_url + '" alt="" class="size-6 object-cover rounded">' : '<i class="ki-filled ki-abstract-26 text-xs text-muted-foreground"></i>') +
+                                            '</div>' +
+                                            '<div class="flex flex-col">' +
+                                            '<span class="font-medium text-sm">' + data.name + '</span>' +
+                                            '<span class="kt-badge kt-badge-outline kt-badge-primary kt-badge-xs w-fit">' + data.type_name + '</span>' +
+                                            '</div>' +
+                                            '</div>');
+                                        return $elem;
+                                    }}
+                                    templateSelection={function(data) {
+                                        if (!data.id) return data.text;
+                                        return data.name;
+                                    }}
+                                />
                             </div>
                         </div>
                     </div>
@@ -409,12 +427,22 @@
                                     </th>
                                     <th class="min-w-[200px]">
                                         <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Product</span>
+                                            <span class="kt-table-col-label">Production Line</span>
+                                        </span>
+                                    </th>
+                                    <th class="min-w-[120px]">
+                                        <span class="kt-table-col">
+                                            <span class="kt-table-col-label">Area (sq m)</span>
+                                        </span>
+                                    </th>
+                                    <th class="min-w-[100px]">
+                                        <span class="kt-table-col">
+                                            <span class="kt-table-col-label">Steps</span>
                                         </span>
                                     </th>
                                     <th class="min-w-[150px]">
                                         <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Type</span>
+                                            <span class="kt-table-col-label">Products</span>
                                         </span>
                                     </th>
                                     <th class="w-[80px]">
@@ -436,38 +464,41 @@
                                                 <div class="kt-skeleton w-8 h-4 rounded"></div>
                                             </td>
                                             <td class="p-4">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="kt-skeleton w-10 h-10 rounded-lg"></div>
-                                                    <div class="flex flex-col gap-1">
-                                                        <div class="kt-skeleton w-24 h-4 rounded"></div>
-                                                        <div class="kt-skeleton w-16 h-3 rounded"></div>
-                                                    </div>
+                                                <div class="flex flex-col gap-1">
+                                                    <div class="kt-skeleton w-32 h-4 rounded"></div>
+                                                    <div class="kt-skeleton w-20 h-3 rounded"></div>
                                                 </div>
                                             </td>
                                             <td class="p-4">
-                                                <div class="kt-skeleton w-16 h-6 rounded"></div>
+                                                <div class="kt-skeleton w-16 h-4 rounded"></div>
+                                            </td>
+                                            <td class="p-4">
+                                                <div class="kt-skeleton w-12 h-4 rounded"></div>
+                                            </td>
+                                            <td class="p-4">
+                                                <div class="kt-skeleton w-20 h-6 rounded"></div>
                                             </td>
                                             <td class="p-4">
                                                 <div class="kt-skeleton w-8 h-8 rounded"></div>
                                             </td>
                                         </tr>
                                     {/each}
-                                {:else if products.length === 0}
+                                {:else if productionLines.length === 0}
                                     <!-- Empty state -->
                                     <tr>
-                                        <td colspan="5" class="p-10">
+                                        <td colspan="7" class="p-10">
                                             <div class="flex flex-col items-center justify-center text-center">
                                                 <div class="mb-4">
-                                                    <i class="ki-filled ki-package text-4xl text-muted-foreground"></i>
+                                                    <i class="ki-filled ki-abstract text-4xl text-muted-foreground"></i>
                                                 </div>
-                                                <h3 class="text-lg font-semibold text-mono mb-2">No products found</h3>
+                                                <h3 class="text-lg font-semibold text-mono mb-2">No production lines found</h3>
                                                 <p class="text-sm text-secondary-foreground mb-4">
-                                                    {search ? 'No products match your search criteria.' : 'Get started by creating your first product.'}
+                                                    {search ? 'No production lines match your search criteria.' : 'Get started by creating your first production line.'}
                                                 </p>
-                                                {#if hasPermission('admin.products.store')}
-                                                <a href="{route('admin.products.create')}" class="kt-btn kt-btn-primary">
+                                                {#if hasPermission('admin.production-lines.store')}
+                                                <a href="{route('admin.production-lines.create')}" class="kt-btn kt-btn-primary">
                                                     <i class="ki-filled ki-plus text-base"></i>
-                                                    Create First Product
+                                                    Create First Production Line
                                                 </a>
                                                 {/if}
                                             </div>
@@ -475,41 +506,47 @@
                                     </tr>
                                 {:else}
                                     <!-- Actual data rows -->
-                                    {#each products as product}
+                                    {#each productionLines as productionLine}
                                         <tr class="hover:bg-muted/50">
                                             <td>
-                                                <input class="kt-checkbox kt-checkbox-sm" type="checkbox" value={product.id}/>
+                                                <input class="kt-checkbox kt-checkbox-sm" type="checkbox" value={productionLine.id}/>
                                             </td>
                                             <td>
-                                                <span class="text-sm font-medium text-mono">#{product.id}</span>
+                                                <span class="text-sm font-medium text-mono">#{productionLine.id}</span>
                                             </td>
                                             <td>
-                                                <div class="flex items-center gap-3">
-                                                    <div class="flex-shrink-0">
-                                                        {#if product.image_url}
-                                                            <img 
-                                                                src={product.image_url} 
-                                                                alt={product.name}
-                                                                class="w-10 h-10 rounded-lg object-cover"
-                                                            />
-                                                        {:else}
-                                                            <div class="w-10 h-10 rounded-lg bg-accent/50 flex items-center justify-center">
-                                                                <i class="ki-filled ki-package text-lg text-muted-foreground"></i>
-                                                            </div>
-                                                        {/if}
-                                                    </div>
-                                                    <div class="flex flex-col gap-1">
-                                                        <span class="text-sm font-medium text-mono hover:text-primary">
-                                                            {product.name}
+                                                <div class="flex flex-col gap-1">
+                                                    <span class="text-sm font-medium text-mono hover:text-primary">
+                                                        {productionLine.name}
+                                                    </span>
+                                                    {#if productionLine.description}
+                                                        <span class="text-xs text-muted-foreground">
+                                                            {productionLine.description.slice(0, 50)}{productionLine.description.length > 50 ? '...' : ''}
                                                         </span>
-                                                    </div>
+                                                    {/if}
                                                 </div>
                                             </td>
-
                                             <td>
-                                                <span class={getProductTypeBadgeClass(product.type)}>
-                                                    {productTypes[product.type] || product.type}
+                                                <span class="text-sm font-medium">{productionLine.area_required}</span>
+                                            </td>
+                                            <td>
+                                                <span class="kt-badge kt-badge-outline kt-badge-primary kt-badge-sm">
+                                                    {productionLine.steps?.length || 0} steps
                                                 </span>
+                                            </td>
+                                            <td>
+                                                <div class="flex flex-wrap gap-1">
+                                                    {#each (productionLine.products || []).slice(0, 2) as product}
+                                                        <span class="kt-badge kt-badge-outline kt-badge-success kt-badge-sm">
+                                                            {product.name}
+                                                        </span>
+                                                    {/each}
+                                                    {#if (productionLine.products || []).length > 2}
+                                                        <span class="kt-badge kt-badge-outline kt-badge-secondary kt-badge-sm">
+                                                            +{(productionLine.products || []).length - 2} more
+                                                        </span>
+                                                    {/if}
+                                                </div>
                                             </td>
                                             <td class="text-center">
                                                 <div class="kt-menu flex-inline" data-kt-menu="true">
@@ -518,35 +555,9 @@
                                                             <i class="ki-filled ki-dots-vertical text-lg"></i>
                                                         </button>
                                                         <div class="kt-menu-dropdown kt-menu-default w-full max-w-[175px]" data-kt-menu-dismiss="true">
-                                                            {#if hasPermission('admin.product-demand.index')}
+                                                            {#if hasPermission('admin.production-lines.show')}
                                                             <div class="kt-menu-item">
-                                                                <a class="kt-menu-link" href={route('admin.product-demand.index', { product_id: product.id, product_name: product.name })}>
-                                                                    <span class="kt-menu-icon">
-                                                                        <i class="ki-filled ki-chart-line"></i>
-                                                                    </span>
-                                                                    <span class="kt-menu-title">Demand</span>
-                                                                </a>
-                                                            </div>
-
-                                                            <div class="kt-menu-separator"></div>
-                                                            {/if}
-
-                                                            {#if hasPermission('admin.product-recipes.index')}
-                                                            <div class="kt-menu-item">
-                                                                <a class="kt-menu-link" href={route('admin.product-recipes.index', { product_id: product.id, product_name: product.name })}>
-                                                                    <span class="kt-menu-icon">
-                                                                        <i class="ki-filled ki-element-11"></i>
-                                                                    </span>
-                                                                    <span class="kt-menu-title">Recipes</span>
-                                                                </a>
-                                                            </div>
-
-                                                            <div class="kt-menu-separator"></div>
-                                                            {/if}
-                                                                
-                                                            {#if hasPermission('admin.products.show')}
-                                                            <div class="kt-menu-item">
-                                                                <a class="kt-menu-link" href={route('admin.products.show', { product: product.id })}>
+                                                                <a class="kt-menu-link" href={route('admin.production-lines.show', { productionLine: productionLine.id })}>
                                                                     <span class="kt-menu-icon">
                                                                         <i class="ki-filled ki-search-list"></i>
                                                                     </span>
@@ -554,9 +565,9 @@
                                                                 </a>
                                                             </div>
                                                             {/if}
-                                                            {#if hasPermission('admin.products.update')}
+                                                            {#if hasPermission('admin.production-lines.update')}
                                                             <div class="kt-menu-item">
-                                                                <a class="kt-menu-link" href={route('admin.products.edit', { product: product.id })}>
+                                                                <a class="kt-menu-link" href={route('admin.production-lines.edit', { productionLine: productionLine.id })}>
                                                                     <span class="kt-menu-icon">
                                                                         <i class="ki-filled ki-pencil"></i>
                                                                     </span>
@@ -564,10 +575,10 @@
                                                                 </a>
                                                             </div>
                                                             {/if}
-                                                            {#if hasPermission('admin.products.destroy')}
+                                                            {#if hasPermission('admin.production-lines.destroy')}
                                                                 <div class="kt-menu-separator"></div>
                                                                 <div class="kt-menu-item">
-                                                                    <button class="kt-menu-link" on:click={() => deleteProduct(product.id)}>
+                                                                    <button class="kt-menu-link" on:click={() => deleteProductionLine(productionLine.id)}>
                                                                         <span class="kt-menu-icon">
                                                                             <i class="ki-filled ki-trash"></i>
                                                                         </span>
@@ -600,5 +611,4 @@
         </div>
     </div>
     <!-- End of Container -->
-</AdminLayout>
-
+</AdminLayout> 

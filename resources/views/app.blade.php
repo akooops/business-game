@@ -57,6 +57,10 @@
           .dark .select2-container--default .select2-selection--single .select2-selection__clear{
             color: #fff !important;
           }
+
+          .dark .select2-dropdown{
+            background-color: #000 !important;
+          }
           
           .note-editable{
             background-color: #fff

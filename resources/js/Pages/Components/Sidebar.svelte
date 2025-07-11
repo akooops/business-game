@@ -111,7 +111,7 @@
                         <i class="ki-outline ki-handcart text-lg"></i>
                     </span>
                     <span class="kt-tooltip" data-kt-tooltip-content="true">
-                        Products Management
+                        Production Management
                     </span>
                 </button>
                 {/if}
@@ -270,7 +270,7 @@
                 {#if activeSection === 'products'}
                 <div class="mb-3">
                     <h3 class="text-xs text-muted-foreground uppercase ps-2.5 mb-2.5">
-                        Products Management
+                        Production Management
                     </h3>
                     {#if hasPermission('admin.products.index')}
                     <div class="kt-menu-item">
@@ -306,6 +306,19 @@
                             </span>
                             <span class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono ms-2">
                                 Product Demand
+                            </span>
+                        </a>
+                    </div>
+                    {/if}
+
+                    {#if hasPermission('admin.production-lines.index')}
+                    <div class="kt-menu-item">
+                        <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute('admin.production-lines.index') ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.production-lines.index')}>
+                            <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
+                                <i class="ki-outline ki-dropbox"></i>
+                            </span>
+                            <span class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono ms-2">
+                                Production Lines
                             </span>
                         </a>
                     </div>

@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Admin\ProductsController;
 use App\Http\Controllers\Admin\ProductDemandController;
 use App\Http\Controllers\Admin\ProductRecipesController;
+use App\Http\Controllers\Admin\ProductionLinesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -86,6 +87,15 @@ Route::prefix('admin')->middleware(['auth', 'handle.inertia'])->group(function (
     Route::post('product-recipes', [ProductRecipesController::class, 'store'])->middleware('check.permission:admin.product-recipes.store')->name('admin.product-recipes.store');
     Route::patch('product-recipes/{productRecipe}', [ProductRecipesController::class, 'update'])->middleware('check.permission:admin.product-recipes.update')->name('admin.product-recipes.update');
     Route::delete('product-recipes/{productRecipe}', [ProductRecipesController::class, 'destroy'])->middleware('check.permission:admin.product-recipes.destroy')->name('admin.product-recipes.destroy');
+
+    // Production Lines
+    Route::get('production-lines', [ProductionLinesController::class, 'index'])->middleware('check.permission:admin.production-lines.index')->name('admin.production-lines.index');
+    Route::get('production-lines/create', [ProductionLinesController::class, 'create'])->middleware('check.permission:admin.production-lines.store')->name('admin.production-lines.create');
+    Route::post('production-lines', [ProductionLinesController::class, 'store'])->middleware('check.permission:admin.production-lines.store')->name('admin.production-lines.store');
+    Route::get('production-lines/{productionLine}', [ProductionLinesController::class, 'show'])->middleware('check.permission:admin.production-lines.show')->name('admin.production-lines.show');
+    Route::get('production-lines/{productionLine}/edit', [ProductionLinesController::class, 'edit'])->middleware('check.permission:admin.production-lines.update')->name('admin.production-lines.edit');
+    Route::patch('production-lines/{productionLine}', [ProductionLinesController::class, 'update'])->middleware('check.permission:admin.production-lines.update')->name('admin.production-lines.update');
+    Route::delete('production-lines/{productionLine}', [ProductionLinesController::class, 'destroy'])->middleware('check.permission:admin.production-lines.destroy')->name('admin.production-lines.destroy');
 });
 
 

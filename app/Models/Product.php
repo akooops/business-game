@@ -36,6 +36,21 @@ class Product extends Model
         return $this->hasMany(ProductDemand::class)->orderBy('gameweek', 'asc');
     }
 
+    public function recipes()
+    {
+        return $this->hasMany(ProductRecipe::class);
+    }
+
+    public function productionLineOutputs()
+    {
+        return $this->hasMany(ProductionLineOutput::class);
+    }
+
+    public function productionLines()
+    {
+        return $this->belongsToMany(ProductionLine::class, 'production_line_outputs');
+    }
+
     // Scopes
     public function scopeByType($query, $type)
     {
