@@ -148,7 +148,7 @@ class ProductsController extends Controller
     {
         $product->update($request->validated());
 
-        if($request->has('file')){
+        if($request->file('file')){            
             //Delete the old file if it exists
             if($product->image){
                 FileService::delete($product->image);

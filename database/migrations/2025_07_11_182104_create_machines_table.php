@@ -20,10 +20,14 @@ return new class extends Migration
             $table->string('manufacturer');
             $table->float('cost_to_acquire', 13, 3);
 
+            // Area required in square meters for the machine
+            $table->float('area_required', 13, 3)->default(0);
+            $table->integer('setup_time_days');
+
             // Performance
             $table->float('hourly_energy_consumption', 13, 3);
             $table->float('hourly_carbon_emissions', 13, 3);
-            $table->float('hourly_quality_factor', 13, 3);
+            $table->float('quality_factor', 13, 3);
 
             // Speed
             $table->float('hourly_speed_min', 13, 3);

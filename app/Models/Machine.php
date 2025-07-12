@@ -13,11 +13,14 @@ class Machine extends Model
 
     protected $guarded = ['id'];
 
+    protected $appends = ['image_url'];
+
     protected $casts = [
         'cost_to_acquire' => 'decimal:3',
+        'area_required' => 'decimal:3',
         'hourly_energy_consumption' => 'decimal:3',
         'hourly_carbon_emissions' => 'decimal:3',
-        'hourly_quality_factor' => 'decimal:3',
+        'quality_factor' => 'decimal:3',
         'hourly_speed_min' => 'decimal:3',
         'hourly_speed_avg' => 'decimal:3',
         'hourly_speed_max' => 'decimal:3',
@@ -30,8 +33,6 @@ class Machine extends Model
         'corrective_maintenance_cost_avg' => 'decimal:3',
         'corrective_maintenance_cost_max' => 'decimal:3',
     ];
-
-    protected $appends = ['image_url', 'speed_range', 'maintenance_cost_range'];
 
     // Relations
     public function image()
@@ -46,11 +47,14 @@ class Machine extends Model
                    ->withTimestamps();
     }
 
-    public function productionLineSteps()
+    public function outputs()
     {
-        return $this->belongsToMany(ProductionLineStep::class, 'machine_production_line_steps')
-                   ->withPivot('setup_time_days')
-                   ->withTimestamps();
+        return $this->hasMany(MachineOutput::class);
+    }
+
+    public function products()  
+    {
+        return $this->belongsToMany(Product::class, 'machine_outputs')->withTimestamps();
     }
 
     // Scopes
@@ -70,50 +74,10 @@ class Machine extends Model
         return $query;
     }
 
-    public function scopeHighSpeed($query)
-    {
-        return $query->where('hourly_speed_avg', '>', 100);
-    }
-
-    public function scopeLowMaintenance($query)
-    {
-        return $query->where('maintenance_interval_days', '>', 60);
-    }
-
-    public function scopeEcoFriendly($query)
-    {
-        return $query->where('hourly_carbon_emissions', '<', 5);
-    }
-
     // Accessors
     public function getImageUrlAttribute()
     {
         return ($this->image) ? $this->image->url : URL::to('assets/images/default-machine-image.jpg');
-    }
-
-    public function getSpeedRangeAttribute()
-    {
-        return [
-            'min' => $this->hourly_speed_min,
-            'avg' => $this->hourly_speed_avg,
-            'max' => $this->hourly_speed_max
-        ];
-    }
-
-    public function getMaintenanceCostRangeAttribute()
-    {
-        return [
-            'predictive' => [
-                'min' => $this->predictive_maintenance_cost_min,
-                'avg' => $this->predictive_maintenance_cost_avg,
-                'max' => $this->predictive_maintenance_cost_max
-            ],
-            'corrective' => [
-                'min' => $this->corrective_maintenance_cost_min,
-                'avg' => $this->corrective_maintenance_cost_avg,
-                'max' => $this->corrective_maintenance_cost_max
-            ]
-        ];
     }
 
     // PERT Distribution Methods

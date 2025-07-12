@@ -133,7 +133,7 @@ class UsersController extends Controller
 
         $user->roles()->sync($request->input('roles'));
 
-        if($request->has('file')){
+        if($request->file('file')){
             //Delete the old file if it exists
             if($user->file){
                 FileService::delete($user->file);

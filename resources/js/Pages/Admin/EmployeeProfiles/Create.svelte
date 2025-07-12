@@ -117,9 +117,9 @@
             <!-- Employee Profile Header -->
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div class="flex flex-col gap-1">
-                    <h1 class="text-2xl font-bold text-mono">Create New Employee Profile</h1>
+                    <h1 class="text-2xl font-bold text-mono">Create Employee Profile</h1>
                     <p class="text-sm text-secondary-foreground">
-                        Add a new employee profile to your simulation
+                        Define a new employee profile with skills, salary, and requirements
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
@@ -150,6 +150,7 @@
                                     class="kt-input {errors.name ? 'kt-input-error' : ''}"
                                     placeholder="Enter profile name (e.g., Production Worker, Manager)"
                                     bind:value={form.name}
+                                    required
                                 />
                                 {#if errors.name}
                                     <p class="text-sm text-destructive">{errors.name}</p>
@@ -211,6 +212,14 @@
                                             </span>
                                         {/each}
                                     </div>
+                                {:else}
+                                    <div class="kt-card bg-muted/20 border-dashed">
+                                        <div class="kt-card-content text-center py-4">
+                                            <i class="ki-filled ki-profile-circle text-xl text-muted-foreground mb-2"></i>
+                                            <p class="text-sm text-muted-foreground">No skills added yet</p>
+                                            <p class="text-xs text-muted-foreground mt-1">Add skills to define what competencies this profile requires</p>
+                                        </div>
+                                    </div>
                                 {/if}
                                 {#if errors.skills}
                                     <p class="text-sm text-destructive">{errors.skills}</p>
@@ -240,6 +249,7 @@
                                     class="kt-input {errors.monthly_min_salary ? 'kt-input-error' : ''}"
                                     placeholder="0.00"
                                     bind:value={form.monthly_min_salary}
+                                    required
                                 />
                                 {#if errors.monthly_min_salary}
                                     <p class="text-sm text-destructive">{errors.monthly_min_salary}</p>
@@ -259,6 +269,7 @@
                                     class="kt-input {errors.monthly_avg_salary ? 'kt-input-error' : ''}"
                                     placeholder="0.00"
                                     bind:value={form.monthly_avg_salary}
+                                    required
                                 />
                                 {#if errors.monthly_avg_salary}
                                     <p class="text-sm text-destructive">{errors.monthly_avg_salary}</p>
@@ -278,6 +289,7 @@
                                     class="kt-input {errors.monthly_max_salary ? 'kt-input-error' : ''}"
                                     placeholder="0.00"
                                     bind:value={form.monthly_max_salary}
+                                    required
                                 />
                                 {#if errors.monthly_max_salary}
                                     <p class="text-sm text-destructive">{errors.monthly_max_salary}</p>
@@ -306,6 +318,7 @@
                                     id="recruitment_difficulty"
                                     class="kt-select {errors.recruitment_difficulty ? 'kt-select-error' : ''}"
                                     bind:value={form.recruitment_difficulty}
+                                    required
                                 >
                                     {#each difficultyOptions as option}
                                         <option value={option.value}>{option.label}</option>
@@ -332,6 +345,7 @@
                                     class="kt-input {errors.recruitment_cost_per_employee ? 'kt-input-error' : ''}"
                                     placeholder="0.00"
                                     bind:value={form.recruitment_cost_per_employee}
+                                    required
                                 />
                                 <p class="text-xs text-secondary-foreground">
                                     Cost to recruit one employee (advertising, interviews, etc.)
@@ -364,6 +378,7 @@
                                     class="kt-input {errors.training_cost_per_employee ? 'kt-input-error' : ''}"
                                     placeholder="0.00"
                                     bind:value={form.training_cost_per_employee}
+                                    required
                                 />
                                 <p class="text-xs text-secondary-foreground">
                                     Cost to train one employee for this profile
@@ -385,6 +400,7 @@
                                     class="kt-input {errors.training_duration_days ? 'kt-input-error' : ''}"
                                     placeholder="7"
                                     bind:value={form.training_duration_days}
+                                    required
                                 />
                                 <p class="text-xs text-secondary-foreground">
                                     Number of days required to fully train an employee

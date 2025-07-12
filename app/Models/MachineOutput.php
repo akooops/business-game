@@ -5,16 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ProductionLineOutput extends Model
+class MachineOutput extends Model
 {
     use HasFactory;
 
     protected $guarded = ['id'];
 
     // Relations
-    public function productionLine()
+    public function machine()
     {
-        return $this->belongsTo(ProductionLine::class);
+        return $this->belongsTo(Machine::class);
     }
 
     public function product()
@@ -23,9 +23,9 @@ class ProductionLineOutput extends Model
     }
 
     // Scopes
-    public function scopeForProductionLine($query, $productionLineId)
+    public function scopeForMachine($query, $machineId)
     {
-        return $query->where('production_line_id', $productionLineId);
+        return $query->where('machine_id', $machineId);
     }
 
     public function scopeForProduct($query, $productId)

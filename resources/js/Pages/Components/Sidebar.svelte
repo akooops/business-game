@@ -13,7 +13,7 @@
         if (url.includes('/admin/dashboard') || url === '/admin' || url === '/admin/') {
             return 'dashboard';
         }
-        if (url.includes('/admin/products') || url.includes('/admin/product-recipes') || url.includes('/admin/product-demand')) {
+        if (url.includes('/admin/products') || url.includes('/admin/product-recipes') || url.includes('/admin/product-demand') || url.includes('/admin/machines')) {
             return 'products';
         }
         if (url.includes('/admin/employee-profiles')) {
@@ -329,14 +329,14 @@
                     </div>
                     {/if}
 
-                    {#if hasPermission('admin.production-lines.index')}
+                    {#if hasPermission('admin.machines.index')}
                     <div class="kt-menu-item">
-                        <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute('admin.production-lines.index') ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.production-lines.index')}>
+                        <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute('admin.machines.index') ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.machines.index')}>
                             <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
-                                <i class="ki-outline ki-dropbox"></i>
+                                <i class="ki-outline ki-setting-3"></i>
                             </span>
                             <span class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono ms-2">
-                                Production Lines
+                                Machines
                             </span>
                         </a>
                     </div>

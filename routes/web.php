@@ -9,8 +9,9 @@ use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\Admin\ProductsController;
 use App\Http\Controllers\Admin\ProductDemandController;
 use App\Http\Controllers\Admin\ProductRecipesController;
-use App\Http\Controllers\Admin\ProductionLinesController;
 use App\Http\Controllers\Admin\EmployeeProfilesController;
+use App\Http\Controllers\Admin\MachinesController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -88,15 +89,6 @@ Route::prefix('admin')->middleware(['auth', 'handle.inertia'])->group(function (
     Route::patch('product-recipes/{productRecipe}', [ProductRecipesController::class, 'update'])->middleware('check.permission:admin.product-recipes.update')->name('admin.product-recipes.update');
     Route::delete('product-recipes/{productRecipe}', [ProductRecipesController::class, 'destroy'])->middleware('check.permission:admin.product-recipes.destroy')->name('admin.product-recipes.destroy');
 
-    // Production Lines
-    Route::get('production-lines', [ProductionLinesController::class, 'index'])->middleware('check.permission:admin.production-lines.index')->name('admin.production-lines.index');
-    Route::get('production-lines/create', [ProductionLinesController::class, 'create'])->middleware('check.permission:admin.production-lines.store')->name('admin.production-lines.create');
-    Route::post('production-lines', [ProductionLinesController::class, 'store'])->middleware('check.permission:admin.production-lines.store')->name('admin.production-lines.store');
-    Route::get('production-lines/{productionLine}', [ProductionLinesController::class, 'show'])->middleware('check.permission:admin.production-lines.show')->name('admin.production-lines.show');
-    Route::get('production-lines/{productionLine}/edit', [ProductionLinesController::class, 'edit'])->middleware('check.permission:admin.production-lines.update')->name('admin.production-lines.edit');
-    Route::patch('production-lines/{productionLine}', [ProductionLinesController::class, 'update'])->middleware('check.permission:admin.production-lines.update')->name('admin.production-lines.update');
-    Route::delete('production-lines/{productionLine}', [ProductionLinesController::class, 'destroy'])->middleware('check.permission:admin.production-lines.destroy')->name('admin.production-lines.destroy');
-
     // Employee Profiles
     Route::get('employee-profiles', [EmployeeProfilesController::class, 'index'])->middleware('check.permission:admin.employee-profiles.index')->name('admin.employee-profiles.index');
     Route::get('employee-profiles/create', [EmployeeProfilesController::class, 'create'])->middleware('check.permission:admin.employee-profiles.store')->name('admin.employee-profiles.create');
@@ -106,6 +98,14 @@ Route::prefix('admin')->middleware(['auth', 'handle.inertia'])->group(function (
     Route::patch('employee-profiles/{employeeProfile}', [EmployeeProfilesController::class, 'update'])->middleware('check.permission:admin.employee-profiles.update')->name('admin.employee-profiles.update');
     Route::delete('employee-profiles/{employeeProfile}', [EmployeeProfilesController::class, 'destroy'])->middleware('check.permission:admin.employee-profiles.destroy')->name('admin.employee-profiles.destroy');
 
+    // Machines 
+    Route::get('machines', [MachinesController::class, 'index'])->middleware('check.permission:admin.machines.index')->name('admin.machines.index');
+    Route::get('machines/create', [MachinesController::class, 'create'])->middleware('check.permission:admin.machines.store')->name('admin.machines.create');
+    Route::post('machines', [MachinesController::class, 'store'])->middleware('check.permission:admin.machines.store')->name('admin.machines.store');
+    Route::get('machines/{machine}', [MachinesController::class, 'show'])->middleware('check.permission:admin.machines.show')->name('admin.machines.show');
+    Route::get('machines/{machine}/edit', [MachinesController::class, 'edit'])->middleware('check.permission:admin.machines.update')->name('admin.machines.edit');
+    Route::patch('machines/{machine}', [MachinesController::class, 'update'])->middleware('check.permission:admin.machines.update')->name('admin.machines.update');
+    Route::delete('machines/{machine}', [MachinesController::class, 'destroy'])->middleware('check.permission:admin.machines.destroy')->name('admin.machines.destroy');
 });
 
 
