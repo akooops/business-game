@@ -21,15 +21,4 @@ class MachineOutput extends Model
     {
         return $this->belongsTo(Product::class);
     }
-
-    // Scopes
-    public function scopeForMachine($query, $machineId)
-    {
-        return $query->where('machine_id', $machineId);
-    }
-
-    public function scopeForProduct($query, $productId)
-    {
-        return $query->where('product_id', $productId);
-    }
 }

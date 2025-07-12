@@ -18,17 +18,14 @@ return new class extends Migration
             $table->string('name');
 
             // Shipping costs
-            $table->decimal('min_shipping_cost', 10, 5)->default(0); 
-            $table->decimal('max_shipping_cost', 10, 5)->default(0); 
-            $table->decimal('avg_shipping_cost', 10, 5)->default(0); 
+            $table->decimal('min_shipping_cost', 15, 5)->default(0); 
+            $table->decimal('max_shipping_cost', 15, 5)->default(0); 
+            $table->decimal('avg_shipping_cost', 15, 5)->default(0); 
 
             // Customs processing times (days)
             $table->integer('min_shipping_time_days')->default(1);
             $table->integer('avg_shipping_time_days')->default(1);
             $table->integer('max_shipping_time_days')->default(1);
-
-            // Taxes
-            $table->decimal('tva_rate', 10, 5)->default(0.19);
 
             $table->timestamps();
         });

@@ -25,22 +25,6 @@ class ProductDemand extends Model
     {
         return $this->belongsTo(Product::class);
     }
-
-    //Scopes
-    public function scopeVisible($query)
-    {
-        return $query->where('is_visible', true);
-    }
-
-    public function scopeInvisible($query)
-    {
-        return $query->where('is_visible', false);
-    }
-
-    public function scopeGameweek($query, $gameweek)
-    {
-        return $query->where('gameweek', $gameweek);
-    }
-
+    
     //Accessors
 }

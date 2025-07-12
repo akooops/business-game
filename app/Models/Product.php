@@ -41,35 +41,14 @@ class Product extends Model
         return $this->hasMany(ProductRecipe::class);
     }
 
-    public function productionLineOutputs()
+    public function machineOutputs()
     {
-        return $this->hasMany(ProductionLineOutput::class);
+        return $this->hasMany(MachineOutput::class);
     }
 
-    public function productionLines()
+    public function machines()
     {
-        return $this->belongsToMany(ProductionLine::class, 'production_line_outputs');
-    }
-
-    // Scopes
-    public function scopeByType($query, $type)
-    {
-        return $query->where('type', $type);
-    }
-
-    public function scopeRawMaterials($query)
-    {
-        return $query->where('type', self::TYPE_RAW_MATERIAL);
-    }
-
-    public function scopeComponents($query)
-    {
-        return $query->where('type', self::TYPE_COMPONENT);
-    }
-
-    public function scopeFinishedProducts($query)
-    {
-        return $query->where('type', self::TYPE_FINISHED_PRODUCT);
+        return $this->belongsToMany(Machine::class, 'machine_outputs')->withTimestamps();
     }
 
     // Accessors

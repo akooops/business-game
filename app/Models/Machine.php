@@ -56,24 +56,7 @@ class Machine extends Model
     {
         return $this->belongsToMany(Product::class, 'machine_outputs')->withTimestamps();
     }
-
-    // Scopes
-    public function scopeByManufacturer($query, $manufacturer)
-    {
-        return $query->where('manufacturer', $manufacturer);
-    }
-
-    public function scopeWithinPriceRange($query, $minPrice = null, $maxPrice = null)
-    {
-        if ($minPrice) {
-            $query->where('cost_to_acquire', '>=', $minPrice);
-        }
-        if ($maxPrice) {
-            $query->where('cost_to_acquire', '<=', $maxPrice);
-        }
-        return $query;
-    }
-
+    
     // Accessors
     public function getImageUrlAttribute()
     {

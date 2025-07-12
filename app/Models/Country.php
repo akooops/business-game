@@ -2,30 +2,41 @@
 
 namespace App\Models;
 
+use App\Models\File;
+use App\Traits\HasFiles;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\URL;
 
 class Country extends Model
 {
-    use HasFactory;
+    use HasFactory, HasFiles;
 
     protected $guarded = ['id'];
 
+    protected $appends = ['flag_url'];
+
     protected $casts = [
-        'customs_duties_rate' => 'decimal:5',
-        'tva_rate' => 'decimal:5',
-        'insurance_rate' => 'decimal:5',
-        'freight_cost' => 'decimal:5',
-        'port_handling_fee' => 'decimal:5',
+        'customs_duties_rate' => 'decimal:3',
+        'tva_rate' => 'decimal:3',
+        'insurance_rate' => 'decimal:3',
+        'freight_cost' => 'decimal:3',
+        'port_handling_fee' => 'decimal:3',
         'allows_imports' => 'boolean',
     ];
 
-    // Scopes
-    public function scopeAllowsImports($query)
+    //Relations
+    public function flag()
     {
-        return $query->where('allows_imports', true);
+        return $this->morphOne(File::class, 'model')->where('is_main', 1);
     }
 
+    // Methods
+    public function getFlagUrlAttribute()
+    {
+        return ($this->flag) ? $this->flag->url : URL::to('assets/images/default-country-flag.jpg');
+    }
+    
     // Main calculation method for total import cost
     public function calculateImportCost($productCost, $weight = 100)
     {
@@ -57,17 +68,5 @@ class Country extends Model
             'total_cost' => $totalCost,
             'tax_percentage' => ($totalTaxes / $cif) * 100
         ];
-    }
-
-    // Simple utility methods
-    public function getEffectiveTaxRate($productCost)
-    {
-        $calculation = $this->calculateImportCost($productCost);
-        return $calculation['tax_percentage'];
-    }
-
-    public function formatCurrency($amount)
-    {
-        return number_format($amount, 2);
     }
 }

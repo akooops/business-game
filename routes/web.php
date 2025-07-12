@@ -11,6 +11,8 @@ use App\Http\Controllers\Admin\ProductDemandController;
 use App\Http\Controllers\Admin\ProductRecipesController;
 use App\Http\Controllers\Admin\EmployeeProfilesController;
 use App\Http\Controllers\Admin\MachinesController;
+use App\Http\Controllers\Admin\CountriesController;
+use App\Http\Controllers\Admin\WilayasController;
 
 /*
 |--------------------------------------------------------------------------
@@ -106,6 +108,24 @@ Route::prefix('admin')->middleware(['auth', 'handle.inertia'])->group(function (
     Route::get('machines/{machine}/edit', [MachinesController::class, 'edit'])->middleware('check.permission:admin.machines.update')->name('admin.machines.edit');
     Route::patch('machines/{machine}', [MachinesController::class, 'update'])->middleware('check.permission:admin.machines.update')->name('admin.machines.update');
     Route::delete('machines/{machine}', [MachinesController::class, 'destroy'])->middleware('check.permission:admin.machines.destroy')->name('admin.machines.destroy');
+
+    // Countries
+    Route::get('countries', [CountriesController::class, 'index'])->middleware('check.permission:admin.countries.index')->name('admin.countries.index');
+    Route::get('countries/create', [CountriesController::class, 'create'])->middleware('check.permission:admin.countries.store')->name('admin.countries.create');
+    Route::post('countries', [CountriesController::class, 'store'])->middleware('check.permission:admin.countries.store')->name('admin.countries.store');
+    Route::get('countries/{country}', [CountriesController::class, 'show'])->middleware('check.permission:admin.countries.show')->name('admin.countries.show');
+    Route::get('countries/{country}/edit', [CountriesController::class, 'edit'])->middleware('check.permission:admin.countries.update')->name('admin.countries.edit');
+    Route::patch('countries/{country}', [CountriesController::class, 'update'])->middleware('check.permission:admin.countries.update')->name('admin.countries.update');
+    Route::delete('countries/{country}', [CountriesController::class, 'destroy'])->middleware('check.permission:admin.countries.destroy')->name('admin.countries.destroy');
+
+    // Wilayas
+    Route::get('wilayas', [WilayasController::class, 'index'])->middleware('check.permission:admin.wilayas.index')->name('admin.wilayas.index');
+    Route::get('wilayas/create', [WilayasController::class, 'create'])->middleware('check.permission:admin.wilayas.store')->name('admin.wilayas.create');
+    Route::post('wilayas', [WilayasController::class, 'store'])->middleware('check.permission:admin.wilayas.store')->name('admin.wilayas.store');
+    Route::get('wilayas/{wilaya}', [WilayasController::class, 'show'])->middleware('check.permission:admin.wilayas.show')->name('admin.wilayas.show');
+    Route::get('wilayas/{wilaya}/edit', [WilayasController::class, 'edit'])->middleware('check.permission:admin.wilayas.update')->name('admin.wilayas.edit');
+    Route::patch('wilayas/{wilaya}', [WilayasController::class, 'update'])->middleware('check.permission:admin.wilayas.update')->name('admin.wilayas.update');
+    Route::delete('wilayas/{wilaya}', [WilayasController::class, 'destroy'])->middleware('check.permission:admin.wilayas.destroy')->name('admin.wilayas.destroy');
 });
 
 

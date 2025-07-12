@@ -31,12 +31,6 @@ class EmployeeProfile extends Model
     const RECRUITMENT_DIFFICULTY_VERY_HARD = 'very_hard';
 
     //Relations
-    
-    //Scopes
-    public function scopeByDifficulty($query, $difficulty)
-    {
-        return $query->where('recruitment_difficulty', $difficulty);
-    }
 
     //Accessors
     public function getRecruitmentDifficultyDisplayAttribute()

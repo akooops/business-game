@@ -34,6 +34,9 @@ class AppServiceProvider extends ServiceProvider
             'role_permission' => 'App\\Models\\RolePermission',
             'machine' => 'App\\Models\\Machine',
             'machine_output' => 'App\\Models\\MachineOutput',
+            'country' => 'App\\Models\\Country',
+            'employee_profile' => 'App\\Models\\EmployeeProfile',
+            'machine_employee_profile' => 'App\\Models\\MachineEmployeeProfile',
             // Add more models as needed
         ]);
 

@@ -22,16 +22,5 @@ class MachineEmployeeProfile extends Model
         return $this->belongsTo(EmployeeProfile::class);
     }
 
-    // Scopes
-    public function scopeForMachine($query, $machineId)
-    {
-        return $query->where('machine_id', $machineId);
-    }
-
-    public function scopeForEmployeeProfile($query, $employeeProfileId)
-    {
-        return $query->where('employee_profile_id', $employeeProfileId);
-    }
-
     // Accessors
 }

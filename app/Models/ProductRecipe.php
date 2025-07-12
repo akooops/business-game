@@ -25,15 +25,4 @@ class ProductRecipe extends Model
     {
         return $this->belongsTo(Product::class, 'material_id');
     }
-
-    //Scopes
-    public function scopeProduct($query, $product)
-    {
-        return $query->where('product_id', $product);
-    }
-
-    public function scopeMaterial($query, $material)
-    {
-        return $query->where('material_id', $material);
-    }
 }

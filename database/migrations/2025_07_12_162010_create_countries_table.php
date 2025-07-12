@@ -19,15 +19,15 @@ return new class extends Migration
             $table->string('code', 3)->unique();
             
             // Tax rates (percentages)
-            $table->decimal('customs_duties_rate', 10, 5)->default(0.25); // Custom duties %
-            $table->decimal('tva_rate', 10, 5)->default(0.19); // VAT/TVA rate %
-            $table->decimal('insurance_rate', 10, 5)->default(0.005); // Insurance % (0.5% typical)
+            $table->decimal('customs_duties_rate', 15, 5)->default(0.25); // Custom duties %
+            $table->decimal('tva_rate', 15, 5)->default(0.19); // VAT/TVA rate %
+            $table->decimal('insurance_rate', 15, 5)->default(0.005); // Insurance % (0.5% typical)
             
             // Freight base rates (per km, per kg)
-            $table->decimal('freight_cost', 10, 5)->default(0); // Base freight cost per shipment
+            $table->decimal('freight_cost', 15, 5)->default(0); // Base freight cost per shipment
             
             // Port/handling charges (container/shipment)
-            $table->decimal('port_handling_fee', 10, 5)->default(20000); // Port handling fee
+            $table->decimal('port_handling_fee', 15, 5)->default(20000); // Port handling fee
             
             // System flags
             $table->boolean('allows_imports')->default(true);
