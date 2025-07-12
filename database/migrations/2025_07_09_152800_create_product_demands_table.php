@@ -18,18 +18,17 @@ return new class extends Migration
             $table->integer('gameweek');
 
             // Demand fields
-            $table->float('min_demand', 13, 3)->default(0);
-            $table->float('max_demand', 13, 3)->default(0);
-            $table->float('avg_demand', 13, 3)->default(0);
+            $table->decimal('min_demand', 10, 5)->default(0);
+            $table->decimal('max_demand', 10, 5)->default(0);
+            $table->decimal('avg_demand', 10, 5)->default(0);
 
             // Market price
-            $table->float('market_price', 13, 3)->default(0);
+            $table->decimal('market_price', 10, 5)->default(0);
             
             // Market research fields
             $table->boolean('is_visible')->default(false);
-            $table->float('visibility_cost', 13, 3)->default(0);
-            $table->float('fluctuation_factor', 13, 3)->default(1.0);
-            $table->integer('research_time_days')->default(0);
+            $table->decimal('visibility_cost', 10, 5)->default(0);
+            $table->integer('research_time_days')->default(1);
             
             // Foreign keys
             $table->foreignId('product_id')->constrained()->onDelete('cascade');

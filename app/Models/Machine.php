@@ -18,20 +18,20 @@ class Machine extends Model
     protected $casts = [
         'cost_to_acquire' => 'decimal:3',
         'area_required' => 'decimal:3',
-        'hourly_energy_consumption' => 'decimal:3',
-        'hourly_carbon_emissions' => 'decimal:3',
+        'energy_consumption_hour' => 'decimal:3',
+        'carbon_emissions_hour' => 'decimal:3',
         'quality_factor' => 'decimal:3',
-        'hourly_speed_min' => 'decimal:3',
-        'hourly_speed_avg' => 'decimal:3',
-        'hourly_speed_max' => 'decimal:3',
-        'hourly_failure_chance' => 'decimal:5',
-        'hourly_reliability_decay' => 'decimal:5',
-        'predictive_maintenance_cost_min' => 'decimal:3',
-        'predictive_maintenance_cost_avg' => 'decimal:3',
-        'predictive_maintenance_cost_max' => 'decimal:3',
-        'corrective_maintenance_cost_min' => 'decimal:3',
-        'corrective_maintenance_cost_avg' => 'decimal:3',
-        'corrective_maintenance_cost_max' => 'decimal:3',
+        'min_speed_hour' => 'decimal:3',
+        'avg_speed_hour' => 'decimal:3',
+        'max_speed_hour' => 'decimal:3',
+        'failure_chance_hour' => 'decimal:5',
+        'reliability_decay_hour' => 'decimal:5',
+        'min_predictive_maintenance_cost' => 'decimal:3',
+        'avg_predictive_maintenance_cost' => 'decimal:3',
+        'max_predictive_maintenance_cost' => 'decimal:3',
+        'min_corrective_maintenance_cost' => 'decimal:3',
+        'avg_corrective_maintenance_cost' => 'decimal:3',
+        'max_corrective_maintenance_cost' => 'decimal:3',
     ];
 
     // Relations
@@ -103,45 +103,45 @@ class Machine extends Model
     public function getPredictiveMaintenanceCost()
     {
         return $this->calculatePertValue(
-            $this->predictive_maintenance_cost_min,
-            $this->predictive_maintenance_cost_avg,
-            $this->predictive_maintenance_cost_max
+            $this->min_predictive_maintenance_cost,
+            $this->avg_predictive_maintenance_cost,
+            $this->max_predictive_maintenance_cost
         );
     }
 
     public function getPredictiveMaintenanceDelay()
     {
         return $this->calculatePertValue(
-            $this->predictive_maintenance_delay_min_hours,
-            $this->predictive_maintenance_delay_avg_hours,
-            $this->predictive_maintenance_delay_max_hours
+            $this->min_predictive_maintenance_delay_hours,
+            $this->avg_predictive_maintenance_delay_hours,
+            $this->max_predictive_maintenance_delay_hours
         );
     }
 
     public function getCorrectiveMaintenanceCost()
     {
         return $this->calculatePertValue(
-            $this->corrective_maintenance_cost_min,
-            $this->corrective_maintenance_cost_avg,
-            $this->corrective_maintenance_cost_max
+            $this->min_corrective_maintenance_cost,
+            $this->avg_corrective_maintenance_cost,
+            $this->max_corrective_maintenance_cost
         );
     }
 
     public function getCorrectiveMaintenanceDelay()
     {
         return $this->calculatePertValue(
-            $this->corrective_maintenance_delay_min_hours,
-            $this->corrective_maintenance_delay_avg_hours,
-            $this->corrective_maintenance_delay_max_hours
+            $this->min_corrective_maintenance_delay_hours,
+            $this->avg_corrective_maintenance_delay_hours,
+            $this->max_corrective_maintenance_delay_hours
         );
     }
 
     public function getRandomSpeed()
     {
         return $this->calculatePertValue(
-            $this->hourly_speed_min,
-            $this->hourly_speed_avg,
-            $this->hourly_speed_max
+            $this->min_speed_hour,
+            $this->avg_speed_hour,
+            $this->max_speed_hour
         );
     }
 }

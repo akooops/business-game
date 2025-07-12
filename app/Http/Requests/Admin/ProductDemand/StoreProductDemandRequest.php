@@ -30,7 +30,6 @@ class StoreProductDemandRequest extends FormRequest
             'market_price' => 'required|numeric|min:0',
             'visibility_cost' => 'required|numeric|min:0',
             'research_time_days' => 'required|integer|min:0',
-            'fluctuation_factor' => 'required|numeric|min:0|max:10',
             'is_visible' => 'required|boolean',
         ];
     }
@@ -51,7 +50,6 @@ class StoreProductDemandRequest extends FormRequest
             'market_price' => 'market price',
             'visibility_cost' => 'visibility cost',
             'research_time_days' => 'research time (days)',
-            'fluctuation_factor' => 'fluctuation factor',
             'is_visible' => 'visibility status',
         ];
     }

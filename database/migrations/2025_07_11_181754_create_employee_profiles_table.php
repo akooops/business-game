@@ -18,17 +18,17 @@ return new class extends Migration
             $table->json('skills')->nullable();
 
             // Salary
-            $table->float('monthly_min_salary', 13, 3);
-            $table->float('monthly_avg_salary', 13, 3);
-            $table->float('monthly_max_salary', 13, 3);
+            $table->decimal('min_salary_month', 10, 5)->default(0);
+            $table->decimal('avg_salary_month', 10, 5)->default(0);
+            $table->decimal('max_salary_month', 10, 5)->default(0);
 
             // Recruitment
             $table->enum('recruitment_difficulty', ['very_easy', 'easy', 'medium', 'hard', 'very_hard'])->default('medium');
-            $table->float('recruitment_cost_per_employee', 13, 3);
+            $table->decimal('recruitment_cost_per_employee', 10, 5)->default(0);
 
             // Training
-            $table->float('training_cost_per_employee', 13, 3);
-            $table->integer('training_duration_days');
+            $table->decimal('training_cost_per_employee', 10, 5)->default(0);
+            $table->integer('training_duration_days')->default(1);
             $table->timestamps();
         });
     }

@@ -60,16 +60,6 @@
     let productSelectComponent;
     let employeeProfileSelectComponent;
 
-    // Format currency
-    function formatCurrency(amount) {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-        }).format(amount);
-    }
-
     // Format number with units
     function formatNumber(value, decimals = 1) {
         return parseFloat(value).toFixed(decimals);
@@ -439,7 +429,7 @@
 
                             <!-- Price Range -->
                             <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Acquisition Cost ($)</h4>
+                                <h4 class="text-sm font-medium text-gray-700">Acquisition Cost (DZD)</h4>
                                 
                                 <div class="flex gap-2">
                                     <input 
@@ -778,7 +768,7 @@
                                                     name: profile.name,
                                                     description: profile.description,
                                                     recruitment_difficulty: profile.recruitment_difficulty,
-                                                    avg_salary: profile.monthly_avg_salary
+                                                    avg_salary: profile.avg_salary_month
                                                 }))
                                             };
                                         },
@@ -955,7 +945,7 @@
                                                 <div class="flex flex-col gap-1">
                                                     <div class="flex items-center gap-1">
                                                         <span class="text-xs text-muted-foreground">Speed:</span>
-                                                        <span class="text-xs font-medium">{formatNumber(machine.hourly_speed_avg)}/h</span>
+                                                        <span class="text-xs font-medium">{formatNumber(machine.avg_speed_hour)}/h</span>
                                                     </div>
                                                     <div class="flex items-center gap-1">
                                                         <span class="text-xs text-muted-foreground">Quality:</span>
@@ -963,11 +953,11 @@
                                                     </div>
                                                     <div class="flex items-center gap-1">
                                                         <span class="text-xs text-muted-foreground">Energy:</span>
-                                                        <span class="text-xs font-medium">{formatNumber(machine.hourly_energy_consumption)} kWh</span>
+                                                        <span class="text-xs font-medium">{formatNumber(machine.energy_consumption_hour)} kWh</span>
                                                     </div>
                                                     <div class="flex items-center gap-1">
                                                         <span class="text-xs text-muted-foreground">Carbon:</span>
-                                                        <span class="text-xs font-medium">{formatNumber(machine.hourly_carbon_emissions)} kg/h</span>
+                                                        <span class="text-xs font-medium">{formatNumber(machine.carbon_emissions_hour)} kg/h</span>
                                                     </div>
                                                 </div>
                                             </td>
@@ -982,7 +972,7 @@
                                                 </div>
                                                 <div class="flex items-center gap-1">
                                                     <span class="text-xs text-muted-foreground">Cost:</span>
-                                                    <span class="text-sm font-bold">{formatCurrency(machine.cost_to_acquire)}</span>
+                                                    <span class="text-sm font-bold">DZD{machine.cost_to_acquire}</span>
                                                 </div>
                                             </td>
                                             <td>

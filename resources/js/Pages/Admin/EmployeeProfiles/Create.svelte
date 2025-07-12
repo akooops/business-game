@@ -33,9 +33,9 @@
         name: '',
         description: '',
         skills: [],
-        monthly_min_salary: '',
-        monthly_avg_salary: '',
-        monthly_max_salary: '',
+        min_salary_month: '',
+        avg_salary_month: '',
+        max_salary_month: '',
         recruitment_difficulty: 'medium',
         recruitment_cost_per_employee: '',
         training_cost_per_employee: '',
@@ -238,61 +238,61 @@
                         <div class="grid gap-4 md:grid-cols-3">
                             <!-- Minimum Salary -->
                             <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="monthly_min_salary">
+                                <label class="text-sm font-medium text-mono" for="min_salary_month">
                                     Minimum Monthly Salary <span class="text-destructive">*</span>
                                 </label>
                                 <input
-                                    id="monthly_min_salary"
+                                    id="min_salary_month"
                                     type="number"
-                                    step="0.01"
+                                    step="0.001"
                                     min="0"
-                                    class="kt-input {errors.monthly_min_salary ? 'kt-input-error' : ''}"
-                                    placeholder="0.00"
-                                    bind:value={form.monthly_min_salary}
+                                    class="kt-input {errors.min_salary_month ? 'kt-input-error' : ''}"
+                                    placeholder="0.000"
+                                    bind:value={form.min_salary_month}
                                     required
                                 />
-                                {#if errors.monthly_min_salary}
-                                    <p class="text-sm text-destructive">{errors.monthly_min_salary}</p>
+                                {#if errors.min_salary_month}
+                                    <p class="text-sm text-destructive">{errors.min_salary_month}</p>
                                 {/if}
                             </div>
 
                             <!-- Average Salary -->
                             <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="monthly_avg_salary">
+                                <label class="text-sm font-medium text-mono" for="avg_salary_month">
                                     Average Monthly Salary <span class="text-destructive">*</span>
                                 </label>
                                 <input
-                                    id="monthly_avg_salary"
+                                    id="avg_salary_month"
                                     type="number"
-                                    step="0.01"
+                                    step="0.001"
                                     min="0"
-                                    class="kt-input {errors.monthly_avg_salary ? 'kt-input-error' : ''}"
-                                    placeholder="0.00"
-                                    bind:value={form.monthly_avg_salary}
+                                    class="kt-input {errors.avg_salary_month ? 'kt-input-error' : ''}"
+                                    placeholder="0.000"
+                                    bind:value={form.avg_salary_month}
                                     required
                                 />
-                                {#if errors.monthly_avg_salary}
-                                    <p class="text-sm text-destructive">{errors.monthly_avg_salary}</p>
+                                {#if errors.avg_salary_month}
+                                    <p class="text-sm text-destructive">{errors.avg_salary_month}</p>
                                 {/if}
                             </div>
 
                             <!-- Maximum Salary -->
                             <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="monthly_max_salary">
+                                <label class="text-sm font-medium text-mono" for="max_salary_month">
                                     Maximum Monthly Salary <span class="text-destructive">*</span>
                                 </label>
                                 <input
-                                    id="monthly_max_salary"
+                                    id="max_salary_month"
                                     type="number"
-                                    step="0.01"
+                                    step="0.001"
                                     min="0"
-                                    class="kt-input {errors.monthly_max_salary ? 'kt-input-error' : ''}"
-                                    placeholder="0.00"
-                                    bind:value={form.monthly_max_salary}
+                                    class="kt-input {errors.max_salary_month ? 'kt-input-error' : ''}"
+                                    placeholder="0.000"
+                                    bind:value={form.max_salary_month}
                                     required
                                 />
-                                {#if errors.monthly_max_salary}
-                                    <p class="text-sm text-destructive">{errors.monthly_max_salary}</p>
+                                {#if errors.max_salary_month}
+                                    <p class="text-sm text-destructive">{errors.max_salary_month}</p>
                                 {/if}
                             </div>
                         </div>
@@ -340,10 +340,10 @@
                                 <input
                                     id="recruitment_cost_per_employee"
                                     type="number"
-                                    step="0.01"
+                                    step="0.001"
                                     min="0"
                                     class="kt-input {errors.recruitment_cost_per_employee ? 'kt-input-error' : ''}"
-                                    placeholder="0.00"
+                                    placeholder="0.000"
                                     bind:value={form.recruitment_cost_per_employee}
                                     required
                                 />
@@ -373,10 +373,10 @@
                                 <input
                                     id="training_cost_per_employee"
                                     type="number"
-                                    step="0.01"
+                                    step="0.001"
                                     min="0"
                                     class="kt-input {errors.training_cost_per_employee ? 'kt-input-error' : ''}"
-                                    placeholder="0.00"
+                                    placeholder="0.000"
                                     bind:value={form.training_cost_per_employee}
                                     required
                                 />

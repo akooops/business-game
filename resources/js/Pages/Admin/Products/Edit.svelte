@@ -231,7 +231,7 @@
                                 <input
                                     id="elasticity_coefficient"
                                     type="number"
-                                    step="0.1"
+                                    step="0.001"
                                     min="0"
                                     class="kt-input {errors.elasticity_coefficient ? 'kt-input-error' : ''}"
                                     placeholder="1.0"

@@ -27,27 +27,27 @@
         cost_to_acquire: '',
         area_required: '',
         setup_time_days: '',
-        hourly_energy_consumption: '',
-        hourly_carbon_emissions: '',
+        energy_consumption_hour: '',
+        carbon_emissions_hour: '',
         quality_factor: '',
-        hourly_speed_min: '',
-        hourly_speed_avg: '',
-        hourly_speed_max: '',
-        hourly_failure_chance: '',
-        hourly_reliability_decay: '',
+        min_speed_hour: '',
+        avg_speed_hour: '',
+        max_speed_hour: '',
+        failure_chance_hour: '',
+        reliability_decay_hour: '',
         maintenance_interval_days: '',
-        predictive_maintenance_cost_min: '',
-        predictive_maintenance_cost_avg: '',
-        predictive_maintenance_cost_max: '',
-        predictive_maintenance_delay_min_hours: '',
-        predictive_maintenance_delay_avg_hours: '',
-        predictive_maintenance_delay_max_hours: '',
-        corrective_maintenance_cost_min: '',
-        corrective_maintenance_cost_avg: '',
-        corrective_maintenance_cost_max: '',
-        corrective_maintenance_delay_min_hours: '',
-        corrective_maintenance_delay_avg_hours: '',
-        corrective_maintenance_delay_max_hours: '',
+        min_predictive_maintenance_cost: '',
+        avg_predictive_maintenance_cost: '',
+        max_predictive_maintenance_cost: '',
+        min_predictive_maintenance_delay_hours: '',
+        avg_predictive_maintenance_delay_hours: '',
+        max_predictive_maintenance_delay_hours: '',
+        min_corrective_maintenance_cost: '',
+        avg_corrective_maintenance_cost: '',
+        max_corrective_maintenance_cost: '',
+        min_corrective_maintenance_delay_hours: '',
+        avg_corrective_maintenance_delay_hours: '',
+        max_corrective_maintenance_delay_hours: '',
         file: null,
         employee_profiles: [],
         outputs: []
@@ -260,7 +260,7 @@
                                         class="kt-input {errors.area_required ? 'kt-input-error' : ''}"
                                         placeholder="Enter area in square meters"
                                         min="0"
-                                        step="0.1"
+                                        step="0.001"
                                         required
                                     />
                                     <p class="text-xs text-secondary-foreground">
@@ -281,7 +281,7 @@
                                         bind:value={formData.setup_time_days}
                                         class="kt-input {errors.setup_time_days ? 'kt-input-error' : ''}"
                                         placeholder="Enter setup time in days"
-                                        min="0"
+                                        min="1"
                                         step="1"
                                         required
                                     />
@@ -314,7 +314,7 @@
                             <!-- Acquisition Cost -->
                             <div class="flex flex-col gap-2">
                                 <label class="text-sm font-medium text-mono" for="cost_to_acquire">
-                                    Acquisition Cost ($) <span class="text-destructive">*</span>
+                                    Acquisition Cost (DZD) <span class="text-destructive">*</span>
                                 </label>
                                 <input 
                                     id="cost_to_acquire"
@@ -323,7 +323,7 @@
                                     class="kt-input {errors.cost_to_acquire ? 'kt-input-error' : ''}"
                                     placeholder="Enter acquisition cost"
                                     min="0"
-                                    step="0.01"
+                                    step="0.001"
                                     required
                                 />
                                 {#if errors.cost_to_acquire}
@@ -379,40 +379,40 @@
                             <!-- Energy Consumption, Carbon Emissions, and Quality Factor -->
                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="hourly_energy_consumption">
+                                    <label class="text-sm font-medium text-mono" for="energy_consumption_hour">
                                         Hourly Energy Consumption (kWh) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="hourly_energy_consumption"
+                                        id="energy_consumption_hour"
                                         type="number" 
-                                        bind:value={formData.hourly_energy_consumption}
-                                        class="kt-input {errors.hourly_energy_consumption ? 'kt-input-error' : ''}"
+                                        bind:value={formData.energy_consumption_hour}
+                                        class="kt-input {errors.energy_consumption_hour ? 'kt-input-error' : ''}"
                                         placeholder="Enter hourly energy consumption"
                                         min="0"
-                                        step="0.01"
+                                        step="0.001"
                                         required
                                     />
-                                    {#if errors.hourly_energy_consumption}
-                                        <p class="text-sm text-destructive">{errors.hourly_energy_consumption}</p>
+                                    {#if errors.energy_consumption_hour}
+                                        <p class="text-sm text-destructive">{errors.energy_consumption_hour}</p>
                                     {/if}
                                 </div>
 
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="hourly_carbon_emissions">
+                                    <label class="text-sm font-medium text-mono" for="carbon_emissions_hour">
                                         Hourly Carbon Emissions (CO2) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="hourly_carbon_emissions"
+                                        id="carbon_emissions_hour"
                                         type="number" 
-                                        bind:value={formData.hourly_carbon_emissions}
-                                        class="kt-input {errors.hourly_carbon_emissions ? 'kt-input-error' : ''}"
+                                        bind:value={formData.carbon_emissions_hour}
+                                        class="kt-input {errors.carbon_emissions_hour ? 'kt-input-error' : ''}"
                                         placeholder="Enter hourly carbon emissions"
                                         min="0"
-                                        step="0.01"
+                                        step="0.001"
                                         required
                                     />
-                                    {#if errors.hourly_carbon_emissions}
-                                        <p class="text-sm text-destructive">{errors.hourly_carbon_emissions}</p>
+                                    {#if errors.carbon_emissions_hour}
+                                        <p class="text-sm text-destructive">{errors.carbon_emissions_hour}</p>
                                     {/if}
                                 </div>
 
@@ -428,7 +428,7 @@
                                         placeholder="Enter quality factor"
                                         min="0"
                                         max="1"
-                                        step="0.1"
+                                        step="0.001"
                                         required
                                     />
                                     {#if errors.quality_factor}
@@ -440,59 +440,59 @@
                             <!-- Speed Ranges -->
                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="hourly_speed_min">
+                                    <label class="text-sm font-medium text-mono" for="min_speed_hour">
                                         Minimum Speed (units/h) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="hourly_speed_min"
+                                        id="min_speed_hour"
                                         type="number" 
-                                        bind:value={formData.hourly_speed_min}
-                                        class="kt-input {errors.hourly_speed_min ? 'kt-input-error' : ''}"
+                                        bind:value={formData.min_speed_hour}
+                                        class="kt-input {errors.min_speed_hour ? 'kt-input-error' : ''}"
                                         placeholder="Enter minimum speed"
                                         min="0"
-                                        step="0.1"
+                                        step="0.001"
                                         required
                                     />
-                                    {#if errors.hourly_speed_min}
-                                        <p class="text-sm text-destructive">{errors.hourly_speed_min}</p>
+                                    {#if errors.min_speed_hour}
+                                        <p class="text-sm text-destructive">{errors.min_speed_hour}</p>
                                     {/if}
                                 </div>
 
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="hourly_speed_avg">
+                                    <label class="text-sm font-medium text-mono" for="avg_speed_hour">
                                         Average Speed (units/h) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="hourly_speed_avg"
+                                        id="avg_speed_hour"
                                         type="number" 
-                                        bind:value={formData.hourly_speed_avg}
-                                        class="kt-input {errors.hourly_speed_avg ? 'kt-input-error' : ''}"
+                                        bind:value={formData.avg_speed_hour}
+                                        class="kt-input {errors.avg_speed_hour ? 'kt-input-error' : ''}"
                                         placeholder="Enter average speed"
                                         min="0"
-                                        step="0.1"
+                                        step="0.001"
                                         required
                                     />
-                                    {#if errors.hourly_speed_avg}
-                                        <p class="text-sm text-destructive">{errors.hourly_speed_avg}</p>
+                                    {#if errors.avg_speed_hour}
+                                        <p class="text-sm text-destructive">{errors.avg_speed_hour}</p>
                                     {/if}
                                 </div>
 
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="hourly_speed_max">
+                                    <label class="text-sm font-medium text-mono" for="max_speed_hour">
                                         Maximum Speed (units/h) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="hourly_speed_max"
+                                        id="max_speed_hour"
                                         type="number" 
-                                        bind:value={formData.hourly_speed_max}
-                                        class="kt-input {errors.hourly_speed_max ? 'kt-input-error' : ''}"
+                                        bind:value={formData.max_speed_hour}
+                                        class="kt-input {errors.max_speed_hour ? 'kt-input-error' : ''}"
                                         placeholder="Enter maximum speed"
                                         min="0"
-                                        step="0.1"
+                                        step="0.001"
                                         required
                                     />
-                                    {#if errors.hourly_speed_max}
-                                        <p class="text-sm text-destructive">{errors.hourly_speed_max}</p>
+                                    {#if errors.max_speed_hour}
+                                        <p class="text-sm text-destructive">{errors.max_speed_hour}</p>
                                     {/if}
                                 </div>
                             </div>
@@ -500,42 +500,42 @@
                             <!-- Reliability -->
                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="hourly_failure_chance">
+                                    <label class="text-sm font-medium text-mono" for="failure_chance_hour">
                                         Hourly Failure Chance (0-1) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="hourly_failure_chance"
+                                        id="failure_chance_hour"
                                         type="number" 
-                                        bind:value={formData.hourly_failure_chance}
-                                        class="kt-input {errors.hourly_failure_chance ? 'kt-input-error' : ''}"
+                                        bind:value={formData.failure_chance_hour}
+                                        class="kt-input {errors.failure_chance_hour ? 'kt-input-error' : ''}"
                                         placeholder="Enter failure chance"
                                         min="0"
                                         max="1"
                                         step="0.00001"
                                         required
                                     />
-                                    {#if errors.hourly_failure_chance}
-                                        <p class="text-sm text-destructive">{errors.hourly_failure_chance}</p>
+                                    {#if errors.failure_chance_hour}
+                                        <p class="text-sm text-destructive">{errors.failure_chance_hour}</p>
                                     {/if}
                                 </div>
 
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="hourly_reliability_decay">
+                                    <label class="text-sm font-medium text-mono" for="reliability_decay_hour">
                                         Hourly Reliability Decay (0-1) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="hourly_reliability_decay"
+                                        id="reliability_decay_hour"
                                         type="number" 
-                                        bind:value={formData.hourly_reliability_decay}
-                                        class="kt-input {errors.hourly_reliability_decay ? 'kt-input-error' : ''}"
+                                        bind:value={formData.reliability_decay_hour}
+                                        class="kt-input {errors.reliability_decay_hour ? 'kt-input-error' : ''}"
                                         placeholder="Enter reliability decay"
                                         min="0"
                                         max="1"
                                         step="0.00001"
                                         required
                                     />
-                                    {#if errors.hourly_reliability_decay}
-                                        <p class="text-sm text-destructive">{errors.hourly_reliability_decay}</p>
+                                    {#if errors.reliability_decay_hour}
+                                        <p class="text-sm text-destructive">{errors.reliability_decay_hour}</p>
                                     {/if}
                                 </div>
 
@@ -572,59 +572,59 @@
                             <!-- Predictive Maintenance Costs -->
                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="predictive_maintenance_cost_min">
-                                        Minimum Cost ($) <span class="text-destructive">*</span>
+                                    <label class="text-sm font-medium text-mono" for="min_predictive_maintenance_cost">
+                                        Minimum Cost (DZD) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="predictive_maintenance_cost_min"
+                                        id="min_predictive_maintenance_cost"
                                         type="number" 
-                                        bind:value={formData.predictive_maintenance_cost_min}
-                                        class="kt-input {errors.predictive_maintenance_cost_min ? 'kt-input-error' : ''}"
+                                        bind:value={formData.min_predictive_maintenance_cost}
+                                        class="kt-input {errors.min_predictive_maintenance_cost ? 'kt-input-error' : ''}"
                                         placeholder="Enter minimum cost"
                                         min="0"
-                                        step="0.01"
+                                        step="0.001"
                                         required
                                     />
-                                    {#if errors.predictive_maintenance_cost_min}
-                                        <p class="text-sm text-destructive">{errors.predictive_maintenance_cost_min}</p>
+                                    {#if errors.min_predictive_maintenance_cost}
+                                        <p class="text-sm text-destructive">{errors.min_predictive_maintenance_cost}</p>
                                     {/if}
                                 </div>
 
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="predictive_maintenance_cost_avg">
-                                        Average Cost ($) <span class="text-destructive">*</span>
+                                    <label class="text-sm font-medium text-mono" for="avg_predictive_maintenance_cost">
+                                        Average Cost (DZD) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="predictive_maintenance_cost_avg"
+                                        id="avg_predictive_maintenance_cost"
                                         type="number" 
-                                        bind:value={formData.predictive_maintenance_cost_avg}
-                                        class="kt-input {errors.predictive_maintenance_cost_avg ? 'kt-input-error' : ''}"
+                                        bind:value={formData.avg_predictive_maintenance_cost}
+                                        class="kt-input {errors.avg_predictive_maintenance_cost ? 'kt-input-error' : ''}"
                                         placeholder="Enter average cost"
                                         min="0"
-                                        step="0.01"
+                                        step="0.001"
                                         required
                                     />
-                                    {#if errors.predictive_maintenance_cost_avg}
-                                        <p class="text-sm text-destructive">{errors.predictive_maintenance_cost_avg}</p>
+                                    {#if errors.avg_predictive_maintenance_cost}
+                                        <p class="text-sm text-destructive">{errors.avg_predictive_maintenance_cost}</p>
                                     {/if}
                                 </div>
 
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="predictive_maintenance_cost_max">
-                                        Maximum Cost ($) <span class="text-destructive">*</span>
+                                    <label class="text-sm font-medium text-mono" for="max_predictive_maintenance_cost">
+                                        Maximum Cost (DZD) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="predictive_maintenance_cost_max"
+                                        id="max_predictive_maintenance_cost"
                                         type="number" 
-                                        bind:value={formData.predictive_maintenance_cost_max}
-                                        class="kt-input {errors.predictive_maintenance_cost_max ? 'kt-input-error' : ''}"
+                                        bind:value={formData.max_predictive_maintenance_cost}
+                                        class="kt-input {errors.max_predictive_maintenance_cost ? 'kt-input-error' : ''}"
                                         placeholder="Enter maximum cost"
                                         min="0"
-                                        step="0.01"
+                                        step="0.001"
                                         required
                                     />
-                                    {#if errors.predictive_maintenance_cost_max}
-                                        <p class="text-sm text-destructive">{errors.predictive_maintenance_cost_max}</p>
+                                    {#if errors.max_predictive_maintenance_cost}
+                                        <p class="text-sm text-destructive">{errors.max_predictive_maintenance_cost}</p>
                                     {/if}
                                 </div>
                             </div>
@@ -632,59 +632,59 @@
                             <!-- Predictive Maintenance Delays -->
                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="predictive_maintenance_delay_min_hours">
+                                    <label class="text-sm font-medium text-mono" for="min_predictive_maintenance_delay_hours">
                                         Minimum Delay (hours) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="predictive_maintenance_delay_min_hours"
+                                        id="min_predictive_maintenance_delay_hours"
                                         type="number" 
-                                        bind:value={formData.predictive_maintenance_delay_min_hours}
-                                        class="kt-input {errors.predictive_maintenance_delay_min_hours ? 'kt-input-error' : ''}"
+                                        bind:value={formData.min_predictive_maintenance_delay_hours}
+                                        class="kt-input {errors.min_predictive_maintenance_delay_hours ? 'kt-input-error' : ''}"
                                         placeholder="Enter minimum delay"
-                                        min="0"
+                                        min="1"
                                         step="1"
                                         required
                                     />
-                                    {#if errors.predictive_maintenance_delay_min_hours}
-                                        <p class="text-sm text-destructive">{errors.predictive_maintenance_delay_min_hours}</p>
+                                    {#if errors.min_predictive_maintenance_delay_hours}
+                                        <p class="text-sm text-destructive">{errors.min_predictive_maintenance_delay_hours}</p>
                                     {/if}
                                 </div>
 
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="predictive_maintenance_delay_avg_hours">
+                                    <label class="text-sm font-medium text-mono" for="avg_predictive_maintenance_delay_hours">
                                         Average Delay (hours) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="predictive_maintenance_delay_avg_hours"
+                                        id="avg_predictive_maintenance_delay_hours"
                                         type="number" 
-                                        bind:value={formData.predictive_maintenance_delay_avg_hours}
-                                        class="kt-input {errors.predictive_maintenance_delay_avg_hours ? 'kt-input-error' : ''}"
+                                        bind:value={formData.avg_predictive_maintenance_delay_hours}
+                                        class="kt-input {errors.avg_predictive_maintenance_delay_hours ? 'kt-input-error' : ''}"
                                         placeholder="Enter average delay"
-                                        min="0"
+                                        min="1"
                                         step="1"
                                         required
                                     />
-                                    {#if errors.predictive_maintenance_delay_avg_hours}
-                                        <p class="text-sm text-destructive">{errors.predictive_maintenance_delay_avg_hours}</p>
+                                    {#if errors.avg_predictive_maintenance_delay_hours}
+                                        <p class="text-sm text-destructive">{errors.avg_predictive_maintenance_delay_hours}</p>
                                     {/if}
                                 </div>
 
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="predictive_maintenance_delay_max_hours">
+                                    <label class="text-sm font-medium text-mono" for="max_predictive_maintenance_delay_hours">
                                         Maximum Delay (hours) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="predictive_maintenance_delay_max_hours"
+                                        id="max_predictive_maintenance_delay_hours"
                                         type="number" 
-                                        bind:value={formData.predictive_maintenance_delay_max_hours}
-                                        class="kt-input {errors.predictive_maintenance_delay_max_hours ? 'kt-input-error' : ''}"
+                                        bind:value={formData.max_predictive_maintenance_delay_hours}
+                                        class="kt-input {errors.max_predictive_maintenance_delay_hours ? 'kt-input-error' : ''}"
                                         placeholder="Enter maximum delay"
-                                        min="0"
+                                        min="1"
                                         step="1"
                                         required
                                     />
-                                    {#if errors.predictive_maintenance_delay_max_hours}
-                                        <p class="text-sm text-destructive">{errors.predictive_maintenance_delay_max_hours}</p>
+                                    {#if errors.max_predictive_maintenance_delay_hours}
+                                        <p class="text-sm text-destructive">{errors.max_predictive_maintenance_delay_hours}</p>
                                     {/if}
                                 </div>
                             </div>
@@ -702,59 +702,59 @@
                             <!-- Corrective Maintenance Costs -->
                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="corrective_maintenance_cost_min">
-                                        Minimum Cost ($) <span class="text-destructive">*</span>
+                                    <label class="text-sm font-medium text-mono" for="min_corrective_maintenance_cost">
+                                        Minimum Cost (DZD) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="corrective_maintenance_cost_min"
+                                        id="min_corrective_maintenance_cost"
                                         type="number" 
-                                        bind:value={formData.corrective_maintenance_cost_min}
-                                        class="kt-input {errors.corrective_maintenance_cost_min ? 'kt-input-error' : ''}"
+                                        bind:value={formData.min_corrective_maintenance_cost}
+                                        class="kt-input {errors.min_corrective_maintenance_cost ? 'kt-input-error' : ''}"
                                         placeholder="Enter minimum cost"
                                         min="0"
-                                        step="0.01"
+                                        step="0.001"
                                         required
                                     />
-                                    {#if errors.corrective_maintenance_cost_min}
-                                        <p class="text-sm text-destructive">{errors.corrective_maintenance_cost_min}</p>
+                                    {#if errors.min_corrective_maintenance_cost}
+                                        <p class="text-sm text-destructive">{errors.min_corrective_maintenance_cost}</p>
                                     {/if}
                                 </div>
 
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="corrective_maintenance_cost_avg">
-                                        Average Cost ($) <span class="text-destructive">*</span>
+                                    <label class="text-sm font-medium text-mono" for="avg_corrective_maintenance_cost">
+                                        Average Cost (DZD) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="corrective_maintenance_cost_avg"
+                                        id="avg_corrective_maintenance_cost"
                                         type="number" 
-                                        bind:value={formData.corrective_maintenance_cost_avg}
-                                        class="kt-input {errors.corrective_maintenance_cost_avg ? 'kt-input-error' : ''}"
+                                        bind:value={formData.avg_corrective_maintenance_cost}
+                                        class="kt-input {errors.avg_corrective_maintenance_cost ? 'kt-input-error' : ''}"
                                         placeholder="Enter average cost"
                                         min="0"
-                                        step="0.01"
+                                        step="0.001"
                                         required
                                     />
-                                    {#if errors.corrective_maintenance_cost_avg}
-                                        <p class="text-sm text-destructive">{errors.corrective_maintenance_cost_avg}</p>
+                                    {#if errors.avg_corrective_maintenance_cost}
+                                        <p class="text-sm text-destructive">{errors.avg_corrective_maintenance_cost}</p>
                                     {/if}
                                 </div>
 
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="corrective_maintenance_cost_max">
-                                        Maximum Cost ($) <span class="text-destructive">*</span>
+                                    <label class="text-sm font-medium text-mono" for="max_corrective_maintenance_cost">
+                                        Maximum Cost (DZD) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="corrective_maintenance_cost_max"
+                                        id="max_corrective_maintenance_cost"
                                         type="number" 
-                                        bind:value={formData.corrective_maintenance_cost_max}
-                                        class="kt-input {errors.corrective_maintenance_cost_max ? 'kt-input-error' : ''}"
+                                        bind:value={formData.max_corrective_maintenance_cost}
+                                        class="kt-input {errors.max_corrective_maintenance_cost ? 'kt-input-error' : ''}"
                                         placeholder="Enter maximum cost"
                                         min="0"
-                                        step="0.01"
+                                        step="0.001"
                                         required
                                     />
-                                    {#if errors.corrective_maintenance_cost_max}
-                                        <p class="text-sm text-destructive">{errors.corrective_maintenance_cost_max}</p>
+                                    {#if errors.max_corrective_maintenance_cost}
+                                        <p class="text-sm text-destructive">{errors.max_corrective_maintenance_cost}</p>
                                     {/if}
                                 </div>
                             </div>
@@ -762,59 +762,59 @@
                             <!-- Corrective Maintenance Delays -->
                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="corrective_maintenance_delay_min_hours">
+                                    <label class="text-sm font-medium text-mono" for="min_corrective_maintenance_delay_hours">
                                         Minimum Delay (hours) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="corrective_maintenance_delay_min_hours"
+                                        id="min_corrective_maintenance_delay_hours"
                                         type="number" 
-                                        bind:value={formData.corrective_maintenance_delay_min_hours}
-                                        class="kt-input {errors.corrective_maintenance_delay_min_hours ? 'kt-input-error' : ''}"
+                                        bind:value={formData.min_corrective_maintenance_delay_hours}
+                                        class="kt-input {errors.min_corrective_maintenance_delay_hours ? 'kt-input-error' : ''}"
                                         placeholder="Enter minimum delay"
-                                        min="0"
+                                        min="1"
                                         step="1"
                                         required
                                     />
-                                    {#if errors.corrective_maintenance_delay_min_hours}
-                                        <p class="text-sm text-destructive">{errors.corrective_maintenance_delay_min_hours}</p>
+                                    {#if errors.min_corrective_maintenance_delay_hours}
+                                        <p class="text-sm text-destructive">{errors.min_corrective_maintenance_delay_hours}</p>
                                     {/if}
                                 </div>
 
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="corrective_maintenance_delay_avg_hours">
+                                    <label class="text-sm font-medium text-mono" for="avg_corrective_maintenance_delay_hours">
                                         Average Delay (hours) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="corrective_maintenance_delay_avg_hours"
+                                        id="avg_corrective_maintenance_delay_hours"
                                         type="number" 
-                                        bind:value={formData.corrective_maintenance_delay_avg_hours}
-                                        class="kt-input {errors.corrective_maintenance_delay_avg_hours ? 'kt-input-error' : ''}"
+                                        bind:value={formData.avg_corrective_maintenance_delay_hours}
+                                        class="kt-input {errors.avg_corrective_maintenance_delay_hours ? 'kt-input-error' : ''}"
                                         placeholder="Enter average delay"
                                         min="0"
                                         step="1"
                                         required
                                     />
-                                    {#if errors.corrective_maintenance_delay_avg_hours}
-                                        <p class="text-sm text-destructive">{errors.corrective_maintenance_delay_avg_hours}</p>
+                                    {#if errors.avg_corrective_maintenance_delay_hours}
+                                        <p class="text-sm text-destructive">{errors.avg_corrective_maintenance_delay_hours}</p>
                                     {/if}
                                 </div>
 
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="corrective_maintenance_delay_max_hours">
+                                    <label class="text-sm font-medium text-mono" for="max_corrective_maintenance_delay_hours">
                                         Maximum Delay (hours) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="corrective_maintenance_delay_max_hours"
+                                        id="max_corrective_maintenance_delay_hours"
                                         type="number" 
-                                        bind:value={formData.corrective_maintenance_delay_max_hours}
-                                        class="kt-input {errors.corrective_maintenance_delay_max_hours ? 'kt-input-error' : ''}"
+                                        bind:value={formData.max_corrective_maintenance_delay_hours}
+                                        class="kt-input {errors.max_corrective_maintenance_delay_hours ? 'kt-input-error' : ''}"
                                         placeholder="Enter maximum delay"
                                         min="0"
                                         step="1"
                                         required
                                     />
-                                    {#if errors.corrective_maintenance_delay_max_hours}
-                                        <p class="text-sm text-destructive">{errors.corrective_maintenance_delay_max_hours}</p>
+                                    {#if errors.max_corrective_maintenance_delay_hours}
+                                        <p class="text-sm text-destructive">{errors.max_corrective_maintenance_delay_hours}</p>
                                     {/if}
                                 </div>
                             </div>

@@ -567,9 +567,9 @@
                                             </td>
                                             <td>
                                                 <div class="flex flex-col gap-1">
-                                                    <span class="text-sm font-medium">{profile.monthly_avg_salary}</span>
+                                                    <span class="text-sm font-medium">{profile.avg_salary_month}</span>
                                                     <span class="text-xs text-muted-foreground">
-                                                        {profile.monthly_min_salary} - {profile.monthly_max_salary}
+                                                        {profile.min_salary_month} - {profile.max_salary_month}
                                                     </span>
                                                 </div>
                                             </td>

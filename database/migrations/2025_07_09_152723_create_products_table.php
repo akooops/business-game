@@ -20,7 +20,7 @@ return new class extends Migration
             $table->enum('type', ['raw_material', 'component', 'finished_product']);
 
             // Elasticity coefficient for demand adjustments
-            $table->float('elasticity_coefficient', 13, 3)->default(1.000);
+            $table->decimal('elasticity_coefficient', 10, 5)->default(1);
 
             // Shelf life and expiration
             $table->integer('shelf_life_days')->nullable();

@@ -42,11 +42,11 @@ class EmployeeProfilesController extends Controller
 
         // Apply salary range filters (using average salary for filtering)
         if ($salaryMin) {
-            $employeeProfiles->where('monthly_avg_salary', '>=', $salaryMin);
+            $employeeProfiles->where('avg_salary_month', '>=', $salaryMin);
         }
 
         if ($salaryMax) {
-            $employeeProfiles->where('monthly_avg_salary', '<=', $salaryMax);
+            $employeeProfiles->where('avg_salary_month', '<=', $salaryMax);
         }
 
         // Apply recruitment cost range filters

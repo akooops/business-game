@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             
             // Recipe details
-            $table->float('quantity', 13, 3)->default(1.0);
+            $table->decimal('quantity', 10, 5)->default(1);
 
             // Foreign keys
             $table->foreignId('product_id')->constrained()->onDelete('cascade');

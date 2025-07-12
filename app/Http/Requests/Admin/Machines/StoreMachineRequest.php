@@ -29,35 +29,35 @@ class StoreMachineRequest extends FormRequest
             'setup_time_days' => 'required|integer|min:0',
 
             // Performance metrics
-            'hourly_energy_consumption' => 'required|numeric|min:0',
-            'hourly_carbon_emissions' => 'required|numeric|min:0',
+            'energy_consumption_hour' => 'required|numeric|min:0',
+            'carbon_emissions_hour' => 'required|numeric|min:0',
             'quality_factor' => 'required|numeric|min:0|max:1',
             
             // Speed ranges
-            'hourly_speed_min' => 'required|numeric|min:0',
-            'hourly_speed_avg' => 'required|numeric|min:0',
-            'hourly_speed_max' => 'required|numeric|min:0',
+            'min_speed_hour' => 'required|numeric|min:0',
+            'avg_speed_hour' => 'required|numeric|min:0',
+            'max_speed_hour' => 'required|numeric|min:0',
             
             // Reliability
-            'hourly_failure_chance' => 'required|numeric|min:0|max:1',
-            'hourly_reliability_decay' => 'required|numeric|min:0|max:1',
+            'failure_chance_hour' => 'required|numeric|min:0|max:1',
+            'reliability_decay_hour' => 'required|numeric|min:0|max:1',
             'maintenance_interval_days' => 'required|integer|min:1',
             
             // Predictive maintenance PERT
-            'predictive_maintenance_cost_min' => 'required|numeric|min:0',
-            'predictive_maintenance_cost_avg' => 'required|numeric|min:0',
-            'predictive_maintenance_cost_max' => 'required|numeric|min:0',
-            'predictive_maintenance_delay_min_hours' => 'required|integer|min:0',
-            'predictive_maintenance_delay_avg_hours' => 'required|integer|min:0',
-            'predictive_maintenance_delay_max_hours' => 'required|integer|min:0',
+            'min_predictive_maintenance_cost' => 'required|numeric|min:0',
+            'avg_predictive_maintenance_cost' => 'required|numeric|min:0',
+            'max_predictive_maintenance_cost' => 'required|numeric|min:0',
+            'min_predictive_maintenance_delay_hours' => 'required|integer|min:0',
+            'avg_predictive_maintenance_delay_hours' => 'required|integer|min:0',
+            'max_predictive_maintenance_delay_hours' => 'required|integer|min:0',
             
             // Corrective maintenance PERT
-            'corrective_maintenance_cost_min' => 'required|numeric|min:0',
-            'corrective_maintenance_cost_avg' => 'required|numeric|min:0',
-            'corrective_maintenance_cost_max' => 'required|numeric|min:0',
-            'corrective_maintenance_delay_min_hours' => 'required|integer|min:0',
-            'corrective_maintenance_delay_avg_hours' => 'required|integer|min:0',
-            'corrective_maintenance_delay_max_hours' => 'required|integer|min:0',
+            'min_corrective_maintenance_cost' => 'required|numeric|min:0',
+            'avg_corrective_maintenance_cost' => 'required|numeric|min:0',
+            'max_corrective_maintenance_cost' => 'required|numeric|min:0',
+            'min_corrective_maintenance_delay_hours' => 'required|integer|min:0',
+            'avg_corrective_maintenance_delay_hours' => 'required|integer|min:0',
+            'max_corrective_maintenance_delay_hours' => 'required|integer|min:0',
             
             // Relationships
             'employee_profiles' => 'nullable|array',
@@ -83,14 +83,14 @@ class StoreMachineRequest extends FormRequest
             'model' => 'machine model',
             'manufacturer' => 'manufacturer',
             'cost_to_acquire' => 'acquisition cost',
-            'hourly_energy_consumption' => 'energy consumption',
-            'hourly_carbon_emissions' => 'carbon emissions',
+            'energy_consumption_hour' => 'energy consumption',
+            'carbon_emissions_hour' => 'carbon emissions',
             'quality_factor' => 'quality factor',
-            'hourly_speed_min' => 'minimum speed',
-            'hourly_speed_avg' => 'average speed',
-            'hourly_speed_max' => 'maximum speed',
-            'hourly_failure_chance' => 'failure chance',
-            'hourly_reliability_decay' => 'reliability decay',
+            'min_speed_hour' => 'minimum speed',
+            'avg_speed_hour' => 'average speed',
+            'max_speed_hour' => 'maximum speed',
+            'failure_chance_hour' => 'failure chance',
+            'reliability_decay_hour' => 'reliability decay',
             'maintenance_interval_days' => 'maintenance interval',
             'outputs.*.product_id' => 'product',
             'file' => 'machine image',
@@ -104,8 +104,8 @@ class StoreMachineRequest extends FormRequest
     {
         return [
             'name.unique' => 'A machine with this name already exists.',
-            'hourly_failure_chance.max' => 'Failure chance must be between 0 and 1.',
-            'hourly_reliability_decay.max' => 'Reliability decay must be between 0 and 1.',
+            'failure_chance_hour.max' => 'Failure chance must be between 0 and 1.',
+            'reliability_decay_hour.max' => 'Reliability decay must be between 0 and 1.',
             'employee_profiles.*.employee_profile_id.exists' => 'Selected employee profile does not exist.',
             'outputs.*.product_id.required' => 'Product is required for each output.',
             'outputs.*.product_id.exists' => 'Selected product does not exist.',

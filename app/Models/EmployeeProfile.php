@@ -16,9 +16,9 @@ class EmployeeProfile extends Model
 
     protected $casts = [
         'skills' => 'array',
-        'monthly_min_salary' => 'decimal:3',
-        'monthly_avg_salary' => 'decimal:3',
-        'monthly_max_salary' => 'decimal:3',
+        'min_salary_month' => 'decimal:3',
+        'avg_salary_month' => 'decimal:3',
+        'max_salary_month' => 'decimal:3',
         'recruitment_cost_per_employee' => 'decimal:3',
         'training_cost_per_employee' => 'decimal:3',
     ];

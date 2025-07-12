@@ -52,7 +52,7 @@
         profile_description: profile.description,
         required_count: profile.pivot.required_count,
         recruitment_difficulty: profile.recruitment_difficulty,
-        avg_salary: profile.monthly_avg_salary
+        avg_salary: profile.avg_salary_month
     }));
 
     // Map machine outputs for display
@@ -223,7 +223,7 @@
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Energy Consumption</h4>
                             <p class="text-sm text-secondary-foreground">
-                                {formatNumber(machine.hourly_energy_consumption)} kWh/hour
+                                {formatNumber(machine.energy_consumption_hour)} kWh/hour
                                 <span class="text-xs text-muted-foreground ml-2">
                                     (Electricity usage per hour)
                                 </span>
@@ -234,7 +234,7 @@
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Carbon Emissions</h4>
                             <p class="text-sm text-secondary-foreground">
-                                {formatNumber(machine.hourly_carbon_emissions)} kg CO2/hour
+                                {formatNumber(machine.carbon_emissions_hour)} kg CO2/hour
                                 <span class="text-xs text-muted-foreground ml-2">
                                     (Environmental impact per hour)
                                 </span>
@@ -259,19 +259,19 @@
                                 <div class="flex flex-col gap-1">
                                     <span class="text-xs text-muted-foreground">Minimum</span>
                                     <p class="text-sm text-secondary-foreground">
-                                        {formatNumber(machine.hourly_speed_min)} units/h
+                                        {formatNumber(machine.min_speed_hour)} units/h
                                     </p>
                                 </div>
                                 <div class="flex flex-col gap-1">
                                     <span class="text-xs text-muted-foreground">Average</span>
                                     <p class="text-sm text-secondary-foreground font-medium">
-                                        {formatNumber(machine.hourly_speed_avg)} units/h
+                                        {formatNumber(machine.avg_speed_hour)} units/h
                                     </p>
                                 </div>
                                 <div class="flex flex-col gap-1">
                                     <span class="text-xs text-muted-foreground">Maximum</span>
                                     <p class="text-sm text-secondary-foreground">
-                                        {formatNumber(machine.hourly_speed_max)} units/h
+                                        {formatNumber(machine.max_speed_hour)} units/h
                                     </p>
                                 </div>
                             </div>
@@ -291,7 +291,7 @@
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Failure Rate</h4>
                             <p class="text-sm text-secondary-foreground">
-                                {formatNumber(machine.hourly_failure_chance, 3)}% per hour
+                                {formatNumber(machine.failure_chance_hour, 3)}% per hour
                                 <span class="text-xs text-muted-foreground ml-2">
                                     (Probability of breakdown per hour)
                                 </span>
@@ -302,7 +302,7 @@
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Reliability Decay</h4>
                             <p class="text-sm text-secondary-foreground">
-                                {formatNumber(machine.hourly_reliability_decay, 3)}% per hour
+                                {formatNumber(machine.reliability_decay_hour, 3)}% per hour
                                 <span class="text-xs text-muted-foreground ml-2">
                                     (Degradation of reliability over time)
                                 </span>
@@ -327,19 +327,19 @@
                                 <div class="flex flex-col gap-1">
                                     <span class="text-xs text-muted-foreground">Cost Range</span>
                                     <p class="text-sm text-secondary-foreground">
-                                        {formatCurrency(machine.predictive_maintenance_cost_min)} - {formatCurrency(machine.predictive_maintenance_cost_max)}
+                                        {formatCurrency(machine.min_predictive_maintenance_cost)} - {formatCurrency(machine.max_predictive_maintenance_cost)}
                                     </p>
                                     <p class="text-xs text-muted-foreground">
-                                        Avg: {formatCurrency(machine.predictive_maintenance_cost_avg)}
+                                        Avg: {formatCurrency(machine.avg_predictive_maintenance_cost)}
                                     </p>
                                 </div>
                                 <div class="flex flex-col gap-1">
                                     <span class="text-xs text-muted-foreground">Time Range</span>
                                     <p class="text-sm text-secondary-foreground">
-                                        {formatHours(machine.predictive_maintenance_delay_min_hours)} - {formatHours(machine.predictive_maintenance_delay_max_hours)}
+                                        {formatHours(machine.min_predictive_maintenance_delay_hours)} - {formatHours(machine.max_predictive_maintenance_delay_hours)}
                                     </p>
                                     <p class="text-xs text-muted-foreground">
-                                        Avg: {formatHours(machine.predictive_maintenance_delay_avg_hours)}
+                                        Avg: {formatHours(machine.avg_predictive_maintenance_delay_hours)}
                                     </p>
                                 </div>
                             </div>
@@ -352,19 +352,19 @@
                                 <div class="flex flex-col gap-1">
                                     <span class="text-xs text-muted-foreground">Cost Range</span>
                                     <p class="text-sm text-secondary-foreground">
-                                        {formatCurrency(machine.corrective_maintenance_cost_min)} - {formatCurrency(machine.corrective_maintenance_cost_max)}
+                                        {formatCurrency(machine.min_corrective_maintenance_cost)} - {formatCurrency(machine.max_corrective_maintenance_cost)}
                                     </p>
                                     <p class="text-xs text-muted-foreground">
-                                        Avg: {formatCurrency(machine.corrective_maintenance_cost_avg)}
+                                        Avg: {formatCurrency(machine.avg_corrective_maintenance_cost)}
                                     </p>
                                 </div>
                                 <div class="flex flex-col gap-1">
                                     <span class="text-xs text-muted-foreground">Time Range</span>
                                     <p class="text-sm text-secondary-foreground">
-                                        {formatHours(machine.corrective_maintenance_delay_min_hours)} - {formatHours(machine.corrective_maintenance_delay_max_hours)}
+                                        {formatHours(machine.min_corrective_maintenance_delay_hours)} - {formatHours(machine.max_corrective_maintenance_delay_hours)}
                                     </p>
                                     <p class="text-xs text-muted-foreground">
-                                        Avg: {formatHours(machine.corrective_maintenance_delay_avg_hours)}
+                                        Avg: {formatHours(machine.avg_corrective_maintenance_delay_hours)}
                                     </p>
                                 </div>
                             </div>

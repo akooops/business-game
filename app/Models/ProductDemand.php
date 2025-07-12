@@ -17,7 +17,6 @@ class ProductDemand extends Model
         'avg_demand' => 'decimal:3',
         'market_price' => 'decimal:3',
         'visibility_cost' => 'decimal:3',
-        'fluctuation_factor' => 'decimal:3',
         'is_visible' => 'boolean',
     ];
 

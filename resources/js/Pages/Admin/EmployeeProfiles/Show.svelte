@@ -151,7 +151,7 @@
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Minimum Monthly Salary</h4>
                             <p class="text-lg font-bold">
-                                ${employeeProfile?.monthly_min_salary}
+                                ${employeeProfile?.min_salary_month}
                             </p>
                         </div>
 
@@ -159,7 +159,7 @@
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Average Monthly Salary</h4>
                             <p class="text-lg font-bold">
-                                ${employeeProfile?.monthly_avg_salary}
+                                ${employeeProfile?.avg_salary_month}
                             </p>
                         </div>
 
@@ -167,7 +167,7 @@
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Maximum Monthly Salary</h4>
                             <p class="text-lg font-bold">
-                                ${employeeProfile?.monthly_max_salary}
+                                ${employeeProfile?.max_salary_month}
                             </p>
                         </div>
                     </div>

@@ -42,7 +42,6 @@
         market_price: '',
         visibility_cost: '',
         research_time_days: '',
-        fluctuation_factor: 1,
         is_visible: true
     };
 
@@ -75,7 +74,6 @@
             market_price: '',
             visibility_cost: '',
             research_time_days: '',
-            fluctuation_factor: 1,
             is_visible: true
         };
         
@@ -100,7 +98,6 @@
             market_price: gameweek.market_price,
             visibility_cost: gameweek.visibility_cost || '',
             research_time_days: gameweek.research_time_days || '',
-            fluctuation_factor: gameweek.fluctuation_factor,
             is_visible: gameweek.is_visible
         };
         
@@ -191,7 +188,6 @@
                     market_price: '',
                     visibility_cost: '',
                     research_time_days: '',
-                    fluctuation_factor: 1,
                     is_visible: true
                 };
                 
@@ -409,23 +405,21 @@
             return;
         }
 
-        const visibleData = demandData.filter(d => d.is_visible);
-
         const series = [
             {
                 name: 'Min Demand',
                 type: 'line',
-                data: visibleData.map(d => ({ x: parseInt(d.gameweek), y: parseFloat(d.min_demand) }))
+                data: demandData.map(d => ({ x: parseInt(d.gameweek), y: parseFloat(d.min_demand) }))
             },
             {
                 name: 'Average Demand',
                 type: 'line',
-                data: visibleData.map(d => ({ x: parseInt(d.gameweek), y: parseFloat(d.avg_demand) }))
+                data: demandData.map(d => ({ x: parseInt(d.gameweek), y: parseFloat(d.avg_demand) }))
             },
             {
                 name: 'Max Demand',
                 type: 'line',
-                data: visibleData.map(d => ({ x: parseInt(d.gameweek), y: parseFloat(d.max_demand) }))
+                data: demandData.map(d => ({ x: parseInt(d.gameweek), y: parseFloat(d.max_demand) }))
             }
         ];
 
@@ -712,7 +706,6 @@
                                                 <th>Market Price</th>
                                                 <th>Visibility Cost</th>
                                                 <th>Research Time</th>
-                                                <th>Fluctuation</th>
                                                 <th>Visible</th>
                                                 <th>Actions</th>
                                             </tr>
@@ -726,10 +719,9 @@
                                                     <td>{demand.min_demand}</td>
                                                     <td class="font-medium">{demand.avg_demand}</td>
                                                     <td>{demand.max_demand}</td>
-                                                    <td>${demand.market_price}</td>
-                                                    <td>{demand.visibility_cost ? '$' + demand.visibility_cost : '-'}</td>
+                                                    <td>DZD{demand.market_price}</td>
+                                                    <td>{demand.visibility_cost ? 'DZD' + demand.visibility_cost : '-'}</td>
                                                     <td>{demand.research_time_days ? demand.research_time_days + ' days' : '-'}</td>
-                                                    <td>{demand.fluctuation_factor}x</td>
                                                     <td>
                                                         {#if demand.is_visible}
                                                             <span class="kt-badge kt-badge-success kt-badge-sm">Visible</span>
@@ -815,7 +807,7 @@
                                 type="number" 
                                 bind:value={formData.min_demand}
                                 min="0"
-                                step="0.01"
+                                step="0.001"
                                 class="kt-input w-full {errors.min_demand ? 'kt-input-error' : ''}"
                                 required
                             />
@@ -830,7 +822,7 @@
                                 type="number" 
                                 bind:value={formData.avg_demand}
                                 min="0"
-                                step="0.01"
+                                step="0.001"
                                 class="kt-input w-full {errors.avg_demand ? 'kt-input-error' : ''}"
                                 required
                             />
@@ -845,7 +837,7 @@
                                 type="number" 
                                 bind:value={formData.max_demand}
                                 min="0"
-                                step="0.01"
+                                step="0.001"
                                 class="kt-input w-full {errors.max_demand ? 'kt-input-error' : ''}"
                                 required
                             />
@@ -856,12 +848,12 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-mono mb-2">Market Price ($)</label>
+                        <label class="block text-sm font-medium text-mono mb-2">Market Price (DZD)</label>
                         <input 
                             type="number" 
                             bind:value={formData.market_price}
                             min="0"
-                            step="0.01"
+                            step="0.001"
                             class="kt-input w-full {errors.market_price ? 'kt-input-error' : ''}"
                             required
                         />
@@ -873,9 +865,9 @@
                     <!-- Research & Visibility Settings -->
                     <div class="border border-border rounded-lg p-4 bg-secondary/20">
                         <h4 class="text-sm font-semibold text-mono mb-3">Research & Visibility Settings</h4>
-                        <p class="text-xs text-secondary-foreground mb-4">Settings for when data is not visible - costs and fluctuation after research</p>
+                        <p class="text-xs text-secondary-foreground mb-4">Settings for when data is not visible - costs a research time needed</p>
                         
-                        <div>
+                        <div class="mb-2">
                             <label class="block text-sm font-medium text-mono mb-2">Research Time (Days)</label>
                             <input 
                                 type="number" 
@@ -888,36 +880,19 @@
                             {/if}
                         </div>
 
-                        <div class="grid grid-cols-2 gap-3 my-2">
-                            <div>
-                                <label class="block text-sm font-medium text-mono mb-2">Visibility Cost ($)</label>
-                                <input 
-                                    type="number" 
-                                    bind:value={formData.visibility_cost}
-                                    min="0"
-                                    step="0.01"
-                                    class="kt-input w-full {errors.visibility_cost ? 'kt-input-error' : ''}"
-                                />
-                                {#if errors.visibility_cost}
-                                    <p class="text-sm text-destructive mt-1">{errors.visibility_cost}</p>
-                                {/if}
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-mono mb-2">Fluctuation Factor</label>
-                                <input 
-                                    type="number" 
-                                    bind:value={formData.fluctuation_factor}
-                                    min="0"
-                                    step="0.01"
-                                    class="kt-input w-full {errors.fluctuation_factor ? 'kt-input-error' : ''}"
-                                    required
-                                />
-                                {#if errors.fluctuation_factor}
-                                    <p class="text-sm text-destructive mt-1">{errors.fluctuation_factor}</p>
-                                {/if}
-                            </div>
-                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-mono mb-2">Visibility Cost (DZD)</label>
+                            <input 
+                                type="number" 
+                                bind:value={formData.visibility_cost}
+                                min="0"
+                                step="0.001"
+                                class="kt-input w-full {errors.visibility_cost ? 'kt-input-error' : ''}"
+                            />
+                            {#if errors.visibility_cost}
+                                <p class="text-sm text-destructive mt-1">{errors.visibility_cost}</p>
+                            {/if}
+                        </div>           
                         
                         <div class="flex items-center justify-between pt-3 border-t border-border">
                             <div class="flex flex-col">

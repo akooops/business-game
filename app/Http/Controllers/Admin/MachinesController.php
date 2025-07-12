@@ -66,20 +66,20 @@ class MachinesController extends Controller
 
         // Apply energy consumption range filters
         if ($energyMin) {
-            $machines->where('hourly_energy_consumption', '>=', $energyMin);
+            $machines->where('energy_consumption_hour', '>=', $energyMin);
         }
 
         if ($energyMax) {
-            $machines->where('hourly_energy_consumption', '<=', $energyMax);
+            $machines->where('energy_consumption_hour', '<=', $energyMax);
         }
 
         // Apply speed range filters (using average speed)
         if ($speedMin) {
-            $machines->where('hourly_speed_avg', '>=', $speedMin);
+            $machines->where('avg_speed_hour', '>=', $speedMin);
         }
 
         if ($speedMax) {
-            $machines->where('hourly_speed_avg', '<=', $speedMax);
+            $machines->where('avg_speed_hour', '<=', $speedMax);
         }
 
         // Apply quality range filters
@@ -111,29 +111,29 @@ class MachinesController extends Controller
 
         // Apply carbon emissions range filters
         if ($carbonMin) {
-            $machines->where('hourly_carbon_emissions', '>=', $carbonMin);
+            $machines->where('carbon_emissions_hour', '>=', $carbonMin);
         }
 
         if ($carbonMax) {
-            $machines->where('hourly_carbon_emissions', '<=', $carbonMax);
+            $machines->where('carbon_emissions_hour', '<=', $carbonMax);
         }
 
         // Apply failure rate range filters
         if ($failureMin) {
-            $machines->where('hourly_failure_chance', '>=', $failureMin);
+            $machines->where('failure_chance_hour', '>=', $failureMin);
         }
 
         if ($failureMax) {
-            $machines->where('hourly_failure_chance', '<=', $failureMax);
+            $machines->where('failure_chance_hour', '<=', $failureMax);
         }
 
         // Apply reliability decay range filters
         if ($decayMin) {
-            $machines->where('hourly_reliability_decay', '>=', $decayMin);
+            $machines->where('reliability_decay_hour', '>=', $decayMin);
         }
 
         if ($decayMax) {
-            $machines->where('hourly_reliability_decay', '<=', $decayMax);
+            $machines->where('reliability_decay_hour', '<=', $decayMax);
         }
 
         // Apply maintenance interval range filters

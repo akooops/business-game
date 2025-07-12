@@ -29,9 +29,9 @@ class StoreEmployeeProfileRequest extends FormRequest
             'skills.*' => 'string|max:255',
             
             // Salary validation - min must be less than avg, avg must be less than max
-            'monthly_min_salary' => 'required|numeric|min:0',
-            'monthly_avg_salary' => 'required|numeric|min:0|gte:monthly_min_salary',
-            'monthly_max_salary' => 'required|numeric|min:0|gte:monthly_avg_salary',
+            'min_salary_month' => 'required|numeric|min:0',
+            'avg_salary_month' => 'required|numeric|min:0|gte:min_salary_month',
+            'max_salary_month' => 'required|numeric|min:0|gte:avg_salary_month',
             
             // Recruitment
             'recruitment_difficulty' => 'required|in:very_easy,easy,medium,hard,very_hard',
@@ -49,8 +49,8 @@ class StoreEmployeeProfileRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'monthly_avg_salary.gte' => 'Average salary must be greater than or equal to minimum salary.',
-            'monthly_max_salary.gte' => 'Maximum salary must be greater than or equal to average salary.',
+            'avg_salary_month.gte' => 'Average salary must be greater than or equal to minimum salary.',
+            'max_salary_month.gte' => 'Maximum salary must be greater than or equal to average salary.',
             'recruitment_difficulty.in' => 'Please select a valid recruitment difficulty level.',
             'training_duration_days.max' => 'Training duration cannot exceed 365 days.',
         ];
@@ -64,9 +64,9 @@ class StoreEmployeeProfileRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'monthly_min_salary' => 'minimum monthly salary',
-            'monthly_avg_salary' => 'average monthly salary',
-            'monthly_max_salary' => 'maximum monthly salary',
+            'min_salary_month' => 'minimum monthly salary',
+            'avg_salary_month' => 'average monthly salary',
+            'max_salary_month' => 'maximum monthly salary',
             'recruitment_difficulty' => 'recruitment difficulty',
             'recruitment_cost_per_employee' => 'recruitment cost per employee',
             'training_cost_per_employee' => 'training cost per employee',
