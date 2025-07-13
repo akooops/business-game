@@ -39,15 +39,15 @@
         min_predictive_maintenance_cost: '',
         avg_predictive_maintenance_cost: '',
         max_predictive_maintenance_cost: '',
-        min_predictive_maintenance_delay_hours: '',
-        avg_predictive_maintenance_delay_hours: '',
-        max_predictive_maintenance_delay_hours: '',
+        min_predictive_maintenance_time_hours: '',
+        avg_predictive_maintenance_time_hours: '',
+        max_predictive_maintenance_time_hours: '',
         min_corrective_maintenance_cost: '',
         avg_corrective_maintenance_cost: '',
         max_corrective_maintenance_cost: '',
-        min_corrective_maintenance_delay_hours: '',
-        avg_corrective_maintenance_delay_hours: '',
-        max_corrective_maintenance_delay_hours: '',
+        min_corrective_maintenance_time_hours: '',
+        avg_corrective_maintenance_time_hours: '',
+        max_corrective_maintenance_time_hours: '',
         file: null,
         employee_profiles: [],
         outputs: []
@@ -629,62 +629,62 @@
                                 </div>
                             </div>
 
-                            <!-- Predictive Maintenance Delays -->
+                            <!-- Predictive Maintenance Times -->
                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="min_predictive_maintenance_delay_hours">
-                                        Minimum Delay (hours) <span class="text-destructive">*</span>
+                                    <label class="text-sm font-medium text-mono" for="min_predictive_maintenance_time_hours">
+                                        Minimum Time (hours) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="min_predictive_maintenance_delay_hours"
+                                        id="min_predictive_maintenance_time_hours"
                                         type="number" 
-                                        bind:value={formData.min_predictive_maintenance_delay_hours}
-                                        class="kt-input {errors.min_predictive_maintenance_delay_hours ? 'kt-input-error' : ''}"
-                                        placeholder="Enter minimum delay"
+                                        bind:value={formData.min_predictive_maintenance_time_hours}
+                                        class="kt-input {errors.min_predictive_maintenance_time_hours ? 'kt-input-error' : ''}"
+                                        placeholder="Enter minimum time"
                                         min="1"
                                         step="1"
                                         required
                                     />
-                                    {#if errors.min_predictive_maintenance_delay_hours}
-                                        <p class="text-sm text-destructive">{errors.min_predictive_maintenance_delay_hours}</p>
+                                    {#if errors.min_predictive_maintenance_time_hours}
+                                        <p class="text-sm text-destructive">{errors.min_predictive_maintenance_time_hours}</p>
                                     {/if}
                                 </div>
 
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="avg_predictive_maintenance_delay_hours">
-                                        Average Delay (hours) <span class="text-destructive">*</span>
+                                    <label class="text-sm font-medium text-mono" for="avg_predictive_maintenance_time_hours">
+                                        Average Time (hours) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="avg_predictive_maintenance_delay_hours"
+                                        id="avg_predictive_maintenance_time_hours"
                                         type="number" 
-                                        bind:value={formData.avg_predictive_maintenance_delay_hours}
-                                        class="kt-input {errors.avg_predictive_maintenance_delay_hours ? 'kt-input-error' : ''}"
-                                        placeholder="Enter average delay"
+                                        bind:value={formData.avg_predictive_maintenance_time_hours}
+                                        class="kt-input {errors.avg_predictive_maintenance_time_hours ? 'kt-input-error' : ''}"
+                                        placeholder="Enter average time"
                                         min="1"
                                         step="1"
                                         required
                                     />
-                                    {#if errors.avg_predictive_maintenance_delay_hours}
-                                        <p class="text-sm text-destructive">{errors.avg_predictive_maintenance_delay_hours}</p>
+                                    {#if errors.avg_predictive_maintenance_time_hours}
+                                        <p class="text-sm text-destructive">{errors.avg_predictive_maintenance_time_hours}</p>
                                     {/if}
                                 </div>
 
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="max_predictive_maintenance_delay_hours">
-                                        Maximum Delay (hours) <span class="text-destructive">*</span>
+                                    <label class="text-sm font-medium text-mono" for="max_predictive_maintenance_time_hours">
+                                        Maximum Time (hours) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="max_predictive_maintenance_delay_hours"
+                                        id="max_predictive_maintenance_time_hours"
                                         type="number" 
-                                        bind:value={formData.max_predictive_maintenance_delay_hours}
-                                        class="kt-input {errors.max_predictive_maintenance_delay_hours ? 'kt-input-error' : ''}"
-                                        placeholder="Enter maximum delay"
+                                        bind:value={formData.max_predictive_maintenance_time_hours}
+                                        class="kt-input {errors.max_predictive_maintenance_time_hours ? 'kt-input-error' : ''}"
+                                        placeholder="Enter maximum time"
                                         min="1"
                                         step="1"
                                         required
                                     />
-                                    {#if errors.max_predictive_maintenance_delay_hours}
-                                        <p class="text-sm text-destructive">{errors.max_predictive_maintenance_delay_hours}</p>
+                                    {#if errors.max_predictive_maintenance_time_hours}
+                                        <p class="text-sm text-destructive">{errors.max_predictive_maintenance_time_hours}</p>
                                     {/if}
                                 </div>
                             </div>
@@ -759,62 +759,62 @@
                                 </div>
                             </div>
 
-                            <!-- Corrective Maintenance Delays -->
+                            <!-- Corrective Maintenance Times -->
                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="min_corrective_maintenance_delay_hours">
-                                        Minimum Delay (hours) <span class="text-destructive">*</span>
+                                    <label class="text-sm font-medium text-mono" for="min_corrective_maintenance_time_hours">
+                                        Minimum Time (hours) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="min_corrective_maintenance_delay_hours"
+                                        id="min_corrective_maintenance_time_hours"
                                         type="number" 
-                                        bind:value={formData.min_corrective_maintenance_delay_hours}
-                                        class="kt-input {errors.min_corrective_maintenance_delay_hours ? 'kt-input-error' : ''}"
-                                        placeholder="Enter minimum delay"
+                                        bind:value={formData.min_corrective_maintenance_time_hours}
+                                        class="kt-input {errors.min_corrective_maintenance_time_hours ? 'kt-input-error' : ''}"
+                                        placeholder="Enter minimum time"
                                         min="1"
                                         step="1"
                                         required
                                     />
-                                    {#if errors.min_corrective_maintenance_delay_hours}
-                                        <p class="text-sm text-destructive">{errors.min_corrective_maintenance_delay_hours}</p>
+                                    {#if errors.min_corrective_maintenance_time_hours}
+                                        <p class="text-sm text-destructive">{errors.min_corrective_maintenance_time_hours}</p>
                                     {/if}
                                 </div>
 
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="avg_corrective_maintenance_delay_hours">
-                                        Average Delay (hours) <span class="text-destructive">*</span>
+                                    <label class="text-sm font-medium text-mono" for="avg_corrective_maintenance_time_hours">
+                                        Average Time (hours) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="avg_corrective_maintenance_delay_hours"
+                                        id="avg_corrective_maintenance_time_hours"
                                         type="number" 
-                                        bind:value={formData.avg_corrective_maintenance_delay_hours}
-                                        class="kt-input {errors.avg_corrective_maintenance_delay_hours ? 'kt-input-error' : ''}"
-                                        placeholder="Enter average delay"
+                                        bind:value={formData.avg_corrective_maintenance_time_hours}
+                                        class="kt-input {errors.avg_corrective_maintenance_time_hours ? 'kt-input-error' : ''}"
+                                        placeholder="Enter average time"
                                         min="0"
                                         step="1"
                                         required
                                     />
-                                    {#if errors.avg_corrective_maintenance_delay_hours}
-                                        <p class="text-sm text-destructive">{errors.avg_corrective_maintenance_delay_hours}</p>
+                                    {#if errors.avg_corrective_maintenance_time_hours}
+                                        <p class="text-sm text-destructive">{errors.avg_corrective_maintenance_time_hours}</p>
                                     {/if}
                                 </div>
 
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="max_corrective_maintenance_delay_hours">
-                                        Maximum Delay (hours) <span class="text-destructive">*</span>
+                                    <label class="text-sm font-medium text-mono" for="max_corrective_maintenance_time_hours">
+                                        Maximum Time (hours) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="max_corrective_maintenance_delay_hours"
+                                        id="max_corrective_maintenance_time_hours"
                                         type="number" 
-                                        bind:value={formData.max_corrective_maintenance_delay_hours}
-                                        class="kt-input {errors.max_corrective_maintenance_delay_hours ? 'kt-input-error' : ''}"
-                                        placeholder="Enter maximum delay"
+                                        bind:value={formData.max_corrective_maintenance_time_hours}
+                                        class="kt-input {errors.max_corrective_maintenance_time_hours ? 'kt-input-error' : ''}"
+                                        placeholder="Enter maximum time"
                                         min="0"
                                         step="1"
                                         required
                                     />
-                                    {#if errors.max_corrective_maintenance_delay_hours}
-                                        <p class="text-sm text-destructive">{errors.max_corrective_maintenance_delay_hours}</p>
+                                    {#if errors.max_corrective_maintenance_time_hours}
+                                        <p class="text-sm text-destructive">{errors.max_corrective_maintenance_time_hours}</p>
                                     {/if}
                                 </div>
                             </div>
@@ -846,7 +846,7 @@
                                     ajax={{
                                         url: route('admin.employee-profiles.index'),
                                         dataType: 'json',
-                                        delay: 300,
+                                        time: 300,
                                         data: function(params) {
                                             return {
                                                 search: params.term,
@@ -971,7 +971,7 @@
                                     ajax={{
                                         url: route('admin.products.index'),
                                         dataType: 'json',
-                                        delay: 300,
+                                        time: 300,
                                         data: function(params) {
                                             return {
                                                 search: params.term,

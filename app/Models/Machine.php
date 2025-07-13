@@ -95,9 +95,9 @@ class Machine extends Model
     public function getPredictiveMaintenanceDelay()
     {
         return $this->calculatePertValue(
-            $this->min_predictive_maintenance_delay_hours,
-            $this->avg_predictive_maintenance_delay_hours,
-            $this->max_predictive_maintenance_delay_hours
+            $this->min_predictive_maintenance_time_hours,
+            $this->avg_predictive_maintenance_time_hours,
+            $this->max_predictive_maintenance_time_hours
         );
     }
 
@@ -113,9 +113,9 @@ class Machine extends Model
     public function getCorrectiveMaintenanceDelay()
     {
         return $this->calculatePertValue(
-            $this->min_corrective_maintenance_delay_hours,
-            $this->avg_corrective_maintenance_delay_hours,
-            $this->max_corrective_maintenance_delay_hours
+            $this->min_corrective_maintenance_time_hours,
+            $this->avg_corrective_maintenance_time_hours,
+            $this->max_corrective_maintenance_time_hours
         );
     }
 

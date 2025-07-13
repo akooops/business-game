@@ -20,10 +20,11 @@ return new class extends Migration
             $table->text('description')->nullable();
 
             // Setting type
-            $table->enum('type', ['string', 'integer', 'float', 'boolean', 'array', 'object']);
+            $table->string('type');
 
             // Setting value
             $table->json('value')->nullable();
+            $table->json('options')->nullable();
 
             $table->timestamps();
         });

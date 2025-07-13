@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\MachinesController;
 use App\Http\Controllers\Admin\CountriesController;
 use App\Http\Controllers\Admin\WilayasController;
 use App\Http\Controllers\Admin\TechnologiesController;
+use App\Http\Controllers\Admin\SettingsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -80,6 +81,10 @@ Route::prefix('admin')->middleware(['auth', 'handle.inertia'])->group(function (
     Route::get('technologies/{technology}/edit', [TechnologiesController::class, 'edit'])->middleware('check.permission:admin.technologies.update')->name('admin.technologies.edit');
     Route::patch('technologies/{technology}', [TechnologiesController::class, 'update'])->middleware('check.permission:admin.technologies.update')->name('admin.technologies.update');
     Route::delete('technologies/{technology}', [TechnologiesController::class, 'destroy'])->middleware('check.permission:admin.technologies.destroy')->name('admin.technologies.destroy');
+
+    //Settings
+    Route::get('settings', [SettingsController::class, 'index'])->middleware('check.permission:admin.settings.index')->name('admin.settings.index');
+    Route::patch('settings/{setting}', [SettingsController::class, 'update'])->middleware('check.permission:admin.settings.update')->name('admin.settings.update');
 
     // Products
     Route::get('products', [ProductsController::class, 'index'])->middleware('check.permission:admin.products.index')->name('admin.products.index');

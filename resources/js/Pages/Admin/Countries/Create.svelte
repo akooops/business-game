@@ -452,7 +452,7 @@
                                 {#if errors.max_shipping_time_days}
                                     <p class="text-sm text-destructive">{errors.max_shipping_time_days}</p>
                                 {/if}
-                                <p class="text-sm text-secondary-foreground">Delayed delivery time (days)</p>
+                                <p class="text-sm text-secondary-foreground">Delivery time (days)</p>
                             </div>
                         </div>
                     </div>

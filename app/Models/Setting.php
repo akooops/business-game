@@ -14,5 +14,6 @@ class Setting extends Model
 
     protected $casts = [
         'value' => 'json',
+        'options' => 'json',
     ];
 }

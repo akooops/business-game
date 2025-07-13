@@ -43,17 +43,17 @@ return new class extends Migration
             $table->decimal('min_predictive_maintenance_cost', 15, 5)->default(0);
             $table->decimal('avg_predictive_maintenance_cost', 15, 5)->default(0);
             $table->decimal('max_predictive_maintenance_cost', 15, 5)->default(0);
-            $table->integer('min_predictive_maintenance_delay_hours')->default(1);
-            $table->integer('avg_predictive_maintenance_delay_hours')->default(1);
-            $table->integer('max_predictive_maintenance_delay_hours')->default(1);
+            $table->integer('min_predictive_maintenance_time_hours')->default(1);
+            $table->integer('avg_predictive_maintenance_time_hours')->default(1);
+            $table->integer('max_predictive_maintenance_time_hours')->default(1);
             
             // PERT Distribution for Corrective Maintenance
             $table->decimal('min_corrective_maintenance_cost', 15, 5)->default(0);
             $table->decimal('avg_corrective_maintenance_cost', 15, 5)->default(0);
             $table->decimal('max_corrective_maintenance_cost', 15, 5)->default(0);
-            $table->integer('min_corrective_maintenance_delay_hours')->default(1);
-            $table->integer('avg_corrective_maintenance_delay_hours')->default(1);
-            $table->integer('max_corrective_maintenance_delay_hours')->default(1);
+            $table->integer('min_corrective_maintenance_time_hours')->default(1);
+            $table->integer('avg_corrective_maintenance_time_hours')->default(1);
+            $table->integer('max_corrective_maintenance_time_hours')->default(1);
             $table->timestamps();
         });
     }

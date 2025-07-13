@@ -53,17 +53,17 @@ class UpdateMachineRequest extends FormRequest
             'min_predictive_maintenance_cost' => 'required|numeric|min:0',
             'avg_predictive_maintenance_cost' => 'required|numeric|min:0',
             'max_predictive_maintenance_cost' => 'required|numeric|min:0',
-            'min_predictive_maintenance_delay_hours' => 'required|integer|min:0',
-            'avg_predictive_maintenance_delay_hours' => 'required|integer|min:0',
-            'max_predictive_maintenance_delay_hours' => 'required|integer|min:0',
+            'min_predictive_maintenance_time_hours' => 'required|integer|min:0',
+            'avg_predictive_maintenance_time_hours' => 'required|integer|min:0',
+            'max_predictive_maintenance_time_hours' => 'required|integer|min:0',
             
             // Corrective maintenance PERT
             'min_corrective_maintenance_cost' => 'required|numeric|min:0',
             'avg_corrective_maintenance_cost' => 'required|numeric|min:0',
             'max_corrective_maintenance_cost' => 'required|numeric|min:0',
-            'min_corrective_maintenance_delay_hours' => 'required|integer|min:0',
-            'avg_corrective_maintenance_delay_hours' => 'required|integer|min:0',
-            'max_corrective_maintenance_delay_hours' => 'required|integer|min:0',
+            'min_corrective_maintenance_time_hours' => 'required|integer|min:0',
+            'avg_corrective_maintenance_time_hours' => 'required|integer|min:0',
+            'max_corrective_maintenance_time_hours' => 'required|integer|min:0',
             
             // Machine employee profiles validation
             'employee_profiles' => 'nullable|array',

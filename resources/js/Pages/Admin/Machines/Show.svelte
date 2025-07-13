@@ -336,10 +336,10 @@
                                 <div class="flex flex-col gap-1">
                                     <span class="text-xs text-muted-foreground">Time Range</span>
                                     <p class="text-sm text-secondary-foreground">
-                                        {formatHours(machine.min_predictive_maintenance_delay_hours)} - {formatHours(machine.max_predictive_maintenance_delay_hours)}
+                                        {formatHours(machine.min_predictive_maintenance_time_hours)} - {formatHours(machine.max_predictive_maintenance_time_hours)}
                                     </p>
                                     <p class="text-xs text-muted-foreground">
-                                        Avg: {formatHours(machine.avg_predictive_maintenance_delay_hours)}
+                                        Avg: {formatHours(machine.avg_predictive_maintenance_time_hours)}
                                     </p>
                                 </div>
                             </div>
@@ -361,10 +361,10 @@
                                 <div class="flex flex-col gap-1">
                                     <span class="text-xs text-muted-foreground">Time Range</span>
                                     <p class="text-sm text-secondary-foreground">
-                                        {formatHours(machine.min_corrective_maintenance_delay_hours)} - {formatHours(machine.max_corrective_maintenance_delay_hours)}
+                                        {formatHours(machine.min_corrective_maintenance_time_hours)} - {formatHours(machine.max_corrective_maintenance_time_hours)}
                                     </p>
                                     <p class="text-xs text-muted-foreground">
-                                        Avg: {formatHours(machine.avg_corrective_maintenance_delay_hours)}
+                                        Avg: {formatHours(machine.avg_corrective_maintenance_time_hours)}
                                     </p>
                                 </div>
                             </div>
