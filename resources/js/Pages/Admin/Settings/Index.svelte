@@ -1,6 +1,7 @@
 <script>
     import AdminLayout from '../../Layouts/AdminLayout.svelte';
     import Pagination from '../../Components/Pagination.svelte';
+    import Flatpickr from '../../Components/Forms/Flatpickr.svelte';
     import { onMount, tick } from 'svelte';
     import { page } from '@inertiajs/svelte'
 
@@ -414,6 +415,21 @@
                                                                 {/each}
                                                             {/if}
                                                         </select>
+                                                    {:else if setting.type === 'timestamp'}
+                                                        <div class="flex-1">
+                                                            <Flatpickr
+                                                                id="timestamp-{setting.id}"
+                                                                bind:value={setting.value}
+                                                                placeholder="Select date and time"
+                                                                config={{
+                                                                    enableTime: true,
+                                                                    dateFormat: 'Y-m-d H:i:S',
+                                                                    time_24hr: true,
+                                                                    allowInput: true
+                                                                }}
+                                                                on:change={(e) => handleValueChange(setting, e.detail.value)}
+                                                            />
+                                                        </div>
                                                     {:else if setting.type === 'array'}
                                                         <div class="flex flex-col gap-2 flex-1">
                                                             {#each setting.value as item, index}

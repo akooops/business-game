@@ -19,6 +19,7 @@ class UpdateSettingRequest extends FormRequest
             'number' => ['numeric'],
             'select' => $options && is_array($options) ? ['string', 'in:' . implode(',', $options)] : ['string'],
             'array' => ['string'], // Arrays come as JSON string from frontend
+            'timestamp' => ['string', 'date_format:Y-m-d H:i:s'],
             default => ['string'],
         };
 

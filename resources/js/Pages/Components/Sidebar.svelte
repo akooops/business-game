@@ -26,6 +26,9 @@
         if (url.includes('/admin/countries') || url.includes('/admin/wilayas')) {
             return 'logistics';
         }
+        if (url.includes('/admin/settings')) {
+            return 'settings';
+        }
 
         // Add more route-to-section mappings here as needed
         return 'dashboard'; // default fallback
@@ -167,6 +170,21 @@
                     </span>
                     <span class="kt-tooltip" data-kt-tooltip-content="true">
                         Logistics Management
+                    </span>
+                </button>
+                {/if}
+
+                {#if hasPermission('admin.settings.index')}
+                <button 
+                    class="kt-btn kt-btn-icon kt-btn-ghost rounded-md size-9 border border-transparent hover:bg-background hover:[&_i]:text-primary hover:border-border {activeSection === 'settings' ? 'bg-background [&_i]:text-primary border-border' : ''}" 
+                    data-kt-tooltip="" 
+                    data-kt-tooltip-placement="right"
+                    on:click={() => setActiveSection('settings')}>
+                    <span class="kt-menu-icon">
+                        <i class="ki-outline ki-setting-2 text-lg"></i>
+                    </span>
+                    <span class="kt-tooltip" data-kt-tooltip-content="true">
+                        Settings
                     </span>
                 </button>
                 {/if}
@@ -457,6 +475,26 @@
                 </div>
                 {/if}
 
+                <!-- Settings Section -->
+                {#if activeSection === 'settings'}
+                <div class="mb-3">
+                    <h3 class="text-xs text-muted-foreground uppercase ps-2.5 mb-2.5">
+                        Settings
+                    </h3>
+                    {#if hasPermission('admin.settings.index')}
+                    <div class="kt-menu-item">
+                        <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute('admin.settings.index') ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.settings.index')}>
+                            <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
+                                <i class="ki-outline ki-setting-2 text-lg"></i>
+                            </span>
+                            <span class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono ms-2">
+                                Settings
+                            </span>
+                        </a>
+                    </div>
+                    {/if}
+                </div>
+                {/if}
             </div>
             <!-- End of Sidebar Menu -->
         </div>
