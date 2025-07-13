@@ -28,31 +28,10 @@ class UpdateCountryRequest extends FormRequest
                 'max:255',
                 Rule::unique('countries', 'name')->ignore($this->route('country'))
             ],
-            'code' => [
-                'required',
-                'string',
-                'max:3',
-                Rule::unique('countries', 'code')->ignore($this->route('country'))
-            ],
 
-            // Shipping costs
-            'min_shipping_cost' => 'required|numeric|min:0',
-            'max_shipping_cost' => 'required|numeric|min:0',
-            'avg_shipping_cost' => 'required|numeric|min:0',
-            
-            // Shipping time
-            'min_shipping_time_days' => 'required|integer|min:0',
-            'avg_shipping_time_days' => 'required|integer|min:0',
-            'max_shipping_time_days' => 'required|integer|min:0',
             
             // Tax rates (percentages as decimals, 0-1 range)
             'customs_duties_rate' => 'required|numeric|min:0|max:1',
-            'tva_rate' => 'required|numeric|min:0|max:1',
-            'insurance_rate' => 'required|numeric|min:0|max:1',
-            
-            // Costs
-            'freight_cost' => 'required|numeric|min:0',
-            'port_handling_fee' => 'required|numeric|min:0',
             
             // System flags
             'allows_imports' => 'required|boolean',
@@ -69,18 +48,7 @@ class UpdateCountryRequest extends FormRequest
     {
         return [
             'name' => 'country name',
-            'code' => 'country code',
-            'min_shipping_cost' => 'minimum shipping cost',
-            'max_shipping_cost' => 'maximum shipping cost',
-            'avg_shipping_cost' => 'average shipping cost',
-            'min_shipping_time_days' => 'minimum shipping time',
-            'avg_shipping_time_days' => 'average shipping time',
-            'max_shipping_time_days' => 'maximum shipping time',
             'customs_duties_rate' => 'customs duties rate',
-            'tva_rate' => 'TVA rate',
-            'insurance_rate' => 'insurance rate',
-            'freight_cost' => 'freight cost',
-            'port_handling_fee' => 'port handling fee',
             'allows_imports' => 'allows imports',
             'file' => 'flag image',
         ];
@@ -93,17 +61,7 @@ class UpdateCountryRequest extends FormRequest
     {
         return [
             'name.unique' => 'A country with this name already exists.',
-            'code.unique' => 'A country with this code already exists.',
-            'code.max' => 'Country code must be 3 characters or less.',
-            'min_shipping_cost.required' => 'Minimum shipping cost is required.',
-            'max_shipping_cost.required' => 'Maximum shipping cost is required.',
-            'avg_shipping_cost.required' => 'Average shipping cost is required.',
-            'min_shipping_time_days.required' => 'Minimum shipping time is required.',
-            'avg_shipping_time_days.required' => 'Average shipping time is required.',
-            'max_shipping_time_days.required' => 'Maximum shipping time is required.',
             'customs_duties_rate.max' => 'Customs duties rate must be between 0 and 1 (0-100%).',
-            'tva_rate.max' => 'TVA rate must be between 0 and 1 (0-100%).',
-            'insurance_rate.max' => 'Insurance rate must be between 0 and 1 (0-100%).',
             'file.max' => 'Flag image must not exceed 2MB.',
         ];
     }

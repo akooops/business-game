@@ -15,17 +15,31 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->boolean('is_international')->default(false);
+
+            // Research costs
+            $table->boolean('needs_research')->default(false);
             $table->decimal('research_cost', 10, 5)->default(0);
-            
+            $table->integer('research_time_days')->default(1);
+
+            // Shipping costs
+            $table->decimal('min_shipping_cost', 15, 5)->default(0); 
+            $table->decimal('max_shipping_cost', 15, 5)->default(0); 
+            $table->decimal('avg_shipping_cost', 15, 5)->default(0); 
+            $table->decimal('real_shipping_cost', 15, 5)->default(0); 
+
+            // Shipping times (days)
+            $table->integer('min_shipping_time_days')->default(1);
+            $table->integer('avg_shipping_time_days')->default(1);
+            $table->integer('max_shipping_time_days')->default(1);
+
+            //Carbon footprint per unit
+            $table->decimal('carbon_footprint', 15, 5)->default(0);
+
             // Location relationships - one or the other based on type
             $table->foreignId('country_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('wilaya_id')->nullable()->constrained()->onDelete('cascade');
             
             $table->timestamps();
-            
-            // Ensure only one location type is set
-            $table->index(['is_international', 'country_id']);
-            $table->index(['is_international', 'wilaya_id']);
         });
     }
 

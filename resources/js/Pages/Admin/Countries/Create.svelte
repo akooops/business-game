@@ -22,19 +22,8 @@
     // Form data
     let form = {
         name: '',
-        code: '',
         customs_duties_rate: 0.25,
-        tva_rate: 0.19,
-        insurance_rate: 0.005,
-        freight_cost: 0,
-        port_handling_fee: 20000,
         allows_imports: true,
-        min_shipping_cost: 0,
-        max_shipping_cost: 0,
-        avg_shipping_cost: 0,
-        min_shipping_time_days: 1,
-        avg_shipping_time_days: 3,
-        max_shipping_time_days: 7,
         file: null
     };
 
@@ -151,25 +140,6 @@
                                 {/if}
                             </div>
 
-                            <!-- Country Code -->
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="code">
-                                    Country Code <span class="text-destructive">*</span>
-                                </label>
-                                <input
-                                    id="code"
-                                    type="text"
-                                    class="kt-input {errors.code ? 'kt-input-error' : ''}"
-                                    placeholder="Enter country code (e.g., USA, CHN)"
-                                    maxlength="3"
-                                    bind:value={form.code}
-                                />
-                                {#if errors.code}
-                                    <p class="text-sm text-destructive">{errors.code}</p>
-                                {/if}
-                                <p class="text-sm text-secondary-foreground">3 characters maximum</p>
-                            </div>
-
                             <!-- Allows Imports -->
                             <div class="flex items-center gap-2">
                                 <input 
@@ -198,7 +168,7 @@
                         <h4 class="kt-card-title">Tax Rates</h4>
                     </div>
                     <div class="kt-card-content">
-                        <div class="grid gap-4 lg:grid-cols-2">
+                        <div class="grid gap-4">
                             <!-- Customs Duties Rate -->
                             <div class="flex flex-col gap-2">
                                 <label class="text-sm font-medium text-mono" for="customs_duties_rate">
@@ -220,239 +190,6 @@
                                 <p class="text-sm text-secondary-foreground">
                                     Current: {(form.customs_duties_rate * 100).toFixed(1)}%
                                 </p>
-                            </div>
-
-                            <!-- TVA Rate -->
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="tva_rate">
-                                    TVA Rate <span class="text-destructive">*</span>
-                                </label>
-                                <input
-                                    id="tva_rate"
-                                    type="number"
-                                    class="kt-input {errors.tva_rate ? 'kt-input-error' : ''}"
-                                    placeholder="0.19"
-                                    step="0.001"
-                                    min="0"
-                                    max="1"
-                                    bind:value={form.tva_rate}
-                                />
-                                {#if errors.tva_rate}
-                                    <p class="text-sm text-destructive">{errors.tva_rate}</p>
-                                {/if}
-                                <p class="text-sm text-secondary-foreground">
-                                    Current: {(form.tva_rate * 100).toFixed(1)}%
-                                </p>
-                            </div>
-
-                            <!-- Insurance Rate -->
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="insurance_rate">
-                                    Insurance Rate <span class="text-destructive">*</span>
-                                </label>
-                                <input
-                                    id="insurance_rate"
-                                    type="number"
-                                    class="kt-input {errors.insurance_rate ? 'kt-input-error' : ''}"
-                                    placeholder="0.005"
-                                    step="0.001"
-                                    min="0"
-                                    max="1"
-                                    bind:value={form.insurance_rate}
-                                />
-                                {#if errors.insurance_rate}
-                                    <p class="text-sm text-destructive">{errors.insurance_rate}</p>
-                                {/if}
-                                <p class="text-sm text-secondary-foreground">
-                                    Current: {(form.insurance_rate * 100).toFixed(1)}%
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Costs Card -->
-                <div class="kt-card">
-                    <div class="kt-card-header">
-                        <h4 class="kt-card-title">Shipping & Handling Costs</h4>
-                    </div>
-                    <div class="kt-card-content">
-                        <div class="grid gap-4 lg:grid-cols-2">
-                            <!-- Freight Cost -->
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="freight_cost">
-                                    Freight Cost <span class="text-destructive">*</span>
-                                </label>
-                                <input
-                                    id="freight_cost"
-                                    type="number"
-                                    class="kt-input {errors.freight_cost ? 'kt-input-error' : ''}"
-                                    placeholder="0"
-                                    step="0.01"
-                                    min="0"
-                                    bind:value={form.freight_cost}
-                                />
-                                {#if errors.freight_cost}
-                                    <p class="text-sm text-destructive">{errors.freight_cost}</p>
-                                {/if}
-                                <p class="text-sm text-secondary-foreground">Base freight cost per shipment</p>
-                            </div>
-
-                            <!-- Port Handling Fee -->
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="port_handling_fee">
-                                    Port Handling Fee <span class="text-destructive">*</span>
-                                </label>
-                                <input
-                                    id="port_handling_fee"
-                                    type="number"
-                                    class="kt-input {errors.port_handling_fee ? 'kt-input-error' : ''}"
-                                    placeholder="20000"
-                                    step="0.01"
-                                    min="0"
-                                    bind:value={form.port_handling_fee}
-                                />
-                                {#if errors.port_handling_fee}
-                                    <p class="text-sm text-destructive">{errors.port_handling_fee}</p>
-                                {/if}
-                                <p class="text-sm text-secondary-foreground">Port handling charges</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Shipping Cost Ranges Card -->
-                <div class="kt-card">
-                    <div class="kt-card-header">
-                        <h4 class="kt-card-title">Shipping Cost Ranges</h4>
-                    </div>
-                    <div class="kt-card-content">
-                        <div class="grid gap-4 lg:grid-cols-3">
-                            <!-- Minimum Shipping Cost -->
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="min_shipping_cost">
-                                    Minimum Shipping Cost <span class="text-destructive">*</span>
-                                </label>
-                                <input
-                                    id="min_shipping_cost"
-                                    type="number"
-                                    class="kt-input {errors.min_shipping_cost ? 'kt-input-error' : ''}"
-                                    placeholder="0"
-                                    step="0.001"
-                                    min="0"
-                                    bind:value={form.min_shipping_cost}
-                                />
-                                {#if errors.min_shipping_cost}
-                                    <p class="text-sm text-destructive">{errors.min_shipping_cost}</p>
-                                {/if}
-                                <p class="text-sm text-secondary-foreground">Best case shipping cost</p>
-                            </div>
-
-                            <!-- Average Shipping Cost -->
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="avg_shipping_cost">
-                                    Average Shipping Cost <span class="text-destructive">*</span>
-                                </label>
-                                <input
-                                    id="avg_shipping_cost"
-                                    type="number"
-                                    class="kt-input {errors.avg_shipping_cost ? 'kt-input-error' : ''}"
-                                    placeholder="0"
-                                    step="0.001"
-                                    min="0"
-                                    bind:value={form.avg_shipping_cost}
-                                />
-                                {#if errors.avg_shipping_cost}
-                                    <p class="text-sm text-destructive">{errors.avg_shipping_cost}</p>
-                                {/if}
-                                <p class="text-sm text-secondary-foreground">Typical shipping cost</p>
-                            </div>
-
-                            <!-- Maximum Shipping Cost -->
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="max_shipping_cost">
-                                    Maximum Shipping Cost <span class="text-destructive">*</span>
-                                </label>
-                                <input
-                                    id="max_shipping_cost"
-                                    type="number"
-                                    class="kt-input {errors.max_shipping_cost ? 'kt-input-error' : ''}"
-                                    placeholder="0"
-                                    step="0.001"
-                                    min="0"
-                                    bind:value={form.max_shipping_cost}
-                                />
-                                {#if errors.max_shipping_cost}
-                                    <p class="text-sm text-destructive">{errors.max_shipping_cost}</p>
-                                {/if}
-                                <p class="text-sm text-secondary-foreground">Worst case shipping cost</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Shipping Time Ranges Card -->
-                <div class="kt-card">
-                    <div class="kt-card-header">
-                        <h4 class="kt-card-title">Shipping Time Ranges</h4>
-                    </div>
-                    <div class="kt-card-content">
-                        <div class="grid gap-4 lg:grid-cols-3">
-                            <!-- Minimum Shipping Time -->
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="min_shipping_time_days">
-                                    Minimum Shipping Time <span class="text-destructive">*</span>
-                                </label>
-                                <input
-                                    id="min_shipping_time_days"
-                                    type="number"
-                                    class="kt-input {errors.min_shipping_time_days ? 'kt-input-error' : ''}"
-                                    placeholder="1"
-                                    min="1"
-                                    bind:value={form.min_shipping_time_days}
-                                />
-                                {#if errors.min_shipping_time_days}
-                                    <p class="text-sm text-destructive">{errors.min_shipping_time_days}</p>
-                                {/if}
-                                <p class="text-sm text-secondary-foreground">Express delivery time (days)</p>
-                            </div>
-
-                            <!-- Average Shipping Time -->
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="avg_shipping_time_days">
-                                    Average Shipping Time <span class="text-destructive">*</span>
-                                </label>
-                                <input
-                                    id="avg_shipping_time_days"
-                                    type="number"
-                                    class="kt-input {errors.avg_shipping_time_days ? 'kt-input-error' : ''}"
-                                    placeholder="3"
-                                    min="1"
-                                    bind:value={form.avg_shipping_time_days}
-                                />
-                                {#if errors.avg_shipping_time_days}
-                                    <p class="text-sm text-destructive">{errors.avg_shipping_time_days}</p>
-                                {/if}
-                                <p class="text-sm text-secondary-foreground">Standard delivery time (days)</p>
-                            </div>
-
-                            <!-- Maximum Shipping Time -->
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="max_shipping_time_days">
-                                    Maximum Shipping Time <span class="text-destructive">*</span>
-                                </label>
-                                <input
-                                    id="max_shipping_time_days"
-                                    type="number"
-                                    class="kt-input {errors.max_shipping_time_days ? 'kt-input-error' : ''}"
-                                    placeholder="7"
-                                    min="1"
-                                    bind:value={form.max_shipping_time_days}
-                                />
-                                {#if errors.max_shipping_time_days}
-                                    <p class="text-sm text-destructive">{errors.max_shipping_time_days}</p>
-                                {/if}
-                                <p class="text-sm text-secondary-foreground">Delivery time (days)</p>
                             </div>
                         </div>
                     </div>

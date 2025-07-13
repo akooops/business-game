@@ -24,29 +24,11 @@ class CountriesController extends Controller
         $search = IndexService::checkIfSearchEmpty($request->query('search'));
 
         // Filter parameters
-        $codeFilter = IndexService::checkIfSearchEmpty($request->query('code'));
         $allowsImportsFilter = $request->query('allows_imports');
         $customsDutiesMin = IndexService::checkIfNumber($request->query('customs_duties_min'));
         $customsDutiesMax = IndexService::checkIfNumber($request->query('customs_duties_max'));
-        $tvaMin = IndexService::checkIfNumber($request->query('tva_min'));
-        $tvaMax = IndexService::checkIfNumber($request->query('tva_max'));
-        $insuranceMin = IndexService::checkIfNumber($request->query('insurance_min'));
-        $insuranceMax = IndexService::checkIfNumber($request->query('insurance_max'));
-        $freightMin = IndexService::checkIfNumber($request->query('freight_min'));
-        $freightMax = IndexService::checkIfNumber($request->query('freight_max'));
-        $handlingMin = IndexService::checkIfNumber($request->query('handling_min'));
-        $handlingMax = IndexService::checkIfNumber($request->query('handling_max'));
-        $minShippingCost = IndexService::checkIfNumber($request->query('min_shipping_cost'));
-        $maxShippingCost = IndexService::checkIfNumber($request->query('max_shipping_cost'));
-        $minShippingTimeDays = IndexService::checkIfNumber($request->query('min_shipping_time_days'));
-        $maxShippingTimeDays = IndexService::checkIfNumber($request->query('max_shipping_time_days'));
 
         $countries = Country::latest();
-
-        // Apply code filter
-        if ($codeFilter) {
-            $countries->where('code', $codeFilter);
-        }
 
         // Apply import allowance filter
         if ($allowsImportsFilter !== null) {
@@ -61,67 +43,12 @@ class CountriesController extends Controller
         if ($customsDutiesMax) {
             $countries->where('customs_duties_rate', '<=', $customsDutiesMax);
         }
-
-        // Apply TVA rate range filters
-        if ($tvaMin) {
-            $countries->where('tva_rate', '>=', $tvaMin);
-        }
-
-        if ($tvaMax) {
-            $countries->where('tva_rate', '<=', $tvaMax);
-        }
-
-        // Apply insurance rate range filters
-        if ($insuranceMin) {
-            $countries->where('insurance_rate', '>=', $insuranceMin);
-        }
-
-        if ($insuranceMax) {
-            $countries->where('insurance_rate', '<=', $insuranceMax);
-        }
-
-        // Apply freight cost range filters
-        if ($freightMin) {
-            $countries->where('freight_cost', '>=', $freightMin);
-        }
-
-        if ($freightMax) {
-            $countries->where('freight_cost', '<=', $freightMax);
-        }
-
-        // Apply handling fee range filters
-        if ($handlingMin) {
-            $countries->where('port_handling_fee', '>=', $handlingMin);
-        }
-
-        if ($handlingMax) {
-            $countries->where('port_handling_fee', '<=', $handlingMax);
-        }
-
-        // Apply min shipping cost range filters
-        if ($minShippingCost) {
-            $countries->where('avg_shipping_cost', '>=', $minShippingCost);
-        }
-        
-        if ($maxShippingCost) {
-            $countries->where('avg_shipping_cost', '<=', $maxShippingCost);
-        }
-
-        // Apply min shipping time range filters
-        if ($minShippingTimeDays) {
-            $countries->where('avg_shipping_time_days', '>=', $minShippingTimeDays);
-        }
-
-        if ($maxShippingTimeDays) {
-            $countries->where('avg_shipping_time_days', '<=', $maxShippingTimeDays);
-        }
         
         // Apply search filter
         if ($search) {
             $countries->where(function($query) use ($search) {
                 $query->where('id', $search)
-                      ->orWhere('name', 'like', '%' . $search . '%')
-                      ->orWhere('code', 'like', '%' . $search . '%');
+                      ->orWhere('name', 'like', '%' . $search . '%');
             });
         }
 

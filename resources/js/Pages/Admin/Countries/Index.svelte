@@ -31,22 +31,9 @@
     let showFilters = false;
 
     // Filter variables
-    let codeFilter = '';
     let allowsImportsFilter = '';
     let customsDutiesMin = '';
     let customsDutiesMax = '';
-    let tvaMin = '';
-    let tvaMax = '';
-    let insuranceMin = '';
-    let insuranceMax = '';
-    let freightMin = '';
-    let freightMax = '';
-    let handlingMin = '';
-    let handlingMax = '';
-    let shippingCostMin = '';
-    let shippingCostMax = '';
-    let shippingTimeMin = '';
-    let shippingTimeMax = '';
 
     // Import status badge colors
     function getImportStatusBadgeClass(allowsImports) {
@@ -79,9 +66,6 @@
             });
             
             // Add filter parameters
-            if (codeFilter) {
-                params.append('code', codeFilter);
-            }
             if (allowsImportsFilter) {
                 params.append('allows_imports', allowsImportsFilter);
             }
@@ -90,42 +74,6 @@
             }
             if (customsDutiesMax) {
                 params.append('customs_duties_max', customsDutiesMax);
-            }
-            if (tvaMin) {
-                params.append('tva_min', tvaMin);
-            }
-            if (tvaMax) {
-                params.append('tva_max', tvaMax);
-            }
-            if (insuranceMin) {
-                params.append('insurance_min', insuranceMin);
-            }
-            if (insuranceMax) {
-                params.append('insurance_max', insuranceMax);
-            }
-            if (freightMin) {
-                params.append('freight_min', freightMin);
-            }
-            if (freightMax) {
-                params.append('freight_max', freightMax);
-            }
-            if (handlingMin) {
-                params.append('handling_min', handlingMin);
-            }
-            if (handlingMax) {
-                params.append('handling_max', handlingMax);
-            }
-            if (shippingCostMin) {
-                params.append('min_shipping_cost', shippingCostMin);
-            }
-            if (shippingCostMax) {
-                params.append('max_shipping_cost', shippingCostMax);
-            }
-            if (shippingTimeMin) {
-                params.append('min_shipping_time_days', shippingTimeMin);
-            }
-            if (shippingTimeMax) {
-                params.append('max_shipping_time_days', shippingTimeMax);
             }
             
             const response = await fetch(route('admin.countries.index') + '?' + params.toString(), {
@@ -193,22 +141,10 @@
 
     // Clear all filters
     function clearAllFilters() {
-        codeFilter = '';
         allowsImportsFilter = '';
         customsDutiesMin = '';
         customsDutiesMax = '';
-        tvaMin = '';
-        tvaMax = '';
-        insuranceMin = '';
-        insuranceMax = '';
-        freightMin = '';
-        freightMax = '';
-        handlingMin = '';
-        handlingMax = '';
-        shippingCostMin = '';
-        shippingCostMax = '';
-        shippingTimeMin = '';
-        shippingTimeMax = '';
+        
         currentPage = 1;
         fetchCountries();
     }
@@ -340,7 +276,7 @@
                             </button>
                             
                             <!-- Clear Filters Button -->
-                            {#if codeFilter || allowsImportsFilter || customsDutiesMin || customsDutiesMax || tvaMin || tvaMax || insuranceMin || insuranceMax || freightMin || freightMax || handlingMin || handlingMax}
+                            {#if allowsImportsFilter || customsDutiesMin || customsDutiesMax}
                                 <button 
                                     class="kt-btn kt-btn-ghost kt-btn-sm"
                                     on:click={clearAllFilters}
@@ -357,18 +293,7 @@
                 {#if showFilters}
                     <div class="kt-card-body border-t border-gray-200 p-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                            <!-- Country Code -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Country Code</h4>                                    
-                                <input 
-                                    type="text" 
-                                    class="kt-input w-full" 
-                                    placeholder="e.g., USA, CHN" 
-                                    bind:value={codeFilter}
-                                    on:input={handleFilterChange}
-                                />
-                            </div>
-
+                            
                             <!-- Allows Imports -->
                             <div class="space-y-2">
                                 <h4 class="text-sm font-medium text-gray-700">Allows Imports</h4>                                    
@@ -408,162 +333,6 @@
                                     />
                                 </div>
                             </div>
-
-                            <!-- TVA Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">TVA Rate (%)</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min" 
-                                        bind:value={tvaMin}
-                                        on:input={handleFilterChange}
-                                        step="0.01"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max" 
-                                        bind:value={tvaMax}
-                                        on:input={handleFilterChange}
-                                        step="0.01"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Insurance Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Insurance Rate (%)</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min" 
-                                        bind:value={insuranceMin}
-                                        on:input={handleFilterChange}
-                                        step="0.01"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max" 
-                                        bind:value={insuranceMax}
-                                        on:input={handleFilterChange}
-                                        step="0.01"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Freight Cost Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Freight Cost (DZD)</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min" 
-                                        bind:value={freightMin}
-                                        on:input={handleFilterChange}
-                                        step="0.01"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max" 
-                                        bind:value={freightMax}
-                                        on:input={handleFilterChange}
-                                        step="0.01"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Port Handling Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Port Handling (DZD)</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min" 
-                                        bind:value={handlingMin}
-                                        on:input={handleFilterChange}
-                                        step="0.01"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max" 
-                                        bind:value={handlingMax}
-                                        on:input={handleFilterChange}
-                                        step="0.01"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Shipping Cost Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Avg Shipping Cost (DZD)</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min" 
-                                        bind:value={shippingCostMin}
-                                        on:input={handleFilterChange}
-                                        step="0.01"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max" 
-                                        bind:value={shippingCostMax}
-                                        on:input={handleFilterChange}
-                                        step="0.01"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Shipping Time Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Avg Shipping Time (Days)</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min" 
-                                        bind:value={shippingTimeMin}
-                                        on:input={handleFilterChange}
-                                        step="1"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max" 
-                                        bind:value={shippingTimeMax}
-                                        on:input={handleFilterChange}
-                                        step="1"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
                         </div>
                     </div>
                 {/if}
@@ -588,32 +357,12 @@
                                     </th>
                                     <th class="min-w-[120px]">
                                         <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Code</span>
-                                        </span>
-                                    </th>
-                                    <th class="min-w-[120px]">
-                                        <span class="kt-table-col">
                                             <span class="kt-table-col-label">Customs</span>
-                                        </span>
-                                    </th>
-                                    <th class="min-w-[100px]">
-                                        <span class="kt-table-col">
-                                            <span class="kt-table-col-label">TVA</span>
                                         </span>
                                     </th>
                                     <th class="min-w-[120px]">
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">Imports</span>
-                                        </span>
-                                    </th>
-                                    <th class="min-w-[140px]">
-                                        <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Shipping Cost</span>
-                                        </span>
-                                    </th>
-                                    <th class="min-w-[120px]">
-                                        <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Shipping Time</span>
                                         </span>
                                     </th>
                                     <th class="w-[80px]">
@@ -647,26 +396,6 @@
                                             </td>
                                             <td class="p-4">
                                                 <div class="kt-skeleton w-16 h-4 rounded"></div>
-                                            </td>
-                                            <td class="p-4">
-                                                <div class="kt-skeleton w-16 h-4 rounded"></div>
-                                            </td>
-                                            <td class="p-4">
-                                                <div class="kt-skeleton w-12 h-6 rounded"></div>
-                                            </td>
-                                            <td class="p-4">
-                                                <div class="flex flex-col gap-1">
-                                                    <div class="kt-skeleton w-16 h-3 rounded"></div>
-                                                    <div class="kt-skeleton w-16 h-3 rounded"></div>
-                                                    <div class="kt-skeleton w-16 h-3 rounded"></div>
-                                                </div>
-                                            </td>
-                                            <td class="p-4">
-                                                <div class="flex flex-col gap-1">
-                                                    <div class="kt-skeleton w-8 h-3 rounded"></div>
-                                                    <div class="kt-skeleton w-8 h-3 rounded"></div>
-                                                    <div class="kt-skeleton w-8 h-3 rounded"></div>
-                                                </div>
                                             </td>
                                             <td class="p-4">
                                                 <div class="kt-skeleton w-8 h-8 rounded"></div>
@@ -724,35 +453,14 @@
                                             </td>
 
                                             <td>
-                                                <span class="kt-badge kt-badge-outline kt-badge-primary kt-badge-sm">
-                                                    {country.code}
-                                                </span>
-                                            </td>
-                                            <td>
                                                 <span class="text-sm">{formatPercentage(country.customs_duties_rate)}</span>
-                                            </td>
-                                            <td>
-                                                <span class="text-sm">{formatPercentage(country.tva_rate)}</span>
                                             </td>
                                             <td>
                                                 <span class={getImportStatusBadgeClass(country.allows_imports)}>
                                                     {country.allows_imports ? 'Yes' : 'No'}
                                                 </span>
                                             </td>
-                                            <td>
-                                                <div class="flex flex-col gap-1 text-xs">
-                                                    <span class="text-success">Min: {formatCurrency(country.min_shipping_cost)}</span>
-                                                    <span class="text-gray-600">Avg: {formatCurrency(country.avg_shipping_cost)}</span>
-                                                    <span class="text-destructive">Max: {formatCurrency(country.max_shipping_cost)}</span>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="flex flex-col gap-1 text-xs">
-                                                    <span class="text-success">{country.min_shipping_time_days}d</span>
-                                                    <span class="text-gray-600">{country.avg_shipping_time_days}d</span>
-                                                    <span class="text-destructive">{country.max_shipping_time_days}d</span>
-                                                </div>
-                                            </td>
+                                            
                                             <td class="text-center">
                                                 <div class="kt-menu flex-inline" data-kt-menu="true">
                                                     <div class="kt-menu-item" data-kt-menu-item-offset="0, 10px" data-kt-menu-item-placement="bottom-end" data-kt-menu-item-placement-rtl="bottom-start" data-kt-menu-item-toggle="dropdown" data-kt-menu-item-trigger="click">
