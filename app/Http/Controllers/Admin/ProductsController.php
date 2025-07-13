@@ -29,8 +29,10 @@ class ProductsController extends Controller
         $elasticityMax = IndexService::checkIfNumber($request->query('elasticity_max'));
         $shelfLifeMin = IndexService::checkIfNumber($request->query('shelf_life_min'));
         $shelfLifeMax = IndexService::checkIfNumber($request->query('shelf_life_max'));
+        $needTechnology = IndexService::checkIfBoolean($request->query('need_technology'));
+        $technologyId = IndexService::checkIfNumber($request->query('technology_id'));
 
-        $products = Product::latest();
+        $products = Product::with('technology')->latest();
 
         // Apply type filter
         if ($typeFilter) {
@@ -58,6 +60,16 @@ class ProductsController extends Controller
 
         if ($shelfLifeMax) {
             $products->where('shelf_life_days', '<=', $shelfLifeMax);
+        }
+
+        // Apply need technology filter
+        if ($needTechnology !== null) {
+            $products->where('need_technology', $needTechnology);
+        }
+
+        // Apply technology filter
+        if ($technologyId) {
+            $products->where('technology_id', $technologyId);
         }
 
         // Apply search filter
@@ -123,6 +135,7 @@ class ProductsController extends Controller
      */
     public function show(Product $product)
     {    
+        $product->load('technology');
         return inertia('Admin/Products/Show', compact('product'));
     }
     
@@ -134,6 +147,7 @@ class ProductsController extends Controller
      */
     public function edit(Product $product)
     {
+        $product->load('technology');
         return inertia('Admin/Products/Edit', compact('product'));
     }
     
@@ -146,7 +160,9 @@ class ProductsController extends Controller
      */
     public function update(Product $product, UpdateProductRequest $request)
     {
-        $product->update($request->validated());
+        $product->update(array_merge($request->validated(), [
+            'technology_id' => $request->input('need_technology') ? $request->input('technology_id') : null,
+        ]));
 
         if($request->file('file')){            
             //Delete the old file if it exists

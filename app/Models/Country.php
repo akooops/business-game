@@ -17,6 +17,9 @@ class Country extends Model
     protected $appends = ['flag_url'];
 
     protected $casts = [
+        'min_shipping_cost' => 'decimal:3',
+        'max_shipping_cost' => 'decimal:3',
+        'avg_shipping_cost' => 'decimal:3',
         'customs_duties_rate' => 'decimal:3',
         'tva_rate' => 'decimal:3',
         'insurance_rate' => 'decimal:3',

@@ -23,7 +23,7 @@ class StoreWilayaRequest extends FormRequest
             // Basic country details
             'name' => 'required|string|max:255|unique:wilayas,name',
             
-            // Tax rates (percentages as decimals, 0-1 range)
+            // Shipping costs
             'min_shipping_cost' => 'required|numeric|min:0',
             'max_shipping_cost' => 'required|numeric|min:0',
             'avg_shipping_cost' => 'required|numeric|min:0',

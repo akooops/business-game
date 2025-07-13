@@ -13,6 +13,9 @@
         if (url.includes('/admin/dashboard') || url === '/admin' || url === '/admin/') {
             return 'dashboard';
         }
+        if (url.includes('/admin/technologies')) {
+            return 'technologies';
+        }
         if (url.includes('/admin/products') || url.includes('/admin/product-recipes') || url.includes('/admin/product-demand') || url.includes('/admin/machines')) {
             return 'products';
         }
@@ -104,6 +107,21 @@
                     </span>
                     <span class="kt-tooltip" data-kt-tooltip-content="true">
                         User Management
+                    </span>
+                </button>
+                {/if}
+
+                {#if hasPermission('admin.technologies.index')}
+                <button 
+                    class="kt-btn kt-btn-icon kt-btn-ghost rounded-md size-9 border border-transparent hover:bg-background hover:[&_i]:text-primary hover:border-border {activeSection === 'technologies' ? 'bg-background [&_i]:text-primary border-border' : ''}" 
+                    data-kt-tooltip="" 
+                    data-kt-tooltip-placement="right"
+                    on:click={() => setActiveSection('technologies')}>
+                    <span class="kt-menu-icon">
+                        <i class="ki-outline ki-technology-1 text-lg"></i>
+                    </span>
+                    <span class="kt-tooltip" data-kt-tooltip-content="true">
+                        Technologies Management
                     </span>
                 </button>
                 {/if}
@@ -303,6 +321,27 @@
                 </div>
                 {/if}
 
+                <!-- Technologies Management Section -->
+                {#if activeSection === 'technologies'}
+                <div class="mb-3">
+                    <h3 class="text-xs text-muted-foreground uppercase ps-2.5 mb-2.5">
+                        Technologies Management
+                    </h3>
+                    {#if hasPermission('admin.technologies.index')}
+                    <div class="kt-menu-item">
+                        <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute('admin.technologies.index') ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.technologies.index')}>
+                            <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
+                                <i class="ki-outline ki-technology-1"></i>
+                            </span>
+                            <span class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono ms-2">
+                                Technologies
+                            </span>
+                        </a>
+                    </div>
+                    {/if}
+                </div>
+                {/if}
+                
                 <!-- Products Management Section -->
                 {#if activeSection === 'products'}
                 <div class="mb-3">

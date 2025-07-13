@@ -21,14 +21,10 @@ return new class extends Migration
             $table->decimal('min_demand', 15, 5)->default(0);
             $table->decimal('max_demand', 15, 5)->default(0);
             $table->decimal('avg_demand', 15, 5)->default(0);
+            $table->decimal('real_demand', 15, 5)->default(0);
 
             // Market price
             $table->decimal('market_price', 15, 5)->default(0);
-            
-            // Market research fields
-            $table->boolean('is_visible')->default(false);
-            $table->decimal('visibility_cost', 15, 5)->default(0);
-            $table->integer('research_time_days')->default(1);
             
             // Foreign keys
             $table->foreignId('product_id')->constrained()->onDelete('cascade');

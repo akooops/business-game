@@ -15,7 +15,8 @@ class Product extends Model
 
     protected $casts = [
         'elasticity_coefficient' => 'decimal:3',
-        'has_expiration' => 'boolean'
+        'has_expiration' => 'boolean',
+        'need_technology' => 'boolean',
     ];
 
     protected $appends = ['type_name', 'image_url'];
@@ -29,6 +30,11 @@ class Product extends Model
     public function image()
     {
         return $this->morphOne(File::class, 'model')->where('is_main', 1);
+    }
+
+    public function technology()
+    {
+        return $this->belongsTo(Technology::class);
     }
 
     public function demands()
@@ -49,6 +55,24 @@ class Product extends Model
     public function machines()
     {
         return $this->belongsToMany(Machine::class, 'machine_outputs')->withTimestamps();
+    }
+
+    public function supplierProducts()
+    {
+        return $this->hasMany(SupplierProduct::class);
+    }
+
+    public function suppliers()
+    {
+        return $this->belongsToMany(Supplier::class, 'supplier_products')
+            ->withPivot([
+                'min_sale_price',
+                'avg_sale_price',
+                'max_sale_price',
+                'minimum_order_qty',
+                'carbon_footprint'
+            ])
+            ->withTimestamps();
     }
 
     // Accessors

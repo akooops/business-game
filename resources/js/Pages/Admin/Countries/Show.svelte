@@ -21,53 +21,6 @@
     
     const pageTitle = 'Country Details';
 
-    // Import cost calculator state
-    let calculatorAmount = 10000;
-    let calculatedCosts = {};
-
-    // Calculate import costs based on country rates
-    function calculateImportCosts(amount) {
-        const baseAmount = parseFloat(amount) || 0;
-        
-        // Base CIF components
-        const freight = parseFloat(country.freight_cost) || 0;
-        const insurance = baseAmount * (parseFloat(country.insurance_rate) || 0);
-        const portHandling = parseFloat(country.port_handling_fee) || 0;
-        
-        const cif = baseAmount + freight + insurance + portHandling;
-        
-        // Taxes
-        const customsDuties = cif * (parseFloat(country.customs_duties_rate) || 0);
-        const tva = (cif + customsDuties) * (parseFloat(country.tva_rate) || 0);
-        
-        const totalCost = cif + customsDuties + tva;
-        
-        return {
-            baseAmount,
-            freight,
-            insurance,
-            portHandling,
-            cif,
-            customsDuties,
-            tva,
-            totalCost,
-            totalTaxes: customsDuties + tva,
-            taxPercentage: baseAmount > 0 ? ((totalCost - baseAmount) / baseAmount * 100) : 0
-        };
-    }
-
-    // Reactive calculation
-    $: calculatedCosts = calculateImportCosts(calculatorAmount);
-
-    // Format currency
-    function formatCurrency(amount) {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'DZD',
-            minimumFractionDigits: 2
-        }).format(amount);
-    }
-
     // Format percentage
     function formatPercentage(value) {
         return `${(value * 100).toFixed(2)}%`;
@@ -215,9 +168,9 @@
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Freight Cost</h4>
                             <p class="text-sm text-secondary-foreground">
-                                {formatCurrency(country?.freight_cost)}
+                                {country?.freight_cost}
                                 <span class="text-xs text-muted-foreground ml-2">
-                                    (Fixed shipping cost)
+                                    (Fixed shipping cost per unit)
                                 </span>
                             </p>
                         </div>
@@ -226,7 +179,7 @@
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Port Handling Fee</h4>
                             <p class="text-sm text-secondary-foreground">
-                                {formatCurrency(country?.port_handling_fee)}
+                                {country?.port_handling_fee}
                                 <span class="text-xs text-muted-foreground ml-2">
                                     (Port processing fee)
                                 </span>
@@ -236,101 +189,87 @@
                 </div>
             </div>
 
-            <!-- Import Cost Calculator Card -->
+            <!-- Shipping Cost Information Card -->
             <div class="kt-card">
                 <div class="kt-card-header">
-                    <h4 class="kt-card-title">Import Cost Calculator</h4>
-                    <p class="text-sm text-secondary-foreground">
-                        Calculate total import costs for goods from {country?.name}
-                    </p>
+                    <h4 class="kt-card-title">Shipping Cost Information</h4>
                 </div>
                 <div class="kt-card-content">
-                    <div class="grid gap-6 w-full">
-                        <!-- Calculator Input -->
+                    <div class="grid gap-4 w-full lg:grid-cols-3">
+                        <!-- Minimum Shipping Cost -->
                         <div class="flex flex-col gap-2">
-                            <label class="text-sm font-semibold text-mono">Goods Value (DZD)</label>
-                            <input
-                                type="number"
-                                bind:value={calculatorAmount}
-                                min="0"
-                                step="0.01"
-                                class="kt-input"
-                                placeholder="Enter goods value..."
-                            />
+                            <h4 class="text-sm font-semibold text-mono">Minimum Shipping Cost</h4>
+                            <p class="text-sm text-secondary-foreground">
+                                {country?.min_shipping_cost}
+                                <span class="text-xs text-muted-foreground ml-2">
+                                    (Best case scenario)
+                                </span>
+                            </p>
                         </div>
 
-                        <!-- Calculation Results -->
-                        <div class="space-y-5">
-                            <!-- begin: Card -->
-                            <div class="kt-card bg-accent/50">
-                                <div class="kt-card-header px-5">
-                                    <h3 class="kt-card-title">
-                                        Import Cost Summary
-                                    </h3>
-                                </div>
-                                <div class="kt-card-content px-5 py-4 space-y-2">
-                                    <h4 class="text-sm font-medium text-mono mb-3.5">
-                                        Cost Breakdown
-                                    </h4>
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-sm font-normal text-secondary-foreground">
-                                            Goods Value
-                                        </span>
-                                        <span class="text-sm font-medium text-mono">
-                                            {formatCurrency(calculatedCosts.baseAmount)}
-                                        </span>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-sm font-normal text-secondary-foreground">
-                                            Freight
-                                        </span>
-                                        <span class="text-sm font-medium text-mono">
-                                            {formatCurrency(calculatedCosts.freight)}
-                                        </span>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-sm font-normal text-secondary-foreground">
-                                            Insurance
-                                        </span>
-                                        <span class="text-sm font-medium text-mono">
-                                            {formatCurrency(calculatedCosts.insurance)}
-                                        </span>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-sm font-normal text-secondary-foreground">
-                                            Port Handling
-                                        </span>
-                                        <span class="text-sm font-medium text-mono">
-                                            {formatCurrency(calculatedCosts.portHandling)}
-                                        </span>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-sm font-normal text-secondary-foreground">
-                                            Customs Duties
-                                        </span>
-                                        <span class="text-sm font-medium text-mono">
-                                            {formatCurrency(calculatedCosts.customsDuties)}
-                                        </span>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-sm font-normal text-secondary-foreground">
-                                            TVA
-                                        </span>
-                                        <span class="text-sm font-medium text-mono">
-                                            {formatCurrency(calculatedCosts.tva)}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="kt-card-footer flex justify-between items-center px-5">
-                                    <span class="text-sm font-normal text-secondary-foreground">
-                                        Total Import Cost
-                                    </span>
-                                    <span class="text-base font-semibold text-mono">
-                                        {formatCurrency(calculatedCosts.totalCost)}
-                                    </span>
-                                </div>
-                            </div>
-                            <!-- end: Card -->
+                        <!-- Average Shipping Cost -->
+                        <div class="flex flex-col gap-2">
+                            <h4 class="text-sm font-semibold text-mono">Average Shipping Cost</h4>
+                            <p class="text-sm text-secondary-foreground">
+                                {country?.avg_shipping_cost}
+                                <span class="text-xs text-muted-foreground ml-2">
+                                    (Typical cost)
+                                </span>
+                            </p>
+                        </div>
+
+                        <!-- Maximum Shipping Cost -->
+                        <div class="flex flex-col gap-2">
+                            <h4 class="text-sm font-semibold text-mono">Maximum Shipping Cost</h4>
+                            <p class="text-sm text-secondary-foreground">
+                                {country?.max_shipping_cost}
+                                <span class="text-xs text-muted-foreground ml-2">
+                                    (Worst case scenario)
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shipping Time Information Card -->
+            <div class="kt-card">
+                <div class="kt-card-header">
+                    <h4 class="kt-card-title">Shipping Time Information</h4>
+                </div>
+                <div class="kt-card-content">
+                    <div class="grid gap-4 w-full lg:grid-cols-3">
+                        <!-- Minimum Shipping Time -->
+                        <div class="flex flex-col gap-2">
+                            <h4 class="text-sm font-semibold text-mono">Minimum Shipping Time</h4>
+                            <p class="text-sm text-secondary-foreground">
+                                {country?.min_shipping_time_days} days
+                                <span class="text-xs text-muted-foreground ml-2">
+                                    (Express delivery)
+                                </span>
+                            </p>
+                        </div>
+
+                        <!-- Average Shipping Time -->
+                        <div class="flex flex-col gap-2">
+                            <h4 class="text-sm font-semibold text-mono">Average Shipping Time</h4>
+                            <p class="text-sm text-secondary-foreground">
+                                {country?.avg_shipping_time_days} days
+                                <span class="text-xs text-muted-foreground ml-2">
+                                    (Standard delivery)
+                                </span>
+                            </p>
+                        </div>
+
+                        <!-- Maximum Shipping Time -->
+                        <div class="flex flex-col gap-2">
+                            <h4 class="text-sm font-semibold text-mono">Maximum Shipping Time</h4>
+                            <p class="text-sm text-secondary-foreground">
+                                {country?.max_shipping_time_days} days
+                                <span class="text-xs text-muted-foreground ml-2">
+                                    (Delayed delivery)
+                                </span>
+                            </p>
                         </div>
                     </div>
                 </div>

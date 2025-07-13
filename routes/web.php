@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\EmployeeProfilesController;
 use App\Http\Controllers\Admin\MachinesController;
 use App\Http\Controllers\Admin\CountriesController;
 use App\Http\Controllers\Admin\WilayasController;
+use App\Http\Controllers\Admin\TechnologiesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -69,6 +70,16 @@ Route::prefix('admin')->middleware(['auth', 'handle.inertia'])->group(function (
     Route::get('users/{user}/edit', [UsersController::class, 'edit'])->middleware('check.permission:admin.users.update')->name('admin.users.edit');
     Route::patch('users/{user}', [UsersController::class, 'update'])->middleware('check.permission:admin.users.update')->name('admin.users.update');
     Route::delete('users/{user}', [UsersController::class, 'destroy'])->middleware('check.permission:admin.users.destroy')->name('admin.users.destroy');
+
+
+    // Technologies
+    Route::get('technologies', [TechnologiesController::class, 'index'])->middleware('check.permission:admin.technologies.index')->name('admin.technologies.index');
+    Route::get('technologies/create', [TechnologiesController::class, 'create'])->middleware('check.permission:admin.technologies.store')->name('admin.technologies.create');
+    Route::post('technologies', [TechnologiesController::class, 'store'])->middleware('check.permission:admin.technologies.store')->name('admin.technologies.store');
+    Route::get('technologies/{technology}', [TechnologiesController::class, 'show'])->middleware('check.permission:admin.technologies.show')->name('admin.technologies.show');
+    Route::get('technologies/{technology}/edit', [TechnologiesController::class, 'edit'])->middleware('check.permission:admin.technologies.update')->name('admin.technologies.edit');
+    Route::patch('technologies/{technology}', [TechnologiesController::class, 'update'])->middleware('check.permission:admin.technologies.update')->name('admin.technologies.update');
+    Route::delete('technologies/{technology}', [TechnologiesController::class, 'destroy'])->middleware('check.permission:admin.technologies.destroy')->name('admin.technologies.destroy');
 
     // Products
     Route::get('products', [ProductsController::class, 'index'])->middleware('check.permission:admin.products.index')->name('admin.products.index');

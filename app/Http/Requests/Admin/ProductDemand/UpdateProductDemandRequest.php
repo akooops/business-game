@@ -27,9 +27,6 @@ class UpdateProductDemandRequest extends FormRequest
             'max_demand' => 'required|numeric|min:0|gte:min_demand',
             'avg_demand' => 'required|numeric|min:0|gte:min_demand|lte:max_demand',
             'market_price' => 'required|numeric|min:0',
-            'visibility_cost' => 'required|numeric|min:0',
-            'research_time_days' => 'required|integer|min:0',
-            'is_visible' => 'required|boolean',
         ];
     }
 
@@ -46,9 +43,6 @@ class UpdateProductDemandRequest extends FormRequest
             'max_demand' => 'maximum demand',
             'avg_demand' => 'average demand',
             'market_price' => 'market price',
-            'visibility_cost' => 'visibility cost',
-            'research_time_days' => 'research time (days)',
-            'is_visible' => 'visibility status',
         ];
     }
 

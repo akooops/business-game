@@ -40,9 +40,6 @@
         avg_demand: '',
         max_demand: '',
         market_price: '',
-        visibility_cost: '',
-        research_time_days: '',
-        is_visible: true
     };
 
     // Form errors
@@ -72,9 +69,6 @@
             avg_demand: '',
             max_demand: '',
             market_price: '',
-            visibility_cost: '',
-            research_time_days: '',
-            is_visible: true
         };
         
         // Show drawer
@@ -97,7 +91,6 @@
             max_demand: gameweek.max_demand,
             market_price: gameweek.market_price,
             visibility_cost: gameweek.visibility_cost || '',
-            research_time_days: gameweek.research_time_days || '',
             is_visible: gameweek.is_visible
         };
         
@@ -185,10 +178,7 @@
                     min_demand: '',
                     avg_demand: '',
                     max_demand: '',
-                    market_price: '',
-                    visibility_cost: '',
-                    research_time_days: '',
-                    is_visible: true
+                    market_price: ''
                 };
                 
                 isEditMode = false;
@@ -704,15 +694,12 @@
                                                 <th>Avg Demand</th>
                                                 <th>Max Demand</th>
                                                 <th>Market Price</th>
-                                                <th>Visibility Cost</th>
-                                                <th>Research Time</th>
-                                                <th>Visible</th>
                                                 <th>Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {#each demandData.sort((a, b) => b.gameweek - a.gameweek) as demand}
-                                                <tr class="{!demand.is_visible ? 'opacity-60' : ''}">
+                                                <tr>
                                                     <td>
                                                         <span class="font-medium text-mono">Week {demand.gameweek}</span>
                                                     </td>
@@ -720,15 +707,6 @@
                                                     <td class="font-medium">{demand.avg_demand}</td>
                                                     <td>{demand.max_demand}</td>
                                                     <td>DZD{demand.market_price}</td>
-                                                    <td>{demand.visibility_cost ? 'DZD' + demand.visibility_cost : '-'}</td>
-                                                    <td>{demand.research_time_days ? demand.research_time_days + ' days' : '-'}</td>
-                                                    <td>
-                                                        {#if demand.is_visible}
-                                                            <span class="kt-badge kt-badge-success kt-badge-sm">Visible</span>
-                                                        {:else}
-                                                            <span class="kt-badge kt-badge-outline kt-badge-sm">Hidden</span>
-                                                        {/if}
-                                                    </td>
                                                     <td>
                                                         <div class="flex items-center gap-2">
                                                             <button 
@@ -859,58 +837,6 @@
                         />
                         {#if errors.market_price}
                             <p class="text-sm text-destructive mt-1">{errors.market_price}</p>
-                        {/if}
-                    </div>
-
-                    <!-- Research & Visibility Settings -->
-                    <div class="border border-border rounded-lg p-4 bg-secondary/20">
-                        <h4 class="text-sm font-semibold text-mono mb-3">Research & Visibility Settings</h4>
-                        <p class="text-xs text-secondary-foreground mb-4">Settings for when data is not visible - costs a research time needed</p>
-                        
-                        <div class="mb-2">
-                            <label class="block text-sm font-medium text-mono mb-2">Research Time (Days)</label>
-                            <input 
-                                type="number" 
-                                bind:value={formData.research_time_days}
-                                min="0"
-                                class="kt-input w-full {errors.research_time_days ? 'kt-input-error' : ''}"
-                            />
-                            {#if errors.research_time_days}
-                                <p class="text-sm text-destructive mt-1">{errors.research_time_days}</p>
-                            {/if}
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-mono mb-2">Visibility Cost (DZD)</label>
-                            <input 
-                                type="number" 
-                                bind:value={formData.visibility_cost}
-                                min="0"
-                                step="0.001"
-                                class="kt-input w-full {errors.visibility_cost ? 'kt-input-error' : ''}"
-                            />
-                            {#if errors.visibility_cost}
-                                <p class="text-sm text-destructive mt-1">{errors.visibility_cost}</p>
-                            {/if}
-                        </div>           
-                        
-                        <div class="flex items-center justify-between pt-3 border-t border-border">
-                            <div class="flex flex-col">
-                                <span class="text-sm font-medium text-mono">Visible to players</span>
-                                <span class="text-xs text-secondary-foreground">Toggle data visibility for players</span>
-                            </div>
-                            <input 
-                                class="kt-switch" 
-                                type="checkbox" 
-                                id="is_visible" 
-                                checked={formData.is_visible}
-                                on:change={(e) => {
-                                    formData.is_visible = e.target.checked;
-                                }}
-                            />
-                        </div>
-                        {#if errors.is_visible}
-                            <p class="text-sm text-destructive mt-1">{errors.is_visible}</p>
                         {/if}
                     </div>
                     

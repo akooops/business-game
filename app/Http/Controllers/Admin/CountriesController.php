@@ -36,6 +36,10 @@ class CountriesController extends Controller
         $freightMax = IndexService::checkIfNumber($request->query('freight_max'));
         $handlingMin = IndexService::checkIfNumber($request->query('handling_min'));
         $handlingMax = IndexService::checkIfNumber($request->query('handling_max'));
+        $minShippingCost = IndexService::checkIfNumber($request->query('min_shipping_cost'));
+        $maxShippingCost = IndexService::checkIfNumber($request->query('max_shipping_cost'));
+        $minShippingTimeDays = IndexService::checkIfNumber($request->query('min_shipping_time_days'));
+        $maxShippingTimeDays = IndexService::checkIfNumber($request->query('max_shipping_time_days'));
 
         $countries = Country::latest();
 
@@ -94,6 +98,24 @@ class CountriesController extends Controller
             $countries->where('port_handling_fee', '<=', $handlingMax);
         }
 
+        // Apply min shipping cost range filters
+        if ($minShippingCost) {
+            $countries->where('avg_shipping_cost', '>=', $minShippingCost);
+        }
+        
+        if ($maxShippingCost) {
+            $countries->where('avg_shipping_cost', '<=', $maxShippingCost);
+        }
+
+        // Apply min shipping time range filters
+        if ($minShippingTimeDays) {
+            $countries->where('avg_shipping_time_days', '>=', $minShippingTimeDays);
+        }
+
+        if ($maxShippingTimeDays) {
+            $countries->where('avg_shipping_time_days', '<=', $maxShippingTimeDays);
+        }
+        
         // Apply search filter
         if ($search) {
             $countries->where(function($query) use ($search) {

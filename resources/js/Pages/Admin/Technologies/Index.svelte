@@ -3,26 +3,25 @@
     import Pagination from '../../Components/Pagination.svelte';
     import { onMount, tick } from 'svelte';
     import { page } from '@inertiajs/svelte'
-    import Select2 from '../../Components/Forms/Select2.svelte';
 
     // Define breadcrumbs for this page
     const breadcrumbs = [
         {
-            title: 'Products',
-            url: route('admin.products.index'),
+            title: 'Technologies',
+            url: route('admin.technologies.index'),
             active: false
         },
         {
             title: 'Index',
-            url: route('admin.products.index'),
+            url: route('admin.technologies.index'),
             active: true
         }
     ];
     
-    const pageTitle = 'Products';
+    const pageTitle = 'Technologies';
 
     // Reactive variables
-    let products = [];
+    let technologies = [];
     let pagination = {};
     let loading = true;
     let search = '';
@@ -30,49 +29,16 @@
     let currentPage = 1;
     let searchTimeout;
     let showFilters = false;
-
+    
     // Filter variables
-    let typeFilter = '';
-    let hasExpirationFilter = '';
-    let elasticityMin = '';
-    let elasticityMax = '';
-    let shelfLifeMin = '';
-    let shelfLifeMax = '';
-    let needTechnologyFilter = '';
-    let technologyIdFilter = '';
+    let levelFilter = '';
+    let researchCostMin = '';
+    let researchCostMax = '';
+    let researchTimeDaysMin = '';
+    let researchTimeDaysMax = '';
 
-    // Select2 component reference
-    let technologySelectComponent;
-
-    // Product types mapping
-    const productTypes = {
-        'raw_material': 'Raw Material',
-        'component': 'Component',
-        'finished_product': 'Finished Product'
-    };
-
-    // Product type badge colors
-    function getProductTypeBadgeClass(type) {
-        switch(type) {
-            case 'raw_material':
-                return 'kt-badge kt-badge-outline kt-badge-success kt-badge-sm';
-            case 'component':
-                return 'kt-badge kt-badge-outline kt-badge-warning kt-badge-sm';
-            case 'finished_product':
-                return 'kt-badge kt-badge-outline kt-badge-primary kt-badge-sm';
-            default:
-                return 'kt-badge kt-badge-outline kt-badge-sm';
-        }
-    }
-
-    // Handle technology selection
-    function handleTechnologySelect(event) {
-        technologyIdFilter = event.detail.value;
-        handleFilterChange();
-    }
-
-    // Fetch products data
-    async function fetchProducts() {
+    // Fetch technologies data
+    async function fetchTechnologies() {
         loading = true;
         try {
             const params = new URLSearchParams({
@@ -82,48 +48,39 @@
             });
             
             // Add filter parameters
-            if (typeFilter) {
-                params.append('type', typeFilter);
+            if (levelFilter) {
+                params.append('level', levelFilter);
             }
-            if (hasExpirationFilter) {
-                params.append('has_expiration', hasExpirationFilter);
+            if (researchCostMin) {
+                params.append('research_cost_min', researchCostMin);
             }
-            if (elasticityMin) {
-                params.append('elasticity_min', elasticityMin);
+            if (researchCostMax) {
+                params.append('research_cost_max', researchCostMax);
             }
-            if (elasticityMax) {
-                params.append('elasticity_max', elasticityMax);
+            if (researchTimeDaysMin) {
+                params.append('research_time_days_min', researchTimeDaysMin);
             }
-            if (shelfLifeMin) {
-                params.append('shelf_life_min', shelfLifeMin);
-            }
-            if (shelfLifeMax) {
-                params.append('shelf_life_max', shelfLifeMax);
-            }
-            if (needTechnologyFilter) {
-                params.append('need_technology', needTechnologyFilter);
-            }
-            if (technologyIdFilter) {
-                params.append('technology_id', technologyIdFilter);
+            if (researchTimeDaysMax) {
+                params.append('research_time_days_max', researchTimeDaysMax);
             }
             
-            const response = await fetch(route('admin.products.index') + '?' + params.toString(), {
+            const response = await fetch(route('admin.technologies.index') + '?' + params.toString(), {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             });
             
             const data = await response.json();
-            products = data.products;
+            technologies = data.technologies;
             pagination = data.pagination;
-            
+
             // Wait for DOM to update, then initialize menus
             await tick();
             if (window.KTMenu) {
                 window.KTMenu.init();
             }
         } catch (error) {
-            console.error('Error fetching products:', error);
+            console.error('Error fetching technologies:', error);
         } finally {
             loading = false;
         }
@@ -139,7 +96,7 @@
         // Set new timeout for 500ms
         searchTimeout = setTimeout(() => {
             currentPage = 1;
-            fetchProducts();
+            fetchTechnologies();
         }, 500);
     }
 
@@ -153,7 +110,7 @@
     function goToPage(page) {
         if (page && page !== currentPage) {
             currentPage = page;
-            fetchProducts();
+            fetchTechnologies();
         }
     }
 
@@ -161,30 +118,24 @@
     function handlePerPageChange(newPerPage) {
         perPage = newPerPage;
         currentPage = 1;
-        fetchProducts();
+        fetchTechnologies();
     }
 
     // Handle filter changes
     function handleFilterChange() {
         currentPage = 1;
-        fetchProducts();
+        fetchTechnologies();
     }
 
     // Clear all filters
     function clearAllFilters() {
-        typeFilter = '';
-        hasExpirationFilter = '';
-        elasticityMin = '';
-        elasticityMax = '';
-        shelfLifeMin = '';
-        shelfLifeMax = '';
-        needTechnologyFilter = '';
-        technologyIdFilter = '';
-        if (technologySelectComponent) {
-            technologySelectComponent.clear();
-        }
+        levelFilter = '';
+        researchCostMin = '';
+        researchCostMax = '';
+        researchTimeDaysMin = '';
+        researchTimeDaysMax = '';
         currentPage = 1;
-        fetchProducts();
+        fetchTechnologies();
     }
 
     // Toggle filters visibility
@@ -192,9 +143,9 @@
         showFilters = !showFilters;
     }
 
-    // Delete product
-    async function deleteProduct(productId) {
-        if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
+    // Delete technology
+    async function deleteTechnology(technologyId) {
+        if (!confirm('Are you sure you want to delete this technology? This action cannot be undone.')) {
             return;
         }
 
@@ -203,7 +154,7 @@
             formData.append('_method', 'DELETE');
             formData.append('_token', document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'));
 
-            const response = await fetch(route('admin.products.destroy', { product: productId }), {
+            const response = await fetch(route('admin.technologies.destroy', { technology: technologyId }), {
                 method: 'POST',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
@@ -215,16 +166,16 @@
                 // Show success toast
                 KTToast.show({
                     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                    message: "Product deleted successfully!",
+                    message: "Technology deleted successfully!",
                     variant: "success",
                     position: "bottom-right",
                 });
 
-                // Refresh the products list
-                fetchProducts();
+                // Refresh the technologies list
+                fetchTechnologies();
             } else {
                 const errorData = await response.json().catch(() => ({}));
-                const errorMessage = errorData.message || 'Error deleting product. Please try again.';
+                const errorMessage = errorData.message || 'Error deleting technology. Please try again.';
                 
                 KTToast.show({
                     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
@@ -234,7 +185,7 @@
                 });
             }
         } catch (error) {
-            console.error('Error deleting product:', error);
+            console.error('Error deleting technology:', error);
             
             KTToast.show({
                     icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
@@ -246,7 +197,7 @@
     }
 
     onMount(() => {
-        fetchProducts();
+        fetchTechnologies();
     });
 
     // Flash message handling
@@ -270,27 +221,25 @@
     <!-- Container -->
     <div class="kt-container-fixed">
         <div class="grid gap-5 lg:gap-7.5">
-            <!-- Product Header -->
+            <!-- Technology Header -->
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div class="flex flex-col gap-1">
-                    <h1 class="text-2xl font-bold text-mono">Products Management</h1>
+                    <h1 class="text-2xl font-bold text-mono">Technologies Management</h1>
                     <p class="text-sm text-secondary-foreground">
-                        Manage your simulation products inventory
+                        Manage your simulation technologies research roadmap
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
-                    {#if hasPermission('admin.products.store')}
-                    <a href="{route('admin.products.create')}" class="kt-btn kt-btn-primary">
+                    {#if hasPermission('admin.technologies.store')}
+                    <a href="{route('admin.technologies.create')}" class="kt-btn kt-btn-primary">
                         <i class="ki-filled ki-plus text-base"></i>
-                        Add New Product
+                        Add New Technology
                     </a>
                     {/if}
                 </div>                      
             </div>
 
-
-
-            <!-- Products Table -->
+            <!-- Technologies Table -->
             <div class="kt-card">
                 <div class="kt-card-header">
                     <div class="kt-card-toolbar">
@@ -300,7 +249,7 @@
                                 <input 
                                     type="text" 
                                     class="kt-input" 
-                                    placeholder="Search products..." 
+                                    placeholder="Search technologies..." 
                                     bind:value={search}
                                     on:input={handleSearchInput}
                                 />
@@ -316,7 +265,7 @@
                             </button>
                             
                             <!-- Clear Filters Button -->
-                            {#if typeFilter || hasExpirationFilter || elasticityMin || elasticityMax || shelfLifeMin || shelfLifeMax || needTechnologyFilter || technologyIdFilter}
+                            {#if levelFilter || researchCostMin || researchCostMax || researchTimeDaysMin || researchTimeDaysMax}
                                 <button 
                                     class="kt-btn kt-btn-ghost kt-btn-sm"
                                     on:click={clearAllFilters}
@@ -333,47 +282,56 @@
                 {#if showFilters}
                     <div class="kt-card-body border-t border-gray-200 p-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                            <!-- Product Properties -->
+                            <!-- Technology Properties -->
                             <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Product Properties</h4>                                    
-                                <!-- Product type -->
-                                <select 
-                                    class="kt-select w-full" 
-                                    bind:value={typeFilter}
-                                    on:change={handleFilterChange}
-                                >
-                                    <option value="">All Products</option>
-                                    <option value="raw_material">Raw Materials</option>
-                                    <option value="component">Components</option>
-                                    <option value="finished_product">Finished Products</option>
-                                </select>
+                                <h4 class="text-sm font-medium text-gray-700">Technology Properties</h4>                                    
+                                <!-- Technology level -->
+                                <input 
+                                    type="number" 
+                                    class="kt-input flex-1" 
+                                    placeholder="Level" 
+                                    bind:value={levelFilter}
+                                    on:input={handleFilterChange}
+                                    min="0"
+                                />
+                            </div>             
+                            
+                            <!-- Research Cost Range -->
+                            <div class="space-y-2">
+                                <h4 class="text-sm font-medium text-gray-700">Research Cost</h4>
+                                
+                                <div class="flex gap-2">
+                                    <input 
+                                        type="number" 
+                                        class="kt-input flex-1" 
+                                        placeholder="Min" 
+                                        bind:value={researchCostMin}
+                                        on:input={handleFilterChange}
+                                        step="0.01"
+                                        min="0"
+                                    />
+                                    <input 
+                                        type="number" 
+                                        class="kt-input flex-1" 
+                                        placeholder="Max" 
+                                        bind:value={researchCostMax}
+                                        on:input={handleFilterChange}
+                                        step="0.01"
+                                        min="0"
+                                    />
+                                </div>
                             </div>
 
-                            <!-- Has expiration -->
+                            <!-- Research Time Range -->
                             <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Has expiration</h4>                                    
-                                <!-- Has expiration -->
-                                <select 
-                                    class="kt-select w-full" 
-                                    bind:value={hasExpirationFilter}
-                                    on:change={handleFilterChange}
-                                >
-                                    <option value="">All Products</option>
-                                    <option value="1">Yes</option>
-                                    <option value="0">No</option>
-                                </select>
-                            </div>                     
-                            
-                            <!-- Shelf Life Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Shelf Life (Days)</h4>
+                                <h4 class="text-sm font-medium text-gray-700">Research Time (Days)</h4>
                                 
                                 <div class="flex gap-2">
                                     <input 
                                         type="number" 
                                         class="kt-input flex-1" 
                                         placeholder="Min Days" 
-                                        bind:value={shelfLifeMin}
+                                        bind:value={researchTimeDaysMin}
                                         on:input={handleFilterChange}
                                         min="1"
                                     />
@@ -381,104 +339,12 @@
                                         type="number" 
                                         class="kt-input flex-1" 
                                         placeholder="Max Days" 
-                                        bind:value={shelfLifeMax}
+                                        bind:value={researchTimeDaysMax}
                                         on:input={handleFilterChange}
                                         min="1"
                                     />
                                 </div>
                             </div>
-
-                            <!-- Elasticity Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Elasticity Coefficient</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min" 
-                                        bind:value={elasticityMin}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max" 
-                                        bind:value={elasticityMax}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Need Technology -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Need Technology</h4>
-                                <select 
-                                    class="kt-select w-full" 
-                                    bind:value={needTechnologyFilter}
-                                    on:change={handleFilterChange}
-                                >
-                                    <option value="">All Products</option>
-                                    <option value="1">Yes</option>
-                                    <option value="0">No</option>
-                                </select>
-                            </div>
-
-                                                         <!-- Technology -->
-                             <div class="space-y-2">
-                                 <h4 class="text-sm font-medium text-gray-700">Technology</h4>
-                                 <Select2
-                                     bind:this={technologySelectComponent}
-                                     id="technology-filter"
-                                     placeholder="All Technologies"
-                                     allowClear={true}
-                                     on:select={handleTechnologySelect}
-                                     on:clear={() => {
-                                         technologyIdFilter = '';
-                                         handleFilterChange();
-                                     }}
-                                     ajax={{
-                                         url: route('admin.technologies.index'),
-                                         dataType: 'json',
-                                         delay: 300,
-                                         data: function(params) {
-                                             return {
-                                                 search: params.term,
-                                                 perPage: 10
-                                             };
-                                         },
-                                         processResults: function(data) {
-                                             return {
-                                                 results: data.technologies.map(technology => ({
-                                                     id: technology.id,
-                                                     text: technology.name,
-                                                     name: technology.name,
-                                                     level: technology.level
-                                                 }))
-                                             };
-                                         },
-                                         cache: true
-                                     }}
-                                     templateResult={function(data) {
-                                         if (data.loading) return data.text;
-                                         
-                                         const $elem = globalThis.$('<div class="flex items-center gap-2">' +
-                                             '<i class="ki-filled ki-technology-1 text-sm text-muted-foreground"></i>' +
-                                             '<span class="font-medium text-sm">' + data.name + '</span>' +
-                                             '<span class="text-xs text-muted-foreground">(Level ' + data.level + ')</span>' +
-                                             '</div>');
-                                         return $elem;
-                                     }}
-                                     templateSelection={function(data) {
-                                         if (!data.id) return data.text;
-                                         return data.name;
-                                     }}
-                                 />
-                             </div>
                         </div>
                     </div>
                 {/if}
@@ -498,17 +364,22 @@
                                     </th>
                                     <th class="min-w-[200px]">
                                         <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Product</span>
-                                        </span>
-                                    </th>
-                                    <th class="min-w-[150px]">
-                                        <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Type</span>
-                                        </span>
-                                    </th>
-                                    <th class="min-w-[150px]">
-                                        <span class="kt-table-col">
                                             <span class="kt-table-col-label">Technology</span>
+                                        </span>
+                                    </th>
+                                    <th class="min-w-[150px]">
+                                        <span class="kt-table-col">
+                                            <span class="kt-table-col-label">Level</span>
+                                        </span>
+                                    </th>
+                                    <th class="min-w-[150px]">
+                                        <span class="kt-table-col">
+                                            <span class="kt-table-col-label">Research Cost</span>
+                                        </span>
+                                    </th>
+                                    <th class="min-w-[150px]">
+                                        <span class="kt-table-col">
+                                            <span class="kt-table-col-label">Research Time (Days)</span>
                                         </span>
                                     </th>
                                     <th class="w-[80px]">
@@ -542,29 +413,32 @@
                                                 <div class="kt-skeleton w-16 h-6 rounded"></div>
                                             </td>
                                             <td class="p-4">
-                                                <div class="kt-skeleton w-20 h-6 rounded"></div>
+                                                <div class="kt-skeleton w-16 h-6 rounded"></div>
+                                            </td>
+                                            <td class="p-4">
+                                                <div class="kt-skeleton w-16 h-6 rounded"></div>
                                             </td>
                                             <td class="p-4">
                                                 <div class="kt-skeleton w-8 h-8 rounded"></div>
                                             </td>
                                         </tr>
                                     {/each}
-                                {:else if products.length === 0}
+                                {:else if technologies.length === 0}
                                     <!-- Empty state -->
                                     <tr>
-                                        <td colspan="6" class="p-10">
+                                        <td colspan="7" class="p-10">
                                             <div class="flex flex-col items-center justify-center text-center">
                                                 <div class="mb-4">
-                                                    <i class="ki-filled ki-package text-4xl text-muted-foreground"></i>
+                                                    <i class="ki-filled ki-technology-1 text-4xl text-muted-foreground"></i>
                                                 </div>
-                                                <h3 class="text-lg font-semibold text-mono mb-2">No products found</h3>
+                                                <h3 class="text-lg font-semibold text-mono mb-2">No technologies found</h3>
                                                 <p class="text-sm text-secondary-foreground mb-4">
-                                                    {search ? 'No products match your search criteria.' : 'Get started by creating your first product.'}
+                                                    {search ? 'No technologies match your search criteria.' : 'Get started by creating your first technology.'}
                                                 </p>
-                                                {#if hasPermission('admin.products.store')}
-                                                <a href="{route('admin.products.create')}" class="kt-btn kt-btn-primary">
+                                                {#if hasPermission('admin.technologies.store')}
+                                                <a href="{route('admin.technologies.create')}" class="kt-btn kt-btn-primary">
                                                     <i class="ki-filled ki-plus text-base"></i>
-                                                    Create First Product
+                                                    Create First Technology
                                                 </a>
                                                 {/if}
                                             </div>
@@ -572,21 +446,21 @@
                                     </tr>
                                 {:else}
                                     <!-- Actual data rows -->
-                                    {#each products as product}
+                                    {#each technologies as technology}
                                         <tr class="hover:bg-muted/50">
                                             <td>
-                                                <input class="kt-checkbox kt-checkbox-sm" type="checkbox" value={product.id}/>
+                                                <input class="kt-checkbox kt-checkbox-sm" type="checkbox" value={technology.id}/>
                                             </td>
                                             <td>
-                                                <span class="text-sm font-medium text-mono">#{product.id}</span>
+                                                <span class="text-sm font-medium text-mono">#{technology.id}</span>
                                             </td>
                                             <td>
                                                 <div class="flex items-center gap-3">
                                                     <div class="flex-shrink-0">
-                                                        {#if product.image_url}
+                                                        {#if technology.image_url}
                                                             <img 
-                                                                src={product.image_url} 
-                                                                alt={product.name}
+                                                                src={technology.image_url} 
+                                                                alt={technology.name}
                                                                 class="w-10 h-10 rounded-lg object-cover"
                                                             />
                                                         {:else}
@@ -597,45 +471,29 @@
                                                     </div>
                                                     <div class="flex flex-col gap-1">
                                                         <span class="text-sm font-medium text-mono hover:text-primary">
-                                                            {product.name}
+                                                            {technology.name}
                                                         </span>
                                                     </div>
                                                 </div>
                                             </td>
 
                                             <td>
-                                                <span class={getProductTypeBadgeClass(product.type)}>
-                                                    {productTypes[product.type] || product.type}
+                                                <span class="text-sm font-medium text-mono kt-badge kt-badge-light-primary">
+                                                    {technology.level}
                                                 </span>
                                             </td>
                                             <td>
-                                                {#if product.need_technology}
-                                                    {#if product.technology}
-                                                        <div class="flex items-center gap-2">
-                                                            <div class="flex items-center justify-center size-8 shrink-0 rounded bg-accent/50">
-                                                                {#if product.technology.image_url}
-                                                                    <img src={product.technology.image_url} alt="" class="size-6 object-cover rounded" />
-                                                                {:else}
-                                                                    <i class="ki-filled ki-technology-1 text-sm text-muted-foreground"></i>
-                                                                {/if}
-                                                            </div>
-                                                            <div class="flex flex-col">
-                                                                <span class="text-xs font-medium text-mono">{product.technology.name}</span>
-                                                                <span class="text-xs text-muted-foreground">Level {product.technology.level}</span>
-                                                            </div>
-                                                        </div>
-                                                    {:else}
-                                                        <span class="kt-badge kt-badge-outline kt-badge-danger kt-badge-sm">
-                                                            <i class="ki-filled ki-technology-1 text-xs mr-1"></i>
-                                                            Required
-                                                        </span>
-                                                    {/if}
-                                                {:else}
-                                                    <span class="text-xs text-muted-foreground">
-                                                        No technology
-                                                    </span>
-                                                {/if}
+                                                <span class="text-sm font-medium text-mono">
+                                                    {technology.research_cost}
+                                                </span>
                                             </td>
+                                            
+                                            <td>
+                                                <span class="text-sm font-medium text-mono">
+                                                    {technology.research_time_days}
+                                                </span>
+                                            </td>
+                                            
                                             <td class="text-center">
                                                 <div class="kt-menu flex-inline" data-kt-menu="true">
                                                     <div class="kt-menu-item" data-kt-menu-item-offset="0, 10px" data-kt-menu-item-placement="bottom-end" data-kt-menu-item-placement-rtl="bottom-start" data-kt-menu-item-toggle="dropdown" data-kt-menu-item-trigger="click">
@@ -643,35 +501,9 @@
                                                             <i class="ki-filled ki-dots-vertical text-lg"></i>
                                                         </button>
                                                         <div class="kt-menu-dropdown kt-menu-default w-full max-w-[175px]" data-kt-menu-dismiss="true">
-                                                            {#if hasPermission('admin.product-demand.index')}
+                                                            {#if hasPermission('admin.technologies.show')}
                                                             <div class="kt-menu-item">
-                                                                <a class="kt-menu-link" href={route('admin.product-demand.index', { product_id: product.id, product_name: product.name })}>
-                                                                    <span class="kt-menu-icon">
-                                                                        <i class="ki-filled ki-chart-line"></i>
-                                                                    </span>
-                                                                    <span class="kt-menu-title">Demand</span>
-                                                                </a>
-                                                            </div>
-
-                                                            <div class="kt-menu-separator"></div>
-                                                            {/if}
-
-                                                            {#if hasPermission('admin.product-recipes.index')}
-                                                            <div class="kt-menu-item">
-                                                                <a class="kt-menu-link" href={route('admin.product-recipes.index', { product_id: product.id, product_name: product.name })}>
-                                                                    <span class="kt-menu-icon">
-                                                                        <i class="ki-filled ki-element-11"></i>
-                                                                    </span>
-                                                                    <span class="kt-menu-title">Recipes</span>
-                                                                </a>
-                                                            </div>
-
-                                                            <div class="kt-menu-separator"></div>
-                                                            {/if}
-                                                                
-                                                            {#if hasPermission('admin.products.show')}
-                                                            <div class="kt-menu-item">
-                                                                <a class="kt-menu-link" href={route('admin.products.show', { product: product.id })}>
+                                                                <a class="kt-menu-link" href={route('admin.technologies.show', { technology: technology.id })}>
                                                                     <span class="kt-menu-icon">
                                                                         <i class="ki-filled ki-search-list"></i>
                                                                     </span>
@@ -679,9 +511,9 @@
                                                                 </a>
                                                             </div>
                                                             {/if}
-                                                            {#if hasPermission('admin.products.update')}
+                                                            {#if hasPermission('admin.technologies.update')}
                                                             <div class="kt-menu-item">
-                                                                <a class="kt-menu-link" href={route('admin.products.edit', { product: product.id })}>
+                                                                <a class="kt-menu-link" href={route('admin.technologies.edit', { technology: technology.id })}>
                                                                     <span class="kt-menu-icon">
                                                                         <i class="ki-filled ki-pencil"></i>
                                                                     </span>
@@ -689,10 +521,10 @@
                                                                 </a>
                                                             </div>
                                                             {/if}
-                                                            {#if hasPermission('admin.products.destroy')}
+                                                            {#if hasPermission('admin.technologies.destroy')}
                                                                 <div class="kt-menu-separator"></div>
                                                                 <div class="kt-menu-item">
-                                                                    <button class="kt-menu-link" on:click={() => deleteProduct(product.id)}>
+                                                                    <button class="kt-menu-link" on:click={() => deleteTechnology(technology.id)}>
                                                                         <span class="kt-menu-icon">
                                                                             <i class="ki-filled ki-trash"></i>
                                                                         </span>

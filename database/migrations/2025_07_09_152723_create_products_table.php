@@ -28,7 +28,13 @@ return new class extends Migration
 
             // Measurement unit
             $table->string('measurement_unit')->default('unit');
-            
+
+            // table need research
+            $table->boolean('need_technology')->default(false);
+
+            // Technology
+            $table->foreignId('technology_id')->nullable()->constrained()->onDelete('set null');
+
             $table->timestamps();
         });
     }

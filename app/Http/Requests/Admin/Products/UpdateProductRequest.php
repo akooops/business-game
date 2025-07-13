@@ -32,6 +32,8 @@ class UpdateProductRequest extends FormRequest
             'has_expiration' => 'required|boolean',
             'shelf_life_days' => 'required_if:has_expiration,true|integer|min:1',
             'measurement_unit' => 'required|string|max:255',
+            'need_technology' => 'required|boolean',
+            'technology_id' => 'required_if:need_technology,true|exists:technologies,id',
             'file' => 'nullable|file|mimes:jpg,jpeg,png',
         ];
     }
@@ -48,6 +50,8 @@ class UpdateProductRequest extends FormRequest
             'shelf_life_days' => 'shelf life (days)',
             'has_expiration' => 'has expiration',
             'measurement_unit' => 'measurement unit',
+            'need_technology' => 'need technology',
+            'technology_id' => 'technology',
         ];
     }
 } 

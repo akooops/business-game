@@ -37,6 +37,8 @@ class AppServiceProvider extends ServiceProvider
             'country' => 'App\\Models\\Country',
             'employee_profile' => 'App\\Models\\EmployeeProfile',
             'machine_employee_profile' => 'App\\Models\\MachineEmployeeProfile',
+            'technology' => 'App\\Models\\Technology',
+            'setting' => 'App\\Models\\Setting',
             // Add more models as needed
         ]);
 
