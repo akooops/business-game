@@ -35,8 +35,8 @@ class StoreMachineRequest extends FormRequest
             
             // Speed ranges
             'min_speed_hour' => 'required|numeric|min:0',
-            'avg_speed_hour' => 'required|numeric|min:0',
-            'max_speed_hour' => 'required|numeric|min:0',
+            'avg_speed_hour' => 'required|numeric|min:0|gte:min_speed_hour|lte:max_speed_hour',
+            'max_speed_hour' => 'required|numeric|min:0|gte:min_speed_hour',
             
             // Reliability
             'failure_chance_hour' => 'required|numeric|min:0|max:1',
@@ -45,19 +45,19 @@ class StoreMachineRequest extends FormRequest
             
             // Predictive maintenance PERT
             'min_predictive_maintenance_cost' => 'required|numeric|min:0',
-            'avg_predictive_maintenance_cost' => 'required|numeric|min:0',
-            'max_predictive_maintenance_cost' => 'required|numeric|min:0',
+            'avg_predictive_maintenance_cost' => 'required|numeric|min:0|gte:min_predictive_maintenance_cost|lte:max_predictive_maintenance_cost',
+            'max_predictive_maintenance_cost' => 'required|numeric|min:0|gte:min_predictive_maintenance_cost',
             'min_predictive_maintenance_time_hours' => 'required|integer|min:0',
-            'avg_predictive_maintenance_time_hours' => 'required|integer|min:0',
-            'max_predictive_maintenance_time_hours' => 'required|integer|min:0',
+            'avg_predictive_maintenance_time_hours' => 'required|integer|min:0|gte:min_predictive_maintenance_time_hours|lte:max_predictive_maintenance_time_hours',
+            'max_predictive_maintenance_time_hours' => 'required|integer|min:0|gte:min_predictive_maintenance_time_hours',
             
             // Corrective maintenance PERT
             'min_corrective_maintenance_cost' => 'required|numeric|min:0',
-            'avg_corrective_maintenance_cost' => 'required|numeric|min:0',
-            'max_corrective_maintenance_cost' => 'required|numeric|min:0',
+            'avg_corrective_maintenance_cost' => 'required|numeric|min:0|gte:min_corrective_maintenance_cost|lte:max_corrective_maintenance_cost',
+            'max_corrective_maintenance_cost' => 'required|numeric|min:0|gte:min_corrective_maintenance_cost',
             'min_corrective_maintenance_time_hours' => 'required|integer|min:0',
-            'avg_corrective_maintenance_time_hours' => 'required|integer|min:0',
-            'max_corrective_maintenance_time_hours' => 'required|integer|min:0',
+            'avg_corrective_maintenance_time_hours' => 'required|integer|min:0|gte:min_corrective_maintenance_time_hours|lte:max_corrective_maintenance_time_hours',
+            'max_corrective_maintenance_time_hours' => 'required|integer|min:0|gte:min_corrective_maintenance_time_hours',
             
             // Relationships
             'employee_profiles' => 'nullable|array',

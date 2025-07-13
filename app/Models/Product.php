@@ -69,8 +69,8 @@ class Product extends Model
                 'min_sale_price',
                 'avg_sale_price',
                 'max_sale_price',
-                'minimum_order_qty',
-                'carbon_footprint'
+                'real_sale_price',
+                'minimum_order_qty'
             ])
             ->withTimestamps();
     }

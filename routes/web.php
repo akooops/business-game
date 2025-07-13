@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\CountriesController;
 use App\Http\Controllers\Admin\WilayasController;
 use App\Http\Controllers\Admin\TechnologiesController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\SuppliersController;
 
 /*
 |--------------------------------------------------------------------------
@@ -142,6 +143,16 @@ Route::prefix('admin')->middleware(['auth', 'handle.inertia'])->group(function (
     Route::get('wilayas/{wilaya}/edit', [WilayasController::class, 'edit'])->middleware('check.permission:admin.wilayas.update')->name('admin.wilayas.edit');
     Route::patch('wilayas/{wilaya}', [WilayasController::class, 'update'])->middleware('check.permission:admin.wilayas.update')->name('admin.wilayas.update');
     Route::delete('wilayas/{wilaya}', [WilayasController::class, 'destroy'])->middleware('check.permission:admin.wilayas.destroy')->name('admin.wilayas.destroy');
+
+    // Suppliers
+    Route::get('suppliers', [SuppliersController::class, 'index'])->middleware('check.permission:admin.suppliers.index')->name('admin.suppliers.index');
+    Route::get('suppliers/create', [SuppliersController::class, 'create'])->middleware('check.permission:admin.suppliers.store')->name('admin.suppliers.create');
+    Route::post('suppliers', [SuppliersController::class, 'store'])->middleware('check.permission:admin.suppliers.store')->name('admin.suppliers.store');
+    Route::get('suppliers/{supplier}', [SuppliersController::class, 'show'])->middleware('check.permission:admin.suppliers.show')->name('admin.suppliers.show');
+    Route::get('suppliers/{supplier}/edit', [SuppliersController::class, 'edit'])->middleware('check.permission:admin.suppliers.update')->name('admin.suppliers.edit');
+    Route::patch('suppliers/{supplier}', [SuppliersController::class, 'update'])->middleware('check.permission:admin.suppliers.update')->name('admin.suppliers.update');
+    Route::delete('suppliers/{supplier}', [SuppliersController::class, 'destroy'])->middleware('check.permission:admin.suppliers.destroy')->name('admin.suppliers.destroy');
 });
+
 
 

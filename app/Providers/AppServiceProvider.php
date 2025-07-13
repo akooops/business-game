@@ -39,6 +39,7 @@ class AppServiceProvider extends ServiceProvider
             'machine_employee_profile' => 'App\\Models\\MachineEmployeeProfile',
             'technology' => 'App\\Models\\Technology',
             'setting' => 'App\\Models\\Setting',
+            'supplier' => 'App\\Models\\Supplier',
             // Add more models as needed
         ]);
 

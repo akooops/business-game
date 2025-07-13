@@ -19,6 +19,12 @@ class Supplier extends Model
     protected $casts = [
         'is_international' => 'boolean',
         'research_cost' => 'decimal:3',
+        'needs_research' => 'boolean',
+        'min_shipping_cost' => 'decimal:3',
+        'max_shipping_cost' => 'decimal:3',
+        'avg_shipping_cost' => 'decimal:3',
+        'real_shipping_cost' => 'decimal:3',
+        'carbon_footprint' => 'decimal:3',
     ];
 
     protected $appends = ['image_url', 'type_name', 'location_name'];
@@ -55,8 +61,8 @@ class Supplier extends Model
                 'min_sale_price',
                 'avg_sale_price',
                 'max_sale_price',
-                'minimum_order_qty',
-                'carbon_footprint'
+                'real_sale_price',
+                'minimum_order_qty'
             ])
             ->withTimestamps();
     }
@@ -83,47 +89,5 @@ class Supplier extends Model
         }
         
         return 'Unknown Location';
-    }
-
-    // Helper methods
-    public function getShippingCosts(): array
-    {
-        if ($this->isInternational() && $this->country) {
-            return [
-                'freight_cost' => $this->country->freight_cost,
-                'port_handling_fee' => $this->country->port_handling_fee,
-                'insurance_rate' => $this->country->insurance_rate,
-                'customs_duties_rate' => $this->country->customs_duties_rate,
-                'tva_rate' => $this->country->tva_rate,
-                'min_shipping_cost' => $this->country->min_shipping_cost,
-                'avg_shipping_cost' => $this->country->avg_shipping_cost,
-                'max_shipping_cost' => $this->country->max_shipping_cost,
-                'min_shipping_time_days' => $this->country->min_shipping_time_days,
-                'avg_shipping_time_days' => $this->country->avg_shipping_time_days,
-                'max_shipping_time_days' => $this->country->max_shipping_time_days,
-                'type' => 'international',
-                'location' => $this->country->name,
-            ];
-        }
-        
-        if ($this->isLocal() && $this->wilaya) {
-            return [
-                'min_shipping_cost' => $this->wilaya->min_shipping_cost,
-                'avg_shipping_cost' => $this->wilaya->avg_shipping_cost,
-                'max_shipping_cost' => $this->wilaya->max_shipping_cost,
-                'min_shipping_time_days' => $this->wilaya->min_shipping_time_days,
-                'avg_shipping_time_days' => $this->wilaya->avg_shipping_time_days,
-                'max_shipping_time_days' => $this->wilaya->max_shipping_time_days,
-                'type' => 'local',
-                'location' => $this->wilaya->name,
-            ];
-        }
-        
-        return [];
-    }
-
-    public function getProductsCount(): int
-    {
-        return $this->supplierProducts()->count();
     }
 } 

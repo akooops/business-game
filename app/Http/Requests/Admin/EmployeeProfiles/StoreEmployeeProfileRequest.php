@@ -30,8 +30,8 @@ class StoreEmployeeProfileRequest extends FormRequest
             
             // Salary validation - min must be less than avg, avg must be less than max
             'min_salary_month' => 'required|numeric|min:0',
-            'avg_salary_month' => 'required|numeric|min:0|gte:min_salary_month',
-            'max_salary_month' => 'required|numeric|min:0|gte:avg_salary_month',
+            'avg_salary_month' => 'required|numeric|min:0|gte:min_salary_month|lte:max_salary_month',
+            'max_salary_month' => 'required|numeric|min:0|gte:min_salary_month',
             
             // Recruitment
             'recruitment_difficulty' => 'required|in:very_easy,easy,medium,hard,very_hard',

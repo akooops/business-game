@@ -27,13 +27,13 @@ class UpdateWilayaRequest extends FormRequest
             
             // Shipping costs
             'min_shipping_cost' => 'required|numeric|min:0',
-            'max_shipping_cost' => 'required|numeric|min:0',
-            'avg_shipping_cost' => 'required|numeric|min:0',
+            'max_shipping_cost' => 'required|numeric|min:0|gte:min_shipping_cost',
+            'avg_shipping_cost' => 'required|numeric|min:0|gte:min_shipping_cost|lte:max_shipping_cost',
             
             // Shipping time
             'min_shipping_time_days' => 'required|integer|min:0',
-            'avg_shipping_time_days' => 'required|integer|min:0',
-            'max_shipping_time_days' => 'required|integer|min:0',
+            'avg_shipping_time_days' => 'required|integer|min:0|gte:min_shipping_time_days|lte:max_shipping_time_days',
+            'max_shipping_time_days' => 'required|integer|min:0|gte:min_shipping_time_days',
         ];
     }
 

@@ -12,10 +12,10 @@ class Wilaya extends Model
     protected $guarded = ['id'];
 
     protected $casts = [
-        'min_shipping_cost_per_unit' => 'decimal:3',
-        'max_shipping_cost_per_unit' => 'decimal:3',
-        'avg_shipping_cost_per_unit' => 'decimal:3',
-        'real_shipping_cost_per_unit' => 'decimal:3',
+        'min_shipping_cost' => 'decimal:3',
+        'max_shipping_cost' => 'decimal:3',
+        'avg_shipping_cost' => 'decimal:3',
+        'real_shipping_cost' => 'decimal:3',
     ];
 
     //Relations
