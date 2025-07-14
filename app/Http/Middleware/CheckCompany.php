@@ -23,6 +23,9 @@ class CheckCompany
             return redirect()->route('admin.dashboard.index')->with('error', 'Access denied. Company account required.');
         }
 
+        // Add company to the request for easy access
+        $request->merge(['company' => $user->company]);
+
         return $next($request);
     }
 } 

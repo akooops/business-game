@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Company\DashboardController;
+use App\Http\Controllers\Company\TechnologiesController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -19,6 +20,10 @@ Route::get('/', function () {
 
 Route::prefix('company')->middleware(['auth', 'check.company', 'handle.inertia'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->middleware('check.permission:company.dashboard.index')->name('company.dashboard.index');
+
+    Route::get('/technologies', [TechnologiesController::class, 'index'])->middleware('check.permission:company.technologies.index')->name('company.technologies.index');
+    Route::get('/technologies/research', [TechnologiesController::class, 'researchPage'])->middleware('check.permission:company.technologies.index')->name('company.technologies.research-page');
+    Route::post('/technologies/{technology}/research', [TechnologiesController::class, 'research'])->middleware('check.permission:company.technologies.research')->name('company.technologies.research');
 });
 
 

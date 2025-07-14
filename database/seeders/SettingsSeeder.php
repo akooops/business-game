@@ -17,7 +17,7 @@ class SettingsSeeder extends Seeder
                 'type' => 'select',
                 'value' => 'running',
                 'description' => 'The status of the game',
-                'options' => ['running', 'paused', 'stopped'],
+                'options' => ['running', 'stopped'],
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

@@ -11,7 +11,7 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $company = $user->company;
+        $company = $request->company;
 
         return Inertia::render('Company/Dashboard/Index', [
             'user' => $user,
