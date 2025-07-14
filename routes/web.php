@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\UtilitiesController;
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PermissionsController;
@@ -57,6 +58,8 @@ Route::middleware(['auth', 'handle.inertia'])->group(function () {
     Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount'])->middleware('check.permission:notifications.index')->name('notifications.unread-count');
     Route::patch('notifications/{notification}/mark-read', [NotificationController::class, 'markAsRead'])->middleware('check.permission:notifications.index')->name('notifications.mark-read');
     Route::patch('notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->middleware('check.permission:notifications.index')->name('notifications.mark-all-read');
+
+    Route::get('utilities/current-timestamp', [UtilitiesController::class, 'currentTimeStamp'])->name('utilities.current-timestamp');
 });
 
 Route::prefix('admin')->middleware(['auth', 'check.admin', 'handle.inertia'])->group(function () {

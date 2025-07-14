@@ -1,6 +1,7 @@
 <script>
     import { page } from '@inertiajs/svelte'
     import Notifications from './Notifications.svelte';
+    import Timer from './Timer.svelte';
     
     // State to track which primary menu is active
     let activeSection = 'dashboard'; // default to dashboard
@@ -153,6 +154,7 @@
         
         <div class="flex flex-col gap-5 items-center shrink-0" id="sidebar_primary_footer">
             <div class="flex flex-col gap-1.5">
+                <Timer/>
                 <Notifications />
             </div>
             
