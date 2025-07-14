@@ -1,9 +1,10 @@
 <script>
-    import { onMount, tick } from 'svelte';
+    import { onMount, onDestroy, tick } from 'svelte';
 
     let notifications = [];
     let pagination = {};
     let unreadCount = 0;
+    let previousUnreadCount = 0;
     let loading = false;
     let search = '';
     let perPage = 10;
@@ -11,13 +12,31 @@
     let searchTimeout;
     let drawerOpen = false;
     let markingAllAsRead = false;
+    let fetchInterval;
+    let notificationSound;
+
+    // Initialize notification sound
+    function initNotificationSound() {
+        notificationSound = new Audio('/assets/media/beep.mp3');
+        notificationSound.volume = 0.5; // Set volume to 50%
+    }
+
+    // Play notification sound
+    function playNotificationSound() {
+        if (notificationSound) {
+            notificationSound.currentTime = 0; // Reset to beginning
+            notificationSound.play().catch(error => {
+                console.log('Could not play notification sound:', error);
+            });
+        }
+    }
 
     // Fetch notifications from API
     async function fetchNotifications() {
         try {
             loading = true;
-            /*
-            const response = await fetch(route('admin.notifications.index', {
+            
+            const response = await fetch(route('notifications.index', {
                 page: currentPage,
                 perPage: perPage,
                 search: search
@@ -29,11 +48,6 @@
             const data = await response.json();
             notifications = data.notifications;
             pagination = data.pagination;
-            */
-
-            notifications = [];
-            pagination = {};
-            unreadCount = 0;
 
             // Wait for DOM to update, then initialize menus
             await tick();
@@ -50,14 +64,34 @@
     // Fetch unread count
     async function fetchUnreadCount() {
         try {
-            /*
-            const response = await fetch(route('admin.notifications.unread-count'));
+            const response = await fetch(route('notifications.unread-count'));
             const data = await response.json();
-            unreadCount = data.count;
-            */
-            unreadCount = 0;
+            const newUnreadCount = data.count;
+            
+            previousUnreadCount = unreadCount;
+            console.log(previousUnreadCount);
+
+            if(newUnreadCount > 0 && newUnreadCount > previousUnreadCount){
+                showToast(`You have ${newUnreadCount} new notification`, 'primary');
+                playNotificationSound();
+            }
+            
+            unreadCount = newUnreadCount;
+            previousUnreadCount = newUnreadCount;
         } catch (error) {
             console.error('Error fetching unread count:', error);
+        }
+    }
+
+    // Show toast notification
+    function showToast(message, type = 'info') {
+        if (window.KTToast) {
+            KTToast.show({
+                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
+                message: message,
+                variant: type,
+                position: 'bottom-right',
+            });
         }
     }
 
@@ -93,14 +127,13 @@
     function handlePerPageChange(newPerPage) {
         perPage = newPerPage;
         currentPage = 1;
-        fetchNotifications();
+            fetchNotifications();
     }
 
     // Mark notification as read
     async function markAsRead(notificationId) {
-        /*
         try {
-            await fetch(route('admin.notifications.mark-read', { notification: notificationId }), {
+            await fetch(route('notifications.mark-read', { notification: notificationId }), {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -111,7 +144,6 @@
             // Update local state
             const notification = notifications.find(n => n.id === notificationId);
             if (notification) {
-                notification.read_at = true;
                 notification.read_at = new Date().toISOString();
             }
             
@@ -120,19 +152,16 @@
         } catch (error) {
             console.error('Error marking notification as read:', error);
         }
-        */
     }
 
     // Mark all notifications as read
     async function markAllAsRead() {
-        /*
-
         if (markingAllAsRead) return; // Prevent multiple clicks
         
         try {
             markingAllAsRead = true;
             
-            await fetch(route('admin.notifications.mark-all-read'), {
+            await fetch(route('notifications.mark-all-read'), {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -154,7 +183,6 @@
         } finally {
             markingAllAsRead = false;
         }
-        */
     }
 
     // Handle notification click
@@ -193,10 +221,9 @@
     // Get notification type label
     function getNotificationTypeLabel(type) {
         const labels = {
-            'contact_submission': 'Contact',
-            'inquiry': 'Inquiry',
-            'visit_booking': 'Visit',
-            'job_application': 'Job'
+            'finance_funds_changed': 'Funds Changed',
+            'technology_research_started': 'Technology Research Started',
+            'technology_research_completed': 'Technology Research Completed',
         };
         return labels[type] || type;
     }
@@ -207,10 +234,18 @@
     }
 
     onMount(() => {
+        initNotificationSound();
         fetchUnreadCount();
         
-        // Refresh unread count every 60 seconds
-        setInterval(fetchUnreadCount, 60000);
+        // Fetch unread count every minute (60 seconds)
+        fetchInterval = setInterval(fetchUnreadCount, 30000);
+    });
+
+    // Cleanup interval on component destroy
+    onDestroy(() => {
+        if (fetchInterval) {
+            clearInterval(fetchInterval);
+        }
     });
 </script>
 
@@ -373,7 +408,7 @@
                     Mark all as read
                 {/if}
             </button>
-            <a class="kt-btn kt-btn-primary justify-center" href={route('admin.notifications.index')}>
+            <a class="kt-btn kt-btn-primary justify-center" href={route('notifications.index')}>
                 View all
             </a>
         </div>

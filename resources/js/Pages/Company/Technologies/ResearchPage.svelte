@@ -158,9 +158,6 @@
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
                     'X-Requested-With': 'XMLHttpRequest'
                 },
-                body: JSON.stringify({
-                    funds: researchTechnology.research_cost
-                })
             });
 
             if (response.ok) {

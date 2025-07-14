@@ -19,8 +19,8 @@
     return $page.props.auth.permissions.some(p => p === permission);
   }
 
-  function isActiveRoute(routePattern) {
-    return $page.url.startsWith(route(routePattern));
+  function isActiveRoute(pattern) {
+    return window.location.href.includes(pattern);
   }
 
   function formatTimestamp(timestamp) {

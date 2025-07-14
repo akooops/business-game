@@ -3,8 +3,7 @@
 namespace App\Http\Requests\Company\Technologies;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
-use App\Models\Technology;
+use App\Services\FinanceService;
 
 class ResearchTechnolgyRequest extends FormRequest
 {
@@ -23,10 +22,8 @@ class ResearchTechnolgyRequest extends FormRequest
      */
     public function rules(): array
     {
-        $company = $this->company;
-
         return [
-            'funds' => 'required|numeric|min:0|max:' . $company->funds,
+
         ];
     }
 
@@ -35,6 +32,11 @@ class ResearchTechnolgyRequest extends FormRequest
         $validator->after(function ($validator) {
             $technology = request()->route('technology');
             $company = $this->company;
+
+            // Check if company has sufficient funds
+            if (!FinanceService::haveSufficientFunds($company, $technology->research_cost)) {
+                $validator->errors()->add('funds', 'You do not have enough funds to research this technology. Required: DZD ' . $technology->research_cost . ', Available: DZD ' . $company->funds);
+            }
             
             // Check if technology exists
             if (!$technology) {

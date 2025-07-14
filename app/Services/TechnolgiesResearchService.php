@@ -9,7 +9,7 @@ class TechnolgiesResearchService
 {
     public static function researchTechnology($company, $technology){
         // Pay funds
-        $funds = FundsService::payTechnologyResearch($company, $technology);
+        $funds = FinanceService::payTechnologyResearch($company, $technology);
 
         // Get current timestamp
         $startedAt = SettingsService::getCurrentTimestamp();
@@ -47,6 +47,8 @@ class TechnolgiesResearchService
             ]);
         }
 
+        NotificationService::createTechnologyResearchStartedNotification($companyTechnology);
+
         return $companyTechnology;  
     }
 
@@ -54,5 +56,7 @@ class TechnolgiesResearchService
         $companyTechnology->update([
             'completed_at' => SettingsService::getCurrentTimestamp(),
         ]);
+
+        NotificationService::createTechnologyResearchCompletedNotification($companyTechnology);
     }
 }
