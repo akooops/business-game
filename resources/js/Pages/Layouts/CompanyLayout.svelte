@@ -2,7 +2,7 @@
   import { page } from '@inertiajs/svelte';
   import Topbar from '../Components/Topbar.svelte';
   import Breadcrumbs from '../Components/Breadcrumbs.svelte';
-  import AdminSidebar from '../Components/AdminSidebar.svelte';
+  import CompanySidebar from '../Components/CompanySidebar.svelte';
   
   // Props for the layout
   export let breadcrumbs = [];
@@ -48,7 +48,7 @@
     <!-- Wrapper -->
     <div class="flex flex-col lg:flex-row grow pt-(--header-height) lg:pt-0">
         <!-- Sidebar -->
-        <AdminSidebar />
+        <CompanySidebar />
         <!-- End of Sidebar -->
 
         <!-- Main -->

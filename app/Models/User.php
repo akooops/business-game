@@ -62,6 +62,11 @@ class User extends Authenticatable
             ->values()
             ->pluck('name');
     }
+
+    public function company()
+    {
+        return $this->hasOne(Company::class);
+    }
     
     //Scopes
 

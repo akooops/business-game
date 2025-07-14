@@ -50,7 +50,7 @@ Route::middleware(['handle.inertia'])->group(function () {
     Route::post('auth/logout', [AuthController::class, 'logout'])->middleware('auth')->name('auth.logout');
 });
 
-Route::prefix('admin')->middleware(['auth', 'handle.inertia'])->group(function () {
+Route::prefix('admin')->middleware(['auth', 'check.admin', 'handle.inertia'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->middleware('check.permission:admin.dashboard.index')->name('admin.dashboard.index');
 
     // Permissions
@@ -163,6 +163,9 @@ Route::prefix('admin')->middleware(['auth', 'handle.inertia'])->group(function (
     Route::patch('companies/{company}', [CompaniesController::class, 'update'])->middleware('check.permission:admin.companies.update')->name('admin.companies.update');
     Route::delete('companies/{company}', [CompaniesController::class, 'destroy'])->middleware('check.permission:admin.companies.destroy')->name('admin.companies.destroy');
 });
+
+include 'company.php';
+
 
 
 

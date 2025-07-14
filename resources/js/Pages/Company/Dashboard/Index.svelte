@@ -1,5 +1,5 @@
 <script>
-    import AdminLayout from './Layouts/AdminLayout.svelte';
+    import CompanyLayout from '../../Layouts/CompanyLayout.svelte';
     
     // Define breadcrumbs for this page
     const breadcrumbs = [
@@ -22,7 +22,7 @@
     <title>Business Game - {pageTitle}</title>
 </svelte:head>
 
-<AdminLayout {breadcrumbs} {pageTitle}>
+<CompanyLayout {breadcrumbs} {pageTitle}>
     <!-- Container -->
     <div class="kt-container-fluid">
         <div class="grid gap-5 lg:gap-7.5">
@@ -30,4 +30,4 @@
         </div>
     </div>
     <!-- End of Container -->
-</AdminLayout>
+</CompanyLayout>

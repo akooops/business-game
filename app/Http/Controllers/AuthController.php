@@ -16,15 +16,23 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request)
     {
-        if (!Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
-            return back()
-                ->withInput($request->only('email', 'remember'))
-                ->withErrors(['email' => 'These credentials do not match our records.']);
+        // Try to authenticate with the default guard
+        if (Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
+            $request->session()->regenerate();
+            
+            $user = Auth::user();
+            
+            // Check if user has a company relationship
+            if ($user->company) {
+                return Inertia::location(route('company.dashboard.index'));
+            }
+            
+            return Inertia::location(route('admin.dashboard.index'));
         }
 
-        $request->session()->regenerate();
-
-        return Inertia::location(route('admin.dashboard.index'));
+        return back()
+            ->withInput($request->only('email', 'remember'))
+            ->withErrors(['email' => 'These credentials do not match our records.']);
     }
 
     public function logout(Request $request)
