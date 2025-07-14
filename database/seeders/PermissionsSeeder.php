@@ -47,6 +47,11 @@ class PermissionsSeeder extends Seeder
             ['is_default' => false]
         );
 
+        $companyRole = Role::updateOrCreate(
+            ['name' => 'Company'],
+            ['is_default' => false]
+        );
+
         // Assign all permissions to Super Admin
         $allPermissions = Permission::all();
         $adminRole->permissions()->sync($allPermissions->pluck('id'));

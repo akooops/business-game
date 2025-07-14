@@ -258,7 +258,7 @@
 </script>
 
 <svelte:head>
-    <title>Saud international schools - {pageTitle}</title>
+    <title>Business Game - {pageTitle}</title>
 </svelte:head>
 
 <AdminLayout {breadcrumbs} {pageTitle}>

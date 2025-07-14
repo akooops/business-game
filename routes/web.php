@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\WilayasController;
 use App\Http\Controllers\Admin\TechnologiesController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\SuppliersController;
+use App\Http\Controllers\Admin\CompaniesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -152,6 +153,15 @@ Route::prefix('admin')->middleware(['auth', 'handle.inertia'])->group(function (
     Route::get('suppliers/{supplier}/edit', [SuppliersController::class, 'edit'])->middleware('check.permission:admin.suppliers.update')->name('admin.suppliers.edit');
     Route::patch('suppliers/{supplier}', [SuppliersController::class, 'update'])->middleware('check.permission:admin.suppliers.update')->name('admin.suppliers.update');
     Route::delete('suppliers/{supplier}', [SuppliersController::class, 'destroy'])->middleware('check.permission:admin.suppliers.destroy')->name('admin.suppliers.destroy');
+
+    // Companies
+    Route::get('companies', [CompaniesController::class, 'index'])->middleware('check.permission:admin.companies.index')->name('admin.companies.index');
+    Route::get('companies/create', [CompaniesController::class, 'create'])->middleware('check.permission:admin.companies.store')->name('admin.companies.create');
+    Route::post('companies', [CompaniesController::class, 'store'])->middleware('check.permission:admin.companies.store')->name('admin.companies.store');
+    Route::get('companies/{company}', [CompaniesController::class, 'show'])->middleware('check.permission:admin.companies.show')->name('admin.companies.show');
+    Route::get('companies/{company}/edit', [CompaniesController::class, 'edit'])->middleware('check.permission:admin.companies.update')->name('admin.companies.edit');
+    Route::patch('companies/{company}', [CompaniesController::class, 'update'])->middleware('check.permission:admin.companies.update')->name('admin.companies.update');
+    Route::delete('companies/{company}', [CompaniesController::class, 'destroy'])->middleware('check.permission:admin.companies.destroy')->name('admin.companies.destroy');
 });
 
 
