@@ -24,9 +24,6 @@
     let form = {
         name: '',
         is_international: false,
-        needs_research: false,
-        research_cost: '',
-        research_time_days: '',
         min_shipping_cost: '',
         max_shipping_cost: '',
         avg_shipping_cost: '',
@@ -87,15 +84,6 @@
         }
         if (wilayaSelectComponent) {
             wilayaSelectComponent.clear();
-        }
-    }
-
-    // Handle research toggle
-    function handleResearchToggle() {
-        form.needs_research = !form.needs_research;
-        if (!form.needs_research) {
-            form.research_cost = '';
-            form.research_time_days = '';
         }
     }
 
@@ -163,7 +151,7 @@
             if (form[key] !== null && form[key] !== '') {
                 if (key === 'file' && form.file) {
                     formData.append(key, form.file);
-                } else if (key === 'is_international' || key === 'needs_research') {
+                } else if (key === 'is_international') {
                     formData.append(key, form[key] ? '1' : '0');
                 } else if (key !== 'file' && key !== 'products') {
                     formData.append(key, form[key]);
@@ -369,79 +357,6 @@
                                     {#if errors.wilaya_id}
                                         <p class="text-sm text-destructive">{errors.wilaya_id}</p>
                                     {/if}
-                                </div>
-                            {/if}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Research Requirements Card -->
-                <div class="kt-card">
-                    <div class="kt-card-header">
-                        <h4 class="kt-card-title">Research Requirements</h4>
-                    </div>
-                    <div class="kt-card-content">
-                        <div class="grid gap-4">
-                            <!-- Needs Research -->
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono">
-                                    Research Required
-                                </label>
-                                <div class="flex items-center gap-3">
-                                    <input 
-                                        class="kt-switch" 
-                                        type="checkbox" 
-                                        id="needs_research" 
-                                        bind:checked={form.needs_research}
-                                    />
-                                    <label class="kt-label cursor-pointer" for="needs_research">
-                                        This supplier requires research before doing business
-                                    </label>
-                                </div>
-                                {#if errors.needs_research}
-                                    <p class="text-sm text-destructive">{errors.needs_research}</p>
-                                {/if}
-                            </div>
-
-                            <!-- Research Details (conditional) -->
-                            {#if form.needs_research}
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <!-- Research Cost -->
-                                    <div class="flex flex-col gap-2">
-                                        <label class="text-sm font-medium text-mono" for="research_cost">
-                                            Research Cost
-                                        </label>
-                                        <input
-                                            id="research_cost"
-                                            type="number"
-                                            step="0.001"
-                                            min="0"
-                                            class="kt-input {errors.research_cost ? 'kt-input-error' : ''}"
-                                            placeholder="0.000"
-                                            bind:value={form.research_cost}
-                                        />
-                                        {#if errors.research_cost}
-                                            <p class="text-sm text-destructive">{errors.research_cost}</p>
-                                        {/if}
-                                    </div>
-
-                                    <!-- Research Time -->
-                                    <div class="flex flex-col gap-2">
-                                        <label class="text-sm font-medium text-mono" for="research_time_days">
-                                            Research Time (Days)
-                                        </label>
-                                        <input
-                                            id="research_time_days"
-                                            type="number"
-                                            min="1"
-                                            class="kt-input {errors.research_time_days ? 'kt-input-error' : ''}"
-                                            placeholder="1"
-                                            bind:value={form.research_time_days}
-                                        />
-                                        {#if errors.research_time_days}
-                                            <p class="text-sm text-destructive">{errors.research_time_days}</p>
-                                        {/if}
-                                    </div>
                                 </div>
                             {/if}
                         </div>

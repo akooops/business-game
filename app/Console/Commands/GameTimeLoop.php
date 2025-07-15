@@ -46,7 +46,7 @@ class GameTimeLoop extends Command
 
         // Process technologies research
         $this->call('game:technolgies-research-processing');
-        
+
         $this->info("New game time: " . $newTime->format('Y-m-d H:i:s'));
         $this->info('Game time loop completed successfully!');
     }

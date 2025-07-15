@@ -24,7 +24,7 @@
             return 'employees';
         }
 
-        if (url.includes('/admin/countries') || url.includes('/admin/wilayas')) {
+        if (url.includes('/admin/countries') || url.includes('/admin/wilayas') || url.includes('/admin/suppliers')) {
             return 'logistics';
         }
         if (url.includes('/admin/settings')) {
@@ -478,6 +478,19 @@
                             </span> 
                             <span class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono ms-2">
                                 Wilayas
+                            </span>
+                        </a>
+                    </div>
+                    {/if}
+
+                    {#if hasPermission('admin.suppliers.index')}
+                    <div class="kt-menu-item">
+                        <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('admin.suppliers.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.suppliers.index')}>
+                            <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
+                                <i class="ki-outline ki-ship"></i>
+                            </span>
+                            <span class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono ms-2">
+                                Suppliers
                             </span>
                         </a>
                     </div>

@@ -27,7 +27,6 @@ class SuppliersController extends Controller
 
         // Filter parameters
         $isInternational = IndexService::checkIfBoolean($request->query('is_international'));
-        $needsResearch = IndexService::checkIfBoolean($request->query('needs_research'));
         $countryId = IndexService::checkIfNumber($request->query('country_id'));
         $wilayaId = IndexService::checkIfNumber($request->query('wilaya_id'));
         $minShippingCost = IndexService::checkIfNumber($request->query('min_shipping_cost'));
@@ -42,11 +41,6 @@ class SuppliersController extends Controller
         // Apply international/local filter
         if ($isInternational !== null) {
             $suppliers->where('is_international', $isInternational);
-        }
-
-        // Apply research filter
-        if ($needsResearch !== null) {
-            $suppliers->where('needs_research', $needsResearch);
         }
 
         // Apply country filter

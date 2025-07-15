@@ -17,9 +17,6 @@ class Supplier extends Model
     protected $guarded = ['id'];
 
     protected $casts = [
-        'is_international' => 'boolean',
-        'research_cost' => 'decimal:3',
-        'needs_research' => 'boolean',
         'min_shipping_cost' => 'decimal:3',
         'max_shipping_cost' => 'decimal:3',
         'avg_shipping_cost' => 'decimal:3',

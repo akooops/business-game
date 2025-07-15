@@ -25,11 +25,6 @@ class UpdateSupplierRequest extends FormRequest
             'name' => 'required|string|max:255',
             'is_international' => 'boolean',
             
-            // Research information
-            'needs_research' => 'boolean',
-            'research_cost' => 'nullable|numeric|min:0',
-            'research_time_days' => 'nullable|integer|min:1',
-            
             // Shipping costs
             'min_shipping_cost' => 'required|numeric|min:0',
             'max_shipping_cost' => 'required|numeric|min:0|gte:min_shipping_cost',
@@ -96,12 +91,6 @@ class UpdateSupplierRequest extends FormRequest
             'carbon_footprint.required' => 'The carbon footprint is required.',
             'carbon_footprint.numeric' => 'The carbon footprint must be a number.',
             'carbon_footprint.min' => 'The carbon footprint must be at least 0.',
-            
-            'research_cost.numeric' => 'The research cost must be a number.',
-            'research_cost.min' => 'The research cost must be at least 0.',
-            
-            'research_time_days.integer' => 'The research time must be an integer.',
-            'research_time_days.min' => 'The research time must be at least 1 day.',
             
             'country_id.exists' => 'The selected country does not exist.',
             'wilaya_id.exists' => 'The selected wilaya does not exist.',

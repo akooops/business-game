@@ -33,7 +33,6 @@
 
     // Filter variables
     let isInternationalFilter = '';
-    let needsResearchFilter = '';
     let countryIdFilter = '';
     let wilayaIdFilter = '';
     let minShippingCostFilter = '';
@@ -47,19 +46,7 @@
     let countrySelectComponent;
     let wilayaSelectComponent;
     let productSelectComponent;
-
-    // Supplier types options
-    const supplierTypes = {
-        'true': 'International',
-        'false': 'Local'
-    };
-
-    // Research status options
-    const researchStatus = {
-        'true': 'Required',
-        'false': 'Not Required'
-    };
-
+    
     // Fetch suppliers data
     async function fetchSuppliers() {
         loading = true;
@@ -72,7 +59,6 @@
 
             // Add filters to params
             if (isInternationalFilter !== '') params.append('is_international', isInternationalFilter);
-            if (needsResearchFilter !== '') params.append('needs_research', needsResearchFilter);
             if (countryIdFilter) params.append('country_id', countryIdFilter);
             if (wilayaIdFilter) params.append('wilaya_id', wilayaIdFilter);
             if (minShippingCostFilter) params.append('min_shipping_cost', minShippingCostFilter);
@@ -148,7 +134,6 @@
     // Clear all filters
     function clearAllFilters() {
         isInternationalFilter = '';
-        needsResearchFilter = '';
         countryIdFilter = '';
         wilayaIdFilter = '';
         minShippingCostFilter = '';
@@ -247,13 +232,6 @@
             : 'kt-badge kt-badge-outline kt-badge-success';
     }
 
-    // Get research status badge class
-    function getResearchStatusBadgeClass(needsResearch) {
-        return needsResearch
-            ? 'kt-badge kt-badge-outline kt-badge-warning'
-            : 'kt-badge kt-badge-outline kt-badge-info';
-    }
-
     onMount(() => {
         fetchSuppliers();
     });
@@ -322,7 +300,7 @@
                             </button>
                             
                             <!-- Clear Filters Button -->
-                            {#if isInternationalFilter || needsResearchFilter || countryIdFilter || wilayaIdFilter || minShippingCostFilter || maxShippingCostFilter || minShippingTimeFilter || maxShippingTimeFilter || carbonFootprintMinFilter || carbonFootprintMaxFilter}
+                            {#if isInternationalFilter || countryIdFilter || wilayaIdFilter || minShippingCostFilter || maxShippingCostFilter || minShippingTimeFilter || maxShippingTimeFilter || carbonFootprintMinFilter || carbonFootprintMaxFilter}
                                 <button 
                                     class="kt-btn kt-btn-ghost kt-btn-sm"
                                     on:click={clearAllFilters}
@@ -351,20 +329,6 @@
                                     <option value="">All Types</option>
                                     <option value="true">International</option>
                                     <option value="false">Local</option>
-                                </select>
-                            </div>
-
-                            <!-- Research Status -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Research Required</h4>
-                                <select 
-                                    class="kt-select w-full" 
-                                    bind:value={needsResearchFilter}
-                                    on:change={handleFilterChange}
-                                >
-                                    <option value="">All Statuses</option>
-                                    <option value="true">Required</option>
-                                    <option value="false">Not Required</option>
                                 </select>
                             </div>
 
@@ -574,11 +538,6 @@
                                     </th>
                                     <th class="min-w-[120px]">
                                         <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Research</span>
-                                        </span>
-                                    </th>
-                                    <th class="min-w-[120px]">
-                                        <span class="kt-table-col">
                                             <span class="kt-table-col-label">Shipping Cost</span>
                                         </span>
                                     </th>
@@ -621,9 +580,6 @@
                                             </td>
                                             <td class="p-4">
                                                 <div class="kt-skeleton w-16 h-6 rounded"></div>
-                                            </td>
-                                            <td class="p-4">
-                                                <div class="kt-skeleton w-20 h-4 rounded"></div>
                                             </td>
                                             <td class="p-4">
                                                 <div class="kt-skeleton w-20 h-4 rounded"></div>
@@ -691,17 +647,12 @@
                                             </td>
                                             <td>
                                                 <span class={getSupplierTypeBadgeClass(supplier.is_international)}>
-                                                    {supplierTypes[supplier.is_international.toString()]}
+                                                    {supplier.is_international ? 'International' : 'Local'}
                                                 </span>
                                             </td>
                                             <td>
                                                 <span class="text-sm text-secondary-foreground">
                                                     {supplier.is_international ? (supplier.country?.name || 'N/A') : (supplier.wilaya?.name || 'N/A')}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span class={getResearchStatusBadgeClass(supplier.needs_research)}>
-                                                    {researchStatus[supplier.needs_research.toString()]}
                                                 </span>
                                             </td>
                                             <td>

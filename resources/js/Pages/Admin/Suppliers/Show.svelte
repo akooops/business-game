@@ -168,55 +168,6 @@
                 </div>
             </div>
 
-            <!-- Research Requirements Card -->
-            <div class="kt-card">
-                <div class="kt-card-header">
-                    <h4 class="kt-card-title">Research Requirements</h4>
-                </div>
-                <div class="kt-card-content">
-                    <div class="grid gap-4 w-full">
-                        <!-- Needs Research -->
-                        <div class="flex flex-col gap-2">
-                            <h4 class="text-sm font-semibold text-mono">Research Required</h4>
-                            <div class="flex items-center gap-2">
-                                {#if supplier.needs_research}
-                                    <span class="kt-badge kt-badge-warning">Required</span>
-                                    <span class="text-sm text-secondary-foreground">
-                                        This supplier requires research before doing business
-                                    </span>
-                                {:else}
-                                    <span class="kt-badge kt-badge-outline">Not Required</span>
-                                    <span class="text-sm text-secondary-foreground">
-                                        No research required for this supplier
-                                    </span>
-                                {/if}
-                            </div>
-                        </div>
-
-                        <!-- Research Details (conditional) -->
-                        {#if supplier.needs_research}
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <!-- Research Cost -->
-                                <div class="flex flex-col gap-2">
-                                    <h4 class="text-sm font-semibold text-mono">Research Cost</h4>
-                                    <p class="text-sm text-secondary-foreground font-bold">
-                                        {supplier.research_cost}
-                                    </p>
-                                </div>
-
-                                <!-- Research Time -->
-                                <div class="flex flex-col gap-2">
-                                    <h4 class="text-sm font-semibold text-mono">Research Time</h4>
-                                    <p class="text-sm text-secondary-foreground">
-                                        {supplier.research_time_days} days
-                                    </p>
-                                </div>
-                            </div>
-                        {/if}
-                    </div>
-                </div>
-            </div>
-
             <!-- Shipping Information Card -->
             <div class="kt-card">
                 <div class="kt-card-header">

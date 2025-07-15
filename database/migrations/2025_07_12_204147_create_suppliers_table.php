@@ -16,11 +16,6 @@ return new class extends Migration
             $table->string('name');
             $table->boolean('is_international')->default(false);
 
-            // Research costs
-            $table->boolean('needs_research')->default(false);
-            $table->decimal('research_cost', 10, 5)->default(0);
-            $table->integer('research_time_days')->default(1);
-
             // Shipping costs
             $table->decimal('min_shipping_cost', 15, 5)->default(0); 
             $table->decimal('max_shipping_cost', 15, 5)->default(0); 
