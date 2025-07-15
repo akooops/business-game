@@ -17,4 +17,14 @@ class FinanceService
 
         return $funds;  
     }
+
+    public static function payPurchase($company, $purchase){
+        $funds = $company->funds;
+        $funds -= $purchase->total_cost;
+        $company->update(['funds' => $funds]);
+
+        NotificationService::createFinanceFundsChangedNotification($company, $purchase->total_cost);
+
+        return $funds;
+    }
 }

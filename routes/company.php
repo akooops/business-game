@@ -36,6 +36,8 @@ Route::prefix('company')->middleware(['auth', 'check.company', 'handle.inertia']
     Route::get('/countries', [CountriesController::class, 'index'])->middleware('check.permission:company.countries.index')->name('company.countries.index');
 
     Route::get('/suppliers', [SuppliersController::class, 'index'])->middleware('check.permission:company.suppliers.index')->name('company.suppliers.index');
+    Route::get('/suppliers/{supplier}/purchase-page', [SuppliersController::class, 'purchasePage'])->middleware('check.permission:company.suppliers.purchase')->name('company.suppliers.purchase-page');
+    Route::post('/suppliers/{supplier}/purchase', [SuppliersController::class, 'purchase'])->middleware('check.permission:company.suppliers.purchase')->name('company.suppliers.purchase');
 });
 
 

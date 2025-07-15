@@ -47,6 +47,17 @@ class GameTimeLoop extends Command
         // Process technologies research
         $this->call('game:technolgies-research-processing');
 
+        // Process purchases
+        $this->call('game:purchases-processing');
+
+        // Change supplier prices and costs
+        $currentHour = (int) $currentTime->copy()->format('H');
+        
+        if($currentHour == 8){
+            $this->call('game:change-supplier-prices-and-costs');
+            $this->call('game:change-wilayas-costs');
+        }
+
         $this->info("New game time: " . $newTime->format('Y-m-d H:i:s'));
         $this->info('Game time loop completed successfully!');
     }

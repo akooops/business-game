@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Requests\Company\Technologies;
+namespace App\Http\Requests\Company\Suppliers;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Services\FinanceService;
-use App\Services\TechnolgiesResearchService;
+use App\Services\ProcurementService;
+use App\Models\Product;
 
-class ResearchTechnolgyRequest extends FormRequest
+class PurchaseProductRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,17 +25,26 @@ class ResearchTechnolgyRequest extends FormRequest
     public function rules(): array
     {
         return [
-
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|numeric|min:0.001',
         ];
     }
 
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            $technology = request()->route('technology');
             $company = $this->company;
+            $supplier = request()->route('supplier');
+            $quantity = request()->input('quantity');
 
-            $errors = TechnolgiesResearchService::validateTechnologyResearch($company, $technology);
+            $product = Product::find(request()->input('product_id'));
+
+            if (!$product) {
+                $validator->errors()->add('product_id', 'The selected product does not exist.');
+                return;
+            }
+
+            $errors = ProcurementService::validatePurchase($company, $supplier, $product, $quantity);
 
             if($errors) {
                 foreach($errors as $key => $error) {
@@ -42,14 +52,5 @@ class ResearchTechnolgyRequest extends FormRequest
                 }
             }
         });
-    }
-
-    public function messages(): array
-    {
-        return [
-            'funds.max' => 'You do not have enough funds to research this technology.',
-            'technology_id.unique' => 'You are already researching this technology.',
-            'technology_id.exists' => 'The selected technology does not exist.',
-        ];
     }
 }

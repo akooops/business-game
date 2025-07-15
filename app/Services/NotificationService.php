@@ -39,6 +39,36 @@ class NotificationService
         ]);
     }
 
+    public static function createPurchaseOrderedNotification($purchase){
+        return Notification::create([
+            'type' => Notification::TYPE_PURCHASE_ORDERED,
+            'title' => 'Purchase Ordered',
+            'message' => "Purchase ordered for {$purchase->product->name} at " . $purchase->ordered_at->format('Y-m-d H:i:s') . ". Estimated delivery date: " . $purchase->estimated_delivered_at->format('Y-m-d H:i:s') . ".",
+            'url' => route('company.purchases.index'),
+            'user_id' => $purchase->company->user_id,
+        ]);
+    }
+
+    public static function createPurchaseDeliveredNotification($purchase){
+        return Notification::create([
+            'type' => Notification::TYPE_PURCHASE_DELIVERED,
+            'title' => 'Purchase Delivered',
+            'message' => "Purchase delivered for {$purchase->product->name} at " . $purchase->delivered_at->format('Y-m-d H:i:s') . ".",
+            'url' => route('company.purchases.index'),
+            'user_id' => $purchase->company->user_id,
+        ]);
+    }
+
+    public static function createPurchaseCancelledNotification($purchase, $reason){
+        return Notification::create([
+            'type' => Notification::TYPE_PURCHASE_CANCELLED,
+            'title' => 'Purchase Cancelled',
+            'message' => "Purchase cancelled for {$purchase->product->name} at " . $purchase->cancelled_at->format('Y-m-d H:i:s') . ". Reason: " . $reason . ".",
+            'url' => route('company.purchases.index'),
+            'user_id' => $purchase->company->user_id,
+        ]);
+    }
+
     public static function getUnreadCount()
     {
         return Notification::where('user_id', auth()->user()->id)->whereNull('read_at')->count();

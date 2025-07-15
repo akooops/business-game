@@ -22,8 +22,8 @@ return new class extends Migration
             $table->timestamp('estimated_completed_at')->nullable();
             $table->timestamp('completed_at')->nullable();
 
-            $table->foreignId('company_id')->constrained('companies');
-            $table->foreignId('technology_id')->constrained('technologies');
+            $table->foreignId('company_id')->constrained()->onDelete('cascade');
+            $table->foreignId('technology_id')->constrained()->onDelete('cascade');
 
             $table->timestamps();
         });
