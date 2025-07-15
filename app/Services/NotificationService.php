@@ -22,7 +22,7 @@ class NotificationService
         return Notification::create([
             'type' => Notification::TYPE_TECHNOLOGY_RESEARCH_STARTED,
             'title' => 'Technology Research Started',
-            'message' => "Technology research started for company {$companyTechnology->technology->name} at " . $companyTechnology->started_at->format('Y-m-d H:i:s'),
+            'message' => "Technology research started for {$companyTechnology->technology->name} at " . $companyTechnology->started_at->format('Y-m-d H:i:s'),
             'url' => route('company.technologies.index'),
             'user_id' => $companyTechnology->company->user_id,
         ]);
@@ -33,7 +33,7 @@ class NotificationService
         return Notification::create([
             'type' => Notification::TYPE_TECHNOLOGY_RESEARCH_COMPLETED,
             'title' => 'Technology Research Completed',
-            'message' => "Technology research completed for company {$companyTechnology->technology->name} at " . $companyTechnology->completed_at->format('Y-m-d H:i:s'),
+            'message' => "Technology research completed for {$companyTechnology->technology->name} at " . $companyTechnology->completed_at->format('Y-m-d H:i:s') . ". You have unlocked {$companyTechnology->technology->products->count()} products!",
             'url' => route('company.technologies.index'),
             'user_id' => $companyTechnology->company->user_id,
         ]);

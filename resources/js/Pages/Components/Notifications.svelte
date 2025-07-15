@@ -74,6 +74,8 @@
             if(newUnreadCount > 0 && newUnreadCount > previousUnreadCount){
                 showToast(`You have ${newUnreadCount} new notification`, 'primary');
                 playNotificationSound();
+
+                fetchNotifications();
             }
             
             unreadCount = newUnreadCount;

@@ -22,6 +22,16 @@ class SettingsSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'key' => 'game_start_timestamp',
+                'name' => 'Game Start Timestamp',
+                'type' => 'timestamp',
+                'value' => '2025-01-01 08:00:00',
+                'description' => 'The start timestamp of the game',
+                'options' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
                 'key' => 'current_timestamp',
                 'name' => 'Current Timestamp',
                 'type' => 'timestamp',

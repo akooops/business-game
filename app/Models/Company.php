@@ -35,5 +35,17 @@ class Company extends Model
             ->withTimestamps();
     }
 
+    public function companyProducts()
+    {
+        return $this->hasMany(CompanyProduct::class);
+    }
+
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'company_products', 'company_id', 'product_id')
+            ->withPivot('total_stock', 'in_sale_stock', 'sale_price')
+            ->withTimestamps();
+    }
+
     // Accessors
 }

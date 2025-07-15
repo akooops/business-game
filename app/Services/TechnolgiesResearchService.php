@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\CompanyProduct;
 use App\Models\CompanyTechnology;
 use App\Models\Technology;
 
@@ -56,6 +57,25 @@ class TechnolgiesResearchService
         $companyTechnology->update([
             'completed_at' => SettingsService::getCurrentTimestamp(),
         ]);
+
+        // Create products for company
+        $products = $companyTechnology->technology->products;
+        
+        foreach($products as $product){
+            // Check if product already exists
+            $companyProduct = $companyTechnology->company->companyProducts()->where('product_id', $product->id)->first();
+            if($companyProduct){
+                continue;
+            }
+
+            CompanyProduct::create([
+                'company_id' => $companyTechnology->company_id,
+                'product_id' => $product->id,
+                'total_stock' => 0,
+                'in_sale_stock' => 0,
+                'sale_price' => SalesService::getCurrentGameweekProductMarketPrice($product),
+            ]);
+        }
 
         NotificationService::createTechnologyResearchCompletedNotification($companyTechnology);
     }

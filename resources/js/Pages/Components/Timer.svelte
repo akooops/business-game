@@ -29,10 +29,7 @@
 
     // Toggle drawer
     function toggleDrawer() {
-        drawerOpen = !drawerOpen;
-        if (drawerOpen) {
-            fetchCurrentTimestamp();
-        }
+        fetchCurrentTimestamp();
     }
 
     // Format timestamp for display

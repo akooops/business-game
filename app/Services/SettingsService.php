@@ -36,6 +36,14 @@ class SettingsService
         return self::getGameStatus() == 'stopped';
     }
 
+    // Get the game start timestamp
+    public static function getGameStartTimestamp()
+    {
+        $setting = Setting::where('key', 'game_start_timestamp')->first();
+        
+        return ($setting) ? Carbon::parse($setting->value) : now();
+    }
+
     // Get the current timestamp 
     public static function getCurrentTimestamp()
     {
@@ -51,5 +59,15 @@ class SettingsService
             ['key' => 'current_timestamp'],
             ['value' => $timestamp->toDateTimeString()]
         );
+    }
+
+    public static function getCurrentGameWeek()
+    {
+        $gameStartTimestamp = self::getGameStartTimestamp();
+        $currentTimestamp = self::getCurrentTimestamp();
+
+        $diffInDays = $currentTimestamp->diffInDays($gameStartTimestamp);
+
+        return round($diffInDays / 7) + 1;
     }
 }
