@@ -19,7 +19,7 @@ class Product extends Model
         'need_technology' => 'boolean',
     ];
 
-    protected $appends = ['type_name', 'image_url'];
+    protected $appends = ['type_name', 'image_url', 'is_researched'];
 
     // Product types
     const TYPE_RAW_MATERIAL = 'raw_material';
@@ -89,5 +89,17 @@ class Product extends Model
     public function getImageUrlAttribute()
     {
         return ($this->image) ? $this->image->url : URL::to('assets/images/default-product-image.jpg');
+    }
+
+    public function getIsResearchedAttribute()
+    {
+        if(!auth()->user()->company) return false;
+
+        $companyProduct = CompanyProduct::where([
+            'company_id' => auth()->user()->company->id, 
+            'product_id' => $this->id
+        ])->exists();
+
+        return $companyProduct;
     }
 }

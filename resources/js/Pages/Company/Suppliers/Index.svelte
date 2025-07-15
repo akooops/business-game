@@ -602,29 +602,53 @@
                         <h3 class="text-sm font-semibold text-mono mb-3">Available Products</h3>
                         <div class="space-y-3">
                             {#each selectedSupplier.products as product}
-                                <div class="kt-card">
-                                    <div class="kt-card-body p-3">
-                                        <div class="flex items-center gap-3">
-                                            <div class="flex-shrink-0">
-                                                {#if product.image_url}
-                                                    <img 
-                                                        src={product.image_url} 
-                                                        alt={product.name}
-                                                        class="w-12 h-12 rounded-lg object-cover"
-                                                    />
-                                                {:else}
-                                                    <div class="w-12 h-12 rounded-lg bg-accent/50 flex items-center justify-center">
-                                                        <i class="ki-filled ki-abstract-26 text-lg text-muted-foreground"></i>
-                                                    </div>
-                                                {/if}
-                                            </div>
-                                            <div class="flex-1 min-w-0">
-                                                <h4 class="text-sm font-semibold text-mono mb-1 truncate">{product.name}</h4>
-                                                <p class="text-xs text-muted-foreground mb-1">{product.type_name}</p>
+                                {#if product.is_researched}
+                                    <div class="kt-card">
+                                        <div class="kt-card-body p-3">
+                                            <div class="flex items-center gap-3">
+                                                <div class="flex-shrink-0 relative">
+                                                    {#if product.image_url}
+                                                        <img 
+                                                            src={product.image_url} 
+                                                            alt={product.name}
+                                                            class="w-12 h-12 rounded-lg object-cover"
+                                                        />
+                                                    {:else}
+                                                        <div class="w-12 h-12 rounded-lg bg-accent/50 flex items-center justify-center">
+                                                            <i class="ki-filled ki-abstract-26 text-lg text-muted-foreground"></i>
+                                                        </div>
+                                                    {/if}
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <h4 class="text-sm font-semibold text-mono mb-1 truncate">{product.name}</h4>
+                                                    <p class="text-xs text-muted-foreground mb-1">{product.type_name}</p>
+                                                    <span class="text-xs text-green-500 font-medium">Researched</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                {:else}
+                                    <div class="kt-card">
+                                        <div class="kt-card-body p-3">
+                                            <div class="flex items-center gap-3">
+                                                <div class="flex-shrink-0 relative">
+                                                    <div class="w-12 h-12 rounded-lg bg-muted animate-pulse"></div>
+                                                    <div class="absolute inset-0 flex items-center justify-center" style="top: 50%; left: 50%; bottom: 50%; right: 50%;">
+                                                        <i class="ki-filled ki-lock text-muted-foreground text-sm"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="kt-skeleton h-4 w-24 mb-1"></div>
+                                                    <div class="kt-skeleton h-3 w-16 mb-1"></div>
+                                                    <div class="flex items-center gap-1">
+                                                        <i class="ki-filled ki-search text-orange-500 text-xs"></i>
+                                                        <span class="text-xs text-orange-500 font-medium">Need Research to Unlock</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {/if}
                             {/each}
                         </div>
                     </div>

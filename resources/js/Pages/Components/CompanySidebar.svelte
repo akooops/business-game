@@ -12,6 +12,13 @@
         if($page.url.includes('company/technologies')){
             return 'technologies';
         }
+        if($page.url.includes('company/products')){
+            return 'production';
+        }
+        if($page.url.includes('company/suppliers')){
+            return 'procurement';
+        }
+
         return 'dashboard'; // default fallback
     }
     
@@ -100,7 +107,22 @@
                         <i class="ki-outline ki-handcart text-lg"></i>
                     </span>
                     <span class="kt-tooltip" data-kt-tooltip-content="true">
-                        Production Management
+                        Production
+                    </span>
+                </button>
+                {/if}
+                
+                {#if hasPermission('company.suppliers.index')}
+                <button 
+                    class="kt-btn kt-btn-icon kt-btn-ghost rounded-md size-9 border border-transparent hover:bg-background hover:[&_i]:text-primary hover:border-border {activeSection === 'procurement' ? 'bg-background [&_i]:text-primary border-border' : ''}" 
+                    data-kt-tooltip="" 
+                    data-kt-tooltip-placement="right"
+                    on:click={() => setActiveSection('procurement')}>
+                    <span class="kt-menu-icon">
+                        <i class="ki-outline ki-ship text-lg"></i>
+                    </span>
+                    <span class="kt-tooltip" data-kt-tooltip-content="true">
+                        Procurement
                     </span>
                 </button>
                 {/if}
@@ -254,66 +276,6 @@
                 </div>
                 {/if}
 
-                <!-- User Management Section -->
-                {#if activeSection === 'users'}
-                <div class="mb-3">
-                    <h3 class="text-xs text-muted-foreground uppercase ps-2.5 mb-2.5">
-                        User Management
-                    </h3>
-                    {#if hasPermission('admin.users.index')}
-                    <div class="kt-menu-item">
-                        <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('admin.users.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.users.index')}>
-                            <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
-                                <i class="ki-outline ki-users"></i>
-                            </span>
-                            <span class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono ms-2">
-                                Users
-                            </span>
-                        </a>
-                    </div>
-                    {/if}
-
-                    {#if hasPermission('admin.roles.index')}
-                    <div class="kt-menu-item">
-                        <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('admin.roles.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.roles.index')}>
-                            <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
-                                <i class="ki-outline ki-shield-tick"></i>
-                            </span>
-                            <span class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono ms-2">
-                                Roles
-                            </span>
-                        </a>
-                    </div>
-                    {/if}
-
-                    {#if hasPermission('admin.permissions.index')}
-                    <div class="kt-menu-item">
-                        <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('admin.permissions.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.permissions.index')}>
-                            <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
-                                <i class="ki-outline ki-lock"></i>
-                            </span>
-                            <span class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono ms-2">
-                                Permissions
-                            </span>
-                        </a>
-                    </div>
-                    {/if}
-
-                    {#if hasPermission('admin.companies.index')}
-                    <div class="kt-menu-item">
-                        <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('admin.companies.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.companies.index')}>
-                            <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
-                                <i class="ki-outline ki-bank"></i>
-                            </span>
-                            <span class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono ms-2">
-                                Companies
-                            </span>
-                        </a>
-                    </div>
-                    {/if}
-                </div>
-                {/if}
-
                 <!-- Technologies Management Section -->
                 {#if activeSection === 'technologies'}
                 <div class="mb-3">
@@ -388,6 +350,28 @@
                             </span>
                             <span class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono ms-2">
                                 Machines
+                            </span>
+                        </a>
+                    </div>
+                    {/if}
+                </div>
+                {/if}
+
+                <!-- Procurement Management Section -->
+
+                {#if activeSection === 'procurement'}
+                <div class="mb-3">
+                    <h3 class="text-xs text-muted-foreground uppercase ps-2.5 mb-2.5">
+                        Procurement Management
+                    </h3>
+                    {#if hasPermission('company.suppliers.index')}
+                    <div class="kt-menu-item">
+                        <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('company.suppliers.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('company.suppliers.index')}>
+                            <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
+                                <i class="ki-outline ki-ship"></i>
+                            </span>
+                            <span class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono ms-2">
+                                Suppliers
                             </span>
                         </a>
                     </div>
