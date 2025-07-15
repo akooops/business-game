@@ -66,28 +66,4 @@ class SuppliersController extends Controller
 
         return inertia('Company/Suppliers/Index');
     }
-
-    public function purchasePage(Supplier $supplier)
-    {
-        $supplier->load('country', 'wilaya', 'products');
-
-        return inertia('Company/Suppliers/PurchasePage', [
-            'supplier' => $supplier,
-        ]);
-    }
-
-    public function purchase(PurchaseProductRequest $request, Supplier $supplier){
-        ProcurementService::purchase($request->company, $supplier, $request->product, $request->quantity);
-
-        if($request->expectsJson() || $request->hasHeader('X-Requested-With')){
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Product purchased successfully!'
-            ]);
-        }
-
-        return inertia('Company/Suppliers/PurchasePage', [
-            'success' => 'Product purchased successfully!'
-        ]);
-    }
 }

@@ -170,13 +170,23 @@ class IndexService
      * @param string $date
      * @return string
      */
-    public static function checkValidDate($date)
+    public static function checkIfDate($date)
     {
         try {
             $parsedDate = Carbon::parse($date);
             return $parsedDate->format('Y-m-d');
         } catch (\Exception $e) {
             return Carbon::today()->format('Y-m-d');
+        }
+    }
+
+    public static function checkIfTimestamp($date)
+    {
+        try {
+            $parsedDate = Carbon::parse($date);
+            return $parsedDate->format('Y-m-d H:i:s');
+        } catch (\Exception $e) {
+            return null;
         }
     }
 }

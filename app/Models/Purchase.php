@@ -52,22 +52,22 @@ class Purchase extends Model
     // Accessors
     public function getTotalSalePriceAttribute()
     {
-        return $this->quantity * $this->sale_price;
+        return round($this->quantity * $this->sale_price, 3) ?? 0;
     }
 
     public function getTotalShippingCostAttribute()
     {
-        return $this->quantity * $this->shipping_cost;
+        return round($this->quantity * $this->shipping_cost, 3) ?? 0;
     }
 
     public function getTotalCustomsDutiesAttribute()
     {
-        return ($this->quantity + $this->total_shipping_cost) * $this->customs_duties;
+        return round(($this->total_sale_price + $this->total_shipping_cost) * $this->customs_duties, 3) ?? 0;
     }
 
     public function getTotalCarbonFootprintAttribute()
     {
-        return $this->quantity * $this->carbon_footprint;
+        return round($this->quantity * $this->carbon_footprint, 3) ?? 0;
     }
 
     public function getIsOrderedAttribute()

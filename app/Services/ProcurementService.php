@@ -28,6 +28,11 @@ class ProcurementService
 
         $totalCost = self::calcaulteTotalCost($supplier, $product, $quantity);
 
+        //product is reseached
+        if(!$product->is_researched) {
+            $errors['product_researched'] = 'This product is not researched yet.';
+        }
+        
         // Check if company has sufficient funds
         if (!FinanceService::haveSufficientFunds($company, $totalCost)) {
             $errors['funds'] = 'You do not have enough funds to purchase this product. Required: DZD ' . $totalCost . ', Available: DZD ' . $company->funds;
@@ -38,6 +43,10 @@ class ProcurementService
         }
 
         $supplierProduct = $supplier->products()->where('product_id', $product->id)->first();
+
+        if(!$supplierProduct) {
+            $errors['supplier_product'] = 'This supplier does not sell this product.';
+        }
 
         if($quantity < $supplierProduct->minimum_order_qty) {
             $errors['quantity'] = 'You must order at least ' . $supplierProduct->minimum_order_qty . ' units of this product.';

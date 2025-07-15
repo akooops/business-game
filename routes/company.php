@@ -7,6 +7,7 @@ use App\Http\Controllers\Company\ProductsController;
 use App\Http\Controllers\Company\SuppliersController;
 use App\Http\Controllers\Company\WilayasController;
 use App\Http\Controllers\Company\CountriesController;
+use App\Http\Controllers\Company\PurchasesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,8 +37,9 @@ Route::prefix('company')->middleware(['auth', 'check.company', 'handle.inertia']
     Route::get('/countries', [CountriesController::class, 'index'])->middleware('check.permission:company.countries.index')->name('company.countries.index');
 
     Route::get('/suppliers', [SuppliersController::class, 'index'])->middleware('check.permission:company.suppliers.index')->name('company.suppliers.index');
-    Route::get('/suppliers/{supplier}/purchase-page', [SuppliersController::class, 'purchasePage'])->middleware('check.permission:company.suppliers.purchase')->name('company.suppliers.purchase-page');
-    Route::post('/suppliers/{supplier}/purchase', [SuppliersController::class, 'purchase'])->middleware('check.permission:company.suppliers.purchase')->name('company.suppliers.purchase');
+
+    Route::get('/purchases', [PurchasesController::class, 'index'])->middleware('check.permission:company.purchases.index')->name('company.purchases.index');
+    Route::post('/purchases/{product}/purchase', [PurchasesController::class, 'purchase'])->middleware('check.permission:company.purchases.store')->name('company.purchases.store');
 });
 
 

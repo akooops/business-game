@@ -69,6 +69,16 @@ class NotificationService
         ]);
     }
 
+    public static function createPurchaseDeliveryDelayedNotification($purchase){
+        return Notification::create([
+            'type' => Notification::TYPE_PURCHASE_DELIVERY_DELAYED,
+            'title' => 'Purchase Delivery Delayed',
+            'message' => "Purchase delivery delayed for {$purchase->product->name} until " . $purchase->real_delivered_at->format('Y-m-d H:i:s') . ".",
+            'url' => route('company.purchases.index'),
+            'user_id' => $purchase->company->user_id,
+        ]);
+    }
+
     public static function getUnreadCount()
     {
         return Notification::where('user_id', auth()->user()->id)->whereNull('read_at')->count();

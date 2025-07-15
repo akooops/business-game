@@ -216,7 +216,7 @@
             <!-- Suppliers Grid -->
             <div class="kt-card">
                 <div class="kt-card-header">
-                    <div class="kt-card-toolbar flex flex-col lg:flex-row lg:items-center gap-4 w-full">
+                    <div class="kt-card-toolbar">
                         <div class="kt-input max-w-64 w-64">
                             <i class="ki-filled ki-magnifier"></i>
                             <input 

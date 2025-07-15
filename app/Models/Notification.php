@@ -16,12 +16,19 @@ class Notification extends Model
     ];
 
     // Notification types
+    // Finance
     const TYPE_FINANCE_FUNDS_CHANGED = 'finance_funds_changed';
+
+    // Technology research
     const TYPE_TECHNOLOGY_RESEARCH_STARTED = 'technology_research_started';
     const TYPE_TECHNOLOGY_RESEARCH_COMPLETED = 'technology_research_completed';
+
+    // Procurement
     const TYPE_PURCHASE_ORDERED = 'purchase_ordered';
     const TYPE_PURCHASE_DELIVERED = 'purchase_delivered';
     const TYPE_PURCHASE_CANCELLED = 'purchase_cancelled';
+    const TYPE_PURCHASE_DELIVERY_DELAYED = 'purchase_delivery_delayed';
+
 
     // Icons for different notification types
     const ICONS = [
@@ -31,6 +38,7 @@ class Notification extends Model
         self::TYPE_PURCHASE_ORDERED => 'ki-filled ki-ship',
         self::TYPE_PURCHASE_DELIVERED => 'ki-filled ki-ship',
         self::TYPE_PURCHASE_CANCELLED => 'ki-filled ki-ship',
+        self::TYPE_PURCHASE_DELIVERY_DELAYED => 'ki-filled ki-ship',
     ];
 
     // Methods

@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Company\Suppliers;
+namespace App\Http\Requests\Company\Purchases;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Services\FinanceService;
 use App\Services\ProcurementService;
-use App\Models\Product;
+use App\Models\Supplier;
 
 class PurchaseProductRequest extends FormRequest
 {
@@ -25,7 +24,7 @@ class PurchaseProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'product_id' => 'required|exists:products,id',
+            'supplier_id' => 'required|exists:suppliers,id',
             'quantity' => 'required|numeric|min:0.001',
         ];
     }
@@ -34,13 +33,13 @@ class PurchaseProductRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             $company = $this->company;
-            $supplier = request()->route('supplier');
+            $product = request()->route('product');
             $quantity = request()->input('quantity');
 
-            $product = Product::find(request()->input('product_id'));
+            $supplier = Supplier::find(request()->input('supplier_id'));
 
             if (!$product) {
-                $validator->errors()->add('product_id', 'The selected product does not exist.');
+                $validator->errors()->add('supplier_id', 'The selected supplier does not exist.');
                 return;
             }
 
