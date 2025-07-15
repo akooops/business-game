@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
 
             // Stock management
-            $table->decimal('total_stock', 15, 5)->default(0);
-            $table->decimal('in_sale_stock', 15, 5)->default(0);
+            $table->decimal('total_stock', 15, 3)->default(0);
+            $table->decimal('in_sale_stock', 15, 3)->default(0);
             
             // Pricing
-            $table->decimal('sale_price', 15, 5)->default(0);
+            $table->decimal('sale_price', 15, 3)->default(0);
             
             // Foreign keys
             $table->foreignId('company_id')->constrained()->onDelete('cascade');

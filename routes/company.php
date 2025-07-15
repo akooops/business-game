@@ -40,6 +40,8 @@ Route::prefix('company')->middleware(['auth', 'check.company', 'handle.inertia']
 
     Route::get('/purchases', [PurchasesController::class, 'index'])->middleware('check.permission:company.purchases.index')->name('company.purchases.index');
     Route::post('/purchases/{product}/purchase', [PurchasesController::class, 'purchase'])->middleware('check.permission:company.purchases.store')->name('company.purchases.store');
+
+    Route::get('/purchases/purchase-page', [PurchasesController::class, 'purchasePage'])->middleware('check.permission:company.purchases.index')->name('company.purchases.purchase-page');
 });
 
 

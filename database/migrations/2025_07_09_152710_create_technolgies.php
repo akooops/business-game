@@ -22,7 +22,7 @@ return new class extends Migration
             $table->integer('level')->default(0);
 
             // Technology research
-            $table->decimal('research_cost', 15, 5)->default(0);
+            $table->decimal('research_cost', 15, 3)->default(0);
             $table->integer('research_time_days')->default(0);
 
             $table->timestamps();

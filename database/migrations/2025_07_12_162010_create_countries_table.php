@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('name');
 
             // Tax rates (percentages)
-            $table->decimal('customs_duties_rate', 15, 5)->default(0.25); // Custom duties %
+            $table->decimal('customs_duties_rate', 15, 3)->default(0.25); // Custom duties %
             
             // System flags
             $table->boolean('allows_imports')->default(true);

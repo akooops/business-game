@@ -48,7 +48,6 @@ class StoreSupplierRequest extends FormRequest
             'products.*.min_sale_price' => 'required|numeric|min:0|gte:0',
             'products.*.avg_sale_price' => 'required|numeric|min:0|gte:products.*.min_sale_price|lte:products.*.max_sale_price',
             'products.*.max_sale_price' => 'required|numeric|min:0|gte:products.*.min_sale_price',
-            'products.*.minimum_order_qty' => 'required|integer|min:1',
 
             'file' => 'required|file|mimes:jpg,jpeg,png',
         ];
@@ -113,10 +112,6 @@ class StoreSupplierRequest extends FormRequest
             'products.*.max_sale_price.required' => 'The maximum sale price is required.',
             'products.*.max_sale_price.numeric' => 'The maximum sale price must be a number.',
             'products.*.max_sale_price.min' => 'The maximum sale price must be at least 0.',
-            
-            'products.*.minimum_order_qty.required' => 'The minimum order quantity is required.',
-            'products.*.minimum_order_qty.integer' => 'The minimum order quantity must be an integer.',
-            'products.*.minimum_order_qty.min' => 'The minimum order quantity must be at least 1.',
         ];
     }
 } 

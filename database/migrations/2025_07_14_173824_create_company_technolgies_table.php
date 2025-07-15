@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('company_technologies', function (Blueprint $table) {
             $table->id();
 
-            $table->decimal('research_cost', 15, 5)->default(0);
+            $table->decimal('research_cost', 15, 3)->default(0);
             $table->integer('research_time_days')->default(0);
 
             $table->timestamp('started_at')->nullable();

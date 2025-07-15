@@ -18,10 +18,10 @@ return new class extends Migration
             $table->string('name');
 
             // Shipping to costs from Algiers to this wilaya
-            $table->decimal('min_shipping_cost', 15, 5)->default(0); 
-            $table->decimal('max_shipping_cost', 15, 5)->default(0); 
-            $table->decimal('avg_shipping_cost', 15, 5)->default(0); 
-            $table->decimal('real_shipping_cost', 15, 5)->default(0); 
+            $table->decimal('min_shipping_cost', 15, 3)->default(0); 
+            $table->decimal('max_shipping_cost', 15, 3)->default(0); 
+            $table->decimal('avg_shipping_cost', 15, 3)->default(0); 
+            $table->decimal('real_shipping_cost', 15, 3)->default(0); 
 
             // Shipping to times (days) from Algiers to this wilaya
             $table->integer('min_shipping_time_days')->default(1);

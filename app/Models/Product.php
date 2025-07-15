@@ -70,7 +70,6 @@ class Product extends Model
                 'avg_sale_price',
                 'max_sale_price',
                 'real_sale_price',
-                'minimum_order_qty'
             ])
             ->withTimestamps();
     }

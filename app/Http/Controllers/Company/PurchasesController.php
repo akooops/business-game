@@ -109,6 +109,10 @@ class PurchasesController extends Controller
         return inertia('Company/Purchases/Index');
     }
 
+    public function purchasePage(Request $request){
+        return inertia('Company/Purchases/PurchasePage');
+    }
+
     public function purchase(PurchaseProductRequest $request, Product $product){
         $supplier = Supplier::find($request->supplier_id);
 

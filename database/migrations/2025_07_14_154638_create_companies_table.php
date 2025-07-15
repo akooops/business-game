@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
 
-            $table->decimal('funds', 15, 5)->default(0);
+            $table->decimal('funds', 15, 3)->default(0);
             $table->integer('research_level')->default(0);
-            $table->decimal('carbon_footprint', 15, 5)->default(0);
+            $table->decimal('carbon_footprint', 15, 3)->default(0);
 
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
 

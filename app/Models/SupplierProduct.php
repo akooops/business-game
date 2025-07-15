@@ -17,7 +17,6 @@ class SupplierProduct extends Model
         'avg_sale_price' => 'decimal:3',
         'max_sale_price' => 'decimal:3',
         'real_sale_price' => 'decimal:3',
-        'minimum_order_qty' => 'integer',
     ];
     // Relations
     public function supplier(): BelongsTo

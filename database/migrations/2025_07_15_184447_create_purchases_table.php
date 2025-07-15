@@ -15,16 +15,16 @@ return new class extends Migration
             $table->id();
 
             // Quantity
-            $table->decimal('quantity', 15, 5)->default(0);
+            $table->decimal('quantity', 15, 3)->default(0);
 
             // Pricing
-            $table->decimal('sale_price', 15, 5)->default(0);
-            $table->decimal('shipping_cost', 15, 5)->default(0);
-            $table->decimal('customs_duties', 15, 5)->default(0);
-            $table->decimal('total_cost', 15, 5)->default(0);
+            $table->decimal('sale_price', 15, 3)->default(0);
+            $table->decimal('shipping_cost', 15, 3)->default(0);
+            $table->decimal('customs_duties', 15, 3)->default(0);
+            $table->decimal('total_cost', 15, 3)->default(0);
 
             // Carbon footprint
-            $table->decimal('carbon_footprint', 15, 5)->default(0);
+            $table->decimal('carbon_footprint', 15, 3)->default(0);
 
             // Shipping 
             $table->integer('shipping_time_days')->default(1);

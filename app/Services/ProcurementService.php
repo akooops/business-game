@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Purchase;
+use App\Models\SupplierProduct;
 
 class ProcurementService
 {
@@ -10,17 +11,25 @@ class ProcurementService
     public static function calcaulteTotalCost($supplier, $product, $quantity)
     {
         // Calculate the total cost of the product
-        $supplierProduct = $supplier->products()->where('product_id', $product->id)->first();
+        $supplierProduct = SupplierProduct::where([
+            'supplier_id' => $supplier->id, 
+            'product_id' => $product->id
+        ])->first();
+
         $salePrice = $supplierProduct->real_sale_price;
 
         $shippingCost = $supplier->real_shipping_cost;
         $customsDuties = 0;
+
         
-        if($supplier->country && $supplier->country->customs_duties > 0) {
-            $customsDuties = $supplier->country->customs_duties;
+        if($supplier->country) {
+            $customsDuties = $supplier->country->customs_duties_rate;
         }
         
-        return $salePrice * $quantity + $shippingCost * $quantity + $customsDuties * ($quantity + $shippingCost);
+        $totalSalePrice = $salePrice * $quantity;
+        $totalShippingCost = $shippingCost * $quantity;
+
+        return $totalSalePrice + $totalShippingCost + $customsDuties * ($totalSalePrice *  + $totalShippingCost);
     }
 
     public static function validatePurchase($company, $supplier, $product, $quantity){
@@ -38,33 +47,35 @@ class ProcurementService
             $errors['funds'] = 'You do not have enough funds to purchase this product. Required: DZD ' . $totalCost . ', Available: DZD ' . $company->funds;
         }
 
-        if($supplier->country && !$supplier->country->allow_imports) {
+        if($supplier->country && !$supplier->country->allows_imports) {
             $errors['country_id'] = 'This supplier is in a country that our government does not allow imports from.';
         }
 
-        $supplierProduct = $supplier->products()->where('product_id', $product->id)->first();
+        $supplierProduct = SupplierProduct::where([
+            'supplier_id' => $supplier->id, 
+            'product_id' => $product->id
+        ])->first();
 
         if(!$supplierProduct) {
             $errors['supplier_product'] = 'This supplier does not sell this product.';
-        }
-
-        if($quantity < $supplierProduct->minimum_order_qty) {
-            $errors['quantity'] = 'You must order at least ' . $supplierProduct->minimum_order_qty . ' units of this product.';
         }
         
         return $errors;
     }
 
     public static function purchase($company, $supplier, $product, $quantity){
-        $supplierProduct = $supplier->products()->where('product_id', $product->id)->first();
+        $supplierProduct = SupplierProduct::where([
+            'supplier_id' => $supplier->id, 
+            'product_id' => $product->id
+        ])->first();
 
         $salePrice = $supplierProduct->real_sale_price;
 
         $shippingCost = $supplier->real_shipping_cost;
         $customsDuties = 0;
         
-        if($supplier->country && $supplier->country->customs_duties > 0) {
-            $customsDuties = $supplier->country->customs_duties;
+        if($supplier->country && $supplier->country->customs_duties_rate > 0) {
+            $customsDuties = $supplier->country->customs_duties_rate;
         }
 
         $totalCost = self::calcaulteTotalCost($supplier, $product, $quantity);

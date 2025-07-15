@@ -15,13 +15,10 @@ return new class extends Migration
             $table->id();
             
             // Pricing structure
-            $table->decimal('min_sale_price', 10, 5);
-            $table->decimal('avg_sale_price', 10, 5);
-            $table->decimal('max_sale_price', 10, 5);
-            $table->decimal('real_sale_price', 10, 5);
-            
-            // Order and environmental data
-            $table->integer('minimum_order_qty')->default(1);
+            $table->decimal('min_sale_price', 15, 3);
+            $table->decimal('avg_sale_price', 15, 3);
+            $table->decimal('max_sale_price', 15, 3);
+            $table->decimal('real_sale_price', 15, 3);
 
             // Foreign keys
             $table->foreignId('supplier_id')->constrained()->onDelete('cascade');

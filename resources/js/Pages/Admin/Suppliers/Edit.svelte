@@ -65,7 +65,6 @@
         min_sale_price: product.pivot.min_sale_price || '',
         avg_sale_price: product.pivot.avg_sale_price || '',
         max_sale_price: product.pivot.max_sale_price || '',
-        minimum_order_qty: product.pivot.minimum_order_qty || ''
     }));
 
     // Handle file input change
@@ -130,7 +129,6 @@
             min_sale_price: '',
             avg_sale_price: '',
             max_sale_price: '',
-            minimum_order_qty: ''
         }];
 
         // Clear the select
@@ -175,7 +173,6 @@
             formData.append(`products[${index}][min_sale_price]`, product.min_sale_price);
             formData.append(`products[${index}][avg_sale_price]`, product.avg_sale_price);
             formData.append(`products[${index}][max_sale_price]`, product.max_sale_price);
-            formData.append(`products[${index}][minimum_order_qty]`, product.minimum_order_qty);
         });
 
         // Add _method for PATCH request
@@ -608,7 +605,7 @@
                                                 </div>
                                             </div>
                                             <div class="kt-card-content">
-                                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                                     <!-- Min Sale Price -->
                                                     <div class="flex flex-col gap-2">
                                                         <label class="text-xs font-medium text-mono">
@@ -654,21 +651,6 @@
                                                             placeholder="0.000"
                                                             bind:value={product.max_sale_price}
                                                             on:input={() => updateProduct(index, 'max_sale_price', product.max_sale_price)}
-                                                        />
-                                                    </div>
-
-                                                    <!-- Minimum Order Qty -->
-                                                    <div class="flex flex-col gap-2">
-                                                        <label class="text-xs font-medium text-mono">
-                                                            Min Order Qty <span class="text-destructive">*</span>
-                                                        </label>
-                                                        <input
-                                                            type="number"
-                                                            min="1"
-                                                            class="kt-input kt-input-sm"
-                                                            placeholder="1"
-                                                            bind:value={product.minimum_order_qty}
-                                                            on:input={() => updateProduct(index, 'minimum_order_qty', product.minimum_order_qty)}
                                                         />
                                                     </div>
                                                 </div>

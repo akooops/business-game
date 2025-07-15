@@ -155,7 +155,6 @@ class SuppliersController extends Controller
                 'avg_sale_price' => $productData['avg_sale_price'],
                 'max_sale_price' => $productData['max_sale_price'],
                 'real_sale_price' => $productData['avg_sale_price'], // Default to avg
-                'minimum_order_qty' => $productData['minimum_order_qty'],
             ]);
         }
 
@@ -233,7 +232,6 @@ class SuppliersController extends Controller
                 'avg_sale_price' => $productData['avg_sale_price'],
                 'max_sale_price' => $productData['max_sale_price'],
                 'real_sale_price' => $productData['avg_sale_price'], // Default to avg
-                'minimum_order_qty' => $productData['minimum_order_qty'],
             ]);
         }
     

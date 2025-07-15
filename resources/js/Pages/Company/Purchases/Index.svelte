@@ -310,6 +310,12 @@
                     <p class="text-sm text-secondary-foreground">
                         Track your purchase orders and deliveries
                     </p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <a href="{route('company.purchases.purchase-page')}" class="kt-btn kt-btn-primary">
+                        <i class="ki-filled ki-plus text-base"></i>
+                        Make Purchase
+                    </a>
                 </div>                      
             </div>
 

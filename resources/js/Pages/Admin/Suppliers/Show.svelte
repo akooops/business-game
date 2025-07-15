@@ -35,7 +35,6 @@
         min_sale_price: product.pivot.min_sale_price,
         avg_sale_price: product.pivot.avg_sale_price,
         max_sale_price: product.pivot.max_sale_price,
-        minimum_order_qty: product.pivot.minimum_order_qty
     }));
 
     // Get product type badge class
@@ -294,10 +293,6 @@
                                                         <div class="flex justify-between text-xs">
                                                             <span class="text-muted-foreground">Max Price:</span>
                                                             <span class="font-medium">{product.max_sale_price}</span>
-                                                        </div>
-                                                        <div class="flex justify-between text-xs">
-                                                            <span class="text-muted-foreground">Min Order:</span>
-                                                            <span class="font-medium">{product.minimum_order_qty}</span>
                                                         </div>
                                                     </div>
                                                 </div>
