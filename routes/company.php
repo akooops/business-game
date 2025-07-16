@@ -8,6 +8,7 @@ use App\Http\Controllers\Company\SuppliersController;
 use App\Http\Controllers\Company\WilayasController;
 use App\Http\Controllers\Company\CountriesController;
 use App\Http\Controllers\Company\PurchasesController;
+use App\Http\Controllers\Company\ProductDemandController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +34,8 @@ Route::prefix('company')->middleware(['auth', 'check.company', 'handle.inertia']
 
     Route::get('/products', [ProductsController::class, 'index'])->middleware('check.permission:company.products.index')->name('company.products.index');
     Route::post('/products/{product}/fix-sale-price', [ProductsController::class, 'fixProductSalePrice'])->middleware('check.permission:company.products.index')->name('company.products.fix-sale-price');
+    
+    Route::get('/product-demand', [ProductDemandController::class, 'index'])->middleware('check.permission:company.product-demand.index')->name('company.product-demand.index');
 
     Route::get('/wilayas', [WilayasController::class, 'index'])->middleware('check.permission:company.wilayas.index')->name('company.wilayas.index');
     Route::get('/countries', [CountriesController::class, 'index'])->middleware('check.permission:company.countries.index')->name('company.countries.index');

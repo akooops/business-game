@@ -71,4 +71,12 @@ class SettingsService
 
         return round($diffInDays / 7) + 1;
     }
+
+    // Get the demand visibility ahead weeks
+    public static function getDemandVisibilityAheadWeeks()
+    {
+        $setting = Setting::where('key', 'demand_visiblity_ahead_weeks')->first();
+        
+        return ($setting) ? $setting->value : 1;
+    }
 }

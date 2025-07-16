@@ -54,45 +54,6 @@ class SettingsSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-            [
-                'key' => 'demand_visiblity_ahead_weeks_after_research',
-                'name' => 'Demand Visibility Ahead Weeks After Research',
-                'type' => 'number',
-                'value' => 1,
-                'description' => 'The number of weeks ahead that the demand will be visible to the players after the research',
-                'options' => [
-                    'min' => 0,
-                    'step' => 1,
-                ],
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'key' => 'demand_research_cost',
-                'name' => 'Demand Research Cost',
-                'type' => 'number',
-                'value' => 100000,
-                'description' => 'The cost of making a demand visible to the players',
-                'options' => [
-                    'min' => 0,
-                    'step' => 0.001,
-                ],
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'key' => 'demand_research_time_days',
-                'name' => 'Demand Research Time Days',
-                'type' => 'number',
-                'value' => 1,
-                'description' => 'The number of days that the demand research will take',
-                'options' => [
-                    'min' => 0,
-                    'step' => 1,
-                ],
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
         ];
 
         foreach ($settings as $setting) {
