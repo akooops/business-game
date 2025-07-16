@@ -40,6 +40,8 @@ class AppServiceProvider extends ServiceProvider
             'technology' => 'App\\Models\\Technology',
             'setting' => 'App\\Models\\Setting',
             'supplier' => 'App\\Models\\Supplier',
+            'purchase' => 'App\\Models\\Purchase',
+            'inventory_movement' => 'App\\Models\\InventoryMovement',
             // Add more models as needed
         ]);
 

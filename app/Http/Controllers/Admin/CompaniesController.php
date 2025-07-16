@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Requests\Admin\Companies\UpdateCompanyRequest;
 use App\Http\Requests\Admin\Companies\StoreCompanyRequest;
 use App\Models\Company;
+use App\Models\Product;
+use App\Models\CompanyProduct;
 use Illuminate\Http\Request;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\FileService;
 use App\Services\IndexService;
+use App\Services\SalesService;
 
 class CompaniesController extends Controller
 {
@@ -115,6 +118,24 @@ class CompaniesController extends Controller
             'carbon_footprint' => $request->carbon_footprint,
             'research_level' => $request->research_level,
         ]);
+
+        $products = Product::where('need_technology',false)->get();
+
+        foreach($products as $product){
+            // Check if product already exists
+            $companyProduct = $company->companyProducts()->where('product_id', $product->id)->first();
+            if($companyProduct){
+                continue;
+            }
+
+            CompanyProduct::create([
+                'company_id' => $company->id,
+                'product_id' => $product->id,
+                'total_stock' => 0,
+                'in_sale_stock' => 0,
+                'sale_price' => SalesService::getCurrentGameweekProductMarketPrice($product),
+            ]);
+        }
     
         if($request->has('file')){
             //Upload the new file
@@ -181,6 +202,24 @@ class CompaniesController extends Controller
             'carbon_footprint' => $request->carbon_footprint,
             'research_level' => $request->research_level,
         ]);
+
+        $products = Product::where('need_technology',false)->get();
+
+        foreach($products as $product){
+            // Check if product already exists
+            $companyProduct = $company->companyProducts()->where('product_id', $product->id)->first();
+            if($companyProduct){
+                continue;
+            }
+
+            CompanyProduct::create([
+                'company_id' => $company->id,
+                'product_id' => $product->id,
+                'total_stock' => 0,
+                'in_sale_stock' => 0,
+                'sale_price' => SalesService::getCurrentGameweekProductMarketPrice($product),
+            ]);
+        }
 
         if($request->file('file')){
             //Delete the old file if it exists

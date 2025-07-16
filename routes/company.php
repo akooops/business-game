@@ -9,6 +9,7 @@ use App\Http\Controllers\Company\WilayasController;
 use App\Http\Controllers\Company\CountriesController;
 use App\Http\Controllers\Company\PurchasesController;
 use App\Http\Controllers\Company\ProductDemandController;
+use App\Http\Controllers\Company\InventoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,6 +47,8 @@ Route::prefix('company')->middleware(['auth', 'check.company', 'handle.inertia']
     Route::post('/purchases/{product}/purchase', [PurchasesController::class, 'purchase'])->middleware('check.permission:company.purchases.store')->name('company.purchases.store');
 
     Route::get('/purchases/purchase-page', [PurchasesController::class, 'purchasePage'])->middleware('check.permission:company.purchases.index')->name('company.purchases.purchase-page');
+
+    Route::get('/inventory', [InventoryController::class, 'index'])->middleware('check.permission:company.inventory.index')->name('company.inventory.index');
 });
 
 

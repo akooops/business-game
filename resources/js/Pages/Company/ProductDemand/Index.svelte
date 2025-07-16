@@ -459,7 +459,6 @@
                                                 <th>Avg Demand</th>
                                                 <th>Max Demand</th>
                                                 <th>Market Price</th>
-                                                <th>Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -471,10 +470,7 @@
                                                     <td>{demand.min_demand}</td>
                                                     <td class="font-medium">{demand.avg_demand}</td>
                                                     <td>{demand.max_demand}</td>
-                                                    <td>DZD{demand.market_price}</td>
-                                                                                                <td>
-                                                <span class="text-sm text-muted-foreground">View Only</span>
-                                            </td>
+                                                    <td>DZD{demand.market_price}</td>   
                                                 </tr>
                                             {/each}
                                         </tbody>
