@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Company;
 use App\Models\Notification;
 
 class NotificationService
@@ -77,6 +78,121 @@ class NotificationService
             'url' => route('company.purchases.index'),
             'user_id' => $purchase->company->user_id,
         ]);
+    }
+
+    public static function createCountriesImportBlockedNotification($countries){
+        $companies = Company::get();
+
+        foreach($companies as $company){
+            Notification::create([
+                'type' => Notification::TYPE_COUNTRIES_IMPORT_BLOCKED,
+                'title' => 'Countries Import Blocked',
+                'message' => "Countries import blocked for " . implode(', ', $countries) . ".",
+                'url' => route('company.purchases.index'),
+                'user_id' => $company->user_id,
+            ]);
+        }
+    }
+
+    public static function createCountriesImportAllowedNotification($countries){
+        $companies = Company::get();
+        
+        foreach($companies as $company){
+            Notification::create([
+                'type' => Notification::TYPE_COUNTRIES_IMPORT_ALLOWED,
+                'title' => 'Countries Import Allowed',
+                'message' => "Countries import allowed for " . implode(', ', $countries) . ".",
+                'url' => route('company.purchases.index'),
+                'user_id' => $company->user_id,
+            ]);
+        }
+    }
+
+    public static function createCountriesCustomsDutiesRateRaisedNotification($countries, $rate){
+        $companies = Company::get();
+
+        foreach($companies as $company){
+            Notification::create([
+                'type' => Notification::TYPE_COUNTRIES_CUSTOMS_DUTIES_RATE_RAISED,
+                'title' => 'Countries Customs Duties Rate Raised',
+                'message' => "Countries customs duties rate raised for " . implode(', ', $countries) . " with " . $rate . "%.",
+                'url' => route('company.purchases.index'),
+                'user_id' => $company->user_id,
+            ]);
+        }
+    }
+
+    public static function createCountriesCustomsDutiesRateLoweredNotification($countries, $rate)
+    {
+        $companies = Company::get();
+
+        foreach($companies as $company){
+            Notification::create([
+                'type' => Notification::TYPE_COUNTRIES_CUSTOMS_DUTIES_RATE_LOWERED,
+                'title' => 'Countries Customs Duties Rate Lowered',
+                'message' => "Countries customs duties rate lowered for " . implode(', ', $countries) . " with " . $rate . "%.",
+                'url' => route('company.purchases.index'),
+                'user_id' => $company->user_id,
+            ]);
+        }
+    }
+
+    public static function createOilPriceRaisedNotification($rate){
+        $companies = Company::get();
+
+        foreach($companies as $company){
+            Notification::create([
+                'type' => Notification::TYPE_OIL_PRICE_RAISED,
+                'title' => 'Oil Price Raised',
+                'message' => "Oil price raised with " . $rate . "%. This will affect the shipping costs of your products from suppliers and to customers.",
+                'url' => route('company.purchases.index'),
+                'user_id' => $company->user_id,
+            ]);
+        }
+    }
+
+    public static function createOilPriceLoweredNotification($rate)
+    {
+        $companies = Company::get();
+
+        foreach($companies as $company){
+            Notification::create([
+                'type' => Notification::TYPE_OIL_PRICE_LOWERED,
+                'title' => 'Oil Price Lowered',
+                'message' => "Oil price lowered with " . $rate . "%. This will affect the shipping costs of your products from suppliers and to customers.",
+                'url' => route('company.purchases.index'),
+                'user_id' => $company->user_id,
+            ]);
+        }
+    }
+
+    public static function createSuezCanalClosedNotification($countries, $rate)
+    {
+        $companies = Company::get();
+
+        foreach($companies as $company){
+            Notification::create([
+                'type' => Notification::TYPE_SUEZ_CANAL_CLOSED,
+                'title' => 'Suez Canal Closed',
+                'message' => "Suez canal closed for " . implode(', ', $countries) . ". This will affect the shipping costs and delivery time of your products from suppliers by " . $rate . "%.",
+                'url' => route('company.purchases.index'),
+                'user_id' => $company->user_id,
+            ]);
+        }
+    }
+
+    public static function createSuezCanalOpenedNotification($countries, $rate){
+        $companies = Company::get();
+
+        foreach($companies as $company){
+            Notification::create([
+                'type' => Notification::TYPE_SUEZ_CANAL_OPENED,
+                'title' => 'Suez Canal Opened',
+                'message' => "Suez canal opened for " . implode(', ', $countries) . ". This will affect the shipping costs and delivery time of your products from suppliers by " . $rate . "%.",
+                'url' => route('company.purchases.index'),
+                'user_id' => $company->user_id,
+            ]);
+        }
     }
 
     public static function getUnreadCount()

@@ -16,7 +16,7 @@ class UpdateSettingRequest extends FormRequest
 
         $typeRules = match($type) {
             'text' => ['string'],
-            'number' => ['numeric'],
+            'number' => ['numeric', 'min:' . ($options['min'] ?? 0), 'max:' . ($options['max'] ?? 1)],
             'select' => $options && is_array($options) ? ['string', 'in:' . implode(',', $options)] : ['string'],
             'array' => ['string'], // Arrays come as JSON string from frontend
             'timestamp' => ['string', 'date_format:Y-m-d H:i:s'],

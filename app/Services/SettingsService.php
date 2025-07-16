@@ -61,6 +61,7 @@ class SettingsService
         );
     }
 
+    // Get the current game week
     public static function getCurrentGameWeek()
     {
         $gameStartTimestamp = self::getGameStartTimestamp();

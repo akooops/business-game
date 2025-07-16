@@ -29,6 +29,22 @@ class Notification extends Model
     const TYPE_PURCHASE_CANCELLED = 'purchase_cancelled';
     const TYPE_PURCHASE_DELIVERY_DELAYED = 'purchase_delivery_delayed';
 
+    // Countries import
+    const TYPE_COUNTRIES_IMPORT_BLOCKED = 'countries_import_blocked';
+    const TYPE_COUNTRIES_IMPORT_ALLOWED = 'countries_import_allowed';
+
+    // Countries customs duties rate
+    const TYPE_COUNTRIES_CUSTOMS_DUTIES_RATE_RAISED = 'countries_customs_duties_rate_raised';
+    const TYPE_COUNTRIES_CUSTOMS_DUTIES_RATE_LOWERED = 'countries_customs_duties_rate_lowered';
+
+    // Oil price
+    const TYPE_OIL_PRICE_RAISED = 'oil_price_raised';
+    const TYPE_OIL_PRICE_LOWERED = 'oil_price_lowered';
+
+    // Suez canal
+    const TYPE_SUEZ_CANAL_CLOSED = 'suez_canal_closed';
+    const TYPE_SUEZ_CANAL_OPENED = 'suez_canal_opened';
+
 
     // Icons for different notification types
     const ICONS = [
@@ -39,6 +55,14 @@ class Notification extends Model
         self::TYPE_PURCHASE_DELIVERED => 'ki-filled ki-ship',
         self::TYPE_PURCHASE_CANCELLED => 'ki-filled ki-ship',
         self::TYPE_PURCHASE_DELIVERY_DELAYED => 'ki-filled ki-ship',
+        self::TYPE_COUNTRIES_IMPORT_BLOCKED => 'ki-filled ki-ship',
+        self::TYPE_COUNTRIES_IMPORT_ALLOWED => 'ki-filled ki-ship',
+        self::TYPE_COUNTRIES_CUSTOMS_DUTIES_RATE_RAISED => 'ki-filled ki-ship',
+        self::TYPE_COUNTRIES_CUSTOMS_DUTIES_RATE_LOWERED => 'ki-filled ki-ship',
+        self::TYPE_OIL_PRICE_RAISED => 'ki-filled ki-ship',
+        self::TYPE_OIL_PRICE_LOWERED => 'ki-filled ki-ship',
+        self::TYPE_SUEZ_CANAL_CLOSED => 'ki-filled ki-ship',
+        self::TYPE_SUEZ_CANAL_OPENED => 'ki-filled ki-ship',
     ];
 
     // Methods

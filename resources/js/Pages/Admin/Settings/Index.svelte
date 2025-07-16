@@ -26,7 +26,7 @@
     let pagination = {};
     let loading = true;
     let search = '';
-    let perPage = 10;
+    let perPage = 100;
     let currentPage = 1;
     let searchTimeout;
     let editingSettings = new Set();
