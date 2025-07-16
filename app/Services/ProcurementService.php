@@ -120,6 +120,7 @@ class ProcurementService
             'delivered_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
+        InventoryService::addStock($purchase->company, $purchase->product, $purchase->quantity);
         NotificationService::createPurchaseDeliveredNotification($purchase);
     }
 }

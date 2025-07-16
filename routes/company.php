@@ -32,6 +32,7 @@ Route::prefix('company')->middleware(['auth', 'check.company', 'handle.inertia']
     Route::post('/technologies/{technology}/research', [TechnologiesController::class, 'research'])->middleware('check.permission:company.technologies.research')->name('company.technologies.research');
 
     Route::get('/products', [ProductsController::class, 'index'])->middleware('check.permission:company.products.index')->name('company.products.index');
+    Route::post('/products/{product}/fix-sale-price', [ProductsController::class, 'fixProductSalePrice'])->middleware('check.permission:company.products.index')->name('company.products.fix-sale-price');
 
     Route::get('/wilayas', [WilayasController::class, 'index'])->middleware('check.permission:company.wilayas.index')->name('company.wilayas.index');
     Route::get('/countries', [CountriesController::class, 'index'])->middleware('check.permission:company.countries.index')->name('company.countries.index');

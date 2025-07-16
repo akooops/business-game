@@ -33,6 +33,12 @@
     let selectedProduct = null;
     let showProductDrawer = false;
 
+    // Modal state
+    let showPriceModal = false;
+    let selectedProductForPrice = null;
+    let newSalePrice = 0;
+    let loadingPriceUpdate = false;
+
     // Fetch products data
     async function fetchProducts() {
         loading = true;
@@ -116,6 +122,88 @@
     function closeProductDrawer() {
         showProductDrawer = false;
         selectedProduct = null;
+    }
+
+    // Open price modal
+    function openPriceModal(product) {
+        selectedProductForPrice = product;
+        newSalePrice = product.sale_price;
+        showPriceModal = true;
+        
+        // Show modal
+        const toggleButton = document.querySelector('[data-kt-modal-toggle="#price_modal"]');
+        if (toggleButton) {
+            toggleButton.click();
+        }
+    }
+
+    // Close price modal
+    function closePriceModal() {
+        // Simulate button click to use KT framework logic
+        const dismissButton = document.querySelector('[data-kt-modal-dismiss="#price_modal"]');
+        if (dismissButton) {
+            dismissButton.click();
+        }
+        
+        showPriceModal = false;
+        selectedProductForPrice = null;
+        newSalePrice = 0;
+    }
+
+    // Update sale price
+    async function updateSalePrice() {
+        if (!selectedProductForPrice || newSalePrice <= 0) {
+            showToast('Please enter a valid sale price', 'error');
+            return;
+        }
+
+        loadingPriceUpdate = true;
+        try {
+            const response = await fetch(route('company.products.fix-sale-price', selectedProductForPrice.product.id), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    sale_price: newSalePrice
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                
+                // Show success toast
+                showToast(data.message || 'Sale price updated successfully!', 'success');
+                
+                // Close modal
+                closePriceModal();
+                
+                // Refresh products data
+                fetchProducts();
+            } else {
+                const errorData = await response.json();
+                showToast(errorData.message || 'Error updating sale price. Please try again.', 'error');
+            }
+        } catch (error) {
+            console.error('Error updating sale price:', error);
+            showToast('Network error. Please check your connection and try again.', 'error');
+        } finally {
+            loadingPriceUpdate = false;
+        }
+    }
+
+    // Show toast notification
+    function showToast(message, type = 'success') {
+        if (window.KTToast) {
+            KTToast.show({
+                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
+                message: message,
+                variant: type === 'success' ? 'success' : 'destructive',
+                position: 'bottom-right',
+            });
+        }
     }
 
     // Format timestamp
@@ -240,10 +328,10 @@
                         <div class="p-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
                                 {#each products as product}
-                                    <div class="kt-card kt-card-hover cursor-pointer" on:click={() => openProductDrawer(product)}>
+                                    <div class="kt-card kt-card-hover">
                                         <div class="kt-card-body p-4">
                                             <!-- Product Image -->
-                                            <div class="flex items-center justify-center mb-4">
+                                            <div class="flex items-center justify-center mb-4 cursor-pointer" on:click={() => openProductDrawer(product)}>
                                                 {#if product.product.image_url}
                                                     <img 
                                                         src={product.product.image_url} 
@@ -258,7 +346,7 @@
                                             </div>
 
                                             <!-- Product Info -->
-                                            <div class="mb-4">
+                                            <div class="mb-4 cursor-pointer" on:click={() => openProductDrawer(product)}>
                                                 <h3 class="text-lg font-semibold text-mono mb-1">
                                                     {product.product.name}
                                                 </h3>
@@ -273,19 +361,33 @@
                                             </div>
 
                                             <!-- Stock Details -->
-                                            <div class="text-xs text-muted-foreground space-y-1">
+                                            <div class="text-xs text-muted-foreground space-y-1 cursor-pointer" on:click={() => openProductDrawer(product)}>
                                                 <div class="flex justify-between">
-                                                    <span>Total Stock:</span>
-                                                    <span class="font-medium">{product.total_stock}</span>
-                                                </div>
-                                                <div class="flex justify-between">
-                                                    <span>In Sale:</span>
-                                                    <span class="font-medium">{product.in_sale_stock}</span>
+                                                    <span>Available Stock:</span>
+                                                    <span class="font-medium">{product.available_stock}</span>
                                                 </div>
                                                 <div class="flex justify-between">
                                                     <span>Sale Price:</span>
                                                     <span class="font-medium">DZD {product.sale_price}</span>
                                                 </div>
+                                            </div>
+
+                                            <!-- Action Buttons -->
+                                            <div class="flex items-center justify-between mt-4 pt-3 border-t border-border">
+                                                <button 
+                                                    class="kt-btn kt-btn-sm kt-btn-outline kt-btn-primary"
+                                                    on:click={() => openProductDrawer(product)}
+                                                >
+                                                    <i class="ki-filled ki-eye text-sm"></i>
+                                                    View Details
+                                                </button>
+                                                <button 
+                                                    class="kt-btn kt-btn-sm kt-btn-primary"
+                                                    on:click={() => openPriceModal(product)}
+                                                >
+                                                    <i class="ki-filled ki-dollar text-sm"></i>
+                                                    Set Price
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -313,6 +415,9 @@
 
     <!-- Hidden button to trigger drawer -->
     <button style="display:none" data-kt-drawer-toggle="#product_drawer"></button>
+
+    <!-- Hidden button to trigger modal -->
+    <button style="display:none" data-kt-modal-toggle="#price_modal"></button>
 
     <!-- Product Details Drawer -->
     <div class="hidden kt-drawer kt-drawer-end card flex-col max-w-[90%] w-[450px] top-5 bottom-5 end-5 rounded-xl border border-border" data-kt-drawer="true" data-kt-drawer-container="body" id="product_drawer">
@@ -405,12 +510,8 @@
                     <h3 class="text-sm font-semibold text-mono mb-3">Stock Information</h3>
                     <div class="space-y-2">
                         <div class="flex justify-between">
-                            <span class="text-xs text-muted-foreground">Total Stock:</span>
-                            <span class="text-xs font-medium">{selectedProduct.total_stock}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-xs text-muted-foreground">In Sale:</span>
-                            <span class="text-xs font-medium">{selectedProduct.in_sale_stock}</span>
+                            <span class="text-xs text-muted-foreground">Available Stock:</span>
+                            <span class="text-xs font-medium">{selectedProduct.available_stock}</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-xs text-muted-foreground">Sale Price:</span>
@@ -469,6 +570,151 @@
                     </div>
                 {/if}
             {/if}
+        </div>
+    </div>
+
+    <!-- Price Update Modal -->
+    <div class="kt-modal" data-kt-modal="true" id="price_modal">
+        <div class="kt-modal-content max-w-[500px] top-[5%]">
+            <div class="kt-modal-header">
+                <h3 class="kt-modal-title">Update Sale Price</h3>
+                <button
+                    type="button"
+                    class="kt-modal-close"
+                    aria-label="Close modal"
+                    data-kt-modal-dismiss="#price_modal"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-x"
+                        aria-hidden="true"
+                    >
+                        <path d="M18 6 6 18"></path>
+                        <path d="m6 6 12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="kt-modal-body">
+                {#if selectedProductForPrice}
+                    <div class="space-y-4">
+                        <!-- Product Info -->
+                        <div class="flex items-center gap-4">
+                            <div class="flex-shrink-0">
+                                {#if selectedProductForPrice.product.image_url}
+                                    <img 
+                                        src={selectedProductForPrice.product.image_url} 
+                                        alt={selectedProductForPrice.product.name}
+                                        class="w-16 h-16 rounded-lg object-cover"
+                                    />
+                                {:else}
+                                    <div class="w-16 h-16 rounded-lg bg-accent/50 flex items-center justify-center">
+                                        <i class="ki-filled ki-abstract-26 text-xl text-muted-foreground"></i>
+                                    </div>
+                                {/if}
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-mono mb-1">{selectedProductForPrice.product.name}</h4>
+                                <p class="text-sm text-muted-foreground mb-1">{selectedProductForPrice.product.type_name}</p>
+                                <p class="text-xs text-muted-foreground">Current Price: DZD {selectedProductForPrice.sale_price}</p>
+                            </div>
+                        </div>
+
+                        <!-- Alert -->
+                        <div class="kt-alert kt-alert-warning-light">
+                            <div class="kt-alert-icon">
+                                <i class="ki-filled ki-information-1"></i>
+                            </div>
+                            <div class="kt-alert-content">
+                                <h4 class="kt-alert-title">Price Impact Warning</h4>
+                                <p class="kt-alert-text">
+                                    Changing the sale price will affect the demand for this product using the elasticity coefficient ({selectedProductForPrice.product.elasticity_coefficient}). 
+                                    <strong>Higher prices typically reduce demand, while lower prices increase demand.</strong>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Price Input -->
+                        <div class="kt-card">
+                            <div class="kt-card-body p-4">
+                                <h5 class="font-medium text-mono mb-3">New Sale Price</h5>
+                                <div class="space-y-2">
+                                    <label class="text-sm font-medium text-mono">Price (DZD)</label>
+                                    <input 
+                                        type="number" 
+                                        class="kt-input w-full" 
+                                        bind:value={newSalePrice}
+                                        min="0.001"
+                                        step="0.001"
+                                        placeholder="Enter new sale price..."
+                                    />
+                                    <p class="text-xs text-muted-foreground">
+                                        Enter the new sale price in Algerian Dinars (DZD)
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Price Change Preview -->
+                        {#if newSalePrice !== selectedProductForPrice.sale_price}
+                            <div class="kt-card bg-accent/50">
+                                <div class="kt-card-body p-4">
+                                    <h5 class="font-medium text-mono mb-3">Price Change Preview</h5>
+                                    <div class="space-y-2">
+                                        <div class="flex justify-between">
+                                            <span class="text-sm text-muted-foreground">Current Price:</span>
+                                            <span class="text-sm font-medium">DZD {selectedProductForPrice.sale_price}</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-sm text-muted-foreground">New Price:</span>
+                                            <span class="text-sm font-medium">DZD {newSalePrice}</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-sm text-muted-foreground">Change:</span>
+                                            <span class="text-sm font-medium {newSalePrice > selectedProductForPrice.sale_price ? 'text-destructive' : 'text-green-600'}">
+                                                {newSalePrice > selectedProductForPrice.sale_price ? '+' : ''}DZD {(newSalePrice - selectedProductForPrice.sale_price).toFixed(3)}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {/if}
+                    </div>
+                {/if}
+            </div>
+            <div class="kt-modal-footer">
+                <div></div>
+                <div class="flex gap-4">
+                    <button
+                        class="kt-btn kt-btn-secondary"
+                        data-kt-modal-dismiss="#price_modal"
+                        on:click={closePriceModal}
+                        disabled={loadingPriceUpdate}
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        class="kt-btn kt-btn-primary"
+                        on:click={updateSalePrice}
+                        disabled={loadingPriceUpdate || newSalePrice <= 0}
+                    >
+                        {#if loadingPriceUpdate}
+                            <i class="ki-filled ki-loading ki-spin text-sm"></i>
+                            Updating...
+                        {:else}
+                            <i class="ki-filled ki-check text-sm"></i>
+                            Update Price
+                        {/if}
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </CompanyLayout> 

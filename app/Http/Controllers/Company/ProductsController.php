@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Company;
 use App\Http\Requests\Company\Technologies\ResearchTechnolgyRequest;
 use App\Services\IndexService;
 use Illuminate\Http\Request;
-use App\Models\Technology;
-use App\Services\TechnolgiesResearchService;
+use App\Http\Requests\Company\Products\FixProductSalePriceRequest;
+use App\Models\Product;
 
 class ProductsController extends Controller
 {
@@ -47,5 +47,25 @@ class ProductsController extends Controller
         }
 
         return inertia('Company/Products/Index');
+    }
+
+    public function fixProductSalePrice(FixProductSalePriceRequest $request, Product $product)
+    {
+        $companyProduct = $request->company->companyProducts()->where('product_id', $product->id)->first();
+
+        $companyProduct->update([
+            'sale_price' => $request->sale_price,
+        ]);
+
+        if($request->expectsJson() || $request->hasHeader('X-Requested-With')){
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Product sale price fixed successfully!'
+            ]);
+        }
+
+        return inertia('Company/Products/Index', [
+            'success' => 'Product sale price fixed successfully!'
+        ]);
     }
 }

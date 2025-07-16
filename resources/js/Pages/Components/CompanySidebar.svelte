@@ -15,7 +15,7 @@
         if($page.url.includes('company/products')){
             return 'production';
         }
-        if($page.url.includes('company/suppliers')){
+        if($page.url.includes('company/suppliers') || $page.url.includes('company/purchases')){
             return 'procurement';
         }
 
@@ -102,7 +102,7 @@
                     class="kt-btn kt-btn-icon kt-btn-ghost rounded-md size-9 border border-transparent hover:bg-background hover:[&_i]:text-primary hover:border-border {activeSection === 'products' ? 'bg-background [&_i]:text-primary border-border' : ''}" 
                     data-kt-tooltip="" 
                     data-kt-tooltip-placement="right"
-                    on:click={() => setActiveSection('products')}>
+                    on:click={() => setActiveSection('production')}>
                     <span class="kt-menu-icon">
                         <i class="ki-outline ki-handcart text-lg"></i>
                     </span>
@@ -280,7 +280,7 @@
                 {#if activeSection === 'technologies'}
                 <div class="mb-3">
                     <h3 class="text-xs text-muted-foreground uppercase ps-2.5 mb-2.5">
-                        Technologies Management
+                        R&D
                     </h3>
                     {#if hasPermission('company.technologies.index')}
                     <div class="kt-menu-item">
@@ -298,14 +298,14 @@
                 {/if}
                 
                 <!-- Products Management Section -->
-                {#if activeSection === 'products'}
+                {#if activeSection === 'production'}
                 <div class="mb-3">
                     <h3 class="text-xs text-muted-foreground uppercase ps-2.5 mb-2.5">
-                        Production Management
+                        Production
                     </h3>
-                    {#if hasPermission('admin.products.index')}
+                    {#if hasPermission('company.products.index')}
                     <div class="kt-menu-item">
-                        <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('admin.products.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.products.index')}>
+                        <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('company.products.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('company.products.index')}>
                             <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
                                 <i class="ki-outline ki-handcart"></i>
                             </span>
@@ -372,6 +372,19 @@
                             </span>
                             <span class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono ms-2">
                                 Suppliers
+                            </span>
+                        </a>
+                    </div>
+                    {/if}
+
+                    {#if hasPermission('company.purchases.index')}
+                    <div class="kt-menu-item">
+                        <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('company.purchases.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('company.purchases.index')}>
+                            <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
+                                <i class="ki-outline ki-handcart"></i>
+                            </span>
+                            <span class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono ms-2">
+                                Purchases
                             </span>
                         </a>
                     </div>

@@ -13,8 +13,7 @@ class CompanyProduct extends Model
     protected $guarded = ['id'];
 
     protected $casts = [
-        'total_stock' => 'decimal:3',
-        'in_sale_stock' => 'decimal:3',
+        'available_stock' => 'decimal:3',
         'sale_price' => 'decimal:3',
     ];
 
