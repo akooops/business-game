@@ -195,6 +195,26 @@ class NotificationService
         }
     }
 
+    public static function createInventoryExpiredNotification($company, $product, $quantity){
+        return Notification::create([
+            'type' => Notification::TYPE_INVENTORY_EXPIRED,
+            'title' => 'Inventory Expired',
+            'message' => "Inventory expired for {$product->name} with quantity of {$quantity}.",
+            'url' => route('company.inventory.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
+    public static function createInventoryDamagedNotification($company, $rate){
+        return Notification::create([
+            'type' => Notification::TYPE_INVENTORY_DAMAGED,
+            'title' => 'Inventory Damaged',
+            'message' => "Inventory damaged with {$rate}%. You will lose {$rate}% of your products in inventory.",
+            'url' => route('company.inventory.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
     public static function getUnreadCount()
     {
         return Notification::where('user_id', auth()->user()->id)->whereNull('read_at')->count();

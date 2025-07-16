@@ -45,6 +45,11 @@ class Notification extends Model
     const TYPE_SUEZ_CANAL_CLOSED = 'suez_canal_closed';
     const TYPE_SUEZ_CANAL_OPENED = 'suez_canal_opened';
 
+    // Inventory expired
+    const TYPE_INVENTORY_EXPIRED = 'inventory_expired';
+
+    // Inventory damaged
+    const TYPE_INVENTORY_DAMAGED = 'inventory_damaged';
 
     // Icons for different notification types
     const ICONS = [
@@ -63,6 +68,8 @@ class Notification extends Model
         self::TYPE_OIL_PRICE_LOWERED => 'ki-filled ki-ship',
         self::TYPE_SUEZ_CANAL_CLOSED => 'ki-filled ki-ship',
         self::TYPE_SUEZ_CANAL_OPENED => 'ki-filled ki-ship',
+        self::TYPE_INVENTORY_EXPIRED => 'ki-filled ki-dropbox',
+        self::TYPE_INVENTORY_DAMAGED => 'ki-filled ki-dropbox',
     ];
 
     // Methods

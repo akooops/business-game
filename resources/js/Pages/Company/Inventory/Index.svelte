@@ -614,7 +614,7 @@
                                             </td>
                                             <td>
                                                 <span class="text-sm font-medium {movement.quantity > 0 ? 'text-success' : 'text-warning'}">
-                                                    {movement.quantity > 0 ? '+' : ''}{formatNumber(movement.quantity)}
+                                                    {formatNumber(movement.quantity)}
                                                 </span>
                                             </td>
                                             <td>
