@@ -50,6 +50,9 @@ class GameTimeLoop extends Command
         // Process purchases
         $this->call('game:purchases-processing');
 
+        // Process sales
+        $this->call('game:sales-processing');
+
         // Process expired inventory
         $this->call('game:process-expired-inventory');
 
@@ -59,6 +62,9 @@ class GameTimeLoop extends Command
         if($currentHour == 8){
             $this->call('game:change-supplier-prices-and-costs');
             $this->call('game:change-wilayas-costs');
+
+            // Process sales
+            $this->call('game:generate-new-sales');
         }
 
         $this->info("New game time: " . $newTime->format('Y-m-d H:i:s'));

@@ -636,7 +636,7 @@
                                 <h4 class="kt-alert-title">Price Impact Warning</h4>
                                 <p class="kt-alert-text">
                                     Changing the sale price will affect the demand for this product using the elasticity coefficient ({selectedProductForPrice.product.elasticity_coefficient}). 
-                                    <strong>Higher prices typically reduce demand, while lower prices increase demand.</strong>
+                                    <strong>Negative elasticity coefficient means that higher prices typically reduce demand, while lower prices increase demand. Positive elasticity coefficient means that higher prices typically increase demand, while lower prices reduce demand.</strong>
                                 </p>
                             </div>
                         </div>

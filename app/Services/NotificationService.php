@@ -215,6 +215,46 @@ class NotificationService
         ]);
     }
 
+    public static function createSaleInitiatedNotification($company, $product, $numberOfSales){
+        return Notification::create([
+            'type' => Notification::TYPE_SALE_INITIATED,
+            'title' => 'Sale Initiated',
+            'message' => "{$numberOfSales} new sales for {$product->name}.",
+            'url' => route('company.sales.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
+    public static function createSaleDeliveredNotification($sale){
+        return Notification::create([
+            'type' => Notification::TYPE_SALE_DELIVERED,
+            'title' => 'Sale Delivered',
+            'message' => "Sale delivered for {$sale->product->name} with quantity of {$sale->quantity}.",
+            'url' => route('company.sales.index'),
+            'user_id' => $sale->company->user_id,
+        ]);
+    }
+
+    public static function createSaleCancelledNotification($sale){
+        return Notification::create([
+            'type' => Notification::TYPE_SALE_CANCELLED,
+            'title' => 'Sale Cancelled',
+            'message' => "Sale cancelled for {$sale->product->name} with quantity of {$sale->quantity}.",
+            'url' => route('company.sales.index'),
+            'user_id' => $sale->company->user_id,
+        ]);
+    }
+
+    public static function createSaleDeliveryDelayedNotification($sale){
+        return Notification::create([
+            'type' => Notification::TYPE_SALE_DELIVERY_DELAYED,
+            'title' => 'Sale Delivery Delayed',
+            'message' => "Sale delivery delayed for {$sale->product->name} until " . $sale->real_delivered_at->format('Y-m-d H:i:s') . ".",
+            'url' => route('company.sales.index'),
+            'user_id' => $sale->company->user_id,
+        ]);
+    }
+
     public static function getUnreadCount()
     {
         return Notification::where('user_id', auth()->user()->id)->whereNull('read_at')->count();

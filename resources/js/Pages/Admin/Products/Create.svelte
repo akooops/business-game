@@ -32,7 +32,7 @@
         name: '',
         description: '',
         type: 'raw_material',
-        elasticity_coefficient: 1.0,
+        elasticity_coefficient: 0,
         shelf_life_days: '',
         has_expiration: false,
         measurement_unit: '',
@@ -253,13 +253,14 @@
                                     id="elasticity_coefficient"
                                     type="number"
                                     step="0.001"
-                                    min="0"
+                                    min="-1"
+                                    max="1"
                                     class="kt-input {errors.elasticity_coefficient ? 'kt-input-error' : ''}"
                                     placeholder="1.0"
                                     bind:value={form.elasticity_coefficient}
                                 />
                                 <p class="text-xs text-secondary-foreground">
-                                    Demand/Price sensitivity factor (higher = more sensitive to price changes)
+                                    Demand/Price sensitivity factor (negative = higer prices lead to lower demand and vice versa)
                                 </p>
                                 {#if errors.elasticity_coefficient}
                                     <p class="text-sm text-destructive">{errors.elasticity_coefficient}</p>

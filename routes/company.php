@@ -10,6 +10,7 @@ use App\Http\Controllers\Company\CountriesController;
 use App\Http\Controllers\Company\PurchasesController;
 use App\Http\Controllers\Company\ProductDemandController;
 use App\Http\Controllers\Company\InventoryController;
+use App\Http\Controllers\Company\SalesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,6 +50,10 @@ Route::prefix('company')->middleware(['auth', 'check.company', 'handle.inertia']
     Route::get('/purchases/purchase-page', [PurchasesController::class, 'purchasePage'])->middleware('check.permission:company.purchases.index')->name('company.purchases.purchase-page');
 
     Route::get('/inventory', [InventoryController::class, 'index'])->middleware('check.permission:company.inventory.index')->name('company.inventory.index');
+
+    Route::get('/sales', [SalesController::class, 'index'])->middleware('check.permission:company.sales.index')->name('company.sales.index');
+    Route::post('/sales/{sale}/confirm', [SalesController::class, 'confirm'])->middleware('check.permission:company.sales.store')->name('company.sales.store');
+
 });
 
 

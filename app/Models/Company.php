@@ -57,5 +57,10 @@ class Company extends Model
         return $this->hasMany(InventoryMovement::class);
     }
 
+    public function sales()
+    {
+        return $this->hasMany(Sale::class);
+    }
+
     // Accessors
 }

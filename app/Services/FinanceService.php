@@ -27,4 +27,24 @@ class FinanceService
 
         return $funds;
     }
+
+    public static function paySaleShippingCost($company, $sale){
+        $funds = $company->funds;
+        $funds -= $sale->shipping_cost * $sale->quantity;
+        $company->update(['funds' => $funds]);
+
+        NotificationService::createFinanceFundsChangedNotification($company, $sale->shipping_cost * $sale->quantity);
+
+        return $funds;
+    }
+
+    public static function receiveSalePayment($company, $sale){
+        $funds = $company->funds;
+        $funds += $sale->sale_price * $sale->quantity;
+        $company->update(['funds' => $funds]);
+
+        NotificationService::createFinanceFundsChangedNotification($company, $sale->sale_price * $sale->quantity);
+
+        return $funds;
+    }
 }

@@ -6,7 +6,7 @@ use App\Services\SettingsService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Purchase extends Model
+class Sale extends Model
 {
     use HasFactory;
 
@@ -16,20 +16,18 @@ class Purchase extends Model
         'quantity' => 'decimal:3',
         'sale_price' => 'decimal:3',
         'shipping_cost' => 'decimal:3',
-        'customs_duties' => 'decimal:3',
-        'total_cost' => 'decimal:3',
-        'carbon_footprint' => 'decimal:3',
-        'ordered_at' => 'datetime',
+        'initiated_at' => 'datetime',
+        'confirmed_at' => 'datetime',
         'estimated_delivered_at' => 'datetime',
         'real_delivered_at' => 'datetime',
         'delivered_at' => 'datetime',
     ];
 
-    protected $appends = ['total_sale_price', 'total_shipping_cost', 'total_customs_duties', 'total_carbon_footprint'];
+    protected $appends = ['total_sale_price', 'total_shipping_cost'];
 
     // Statuses
-    const STATUS_PENDING = 'pending';
-    const STATUS_ORDERED = 'ordered';
+    const STATUS_INITIATED = 'initiated';
+    const STATUS_CONFIRMED = 'confirmed';
     const STATUS_DELIVERED = 'delivered';
     const STATUS_CANCELLED = 'cancelled';
 
@@ -39,9 +37,9 @@ class Purchase extends Model
         return $this->belongsTo(Company::class);
     }
 
-    public function supplier()
+    public function wilaya()
     {
-        return $this->belongsTo(Supplier::class);
+        return $this->belongsTo(Wilaya::class);
     }
 
     public function product()
@@ -60,23 +58,8 @@ class Purchase extends Model
         return round($this->quantity * $this->shipping_cost, 3) ?? 0;
     }
 
-    public function getTotalCustomsDutiesAttribute()
+    public function getIsConfirmedAttribute()
     {
-        return round(($this->total_sale_price + $this->total_shipping_cost) * $this->customs_duties, 3) ?? 0;
-    }
-
-    public function getTotalCarbonFootprintAttribute()
-    {
-        return round($this->quantity * $this->carbon_footprint, 3) ?? 0;
-    }
-
-    // boot
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::saving(function ($purchase) {
-            $purchase->total_cost = $purchase->total_sale_price + $purchase->total_shipping_cost + $purchase->total_customs_duties;
-        });
+        return $this->confirmed_at && !$this->cancelled_at;
     }
 }

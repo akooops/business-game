@@ -28,7 +28,7 @@ class UpdateProductRequest extends FormRequest
             'name' => 'required|string|max:255|unique:products,name,'.$product->id,
             'description' => 'nullable|string',
             'type' => 'required|in:raw_material,component,finished_product',
-            'elasticity_coefficient' => 'required|numeric|min:0|max:999999.999',
+            'elasticity_coefficient' => 'required|numeric|min:-1|max:1',
             'has_expiration' => 'required|boolean',
             'shelf_life_days' => 'required_if:has_expiration,true|integer|min:1',
             'measurement_unit' => 'required|string|max:255',
