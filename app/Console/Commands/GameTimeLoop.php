@@ -35,8 +35,8 @@ class GameTimeLoop extends Command
         $currentTime = SettingsService::getCurrentTimestamp();
         $this->info("Current game time: " . $currentTime->format('Y-m-d H:i:s'));
 
-        // Increment by 1 hour
-        $newTime = $currentTime->copy()->addHour();
+        // Increment by current game speed
+        $newTime = $currentTime->copy()->addHour(SettingsService::getGameSpeed());
         
         // Check if we need to handle business hours
         $newTime = $this->handleBusinessHours($newTime);
@@ -49,6 +49,9 @@ class GameTimeLoop extends Command
 
         // Process purchases
         $this->call('game:purchases-processing');
+
+        // Process expired inventory
+        $this->call('game:process-expired-inventory');
 
         // Change supplier prices and costs
         $currentHour = (int) $currentTime->copy()->format('H');

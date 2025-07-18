@@ -72,6 +72,27 @@ class SettingsService
         return round($diffInDays / 7) + 1;
     }
 
+    // Get the game speed
+    public static function getGameSpeed()
+    {
+        $setting = Setting::where('key', 'game_speed')->first();
+        
+        switch($setting->value){
+            case '0.25x':
+                return 0.25;
+            case '0.5x':
+                return 0.5;
+            case '1x':
+                return 1;
+            case '2x':
+                return 2;
+            case '4x':
+                return 4;
+            default:
+                return 1;
+        }
+    }
+
     // Get the demand visibility ahead weeks
     public static function getDemandVisibilityAheadWeeks()
     {

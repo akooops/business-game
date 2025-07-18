@@ -19,7 +19,8 @@ class InventoryService
             'company_id' => $company->id,
             'product_id' => $product->id,
             'movement_type' => InventoryMovement::MOVEMENT_TYPE_IN,
-            'quantity' => $quantity,
+            'original_quantity' => $quantity,
+            'current_quantity' => $quantity,
             'reference_type' => 'purchase',
             'reference_id' => $purchase->id,
             'moved_at' => SettingsService::getCurrentTimestamp(),
@@ -31,7 +32,12 @@ class InventoryService
 
         foreach($products as $product){
             $expiredQuantity = 0;
-            $companyInventory = $company->inventoryMovements()->where('product_id', $product->id)->get();
+
+            $companyInventory = $company->inventoryMovements()->where([
+                'product_id' => $product->id,
+                'movement_type' => InventoryMovement::MOVEMENT_TYPE_IN,
+            ])->get();
+
             $companyProduct = $company->companyProducts()->where('product_id', $product->id)->first();
 
             if(!$companyInventory || !$companyProduct){
@@ -47,17 +53,24 @@ class InventoryService
                     continue;
                 }
 
+                $leftAvailableStock = $inventory->original_quantity - $inventory->current_quantity;
+
+                if($leftAvailableStock <= 0){
+                    continue;
+                }
+
                 InventoryMovement::create([
                     'company_id' => $company->id,
                     'product_id' => $product->id,
                     'movement_type' => InventoryMovement::MOVEMENT_TYPE_EXPIRED,
-                    'quantity' => $inventory->quantity,
+                    'original_quantity' => $leftAvailableStock,
+                    'current_quantity' => $leftAvailableStock,
                     'moved_at' => $currentTimestamp,
                 ]);
     
-                $companyProduct->update(['available_stock' => $companyProduct->available_stock - $inventory->quantity]);
+                $companyProduct->update(['available_stock' => $companyProduct->available_stock - $leftAvailableStock]);
 
-                $expiredQuantity += $inventory->quantity;
+                $expiredQuantity += $leftAvailableStock;
             }
 
             if($expiredQuantity > 0){

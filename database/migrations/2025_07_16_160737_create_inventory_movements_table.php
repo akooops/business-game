@@ -15,7 +15,9 @@ return new class extends Migration
             $table->id();
 
             $table->enum('movement_type', ['in', 'out', 'expired', 'damaged', 'lost']);
-            $table->decimal('quantity', 10, 3);
+
+            $table->decimal('original_quantity', 10, 3)->nullable();
+            $table->decimal('current_quantity', 10, 3)->nullable();
 
             $table->text('notes')->nullable(); 
             $table->timestamp('moved_at')->nullable();

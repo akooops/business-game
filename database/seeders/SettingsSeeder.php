@@ -42,6 +42,16 @@ class SettingsSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'key' => 'game_speed',
+                'name' => 'Game Speed',
+                'type' => 'select',
+                'value' => '1x',
+                'description' => 'The speed of the game',
+                'options' => ['0.25x', '0.5x', '1x', '2x', '4x'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
                 'key' => 'demand_visiblity_ahead_weeks',
                 'name' => 'Demand Visibility Ahead Weeks',
                 'type' => 'number',

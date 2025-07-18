@@ -613,8 +613,8 @@
                                                 </span>
                                             </td>
                                             <td>
-                                                <span class="text-sm font-medium {movement.quantity > 0 ? 'text-success' : 'text-warning'}">
-                                                    {formatNumber(movement.quantity)}
+                                                <span class="text-sm font-medium {movement.original_quantity > 0 ? 'text-success' : 'text-warning'}">
+                                                    {formatNumber(movement.original_quantity)}
                                                 </span>
                                             </td>
                                             <td>
@@ -745,8 +745,8 @@
                             Quantity
                         </span>
                         <div>
-                            <span class="text-xs font-medium {selectedMovement.quantity > 0 ? 'text-success' : 'text-warning'}">
-                                {selectedMovement.quantity > 0 ? '+' : ''}{formatNumber(selectedMovement.quantity)}
+                            <span class="text-xs font-medium {selectedMovement.original_quantity > 0 ? 'text-success' : 'text-warning'}">
+                                {selectedMovement.original_quantity > 0 ? '+' : ''}{formatNumber(selectedMovement.original_quantity)}
                             </span>
                         </div>
                     </div>
