@@ -41,18 +41,39 @@ class DamageInventoryProduct extends Command
             foreach($companyProducts as $companyProduct){
                 $product = $companyProduct->product;
                 $quantity = $companyProduct->available_stock;
+                $overAllDamagedQuantity = 0;
 
                 if($product){
-                    $damagedQuantity = $quantity * $damageRate;
+                    $companyInventory = $company->inventoryMovements()->where([
+                        'product_id' => $product->id,
+                        'movement_type' => InventoryMovement::MOVEMENT_TYPE_IN,
+                    ])->get();
 
-                    $companyProduct->update(['available_stock' => $quantity - $damagedQuantity]);
+                    foreach($companyInventory as $inventory){
+                        $leftAvailableStock = $inventory->original_quantity - $inventory->current_quantity;
+
+                        if($leftAvailableStock <= 0){
+                            continue;
+                        }
+
+                        $damagedQuantity = $leftAvailableStock * $damageRate;
+
+                        $inventory->update([
+                            'current_quantity' => $inventory->current_quantity - $damagedQuantity,
+                        ]);
+
+                        $companyProduct->update(['available_stock' => $companyProduct->available_stock - $damagedQuantity]);
+
+                        $overAllDamagedQuantity += $damagedQuantity;
+                    }
                 }
 
                 InventoryMovement::create([
                     'company_id' => $company->id,
                     'product_id' => $product->id,
                     'movement_type' => InventoryMovement::MOVEMENT_TYPE_DAMAGED,
-                    'quantity' => $damagedQuantity,
+                    'original_quantity' => $overAllDamagedQuantity,
+                    'current_quantity' => $overAllDamagedQuantity,
                     'moved_at' => SettingsService::getCurrentTimestamp(),
                     'note' => 'Inventory damaged with ' . $damageRate . '%',
                 ]);
