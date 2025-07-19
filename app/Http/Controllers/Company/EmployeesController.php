@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\Company\Employees\RecruitEmployeeRequest;
 use App\Models\Employee;
 use App\Services\EmployeesService;
+use App\Services\HrService;
 
 class EmployeesController extends Controller
 {
@@ -93,7 +94,7 @@ class EmployeesController extends Controller
     }
 
     public function recruit(RecruitEmployeeRequest $request, Employee $employee){
-        EmployeesService::recruitEmployee($employee);
+        HrService::recruitEmployee($employee);
 
         if($request->expectsJson() || $request->hasHeader('X-Requested-With')){
             return response()->json([

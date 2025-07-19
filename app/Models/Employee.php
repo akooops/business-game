@@ -24,7 +24,7 @@ class Employee extends Model
     ];
 
     const STATUS_APPLIED = 'applied';
-    const STATUS_HIRED = 'hired';
+    const STATUS_ACTIVE = 'active';
     const STATUS_FIRED = 'fired';
     const STATUS_PROMOTED = 'promoted';
 

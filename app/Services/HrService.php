@@ -7,7 +7,7 @@ use App\Models\Employee;
 class HrService
 {
     public static function generateEmployees($company, $employeeProfile){
-        $numberOfEmployees = rand(1, 10);
+        $numberOfEmployees = rand(1, 4);
 
         $employees = [];
 
@@ -90,7 +90,7 @@ class HrService
 
     public static function recruitEmployee($employee){       
         $employee->update([
-            'status' => Employee::STATUS_HIRED,
+            'status' => Employee::STATUS_ACTIVE,
             'hired_at' => SettingsService::getCurrentTimestamp(),
         ]);
 

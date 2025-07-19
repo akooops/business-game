@@ -62,5 +62,10 @@ class Company extends Model
         return $this->hasMany(Sale::class);
     }
 
+    public function employees()
+    {
+        return $this->hasMany(Employee::class);
+    }
+
     // Accessors
 }
