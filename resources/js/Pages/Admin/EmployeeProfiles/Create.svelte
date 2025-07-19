@@ -19,27 +19,16 @@
     
     const pageTitle = 'Create Employee Profile';
 
-    // Recruitment difficulty options
-    const difficultyOptions = [
-        { value: 'very_easy', label: 'Very Easy' },
-        { value: 'easy', label: 'Easy' },
-        { value: 'medium', label: 'Medium' },
-        { value: 'hard', label: 'Hard' },
-        { value: 'very_hard', label: 'Very Hard' }
-    ];
-
     // Form data
     let form = {
         name: '',
         description: '',
-        skills: [],
         min_salary_month: '',
         avg_salary_month: '',
         max_salary_month: '',
-        recruitment_difficulty: 'medium',
-        recruitment_cost_per_employee: '',
-        training_cost_per_employee: '',
-        training_duration_days: ''
+        min_recruitment_cost: '',
+        avg_recruitment_cost: '',
+        max_recruitment_cost: ''
     };
 
     // Form errors
@@ -47,30 +36,6 @@
 
     // Loading state
     let loading = false;
-
-    // Skills input
-    let skillInput = '';
-
-    // Add skill
-    function addSkill() {
-        if (skillInput.trim() && !form.skills.includes(skillInput.trim())) {
-            form.skills = [...form.skills, skillInput.trim()];
-            skillInput = '';
-        }
-    }
-
-    // Remove skill
-    function removeSkill(index) {
-        form.skills = form.skills.filter((_, i) => i !== index);
-    }
-
-    // Handle skill input keypress
-    function handleSkillKeypress(event) {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            addSkill();
-        }
-    }
 
     // Handle form submission
     function handleSubmit() {
@@ -81,11 +46,7 @@
         // Add form fields
         Object.keys(form).forEach(key => {
             if (form[key] !== null && form[key] !== '') {
-                if (key === 'skills') {
-                    formData.append(key, JSON.stringify(form[key]));
-                } else {
-                    formData.append(key, form[key]);
-                }
+                formData.append(key, form[key]);
             }
         });
 
@@ -173,58 +134,6 @@
                                     <p class="text-sm text-destructive">{errors.description}</p>
                                 {/if}
                             </div>
-
-                            <!-- Skills -->
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono">
-                                    Skills & Competencies
-                                </label>
-                                <div class="flex gap-2">
-                                    <input
-                                        type="text"
-                                        class="kt-input flex-1"
-                                        placeholder="Enter a skill and press Enter"
-                                        bind:value={skillInput}
-                                        on:keypress={handleSkillKeypress}
-                                    />
-                                    <button
-                                        type="button"
-                                        class="kt-btn kt-btn-primary"
-                                        on:click={addSkill}
-                                        disabled={!skillInput.trim()}
-                                    >
-                                        <i class="ki-filled ki-plus text-base"></i>
-                                        Add
-                                    </button>
-                                </div>
-                                {#if form.skills.length > 0}
-                                    <div class="flex flex-wrap gap-2 mt-2">
-                                        {#each form.skills as skill, index}
-                                            <span class="kt-badge kt-badge-outline kt-badge-sm">
-                                                {skill}
-                                                <button
-                                                    type="button"
-                                                    class="ml-1 text-red-500 hover:text-red-700"
-                                                    on:click={() => removeSkill(index)}
-                                                >
-                                                    <i class="ki-filled ki-cross text-xs"></i>
-                                                </button>
-                                            </span>
-                                        {/each}
-                                    </div>
-                                {:else}
-                                    <div class="kt-card bg-muted/20 border-dashed">
-                                        <div class="kt-card-content text-center py-4">
-                                            <i class="ki-filled ki-profile-circle text-xl text-muted-foreground mb-2"></i>
-                                            <p class="text-sm text-muted-foreground">No skills added yet</p>
-                                            <p class="text-xs text-muted-foreground mt-1">Add skills to define what competencies this profile requires</p>
-                                        </div>
-                                    </div>
-                                {/if}
-                                {#if errors.skills}
-                                    <p class="text-sm text-destructive">{errors.skills}</p>
-                                {/if}
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -302,116 +211,79 @@
                     </div>
                 </div>
 
-                <!-- Recruitment Settings Card -->
+                <!-- Recruitment Cost Card -->
                 <div class="kt-card">
                     <div class="kt-card-header">
-                        <h4 class="kt-card-title">Recruitment Settings</h4>
+                        <h4 class="kt-card-title">Recruitment Cost</h4>
                     </div>
                     <div class="kt-card-content">
-                        <div class="grid gap-4 md:grid-cols-2">
-                            <!-- Recruitment Difficulty -->
+                        <div class="grid gap-4 md:grid-cols-3">
+                            <!-- Minimum Salary -->
                             <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="recruitment_difficulty">
-                                    Recruitment Difficulty <span class="text-destructive">*</span>
-                                </label>
-                                <select
-                                    id="recruitment_difficulty"
-                                    class="kt-select {errors.recruitment_difficulty ? 'kt-select-error' : ''}"
-                                    bind:value={form.recruitment_difficulty}
-                                    required
-                                >
-                                    {#each difficultyOptions as option}
-                                        <option value={option.value}>{option.label}</option>
-                                    {/each}
-                                </select>
-                                <p class="text-xs text-secondary-foreground">
-                                    How difficult it is to find and recruit employees for this profile
-                                </p>
-                                {#if errors.recruitment_difficulty}
-                                    <p class="text-sm text-destructive">{errors.recruitment_difficulty}</p>
-                                {/if}
-                            </div>
-
-                            <!-- Recruitment Cost -->
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="recruitment_cost_per_employee">
-                                    Recruitment Cost per Employee <span class="text-destructive">*</span>
+                                <label class="text-sm font-medium text-mono" for="min_recruitment_cost">
+                                    Minimum Recruitment Cost <span class="text-destructive">*</span>
                                 </label>
                                 <input
-                                    id="recruitment_cost_per_employee"
+                                    id="min_recruitment_cost"
                                     type="number"
                                     step="0.001"
                                     min="0"
-                                    class="kt-input {errors.recruitment_cost_per_employee ? 'kt-input-error' : ''}"
+                                    class="kt-input {errors.min_recruitment_cost ? 'kt-input-error' : ''}"
                                     placeholder="0.000"
-                                    bind:value={form.recruitment_cost_per_employee}
+                                    bind:value={form.min_recruitment_cost}
                                     required
                                 />
-                                <p class="text-xs text-secondary-foreground">
-                                    Cost to recruit one employee (advertising, interviews, etc.)
-                                </p>
-                                {#if errors.recruitment_cost_per_employee}
-                                    <p class="text-sm text-destructive">{errors.recruitment_cost_per_employee}</p>
+                                {#if errors.min_recruitment_cost}
+                                    <p class="text-sm text-destructive">{errors.min_recruitment_cost}</p>
                                 {/if}
                             </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Training Settings Card -->
-                <div class="kt-card">
-                    <div class="kt-card-header">
-                        <h4 class="kt-card-title">Training Settings</h4>
-                    </div>
-                    <div class="kt-card-content">
-                        <div class="grid gap-4 md:grid-cols-2">
-                            <!-- Training Cost -->
+                            <!-- Average Salary -->
                             <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="training_cost_per_employee">
-                                    Training Cost per Employee <span class="text-destructive">*</span>
+                                <label class="text-sm font-medium text-mono" for="avg_recruitment_cost">
+                                    Average Recruitment Cost <span class="text-destructive">*</span>
                                 </label>
                                 <input
-                                    id="training_cost_per_employee"
+                                    id="avg_recruitment_cost"
                                     type="number"
                                     step="0.001"
                                     min="0"
-                                    class="kt-input {errors.training_cost_per_employee ? 'kt-input-error' : ''}"
+                                    class="kt-input {errors.avg_recruitment_cost ? 'kt-input-error' : ''}"
                                     placeholder="0.000"
-                                    bind:value={form.training_cost_per_employee}
+                                    bind:value={form.avg_recruitment_cost}
                                     required
                                 />
-                                <p class="text-xs text-secondary-foreground">
-                                    Cost to train one employee for this profile
-                                </p>
-                                {#if errors.training_cost_per_employee}
-                                    <p class="text-sm text-destructive">{errors.training_cost_per_employee}</p>
+                                    {#if errors.avg_recruitment_cost}
+                                    <p class="text-sm text-destructive">{errors.avg_recruitment_cost}</p>
                                 {/if}
                             </div>
 
-                            <!-- Training Duration -->
+                            <!-- Maximum Salary -->
                             <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="training_duration_days">
-                                    Training Duration (Days) <span class="text-destructive">*</span>
+                                <label class="text-sm font-medium text-mono" for="max_recruitment_cost">
+                                    Maximum Recruitment Cost <span class="text-destructive">*</span>
                                 </label>
                                 <input
-                                    id="training_duration_days"
+                                    id="max_recruitment_cost"
                                     type="number"
-                                    min="1"
-                                    class="kt-input {errors.training_duration_days ? 'kt-input-error' : ''}"
-                                    placeholder="7"
-                                    bind:value={form.training_duration_days}
+                                    step="0.001"
+                                    min="0"
+                                    class="kt-input {errors.max_recruitment_cost ? 'kt-input-error' : ''}"
+                                    placeholder="0.000"
+                                    bind:value={form.max_recruitment_cost}
                                     required
                                 />
-                                <p class="text-xs text-secondary-foreground">
-                                    Number of days required to fully train an employee
-                                </p>
-                                {#if errors.training_duration_days}
-                                    <p class="text-sm text-destructive">{errors.training_duration_days}</p>
+                                {#if errors.max_recruitment_cost}
+                                    <p class="text-sm text-destructive">{errors.max_recruitment_cost}</p>
                                 {/if}
                             </div>
                         </div>
+                        <p class="text-xs text-secondary-foreground mt-2">
+                            Define the recruitment cost range for this employee profile. Average should be between min and max.
+                        </p>
                     </div>
                 </div>
+
 
                 <!-- Form Actions -->
                 <div class="flex items-center justify-end gap-3">

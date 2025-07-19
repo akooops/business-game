@@ -265,6 +265,16 @@ class NotificationService
         ]);
     }
 
+    public static function createEmployeeHiredNotification($employee){
+        return Notification::create([
+            'type' => Notification::TYPE_EMPLOYEE_HIRED,
+            'title' => 'Employee Hired',
+            'message' => "Employee {$employee->name} hired for {$employee->employeeProfile->name} with salary of {$employee->salary_month}.",
+            'url' => route('company.employees.index'),
+            'user_id' => $employee->company->user_id,
+        ]);
+    }
+
     public static function getUnreadCount()
     {
         return Notification::where('user_id', auth()->user()->id)->whereNull('read_at')->count();

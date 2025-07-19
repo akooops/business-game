@@ -19,43 +19,7 @@
         }
     ];
     
-    const pageTitle = 'Employee Profile Details';
-
-    // Recruitment difficulty badge colors
-    function getDifficultyBadgeClass(difficulty) {
-        switch(difficulty) {
-            case 'very_easy':
-                return 'kt-badge kt-badge-outline kt-badge-success';
-            case 'easy':
-                return 'kt-badge kt-badge-outline kt-badge-success';
-            case 'medium':
-                return 'kt-badge kt-badge-outline kt-badge-warning';
-            case 'hard':
-                return 'kt-badge kt-badge-outline kt-badge-danger';
-            case 'very_hard':
-                return 'kt-badge kt-badge-outline kt-badge-danger';
-            default:
-                return 'kt-badge kt-badge-outline';
-        }
-    }
-
-    // Format difficulty display name
-    function getDifficultyDisplayName(difficulty) {
-        switch(difficulty) {
-            case 'very_easy':
-                return 'Very Easy';
-            case 'easy':
-                return 'Easy';
-            case 'medium':
-                return 'Medium';
-            case 'hard':
-                return 'Hard';
-            case 'very_hard':
-                return 'Very Hard';
-            default:
-                return difficulty;
-        }
-    }
+    const pageTitle = 'Employee Profile Details';   
 </script>
 
 <svelte:head>
@@ -106,18 +70,6 @@
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Description</h4>
                             <p class="text-sm text-secondary-foreground">{employeeProfile?.description}</p>
-                        </div>
-                        {/if}
-
-                        <!-- Skills -->
-                        {#if employeeProfile?.skills && employeeProfile.skills.length > 0}
-                        <div class="flex flex-col gap-2">
-                            <h4 class="text-sm font-semibold text-mono">Skills & Competencies</h4>
-                            <div class="flex flex-wrap gap-2">
-                                {#each employeeProfile.skills as skill}
-                                    <span class="kt-badge kt-badge-outline kt-badge-sm">{skill}</span>
-                                {/each}
-                            </div>
                         </div>
                         {/if}
 
@@ -174,68 +126,34 @@
                 </div>
             </div>
 
-            <!-- Recruitment Settings Card -->
+            <!-- Recruitment Cost Card -->
             <div class="kt-card">
                 <div class="kt-card-header">
-                    <h4 class="kt-card-title">Recruitment Settings</h4>
+                    <h4 class="kt-card-title">Recruitment Cost</h4>
                 </div>
                 <div class="kt-card-content">
-                    <div class="grid gap-4 w-full md:grid-cols-2">
-                        <!-- Recruitment Difficulty -->
+                    <div class="grid gap-4 w-full md:grid-cols-3">
+                        <!-- Minimum Salary -->
                         <div class="flex flex-col gap-2">
-                            <h4 class="text-sm font-semibold text-mono">Recruitment Difficulty</h4>
-                            <div class="flex items-center gap-2">
-                                <span class={getDifficultyBadgeClass(employeeProfile?.recruitment_difficulty)}>
-                                    {getDifficultyDisplayName(employeeProfile?.recruitment_difficulty)}
-                                </span>
-                            </div>
-                            <p class="text-xs text-muted-foreground">
-                                How difficult it is to find and recruit employees for this profile
-                            </p>
-                        </div>
-
-                        <!-- Recruitment Cost -->
-                        <div class="flex flex-col gap-2">
-                            <h4 class="text-sm font-semibold text-mono">Recruitment Cost per Employee</h4>
+                            <h4 class="text-sm font-semibold text-mono">Minimum Recruitment Cost</h4>
                             <p class="text-lg font-bold">
-                                ${employeeProfile?.recruitment_cost_per_employee}
-                            </p>
-                            <p class="text-xs text-muted-foreground">
-                                Cost to recruit one employee (advertising, interviews, etc.)
+                                ${employeeProfile?.min_recruitment_cost}
                             </p>
                         </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Training Settings Card -->
-            <div class="kt-card">
-                <div class="kt-card-header">
-                    <h4 class="kt-card-title">Training Settings</h4>
-                </div>
-                <div class="kt-card-content">
-                    <div class="grid gap-4 w-full md:grid-cols-2">
-                        <!-- Training Cost -->
+                        <!-- Average Salary -->
                         <div class="flex flex-col gap-2">
-                            <h4 class="text-sm font-semibold text-mono">Training Cost per Employee</h4>
+                            <h4 class="text-sm font-semibold text-mono">Average Recruitment Cost</h4>
                             <p class="text-lg font-bold">
-                                ${employeeProfile?.training_cost_per_employee}
-                            </p>
-                            <p class="text-xs text-muted-foreground">
-                                Cost to train one employee for this profile
+                                ${employeeProfile?.avg_recruitment_cost}
                             </p>
                         </div>
 
-                        <!-- Training Duration -->
+                        <!-- Maximum Salary -->
                         <div class="flex flex-col gap-2">
-                            <h4 class="text-sm font-semibold text-mono">Training Duration</h4>
-                            <div class="flex items-center gap-2">
-                                <p class="text-lg font-bold">
-                                    {employeeProfile?.training_duration_days} days
-                                </p>
-                            </div>
-                            <p class="text-xs text-muted-foreground">
-                                Number of days required to fully train an employee
+                            <h4 class="text-sm font-semibold text-mono">Maximum Recruitment Cost</h4>
+                            <p class="text-lg font-bold">
+                                ${employeeProfile?.max_recruitment_cost}
                             </p>
                         </div>
                     </div>

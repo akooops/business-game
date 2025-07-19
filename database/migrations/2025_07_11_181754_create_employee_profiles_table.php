@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->json('skills')->nullable();
 
             // Salary
             $table->decimal('min_salary_month', 15, 3)->default(0);
@@ -23,12 +22,11 @@ return new class extends Migration
             $table->decimal('max_salary_month', 15, 3)->default(0);
 
             // Recruitment
-            $table->enum('recruitment_difficulty', ['very_easy', 'easy', 'medium', 'hard', 'very_hard'])->default('medium');
-            $table->decimal('recruitment_cost_per_employee', 15, 3)->default(0);
+            $table->decimal('min_recruitment_cost', 15, 3)->default(0);
+            $table->decimal('avg_recruitment_cost', 15, 3)->default(0);
+            $table->decimal('max_recruitment_cost', 15, 3)->default(0);
+            $table->decimal('real_recruitment_cost', 15, 3)->default(0);
 
-            // Training
-            $table->decimal('training_cost_per_employee', 15, 3)->default(0);
-            $table->integer('training_duration_days')->default(1);
             $table->timestamps();
         });
     }

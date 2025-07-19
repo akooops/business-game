@@ -11,6 +11,8 @@ use App\Http\Controllers\Company\PurchasesController;
 use App\Http\Controllers\Company\ProductDemandController;
 use App\Http\Controllers\Company\InventoryController;
 use App\Http\Controllers\Company\SalesController;
+use App\Http\Controllers\Company\EmployeeProfilesController;
+use App\Http\Controllers\Company\EmployeesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,6 +56,14 @@ Route::prefix('company')->middleware(['auth', 'check.company', 'handle.inertia']
     Route::get('/sales', [SalesController::class, 'index'])->middleware('check.permission:company.sales.index')->name('company.sales.index');
     Route::post('/sales/{sale}/confirm', [SalesController::class, 'confirm'])->middleware('check.permission:company.sales.store')->name('company.sales.store');
 
+
+    Route::get('/employee-profiles', [EmployeeProfilesController::class, 'index'])->middleware('check.permission:company.employee-profiles.index')->name('company.employee-profiles.index');
+    Route::get('/employee-profiles/{employeeProfile}/find-employees', [EmployeeProfilesController::class, 'findEmployees'])->middleware('check.permission:company.employee-profiles.index')->name('company.employee-profiles.find-employees');
+
+
+    Route::get('/employees', [EmployeesController::class, 'index'])->middleware('check.permission:company.employees.index')->name('company.employees.index');
+    Route::get('/employees/recruit-page', [EmployeesController::class, 'recruitPage'])->middleware('check.permission:company.employees.index')->name('company.employees.recruit-page');
+    Route::post('/employees/{employee}/recruit', [EmployeesController::class, 'recruit'])->middleware('check.permission:company.employees.store')->name('company.employees.store');
 });
 
 

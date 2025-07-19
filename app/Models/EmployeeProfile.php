@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\HasFiles;
+use App\Services\CalculationsService;
 
 class EmployeeProfile extends Model
 {
@@ -12,36 +13,32 @@ class EmployeeProfile extends Model
 
     protected $guarded = ['id'];
 
-    protected $appends = ['recruitment_difficulty_display'];
-
     protected $casts = [
-        'skills' => 'array',
         'min_salary_month' => 'decimal:3',
         'avg_salary_month' => 'decimal:3',
         'max_salary_month' => 'decimal:3',
-        'recruitment_cost_per_employee' => 'decimal:3',
-        'training_cost_per_employee' => 'decimal:3',
+        'min_recruitment_cost' => 'decimal:3',
+        'avg_recruitment_cost' => 'decimal:3',
+        'max_recruitment_cost' => 'decimal:3',
+        'real_recruitment_cost' => 'decimal:3',
     ];
-
-    // Recruitment difficulties
-    const RECRUITMENT_DIFFICULTY_VERY_EASY = 'very_easy';
-    const RECRUITMENT_DIFFICULTY_EASY = 'easy';
-    const RECRUITMENT_DIFFICULTY_MEDIUM = 'medium';
-    const RECRUITMENT_DIFFICULTY_HARD = 'hard';
-    const RECRUITMENT_DIFFICULTY_VERY_HARD = 'very_hard';
 
     //Relations
 
     //Accessors
-    public function getRecruitmentDifficultyDisplayAttribute()
+
+    // Boot
+    public static function boot()
     {
-        return match($this->recruitment_difficulty) {
-            self::RECRUITMENT_DIFFICULTY_VERY_EASY => 'Very Easy',
-            self::RECRUITMENT_DIFFICULTY_EASY => 'Easy',
-            self::RECRUITMENT_DIFFICULTY_MEDIUM => 'Medium',
-            self::RECRUITMENT_DIFFICULTY_HARD => 'Hard',
-            self::RECRUITMENT_DIFFICULTY_VERY_HARD => 'Very Hard',
-            default => 'Unknown'
-        };
+        parent::boot();
+
+        //Calculate the real recruitment cost
+        static::creating(function ($model) {
+            $model->real_recruitment_cost = CalculationsService::calculatePertValue($model->min_recruitment_cost, $model->avg_recruitment_cost, $model->max_recruitment_cost);
+        });
+
+        static::saving(function ($model) {
+            $model->real_recruitment_cost = CalculationsService::calculatePertValue($model->min_recruitment_cost, $model->avg_recruitment_cost, $model->max_recruitment_cost);
+        });
     }
 }

@@ -23,22 +23,12 @@ class EmployeeProfilesController extends Controller
         $search = IndexService::checkIfSearchEmpty($request->query('search'));
 
         // Filter parameters
-        $difficultyFilter = IndexService::checkIfSearchEmpty($request->query('recruitment_difficulty'));
         $salaryMin = IndexService::checkIfNumber($request->query('salary_min'));
         $salaryMax = IndexService::checkIfNumber($request->query('salary_max'));
         $recruitmentCostMin = IndexService::checkIfNumber($request->query('recruitment_cost_min'));
         $recruitmentCostMax = IndexService::checkIfNumber($request->query('recruitment_cost_max'));
-        $trainingCostMin = IndexService::checkIfNumber($request->query('training_cost_min'));
-        $trainingCostMax = IndexService::checkIfNumber($request->query('training_cost_max'));
-        $trainingDurationMin = IndexService::checkIfNumber($request->query('training_duration_min'));
-        $trainingDurationMax = IndexService::checkIfNumber($request->query('training_duration_max'));
 
         $employeeProfiles = EmployeeProfile::latest();
-
-        // Apply recruitment difficulty filter
-        if ($difficultyFilter) {
-            $employeeProfiles->where('recruitment_difficulty', $difficultyFilter);
-        }
 
         // Apply salary range filters (using average salary for filtering)
         if ($salaryMin) {
@@ -51,29 +41,7 @@ class EmployeeProfilesController extends Controller
 
         // Apply recruitment cost range filters
         if ($recruitmentCostMin) {
-            $employeeProfiles->where('recruitment_cost_per_employee', '>=', $recruitmentCostMin);
-        }
-
-        if ($recruitmentCostMax) {
-            $employeeProfiles->where('recruitment_cost_per_employee', '<=', $recruitmentCostMax);
-        }
-
-        // Apply training cost range filters
-        if ($trainingCostMin) {
-            $employeeProfiles->where('training_cost_per_employee', '>=', $trainingCostMin);
-        }
-
-        if ($trainingCostMax) {
-            $employeeProfiles->where('training_cost_per_employee', '<=', $trainingCostMax);
-        }
-
-        // Apply training duration range filters
-        if ($trainingDurationMin) {
-            $employeeProfiles->where('training_duration_days', '>=', $trainingDurationMin);
-        }
-
-        if ($trainingDurationMax) {
-            $employeeProfiles->where('training_duration_days', '<=', $trainingDurationMax);
+            $employeeProfiles->where('avg_recruitment_cost', '>=', $recruitmentCostMin);
         }
 
         // Apply search filter
@@ -81,9 +49,7 @@ class EmployeeProfilesController extends Controller
             $employeeProfiles->where(function($query) use ($search) {
                 $query->where('id', $search)
                       ->orWhere('name', 'like', '%' . $search . '%')
-                      ->orWhere('description', 'like', '%' . $search . '%')
-                      ->orWhere('skills', 'like', '%' . $search . '%')
-                      ->orWhere('recruitment_difficulty', 'like', '%' . $search . '%');
+                      ->orWhere('description', 'like', '%' . $search . '%');
             });
         }
 

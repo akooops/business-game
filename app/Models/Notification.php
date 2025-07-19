@@ -60,7 +60,8 @@ class Notification extends Model
     const TYPE_SALE_CANCELLED = 'sale_cancelled';
     const TYPE_SALE_DELIVERY_DELAYED = 'sale_delivery_delayed';
 
-
+    // Employees
+    const TYPE_EMPLOYEE_HIRED = 'employee_hired';
 
     // Icons for different notification types
     const ICONS = [
@@ -86,6 +87,7 @@ class Notification extends Model
         self::TYPE_SALE_DELIVERED => 'ki-filled ki-ship',
         self::TYPE_SALE_CANCELLED => 'ki-filled ki-ship',
         self::TYPE_SALE_DELIVERY_DELAYED => 'ki-filled ki-ship',
+        self::TYPE_EMPLOYEE_HIRED => 'ki-filled ki-users',
     ];
 
     // Methods

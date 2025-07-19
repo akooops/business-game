@@ -33,13 +33,8 @@
     // Filter variables
     let salaryMin = '';
     let salaryMax = '';
-    let difficultyFilter = '';
     let recruitmentCostMin = '';
     let recruitmentCostMax = '';
-    let trainingCostMin = '';
-    let trainingCostMax = '';
-    let trainingDurationMin = '';
-    let trainingDurationMax = '';
 
     // Fetch employee profiles data
     async function fetchEmployeeProfiles() {
@@ -58,26 +53,11 @@
             if (salaryMax) {
                 params.append('salary_max', salaryMax);
             }
-            if (difficultyFilter) {
-                params.append('recruitment_difficulty', difficultyFilter);
-            }
             if (recruitmentCostMin) {
                 params.append('recruitment_cost_min', recruitmentCostMin);
             }
             if (recruitmentCostMax) {
                 params.append('recruitment_cost_max', recruitmentCostMax);
-            }
-            if (trainingCostMin) {
-                params.append('training_cost_min', trainingCostMin);
-            }
-            if (trainingCostMax) {
-                params.append('training_cost_max', trainingCostMax);
-            }
-            if (trainingDurationMin) {
-                params.append('training_duration_min', trainingDurationMin);
-            }
-            if (trainingDurationMax) {
-                params.append('training_duration_max', trainingDurationMax);
             }
             
             const response = await fetch(route('admin.employee-profiles.index') + '?' + params.toString(), {
@@ -147,13 +127,8 @@
     function clearAllFilters() {
         salaryMin = '';
         salaryMax = '';
-        difficultyFilter = '';
         recruitmentCostMin = '';
         recruitmentCostMax = '';
-        trainingCostMin = '';
-        trainingCostMax = '';
-        trainingDurationMin = '';
-        trainingDurationMax = '';
         currentPage = 1;
         
         fetchEmployeeProfiles();
@@ -304,7 +279,7 @@
                             </button>
                             
                             <!-- Clear Filters Button -->
-                            {#if salaryMin || salaryMax || difficultyFilter || recruitmentCostMin || recruitmentCostMax || trainingCostMin || trainingCostMax || trainingDurationMin || trainingDurationMax}
+                            {#if salaryMin || salaryMax || recruitmentCostMin || recruitmentCostMax}
                                 <button 
                                     class="kt-btn kt-btn-ghost kt-btn-sm"
                                     on:click={clearAllFilters}
@@ -345,24 +320,6 @@
                                 </div>
                             </div>
 
-                            <!-- Recruitment Difficulty -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Recruitment Difficulty</h4>
-                                
-                                <select 
-                                    class="kt-input" 
-                                    bind:value={difficultyFilter}
-                                    on:change={handleFilterChange}
-                                >
-                                    <option value="">All Difficulties</option>
-                                    <option value="very_easy">Very Easy</option>
-                                    <option value="easy">Easy</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="hard">Hard</option>
-                                    <option value="very_hard">Very Hard</option>
-                                </select>
-                            </div>
-
                             <!-- Recruitment Cost Range -->
                             <div class="space-y-2">
                                 <h4 class="text-sm font-medium text-gray-700">Recruitment Cost</h4>
@@ -381,54 +338,6 @@
                                         class="kt-input flex-1" 
                                         placeholder="Max Cost" 
                                         bind:value={recruitmentCostMax}
-                                        on:input={handleFilterChange}
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Training Cost Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Training Cost</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min Cost" 
-                                        bind:value={trainingCostMin}
-                                        on:input={handleFilterChange}
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max Cost" 
-                                        bind:value={trainingCostMax}
-                                        on:input={handleFilterChange}
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Training Duration Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Training Duration (days)</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min Days" 
-                                        bind:value={trainingDurationMin}
-                                        on:input={handleFilterChange}
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max Days" 
-                                        bind:value={trainingDurationMax}
                                         on:input={handleFilterChange}
                                         min="0"
                                     />
@@ -458,22 +367,12 @@
                                     </th>
                                     <th class="min-w-[120px]">
                                         <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Difficulty</span>
-                                        </span>
-                                    </th>
-                                    <th class="min-w-[120px]">
-                                        <span class="kt-table-col">
                                             <span class="kt-table-col-label">Avg Salary</span>
                                         </span>
                                     </th>
                                     <th class="min-w-[120px]">
                                         <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Costs</span>
-                                        </span>
-                                    </th>
-                                    <th class="min-w-[150px]">
-                                        <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Skills</span>
+                                            <span class="kt-table-col-label">Recruitment Cost</span>
                                         </span>
                                     </th>
                                     <th class="w-[80px]">
@@ -502,15 +401,6 @@
                                             </td>
                                             <td class="p-4">
                                                 <div class="kt-skeleton w-16 h-4 rounded"></div>
-                                            </td>
-                                            <td class="p-4">
-                                                <div class="kt-skeleton w-12 h-4 rounded"></div>
-                                            </td>
-                                            <td class="p-4">
-                                                <div class="kt-skeleton w-20 h-6 rounded"></div>
-                                            </td>
-                                            <td class="p-4">
-                                                <div class="kt-skeleton w-20 h-6 rounded"></div>
                                             </td>
                                             <td class="p-4">
                                                 <div class="kt-skeleton w-8 h-8 rounded"></div>
@@ -561,11 +451,6 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <span class={getDifficultyBadgeClass(profile.recruitment_difficulty)}>
-                                                    {profile.recruitment_difficulty_display}
-                                                </span>
-                                            </td>
-                                            <td>
                                                 <div class="flex flex-col gap-1">
                                                     <span class="text-sm font-medium">{profile.avg_salary_month}</span>
                                                     <span class="text-xs text-muted-foreground">
@@ -573,27 +458,17 @@
                                                     </span>
                                                 </div>
                                             </td>
+
+                                            <!-- Recruitment Cost -->
                                             <td>
                                                 <div class="flex flex-col gap-1">
-                                                    <span class="text-xs text-muted-foreground">Recruitment: {profile.recruitment_cost_per_employee}</span>
-                                                    <span class="text-xs text-muted-foreground">Training: {profile.training_cost_per_employee}</span>
-                                                    <span class="text-xs text-muted-foreground">Training Duration: {profile.training_duration_days}d</span>
+                                                    <span class="text-sm font-medium">{profile.avg_recruitment_cost}</span>
+                                                    <span class="text-xs text-muted-foreground">
+                                                        {profile.min_recruitment_cost} - {profile.max_recruitment_cost}
+                                                    </span>
                                                 </div>
                                             </td>
-                                            <td>
-                                                <div class="flex flex-wrap gap-1">
-                                                    {#each (profile.skills || []).slice(0, 2) as skill}
-                                                        <span class="kt-badge kt-badge-outline kt-badge-success kt-badge-sm">
-                                                            {skill}
-                                                        </span>
-                                                    {/each}
-                                                    {#if (profile.skills || []).length > 2}
-                                                        <span class="kt-badge kt-badge-outline kt-badge-secondary kt-badge-sm">
-                                                            +{(profile.skills || []).length - 2} more
-                                                        </span>
-                                                    {/if}
-                                                </div>
-                                            </td>
+
                                             <td class="text-center">
                                                 <div class="kt-menu flex-inline" data-kt-menu="true">
                                                     <div class="kt-menu-item" data-kt-menu-item-offset="0, 10px" data-kt-menu-item-placement="bottom-end" data-kt-menu-item-placement-rtl="bottom-start" data-kt-menu-item-toggle="dropdown" data-kt-menu-item-trigger="click">
