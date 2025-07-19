@@ -27,6 +27,8 @@ class ProductsController extends Controller
         $hasExpirationFilter = IndexService::checkIfBoolean($request->query('has_expiration'));
         $elasticityMin = IndexService::checkIfNumber($request->query('elasticity_min'));
         $elasticityMax = IndexService::checkIfNumber($request->query('elasticity_max'));
+        $storageCostMin = IndexService::checkIfNumber($request->query('storage_cost_min'));
+        $storageCostMax = IndexService::checkIfNumber($request->query('storage_cost_max'));
         $shelfLifeMin = IndexService::checkIfNumber($request->query('shelf_life_min'));
         $shelfLifeMax = IndexService::checkIfNumber($request->query('shelf_life_max'));
         $needTechnology = IndexService::checkIfBoolean($request->query('need_technology'));
@@ -51,6 +53,15 @@ class ProductsController extends Controller
 
         if ($elasticityMax) {
             $products->where('elasticity_coefficient', '<=', $elasticityMax);
+        }
+
+        // Apply storage cost range filters
+        if ($storageCostMin) {
+            $products->where('storage_cost', '>=', $storageCostMin);
+        }
+
+        if ($storageCostMax) {
+            $products->where('storage_cost', '<=', $storageCostMax);
         }
 
         // Apply shelf life range filters

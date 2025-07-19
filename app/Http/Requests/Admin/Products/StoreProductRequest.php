@@ -27,6 +27,7 @@ class StoreProductRequest extends FormRequest
             'description' => 'nullable|string',
             'type' => 'required|in:raw_material,component,finished_product',
             'elasticity_coefficient' => 'required|numeric|min:-1|max:1',
+            'storage_cost' => 'required|numeric|min:0', 
             'has_expiration' => 'required|boolean',
             'shelf_life_days' => 'required_if:has_expiration,true|integer|min:1',
             'measurement_unit' => 'required|string|max:255',
@@ -45,6 +46,7 @@ class StoreProductRequest extends FormRequest
     {
         return [
             'elasticity_coefficient' => 'elasticity coefficient',
+            'storage_cost' => 'storage cost',
             'shelf_life_days' => 'shelf life (days)',
             'has_expiration' => 'has expiration',
             'measurement_unit' => 'measurement unit',

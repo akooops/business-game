@@ -90,6 +90,26 @@ class InventoryService
         }
     }
 
+    public static function payInventoryCosts($company){
+        $products = Product::where('storage_cost', '>', 0)->get();
+
+        foreach($products as $product){
+            $leftAvailableStock = $company->inventoryMovements()->where([
+                'product_id' => $product->id,
+                'movement_type' => InventoryMovement::MOVEMENT_TYPE_IN,
+            ])->sum('current_quantity');
+
+            $companyProduct = $company->companyProducts()->where('product_id', $product->id)->first();
+
+            if(!$companyProduct || $leftAvailableStock <= 0){
+                continue;
+            }
+
+            FinanceService::payInventoryCosts($company, $product, $leftAvailableStock);
+            NotificationService::createInventoryCostsPaidNotification($company, $product, $leftAvailableStock);
+        }
+    }
+
     public static function saleConfirmed($sale){
         $company = $sale->company;
         $product = $sale->product;

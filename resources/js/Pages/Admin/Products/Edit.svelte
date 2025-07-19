@@ -2,6 +2,7 @@
     import AdminLayout from '../../Layouts/AdminLayout.svelte';
     import { onMount, tick } from 'svelte';
     import { router } from '@inertiajs/svelte';
+    import Select2 from '../../Components/Forms/Select2.svelte';
 
     // Props from the server
     export let product;
@@ -35,9 +36,12 @@
         description: product.description || '',
         type: product.type || 'raw_material',
         elasticity_coefficient: product.elasticity_coefficient || 0,
+        storage_cost: product.storage_cost || 0,
         shelf_life_days: product.shelf_life_days || '',
         has_expiration: product.has_expiration || false,
         measurement_unit: product.measurement_unit || '',
+        need_technology: product.need_technology || false,
+        technology_id: product.technology_id || null,
         file: null
     };
 
@@ -49,6 +53,12 @@
 
     // File preview
     let filePreview = null;
+
+    // Selected technology
+    let selectedTechnology = null;
+
+    // Select2 component reference
+    let technologySelectComponent;
 
     // Handle file input change
     function handleFileChange(event) {
@@ -71,6 +81,24 @@
         }
     }
 
+    // Handle need technology toggle
+    function handleNeedTechnologyToggle() {
+        form.need_technology = !form.need_technology;
+        if (!form.need_technology) {
+            form.technology_id = null;
+            selectedTechnology = null;
+            if (technologySelectComponent) {
+                technologySelectComponent.clear();
+            }
+        }
+    }
+
+    // Handle technology selection
+    function handleTechnologySelect(event) {
+        form.technology_id = event.detail.value;
+        selectedTechnology = event.detail.data;
+    }
+
     // Handle form submission
     function handleSubmit() {
         loading = true;
@@ -82,7 +110,7 @@
             if (form[key] !== null && form[key] !== '') {
                 if (key === 'file' && form.file) {
                     formData.append(key, form.file);
-                } else if (key === 'has_expiration') {
+                } else if (key === 'has_expiration' || key === 'need_technology') {
                     formData.append(key, form[key] ? '1' : '0');
                 } else if (key !== 'file') {
                     formData.append(key, form[key]);
@@ -107,6 +135,11 @@
     // Initialize components after mount
     onMount(async () => {
         await tick();
+        
+        // Pre-select technology if product has one
+        if (product.technology && form.need_technology) {
+            selectedTechnology = product.technology;
+        }
     });
 </script>
 
@@ -246,6 +279,28 @@
                                 {/if}
                             </div>
 
+                            <!-- Storage Cost -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-medium text-mono" for="storage_cost">
+                                    Storage Cost <span class="text-destructive">*</span>
+                                </label>
+                                <input
+                                    id="storage_cost"
+                                    type="number"
+                                    step="0.001"
+                                    min="0"
+                                    class="kt-input {errors.storage_cost ? 'kt-input-error' : ''}"
+                                    placeholder="1.0"
+                                    bind:value={form.storage_cost}
+                                />
+                                <p class="text-xs text-secondary-foreground">
+                                    Storage cost per day per unit
+                                </p>
+                                {#if errors.storage_cost}
+                                    <p class="text-sm text-destructive">{errors.storage_cost}</p>
+                                {/if}
+                            </div>
+
                             <!-- Has Expiration -->
                             <div class="flex flex-col gap-2">
                                 <label class="text-sm font-medium text-mono">
@@ -283,6 +338,88 @@
                                     />
                                     {#if errors.shelf_life_days}
                                         <p class="text-sm text-destructive">{errors.shelf_life_days}</p>
+                                    {/if}
+                                </div>
+                            {/if}
+
+                            <!-- Need Technology -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-medium text-mono">
+                                    This product requires a specific technology
+                                </label>
+                                <div class="flex items-center gap-3">
+                                    <input 
+                                        class="kt-switch" 
+                                        type="checkbox" 
+                                        id="need_technology" 
+                                        bind:checked={form.need_technology}
+                                    />
+                                    <label class="kt-label cursor-pointer" for="need_technology">
+                                        This product needs a technology to be produced
+                                    </label>
+                                </div>
+                                {#if errors.need_technology}
+                                    <p class="text-sm text-destructive">{errors.need_technology}</p>
+                                {/if}
+                            </div>
+
+                            <!-- Technology Selection (conditional) -->
+                            {#if form.need_technology}
+                                <div class="flex flex-col gap-2">
+                                    <label class="text-sm font-medium text-mono" for="technology_id">
+                                        Technology <span class="text-destructive">*</span>
+                                    </label>
+                                    <Select2
+                                        bind:this={technologySelectComponent}
+                                        id="technology_id"
+                                        placeholder="Search and select technology..."
+                                        on:select={handleTechnologySelect}
+                                        ajax={{
+                                            url: route('admin.technologies.index'),
+                                            dataType: 'json',
+                                            delay: 300,
+                                            data: function(params) {
+                                                return {
+                                                    search: params.term,
+                                                    perPage: 10
+                                                };
+                                            },
+                                            processResults: function(data) {
+                                                return {
+                                                    results: data.technologies.map(technology => ({
+                                                        id: technology.id,
+                                                        text: technology.name,
+                                                        name: technology.name,
+                                                        level: technology.level,
+                                                        research_cost: technology.research_cost,
+                                                        research_time_days: technology.research_time_days,
+                                                        image_url: technology.image_url
+                                                    }))
+                                                };
+                                            },
+                                            cache: true
+                                        }}
+                                        templateResult={function(data) {
+                                            if (data.loading) return data.text;
+                                            
+                                            const $elem = globalThis.$('<div class="flex items-center gap-3">' +
+                                                '<div class="flex items-center justify-center size-12 shrink-0 rounded bg-accent/50">' +
+                                                (data.image_url ? '<img src="' + data.image_url + '" alt="" class="size-10 object-cover rounded">' : '<i class="ki-filled ki-technology-1 text-lg text-muted-foreground"></i>') +
+                                                '</div>' +
+                                                '<div class="flex flex-col">' +
+                                                '<span class="font-medium text-sm">' + data.name + '</span>' +
+                                                '<span class="text-xs text-muted-foreground">Level: ' + data.level + ' | Cost: ' + data.research_cost + ' | Time: ' + data.research_time_days + ' days</span>' +
+                                                '</div>' +
+                                                '</div>');
+                                            return $elem;
+                                        }}
+                                        templateSelection={function(data) {
+                                            if (!data.id) return data.text;
+                                            return data.name;
+                                        }}
+                                    />
+                                    {#if errors.technology_id}
+                                        <p class="text-sm text-destructive">{errors.technology_id}</p>
                                     {/if}
                                 </div>
                             {/if}

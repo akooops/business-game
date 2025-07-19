@@ -33,6 +33,7 @@
         description: '',
         type: 'raw_material',
         elasticity_coefficient: 0,
+        storage_cost: 0,
         shelf_life_days: '',
         has_expiration: false,
         measurement_unit: '',
@@ -267,6 +268,28 @@
                                 {/if}
                             </div>
 
+                            <!-- Storage Cost -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-medium text-mono" for="storage_cost">
+                                    Storage Cost <span class="text-destructive">*</span>
+                                </label>
+                                <input
+                                    id="storage_cost"
+                                    type="number"
+                                    step="0.001"
+                                    min="0"
+                                    class="kt-input {errors.storage_cost ? 'kt-input-error' : ''}"
+                                    placeholder="1.0"
+                                    bind:value={form.storage_cost}
+                                />
+                                <p class="text-xs text-secondary-foreground">
+                                    Storage cost per day per unit
+                                </p>
+                                {#if errors.storage_cost}
+                                    <p class="text-sm text-destructive">{errors.storage_cost}</p>
+                                {/if}
+                            </div>
+
                             <!-- Has Expiration -->
                             <div class="flex flex-col gap-2">
                                 <label class="text-sm font-medium text-mono">
@@ -329,7 +352,7 @@
                                 {/if}
                             </div>
 
-                                                         <!-- Technology Selection (conditional) -->
+                            <!-- Technology Selection (conditional) -->
                              {#if form.need_technology}
                                  <div class="flex flex-col gap-2">
                                      <label class="text-sm font-medium text-mono" for="technology_id">

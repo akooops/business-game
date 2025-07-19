@@ -255,6 +255,16 @@ class NotificationService
         ]);
     }
 
+    public static function createInventoryCostsPaidNotification($company, $product, $quantity){
+        return Notification::create([
+            'type' => Notification::TYPE_INVENTORY_COSTS_PAID,
+            'title' => 'Inventory Costs Paid',
+            'message' => "Inventory costs paid for {$product->name} with quantity of {$quantity}.",
+            'url' => route('company.inventory.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
     public static function getUnreadCount()
     {
         return Notification::where('user_id', auth()->user()->id)->whereNull('read_at')->count();

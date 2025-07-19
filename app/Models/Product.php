@@ -15,6 +15,7 @@ class Product extends Model
 
     protected $casts = [
         'elasticity_coefficient' => 'decimal:3',
+        'storage_cost' => 'decimal:3',
         'has_expiration' => 'boolean',
         'need_technology' => 'boolean',
     ];

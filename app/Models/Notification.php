@@ -51,11 +51,16 @@ class Notification extends Model
     // Inventory damaged
     const TYPE_INVENTORY_DAMAGED = 'inventory_damaged';
 
+    // Inventory costs
+    const TYPE_INVENTORY_COSTS_PAID = 'inventory_costs_paid';
+
     // Sales
     const TYPE_SALE_INITIATED = 'sale_initiated';
     const TYPE_SALE_DELIVERED = 'sale_delivered';
     const TYPE_SALE_CANCELLED = 'sale_cancelled';
     const TYPE_SALE_DELIVERY_DELAYED = 'sale_delivery_delayed';
+
+
 
     // Icons for different notification types
     const ICONS = [
@@ -76,6 +81,7 @@ class Notification extends Model
         self::TYPE_SUEZ_CANAL_OPENED => 'ki-filled ki-ship',
         self::TYPE_INVENTORY_EXPIRED => 'ki-filled ki-dropbox',
         self::TYPE_INVENTORY_DAMAGED => 'ki-filled ki-dropbox',
+        self::TYPE_INVENTORY_COSTS_PAID => 'ki-filled ki-dropbox',
         self::TYPE_SALE_INITIATED => 'ki-filled ki-ship',
         self::TYPE_SALE_DELIVERED => 'ki-filled ki-ship',
         self::TYPE_SALE_CANCELLED => 'ki-filled ki-ship',

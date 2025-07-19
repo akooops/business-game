@@ -47,4 +47,14 @@ class FinanceService
 
         return $funds;
     }
+
+    public static function payInventoryCosts($company, $product, $leftAvailableStock){
+        $funds = $company->funds;
+        $funds -= $product->storage_cost * $leftAvailableStock;
+        $company->update(['funds' => $funds]);
+
+        NotificationService::createFinanceFundsChangedNotification($company, $product->storage_cost * $leftAvailableStock);
+
+        return $funds;
+    }
 }

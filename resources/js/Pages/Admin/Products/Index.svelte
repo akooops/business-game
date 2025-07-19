@@ -36,6 +36,8 @@
     let hasExpirationFilter = '';
     let elasticityMin = '';
     let elasticityMax = '';
+    let storageCostMin = '';
+    let storageCostMax = '';
     let shelfLifeMin = '';
     let shelfLifeMax = '';
     let needTechnologyFilter = '';
@@ -93,6 +95,12 @@
             }
             if (elasticityMax) {
                 params.append('elasticity_max', elasticityMax);
+            }
+            if (storageCostMin) {
+                params.append('storage_cost_min', storageCostMin);
+            }
+            if (storageCostMax) {
+                params.append('storage_cost_max', storageCostMax);
             }
             if (shelfLifeMin) {
                 params.append('shelf_life_min', shelfLifeMin);
@@ -176,6 +184,8 @@
         hasExpirationFilter = '';
         elasticityMin = '';
         elasticityMax = '';
+        storageCostMin = '';
+        storageCostMax = '';
         shelfLifeMin = '';
         shelfLifeMax = '';
         needTechnologyFilter = '';
@@ -407,6 +417,32 @@
                                         class="kt-input flex-1" 
                                         placeholder="Max" 
                                         bind:value={elasticityMax}
+                                        on:input={handleFilterChange}
+                                        step="0.1"
+                                        min="0"
+                                    />
+                                </div>
+                            </div>
+
+                            <!-- Storage Cost Range -->
+                            <div class="space-y-2">
+                                <h4 class="text-sm font-medium text-gray-700">Storage Cost</h4>
+                                
+                                <div class="flex gap-2">
+                                    <input 
+                                        type="number" 
+                                        class="kt-input flex-1" 
+                                        placeholder="Min" 
+                                        bind:value={storageCostMin}
+                                        on:input={handleFilterChange}
+                                        step="0.1"
+                                        min="0"
+                                    />
+                                    <input 
+                                        type="number" 
+                                        class="kt-input flex-1" 
+                                        placeholder="Max" 
+                                        bind:value={storageCostMax}
                                         on:input={handleFilterChange}
                                         step="0.1"
                                         min="0"

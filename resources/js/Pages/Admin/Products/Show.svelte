@@ -151,6 +151,17 @@
                             </p>
                         </div>
 
+                        <!-- Storage Cost -->
+                        <div class="flex flex-col gap-2">
+                            <h4 class="text-sm font-semibold text-mono">Storage Cost</h4>
+                            <p class="text-sm text-secondary-foreground">
+                                {product?.storage_cost}
+                                <span class="text-xs text-muted-foreground ml-2">
+                                    (Storage cost per day per unit)
+                                </span>
+                            </p>
+                        </div>
+
                         <!-- Has Expiration -->
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Product Expiration</h4>
