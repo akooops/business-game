@@ -37,8 +37,8 @@ class SalesService
                 $demandForWeek = $productDemand->max_demand;
             }
 
-            if($demandForWeek < $productDemand->min_demand){
-                $demandForWeek = $productDemand->min_demand;
+            if($demandForWeek <= 0){
+                $demandForWeek = 0;
             }
 
             $weekSalesQuantity = $company->sales()->where('product_id', $product->id)->where('gameweek', SettingsService::getCurrentGameWeek())->sum('quantity');
@@ -48,35 +48,10 @@ class SalesService
             // Calculate base daily demand
             $baseDailyDemand = $demandForWeek / 7;
             
-            // Add fluctuations to daily demand
-            $fluctuationFactor = (rand(60, 140) / 100); // Random factor between 0.6 and 1.4 (40% variation)
-            
-            // Apply day-of-week patterns (weekends might have different demand)
-            $currentDayOfWeek = SettingsService::getCurrentTimestamp()->dayOfWeek; // 0 = Sunday, 6 = Saturday
-            $dayOfWeekFactor = 1.0;
-            
-            // Adjust demand based on day of week
-            if ($currentDayOfWeek == 0 || $currentDayOfWeek == 6) {
-                // Weekend - potentially higher or lower demand depending on product type
-                $dayOfWeekFactor = rand(80, 120) / 100; // 20% variation for weekends
-            } else {
-                // Weekday - standard demand
-                $dayOfWeekFactor = rand(90, 110) / 100; // 10% variation for weekdays
-            }
-            
-            // Calculate final daily demand with fluctuations
-            $dailyDemand = $baseDailyDemand * $fluctuationFactor * $dayOfWeekFactor;
-
-            if($dailyDemand < $productDemand->min_demand){
-                $dailyDemand = $productDemand->min_demand;
-            }
-
-            if($dailyDemand > $productDemand->max_demand){
-                $dailyDemand = $productDemand->max_demand;
-            }
+            $dailyDemand = CalculationsService::calculatePertValue($baseDailyDemand * 0.9, $baseDailyDemand, $baseDailyDemand * 1.1);
 
             // Generate the number of sales
-            $numberOfSales = rand(0, 7);
+            $numberOfSales = rand(0, 3);
             
             // Generate individual sale quantities with fluctuations
             $saleQuantities = [];
@@ -97,14 +72,11 @@ class SalesService
             
             // Create the sales
             for($i = 0; $i < $numberOfSales; $i++){
-                $saleDemand = $saleQuantities[$i];
+                $saleDemand = round($saleQuantities[$i]);
 
                 $randomWilaya = Wilaya::inRandomOrder()->first();
 
                 $wilayaShippingCost = $randomWilaya->real_shipping_cost;
-                $wilayaShippingTimeDays = CalculationsService::calculatePertValue($randomWilaya->min_shipping_time_days, $randomWilaya->avg_shipping_time_days, $randomWilaya->max_shipping_time_days);
-
-                $wilayaShippingCost = $wilayaShippingCost * $saleDemand;
 
                 // Get current timestamp
                 $gameWeek = SettingsService::getCurrentGameWeek();
@@ -119,7 +91,7 @@ class SalesService
                     'sale_price' => $companyProduct->sale_price,
 
                     'shipping_cost' => $wilayaShippingCost,
-                    'shipping_time_days' => $wilayaShippingTimeDays,
+                    'shipping_time_days' => $randomWilaya->avg_shipping_time_days,
 
                     'status' => Sale::STATUS_INITIATED,
 

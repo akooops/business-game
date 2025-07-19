@@ -63,7 +63,7 @@ class InventoryService
                     continue;
                 }
 
-                $leftAvailableStock = $inventory->original_quantity - $inventory->current_quantity;
+                $leftAvailableStock = $inventory->current_quantity;
 
                 if($leftAvailableStock <= 0){
                     continue;
@@ -79,6 +79,7 @@ class InventoryService
                 ]);
     
                 $companyProduct->update(['available_stock' => $companyProduct->available_stock - $leftAvailableStock]);
+                $inventory->update(['current_quantity' => 0]);
 
                 $expiredQuantity += $leftAvailableStock;
             }

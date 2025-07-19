@@ -95,7 +95,7 @@
         
         // Calculate purchase data using the pivot data
         const subtotal = supplierProduct.pivot.real_sale_price * quantity;
-        const shippingCost = supplier.avg_shipping_cost * quantity;
+        const shippingCost = supplier.real_shipping_cost * quantity;
         let customsDuties = 0;
         
         // Calculate customs duties for international suppliers
@@ -586,7 +586,7 @@
                                         Shipping
                                     </span>
                                     <span class="text-sm font-medium text-mono">
-                                        DZD {(purchaseData.supplier.avg_shipping_cost * purchaseData.quantity).toFixed(3)}
+                                        DZD {(purchaseData.supplier.real_shipping_cost * purchaseData.quantity).toFixed(3)}
                                     </span>
                                 </div>
                                 {#if purchaseData.supplier.country && purchaseData.supplier.country.allows_imports}

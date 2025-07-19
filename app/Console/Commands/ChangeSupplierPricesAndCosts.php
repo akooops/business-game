@@ -43,7 +43,7 @@ class ChangeSupplierPricesAndCosts extends Command
                 'real_shipping_cost' => CalculationsService::calculatePertValue($supplier->min_shipping_cost, $supplier->avg_shipping_cost, $supplier->max_shipping_cost),
             ]);
 
-            $supplierProducts = $supplier->products()->get();
+            $supplierProducts = $supplier->supplierProducts()->get();
 
             foreach($supplierProducts as $supplierProduct){
                 $this->info('Processing supplier product: ' . $supplierProduct->product->name);

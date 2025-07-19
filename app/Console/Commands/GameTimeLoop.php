@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Services\SettingsService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class GameTimeLoop extends Command
 {
@@ -58,7 +59,8 @@ class GameTimeLoop extends Command
 
         // Change supplier prices and costs
         $currentHour = (int) $currentTime->copy()->format('H');
-        
+        Log::info('Current hour: ' . $currentHour);
+
         if($currentHour == 8){
             $this->call('game:change-supplier-prices-and-costs');
             $this->call('game:change-wilayas-costs');

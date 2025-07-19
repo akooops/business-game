@@ -60,6 +60,10 @@
     let showSaleModal = false;
     let confirmingSale = false;
 
+    // Drawer state for confirmed sales
+    let selectedConfirmedSale = null;
+    let showSaleDrawer = false;
+
     // Fetch sales data
     async function fetchSales() {
         loading = true;
@@ -240,6 +244,30 @@
         showSaleModal = false;
         selectedSale = null;
         confirmingSale = false;
+        
+        // Simulate button click to use KT framework logic
+        const dismissButton = document.querySelector('[data-kt-modal-dismiss="#sale_modal"]');
+        if (dismissButton) {
+            dismissButton.click();
+        }
+    }
+
+    // Open sale drawer for confirmed sales
+    function openSaleDrawer(sale) {
+        selectedConfirmedSale = sale;
+        showSaleDrawer = true;
+        
+        // Show drawer
+        const toggleButton = document.querySelector('[data-kt-drawer-toggle="#sale_drawer"]');
+        if (toggleButton) {
+            toggleButton.click();
+        }
+    }
+
+    // Close sale drawer
+    function closeSaleDrawer() {
+        showSaleDrawer = false;
+        selectedConfirmedSale = null;
     }
 
     // Confirm sale
@@ -661,7 +689,13 @@
                         <div class="p-6">
                             <div class="grid grid-cols-1 gap-6 p-4">
                                 {#each sales as sale}
-                                    <div class="kt-card kt-card-hover cursor-pointer" on:click={() => openSaleModal(sale)}>
+                                    <div class="kt-card kt-card-hover cursor-pointer" on:click={() => {
+                                        if (sale.status === 'initiated') {
+                                            openSaleModal(sale);
+                                        } else {
+                                            openSaleDrawer(sale);
+                                        }
+                                    }}>
                                         <div class="kt-card-header justify-start bg-muted/70 gap-9 h-auto py-5">
                                             <div class="flex flex-col gap-1.5">
                                                 <span class="text-xs font-normal text-secondary-foreground">
@@ -797,6 +831,9 @@
     <!-- Hidden button to trigger modal -->
     <button style="display:none" data-kt-modal-toggle="#sale_modal"></button>
 
+    <!-- Hidden button to trigger drawer -->
+    <button style="display:none" data-kt-drawer-toggle="#sale_drawer"></button>
+
     <!-- Sale Confirmation Modal -->
     <div class="kt-modal" data-kt-modal="true" id="sale_modal">
         <div class="kt-modal-content max-w-[600px] top-[5%]">
@@ -900,14 +937,6 @@
                                     </span>
                                 </div>
                             </div>
-                            <div class="kt-card-footer flex justify-between items-center px-5">
-                                <span class="text-sm font-normal text-secondary-foreground">
-                                    Total Revenue
-                                </span>
-                                <span class="text-base font-semibold text-mono">
-                                    DZD {((selectedSale.sale_price + selectedSale.shipping_cost) * selectedSale.quantity).toFixed(3)}
-                                </span>
-                            </div>
                         </div>
 
                         <!-- Important Notice -->
@@ -960,6 +989,193 @@
                     </button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Sale Details Drawer -->
+    <div class="hidden kt-drawer kt-drawer-end card flex-col max-w-[90%] w-[450px] top-5 bottom-5 end-5 rounded-xl border border-border" data-kt-drawer="true" data-kt-drawer-container="body" id="sale_drawer">
+        <div class="flex items-center justify-between gap-2.5 text-sm text-mono font-semibold px-5 py-2.5 border-b border-b-border">
+            Sale Details
+            <button class="kt-btn kt-btn-sm kt-btn-icon kt-btn-dim shrink-0" data-kt-drawer-dismiss="true" on:click={closeSaleDrawer}>
+                <i class="ki-filled ki-cross"></i>
+            </button>
+        </div>
+        
+        <div class="kt-card-content flex flex-col space-y-3 p-5 kt-scrollable-y-auto">
+            {#if selectedConfirmedSale}
+                <!-- Sale Image -->
+                <div class="kt-card relative items-center justify-center bg-accent/50 mb-6.5 h-[180px] shadow-none">
+                    {#if selectedConfirmedSale.product.image_url}
+                        <img 
+                            src={selectedConfirmedSale.product.image_url} 
+                            alt={selectedConfirmedSale.product.name}
+                            class="h-[180px] w-full object-cover rounded-sm"
+                        />
+                    {:else}
+                        <div class="flex items-center justify-center h-full">
+                            <i class="ki-filled ki-abstract-26 text-4xl text-muted-foreground"></i>
+                        </div>
+                    {/if}
+                </div>
+
+                <!-- Sale Name -->
+                <span class="text-base font-medium text-mono">
+                    {selectedConfirmedSale.product.name}
+                </span>
+
+                <!-- Sale Details -->
+                <div class="flex flex-col gap-2.5">
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-xs font-normal text-foreground min-w-14 xl:min-w-24 shrink-0">
+                            Sale ID
+                        </span>
+                        <div>
+                            <span class="text-xs font-medium text-foreground">
+                                #{selectedConfirmedSale.id}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-xs font-normal text-foreground min-w-14 xl:min-w-24 shrink-0">
+                            Status
+                        </span>
+                        <div>
+                            <span class="kt-badge kt-badge-sm {getStatusBadgeClass(selectedConfirmedSale.status)}">
+                                {getStatusText(selectedConfirmedSale.status)}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-xs font-normal text-foreground min-w-14 xl:min-w-24 shrink-0">
+                            Wilaya
+                        </span>
+                        <div>
+                            <span class="text-xs font-medium text-foreground">
+                                {selectedConfirmedSale.wilaya.name}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-xs font-normal text-foreground min-w-14 xl:min-w-24 shrink-0">
+                            Quantity
+                        </span>
+                        <div>
+                            <span class="text-xs font-medium text-foreground">
+                                {selectedConfirmedSale.quantity}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-xs font-normal text-foreground min-w-14 xl:min-w-24 shrink-0">
+                            Sale Price
+                        </span>
+                        <div>
+                            <span class="text-xs font-medium text-foreground">
+                                DZD {selectedConfirmedSale.sale_price}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-xs font-normal text-foreground min-w-14 xl:min-w-24 shrink-0">
+                            Shipping Cost
+                        </span>
+                        <div>
+                            <span class="text-xs font-medium text-foreground">
+                                DZD {selectedConfirmedSale.shipping_cost}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-xs font-normal text-foreground min-w-14 xl:min-w-24 shrink-0">
+                            Shipping Time
+                        </span>
+                        <div>
+                            <span class="text-xs font-medium text-foreground">
+                                {selectedConfirmedSale.shipping_time_days} days
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-xs font-normal text-foreground min-w-14 xl:min-w-24 shrink-0">
+                            Initiated At
+                        </span>
+                        <div>
+                            <span class="text-xs font-medium text-foreground">
+                                {formatTimestamp(selectedConfirmedSale.initiated_at)}
+                            </span>
+                        </div>
+                    </div>
+                    {#if selectedConfirmedSale.confirmed_at}
+                        <div class="flex items-center gap-2.5">
+                            <span class="text-xs font-normal text-foreground min-w-14 xl:min-w-24 shrink-0">
+                                Confirmed At
+                            </span>
+                            <div>
+                                <span class="text-xs font-medium text-foreground">
+                                    {formatTimestamp(selectedConfirmedSale.confirmed_at)}
+                                </span>
+                            </div>
+                        </div>
+                    {/if}
+                    {#if selectedConfirmedSale.estimated_delivered_at}
+                        <div class="flex items-center gap-2.5">
+                            <span class="text-xs font-normal text-foreground min-w-14 xl:min-w-24 shrink-0">
+                                Estimated Delivery
+                            </span>
+                            <div>
+                                <span class="text-xs font-medium text-foreground">
+                                    {formatTimestamp(selectedConfirmedSale.estimated_delivered_at)}
+                                </span>
+                            </div>
+                        </div>
+                    {/if}
+                    {#if selectedConfirmedSale.delivered_at}
+                        <div class="flex items-center gap-2.5">
+                            <span class="text-xs font-normal text-foreground min-w-14 xl:min-w-24 shrink-0">
+                                Delivered At
+                            </span>
+                            <div>
+                                <span class="text-xs font-medium text-foreground">
+                                    {formatTimestamp(selectedConfirmedSale.delivered_at)}
+                                </span>
+                            </div>
+                        </div>
+                    {/if}
+                </div>
+
+                <div class="border-t border-border"></div>
+
+                <!-- Sale Summary -->
+                <div class="kt-card bg-accent/50">
+                    <div class="kt-card-header px-5">
+                        <h3 class="kt-card-title">
+                            Sale Summary
+                        </h3>
+                    </div>
+                    <div class="kt-card-content px-5 py-4 space-y-2">
+                        <h4 class="text-sm font-medium text-mono mb-3.5">
+                            Price Details
+                        </h4>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-normal text-secondary-foreground">
+                                Subtotal
+                            </span>
+                            <span class="text-sm font-medium text-mono">
+                                DZD {(selectedConfirmedSale.sale_price * selectedConfirmedSale.quantity).toFixed(3)}
+                            </span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-normal text-secondary-foreground">
+                                Shipping
+                            </span>
+                            <span class="text-sm font-medium text-mono">
+                                DZD {(selectedConfirmedSale.shipping_cost * selectedConfirmedSale.quantity).toFixed(3)}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+            {/if}
         </div>
     </div>
 </CompanyLayout> 

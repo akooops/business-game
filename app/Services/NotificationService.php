@@ -12,7 +12,7 @@ class NotificationService
         return Notification::create([
             'type' => Notification::TYPE_FINANCE_FUNDS_CHANGED,
             'title' => 'Funds Changed',
-            'message' => "Funds deducted by DZD " . $amount . ". New balance: DZD " . $company->funds,
+            'message' => "Funds changed by DZD " . $amount . ". New balance: DZD " . $company->funds,
             'url' => route('company.dashboard.index'),
             'user_id' => $company->user_id,
         ]);
