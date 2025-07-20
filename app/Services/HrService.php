@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Employee;
+use App\Services\SettingsService;
 
 class HrService
 {
@@ -32,7 +33,7 @@ class HrService
 
             // Calculate mood decay rate (lambda for exponential distribution)
             // Higher salary means slower decay (smaller lambda)
-            $base_mood_decay_lambda = rand(1, 100) / 100;
+            $base_mood_decay_lambda = rand(1, 5) / 350;
             $mood_decay_rate_days = $base_mood_decay_lambda / $factor;
 
             // Calculate efficiency factor as simple multiplier for machine speed
@@ -88,6 +89,26 @@ class HrService
         return $errors;
     }
 
+    public static function validatePromotion($employee){    
+        $errors = [];
+
+        if($employee->status != Employee::STATUS_ACTIVE){
+            $errors['status'] = 'This employee is not active.';
+        }
+
+        return $errors;
+    }
+
+    public static function validateFiring($employee){
+        $errors = [];
+
+        if($employee->status != Employee::STATUS_ACTIVE){
+            $errors['status'] = 'This employee is not active.';
+        }
+
+        return $errors;
+    }
+
     public static function recruitEmployee($employee){       
         $employee->update([
             'status' => Employee::STATUS_ACTIVE,
@@ -96,5 +117,96 @@ class HrService
 
         FinanceService::payEmployeeRecruitmentCost($employee->company, $employee);
         NotificationService::createEmployeeHiredNotification($employee);
+    }
+
+    public static function paySalaries($company){
+        $totalSalaries = $company->employees()->where('status', Employee::STATUS_ACTIVE)->sum('salary_month');
+
+        FinanceService::payEmployeesSalary($company, $totalSalaries);
+        NotificationService::createEmployeeSalaryPaidNotification($company, $totalSalaries);
+    }
+
+    public static function processEmployeesMood($company){
+        $employees = $company->employees()->where('status', Employee::STATUS_ACTIVE)->get();
+
+        foreach($employees as $employee){
+            $mood = $employee->current_mood;
+            $mood_decay_rate_days = $employee->mood_decay_rate_days;
+            
+            // Calculate mood decay: subtract the decay rate from current mood
+            // Both values are between 0 and 1, so we just subtract directly
+            $mood -= $mood_decay_rate_days;
+            
+            // Ensure mood doesn't go below 0
+            if($mood < 0){
+                $mood = 0;
+            }
+
+            // Check for resignation if mood is below 40%
+            if($mood < 0.4){
+                // Calculate resignation probability based on mood
+                // Lower mood = higher probability
+                $baseProbability = 5; // 5% base chance
+                $moodMultiplier = (0.4 - $mood) / 0.4; // 0 to 1 multiplier
+                $resignationProbability = $baseProbability + ($moodMultiplier * 15); // Max 20% at mood 0
+                
+                $resignationChance = rand(1, 100);
+                if($resignationChance <= $resignationProbability){
+                    // Employee resigns
+                    $employee->update([
+                        'status' => Employee::STATUS_RESIGNED,
+                        'resigned_at' => SettingsService::getCurrentTimestamp(),
+                        'current_mood' => $mood
+                    ]);
+                    
+                    // Create resignation notification
+                    NotificationService::createEmployeeResignedNotification($employee);
+                    continue; // Skip mood update since employee resigned
+                }
+            }else if($mood < 0.5){
+                NotificationService::createEmployeeMoodDecreasedNotification($employee);
+            }
+            
+            $employee->update([
+                'current_mood' => $mood
+            ]);
+        }
+    }
+
+    public static function promoteEmployee($employee, $newSalary){
+        $factor = $newSalary / $employee->salary_month;
+        $mood_decay_rate_days = $employee->mood_decay_rate_days / $factor;
+
+        $employee->update([
+            'salary_month' => $newSalary,
+            'current_mood' => min(1, $employee->current_mood * $factor),
+            'efficiency_factor' => min(4, $employee->efficiency_factor * $factor),
+            'mood_decay_rate_days' => $mood_decay_rate_days,
+            'last_promotion_at' => SettingsService::getCurrentTimestamp(),
+        ]);
+    }
+
+    public static function fireEmployee($employee){
+        $employee->update([
+            'status' => Employee::STATUS_FIRED,
+            'fired_at' => SettingsService::getCurrentTimestamp(),
+        ]);
+
+        $companyEmployees = $employee->company->employees()->where('status', Employee::STATUS_ACTIVE)->get();
+
+        foreach($companyEmployees as $companyEmployee){
+            // Decrease mood by random amount between 5% to 15%
+            $moodDecrease = rand(5, 15) / 100; // Convert to decimal (0.05 to 0.15)
+            $newMood = $companyEmployee->current_mood - $moodDecrease;
+            
+            // Ensure mood doesn't go below 0
+            if($newMood < 0){
+                $newMood = 0;
+            }
+            
+            $companyEmployee->update([
+                'current_mood' => $newMood,
+            ]);
+        }
     }
 }

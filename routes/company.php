@@ -64,6 +64,8 @@ Route::prefix('company')->middleware(['auth', 'check.company', 'handle.inertia']
     Route::get('/employees', [EmployeesController::class, 'index'])->middleware('check.permission:company.employees.index')->name('company.employees.index');
     Route::get('/employees/recruit-page', [EmployeesController::class, 'recruitPage'])->middleware('check.permission:company.employees.index')->name('company.employees.recruit-page');
     Route::post('/employees/{employee}/recruit', [EmployeesController::class, 'recruit'])->middleware('check.permission:company.employees.store')->name('company.employees.store');
+    Route::post('/employees/{employee}/promote', [EmployeesController::class, 'promote'])->middleware('check.permission:company.employees.store')->name('company.employees.promote');
+    Route::post('/employees/{employee}/fire', [EmployeesController::class, 'fire'])->middleware('check.permission:company.employees.store')->name('company.employees.fire');
 });
 
 

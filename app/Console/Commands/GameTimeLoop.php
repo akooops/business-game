@@ -61,6 +61,14 @@ class GameTimeLoop extends Command
         // Process sales
         $this->call('game:generate-new-sales');
 
+        // Process employees mood
+        $this->call('game:process-employees-mood');
+
+        if($newTime->day == 1 ){
+            // Pay employees salaries
+            $this->call('game:pay-employees-salaries');
+        }
+
         $this->info("New game time: " . $newTime->format('Y-m-d H:i:s'));
         $this->info('Game time loop completed successfully!');
     }

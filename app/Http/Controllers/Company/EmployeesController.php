@@ -5,8 +5,9 @@ namespace App\Http\Controllers\Company;
 use App\Services\IndexService;
 use Illuminate\Http\Request;
 use App\Http\Requests\Company\Employees\RecruitEmployeeRequest;
+use App\Http\Requests\Company\Employees\PromoteEmployeeRequest;
+use App\Http\Requests\Company\Employees\FireEmployeeRequest;
 use App\Models\Employee;
-use App\Services\EmployeesService;
 use App\Services\HrService;
 
 class EmployeesController extends Controller
@@ -41,6 +42,8 @@ class EmployeesController extends Controller
 
         if($status){
             $employees->where('status', $status);
+        }else{
+            $employees->whereNot('status', Employee::STATUS_APPLIED);
         }
 
         if($current_mood_min){
@@ -96,15 +99,28 @@ class EmployeesController extends Controller
     public function recruit(RecruitEmployeeRequest $request, Employee $employee){
         HrService::recruitEmployee($employee);
 
-        if($request->expectsJson() || $request->hasHeader('X-Requested-With')){
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Employee recruited successfully!'
-            ]);
-        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Employee recruited successfully!'
+        ]);
+        
+    }
 
-        return inertia('Company/Employees/Recruit', [
-            'success' => 'Employee recruited successfully!'
+    public function promote(PromoteEmployeeRequest $request, Employee $employee){
+        HrService::promoteEmployee($employee, $request->new_salary);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Employee promoted successfully!'
+        ]);
+    }
+
+    public function fire(FireEmployeeRequest $request, Employee $employee){
+        HrService::fireEmployee($employee);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Employee fired successfully!'
         ]);
     }
 }

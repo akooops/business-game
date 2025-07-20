@@ -275,6 +275,36 @@ class NotificationService
         ]);
     }
 
+    public static function createEmployeeMoodDecreasedNotification($employee){
+        return Notification::create([
+            'type' => Notification::TYPE_EMPLOYEE_MOOD_DECREASED,
+            'title' => 'Employee Mood Decreased',
+            'message' => "Employee {$employee->name} mood decreased to {$employee->current_mood}. Consider promoting or firing him.",
+            'url' => route('company.employees.index'),
+            'user_id' => $employee->company->user_id,
+        ]);
+    }
+
+    public static function createEmployeeResignedNotification($employee){
+        return Notification::create([
+            'type' => Notification::TYPE_EMPLOYEE_RESIGNED,
+            'title' => 'Employee Resigned',
+            'message' => "Employee {$employee->name} resigned from {$employee->employeeProfile->name} with mood of {$employee->current_mood}.",
+            'url' => route('company.employees.index'),
+            'user_id' => $employee->company->user_id,
+        ]);
+    }
+
+    public static function createEmployeeSalaryPaidNotification($company, $totalSalaries){
+        return Notification::create([
+            'type' => Notification::TYPE_EMPLOYEE_SALARY_PAID,
+            'title' => 'Employee Salary Paid',
+            'message' => "Employee salary paid for DZD {$totalSalaries}.",
+            'url' => route('company.employees.index'),	
+            'user_id' => $company->user_id,
+        ]);
+    }
+
     public static function getUnreadCount()
     {
         return Notification::where('user_id', auth()->user()->id)->whereNull('read_at')->count();

@@ -67,4 +67,14 @@ class FinanceService
 
         return $funds;
     }
+
+    public static function payEmployeesSalary($company, $totalSalaries){
+        $funds = $company->funds;
+        $funds -= $totalSalaries;
+        $company->update(['funds' => $funds]);
+
+        NotificationService::createFinanceFundsChangedNotification($company, $totalSalaries);
+
+        return $funds;
+    }   
 }

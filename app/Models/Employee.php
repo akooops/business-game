@@ -20,13 +20,14 @@ class Employee extends Model
         'applied_at' => 'datetime',
         'hired_at' => 'datetime',
         'fired_at' => 'datetime',
+        'resigned_at' => 'datetime',
         'last_promotion_at' => 'datetime',
     ];
 
     const STATUS_APPLIED = 'applied';
     const STATUS_ACTIVE = 'active';
     const STATUS_FIRED = 'fired';
-    const STATUS_PROMOTED = 'promoted';
+    const STATUS_RESIGNED = 'resigned';
 
     //Relations
     public function company()

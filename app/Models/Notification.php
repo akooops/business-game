@@ -62,6 +62,9 @@ class Notification extends Model
 
     // Employees
     const TYPE_EMPLOYEE_HIRED = 'employee_hired';
+    const TYPE_EMPLOYEE_MOOD_DECREASED = 'employee_mood_decreased';
+    const TYPE_EMPLOYEE_RESIGNED = 'employee_resigned';
+    const TYPE_EMPLOYEE_SALARY_PAID = 'employee_salary_paid';
 
     // Icons for different notification types
     const ICONS = [
@@ -88,6 +91,9 @@ class Notification extends Model
         self::TYPE_SALE_CANCELLED => 'ki-filled ki-ship',
         self::TYPE_SALE_DELIVERY_DELAYED => 'ki-filled ki-ship',
         self::TYPE_EMPLOYEE_HIRED => 'ki-filled ki-users',
+        self::TYPE_EMPLOYEE_MOOD_DECREASED => 'ki-filled ki-users',
+        self::TYPE_EMPLOYEE_RESIGNED => 'ki-filled ki-users',
+        self::TYPE_EMPLOYEE_SALARY_PAID => 'ki-filled ki-users',
     ];
 
     // Methods
