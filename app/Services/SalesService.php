@@ -102,7 +102,9 @@ class SalesService
                 ]);
             }
 
-            NotificationService::createSaleInitiatedNotification($company, $product, $numberOfSales);
+            if($numberOfSales > 0){
+                NotificationService::createSaleInitiatedNotification($company, $product, $numberOfSales);
+            }
         }
     }
 

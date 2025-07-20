@@ -142,28 +142,35 @@ class HrService
                 $mood = 0;
             }
 
-            // Check for resignation if mood is below 40%
-            if($mood < 0.4){
-                // Calculate resignation probability based on mood
-                // Lower mood = higher probability
-                $baseProbability = 5; // 5% base chance
-                $moodMultiplier = (0.4 - $mood) / 0.4; // 0 to 1 multiplier
-                $resignationProbability = $baseProbability + ($moodMultiplier * 15); // Max 20% at mood 0
+            $resignationChance = 0;
+
+            $resignationChance = rand(1, 100); 
+
+            $resignationThreshold = 0;
+            if($mood < 0.1){
+                $resignationThreshold = 75; // 75% chance
+            } else if($mood < 0.2){
+                $resignationThreshold = 50; // 50% chance
+            } else if($mood < 0.3){
+                $resignationThreshold = 25; // 25% chance
+            } else if($mood < 0.4){
+                $resignationThreshold = 10; // 10% chance
+            }
+
+            if($resignationChance <= $resignationThreshold){
+                // Employee resigns
+                $employee->update([
+                    'status' => Employee::STATUS_RESIGNED,
+                    'resigned_at' => SettingsService::getCurrentTimestamp(),
+                    'current_mood' => $mood
+                ]);
                 
-                $resignationChance = rand(1, 100);
-                if($resignationChance <= $resignationProbability){
-                    // Employee resigns
-                    $employee->update([
-                        'status' => Employee::STATUS_RESIGNED,
-                        'resigned_at' => SettingsService::getCurrentTimestamp(),
-                        'current_mood' => $mood
-                    ]);
-                    
-                    // Create resignation notification
-                    NotificationService::createEmployeeResignedNotification($employee);
-                    continue; // Skip mood update since employee resigned
-                }
-            }else if($mood < 0.5){
+                // Create resignation notification
+                NotificationService::createEmployeeResignedNotification($employee);
+                continue; // Skip mood update since employee resigned
+            }
+
+            if($mood < 0.5){
                 NotificationService::createEmployeeMoodDecreasedNotification($employee);
             }
             

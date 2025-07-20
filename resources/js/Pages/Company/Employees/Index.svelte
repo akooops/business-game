@@ -357,7 +357,6 @@
         loadingFire = true;
         try {
             const formData = new FormData();
-            formData.append('_method', 'DELETE');
             formData.append('_token', document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'));
 
             const response = await fetch(route('company.employees.fire', { employee: fireData.employee.id }), {
