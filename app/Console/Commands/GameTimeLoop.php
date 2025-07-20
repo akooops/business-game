@@ -61,6 +61,9 @@ class GameTimeLoop extends Command
         // Process sales
         $this->call('game:generate-new-sales');
 
+        // Expire old job applications
+        $this->call('game:expire-old-job-applications');
+
         // Process employees mood
         $this->call('game:process-employees-mood');
 
