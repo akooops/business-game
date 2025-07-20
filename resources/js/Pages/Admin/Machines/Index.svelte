@@ -35,35 +35,26 @@
     let manufacturerFilter = '';
     let priceMin = '';
     let priceMax = '';
-    let energyMin = '';
-    let energyMax = '';
+    let operationCostMin = '';
+    let operationCostMax = '';
     let speedMin = '';
     let speedMax = '';
     let qualityMin = '';
     let qualityMax = '';
-    let areaMin = '';
-    let areaMax = '';
+    let carbonFootprintMin = '';
+    let carbonFootprintMax = '';
     let setupTimeMin = '';
     let setupTimeMax = '';
-    let carbonMin = '';
-    let carbonMax = '';
-    let failureMin = '';
-    let failureMax = '';
-    let decayMin = '';
-    let decayMax = '';
-    let maintenanceMin = '';
-    let maintenanceMax = '';
+    let minSpeed = '';
+    let maxSpeed = '';
+    let reliabilityDecayDaysMin = '';
+    let reliabilityDecayDaysMax = '';
     let productFilter = '';
     let employeeProfileFilter = '';
 
     // Select2 component references
     let productSelectComponent;
     let employeeProfileSelectComponent;
-
-    // Format number with units
-    function formatNumber(value, decimals = 1) {
-        return parseFloat(value).toFixed(decimals);
-    }
 
     // Fetch machines data
     async function fetchMachines() {
@@ -85,17 +76,17 @@
             if (priceMax) {
                 params.append('price_max', priceMax);
             }
-            if (energyMin) {
-                params.append('energy_min', energyMin);
+            if (operationCostMin) {
+                params.append('operation_cost_min', operationCostMin);
             }
-            if (energyMax) {
-                params.append('energy_max', energyMax);
+            if (operationCostMax) {
+                params.append('operation_cost_max', operationCostMax);
             }
-            if (speedMin) {
-                params.append('speed_min', speedMin);
+            if (minSpeed) {
+                params.append('min_speed', minSpeed);
             }
-            if (speedMax) {
-                params.append('speed_max', speedMax);
+            if (maxSpeed) {
+                params.append('max_speed', maxSpeed);
             }
             if (qualityMin) {
                 params.append('quality_min', qualityMin);
@@ -103,11 +94,11 @@
             if (qualityMax) {
                 params.append('quality_max', qualityMax);
             }
-            if (areaMin) {
-                params.append('area_min', areaMin);
+            if (carbonFootprintMin) {
+                params.append('carbon_footprint_min', carbonFootprintMin);
             }
-            if (areaMax) {
-                params.append('area_max', areaMax);
+            if (carbonFootprintMax) {
+                params.append('carbon_footprint_max', carbonFootprintMax);
             }
             if (setupTimeMin) {
                 params.append('setup_time_min', setupTimeMin);
@@ -115,29 +106,17 @@
             if (setupTimeMax) {
                 params.append('setup_time_max', setupTimeMax);
             }
-            if (carbonMin) {
-                params.append('carbon_min', carbonMin);
+            if (reliabilityDecayDaysMin) {
+                params.append('reliability_decay_days_min', reliabilityDecayDaysMin);
             }
-            if (carbonMax) {
-                params.append('carbon_max', carbonMax);
+            if (reliabilityDecayDaysMax) {
+                params.append('reliability_decay_days_max', reliabilityDecayDaysMax);
             }
-            if (failureMin) {
-                params.append('failure_min', failureMin);
+            if (qualityMin) {
+                params.append('quality_factor_min', qualityMin);
             }
-            if (failureMax) {
-                params.append('failure_max', failureMax);
-            }
-            if (decayMin) {
-                params.append('decay_min', decayMin);
-            }
-            if (decayMax) {
-                params.append('decay_max', decayMax);
-            }
-            if (maintenanceMin) {
-                params.append('maintenance_min', maintenanceMin);
-            }
-            if (maintenanceMax) {
-                params.append('maintenance_max', maintenanceMax);
+            if (qualityMax) {
+                params.append('quality_factor_max', qualityMax);
             }
             if (productFilter) {
                 params.append('product_id', productFilter);
@@ -238,24 +217,20 @@
         manufacturerFilter = '';
         priceMin = '';
         priceMax = '';
-        energyMin = '';
-        energyMax = '';
+        operationCostMin = '';
+        operationCostMax = '';
         speedMin = '';
         speedMax = '';
         qualityMin = '';
         qualityMax = '';
-        areaMin = '';
-        areaMax = '';
+        carbonFootprintMin = '';
+        carbonFootprintMax = '';
         setupTimeMin = '';
         setupTimeMax = '';
-        carbonMin = '';
-        carbonMax = '';
-        failureMin = '';
-        failureMax = '';
-        decayMin = '';
-        decayMax = '';
-        maintenanceMin = '';
-        maintenanceMax = '';
+        minSpeed = '';
+        maxSpeed = '';
+        reliabilityDecayDaysMin = '';
+        reliabilityDecayDaysMax = '';
         productFilter = '';
         employeeProfileFilter = '';
         currentPage = 1;
@@ -398,7 +373,7 @@
                             </button>
                             
                             <!-- Clear Filters Button -->
-                            {#if manufacturerFilter || priceMin || priceMax || energyMin || energyMax || speedMin || speedMax || qualityMin || qualityMax || areaMin || areaMax || setupTimeMin || setupTimeMax || carbonMin || carbonMax || failureMin || failureMax || decayMin || decayMax || maintenanceMin || maintenanceMax || productFilter || employeeProfileFilter}
+                                {#if manufacturerFilter || priceMin || priceMax || operationCostMin || operationCostMax || minSpeed || maxSpeed || qualityMin || qualityMax || carbonFootprintMin || carbonFootprintMax || setupTimeMin || setupTimeMax || reliabilityDecayDaysMin || reliabilityDecayDaysMax || productFilter || employeeProfileFilter}
                                 <button 
                                     class="kt-btn kt-btn-ghost kt-btn-sm"
                                     on:click={clearAllFilters}
@@ -453,16 +428,16 @@
                                 </div>
                             </div>
 
-                            <!-- Area Range -->
+                            <!-- Carbon Footprint Range -->
                             <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Area Required (sq m)</h4>
+                                <h4 class="text-sm font-medium text-gray-700">Carbon Footprint (kg CO2/unit)</h4>
                                 
                                 <div class="flex gap-2">
                                     <input 
                                         type="number" 
                                         class="kt-input flex-1" 
-                                        placeholder="Min Area" 
-                                        bind:value={areaMin}
+                                        placeholder="Min Carbon Footprint" 
+                                        bind:value={carbonFootprintMin}
                                         on:input={handleFilterChange}
                                         step="0.1"
                                         min="0"
@@ -470,8 +445,8 @@
                                     <input 
                                         type="number" 
                                         class="kt-input flex-1" 
-                                        placeholder="Max Area" 
-                                        bind:value={areaMax}
+                                        placeholder="Max Carbon Footprint" 
+                                        bind:value={carbonFootprintMax}
                                         on:input={handleFilterChange}
                                         step="0.1"
                                         min="0"
@@ -505,14 +480,14 @@
 
                             <!-- Energy Consumption Range -->
                             <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Energy Consumption (kWh)</h4>
+                                <h4 class="text-sm font-medium text-gray-700">Operation Cost (DZD/day)</h4>
                                 
                                 <div class="flex gap-2">
                                     <input 
                                         type="number" 
                                         class="kt-input flex-1" 
-                                        placeholder="Min Energy" 
-                                        bind:value={energyMin}
+                                        placeholder="Min Operation Cost" 
+                                        bind:value={operationCostMin}
                                         on:input={handleFilterChange}
                                         step="0.1"
                                         min="0"
@@ -520,8 +495,8 @@
                                     <input 
                                         type="number" 
                                         class="kt-input flex-1" 
-                                        placeholder="Max Energy" 
-                                        bind:value={energyMax}
+                                        placeholder="Max Operation Cost" 
+                                        bind:value={operationCostMax}
                                         on:input={handleFilterChange}
                                         step="0.1"
                                         min="0"
@@ -529,16 +504,16 @@
                                 </div>
                             </div>
 
-                            <!-- Carbon Emissions Range -->
+                            <!-- Quality Factor Range -->
                             <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Carbon Emissions (kg CO2/h)</h4>
+                                <h4 class="text-sm font-medium text-gray-700">Quality Factor</h4>
                                 
                                 <div class="flex gap-2">
                                     <input 
                                         type="number" 
                                         class="kt-input flex-1" 
-                                        placeholder="Min Carbon" 
-                                        bind:value={carbonMin}
+                                        placeholder="Min Quality" 
+                                        bind:value={qualityMin}
                                         on:input={handleFilterChange}
                                         step="0.1"
                                         min="0"
@@ -546,8 +521,8 @@
                                     <input 
                                         type="number" 
                                         class="kt-input flex-1" 
-                                        placeholder="Max Carbon" 
-                                        bind:value={carbonMax}
+                                        placeholder="Max Quality" 
+                                        bind:value={qualityMax}
                                         on:input={handleFilterChange}
                                         step="0.1"
                                         min="0"
@@ -557,7 +532,7 @@
 
                             <!-- Speed Range -->
                             <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Average Speed (units/h)</h4>
+                                <h4 class="text-sm font-medium text-gray-700">Average Speed (units/day)</h4>
                                 
                                 <div class="flex gap-2">
                                     <input 
@@ -581,16 +556,16 @@
                                 </div>
                             </div>
 
-                            <!-- Quality Factor Range -->
+                            <!-- Reliability Decay Days Range -->
                             <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Quality Factor</h4>
+                                <h4 class="text-sm font-medium text-gray-700">Reliability Decay Days</h4>
                                 
                                 <div class="flex gap-2">
                                     <input 
                                         type="number" 
                                         class="kt-input flex-1" 
-                                        placeholder="Min Quality" 
-                                        bind:value={qualityMin}
+                                        placeholder="Min Reliability Decay Days" 
+                                        bind:value={reliabilityDecayDaysMin}
                                         on:input={handleFilterChange}
                                         step="0.1"
                                         min="0"
@@ -599,88 +574,12 @@
                                     <input 
                                         type="number" 
                                         class="kt-input flex-1" 
-                                        placeholder="Max Quality" 
-                                        bind:value={qualityMax}
+                                        placeholder="Max Reliability Decay Days" 
+                                        bind:value={reliabilityDecayDaysMax}
                                         on:input={handleFilterChange}
                                         step="0.1"
                                         min="0"
                                         max="1"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Failure Rate Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Failure Rate (%/h)</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min Failure" 
-                                        bind:value={failureMin}
-                                        on:input={handleFilterChange}
-                                        step="0.001"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max Failure" 
-                                        bind:value={failureMax}
-                                        on:input={handleFilterChange}
-                                        step="0.001"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Reliability Decay Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Reliability Decay (%/h)</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min Decay" 
-                                        bind:value={decayMin}
-                                        on:input={handleFilterChange}
-                                        step="0.001"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max Decay" 
-                                        bind:value={decayMax}
-                                        on:input={handleFilterChange}
-                                        step="0.001"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Maintenance Interval Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Maintenance Interval (days)</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min Interval" 
-                                        bind:value={maintenanceMin}
-                                        on:input={handleFilterChange}
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max Interval" 
-                                        bind:value={maintenanceMax}
-                                        on:input={handleFilterChange}
-                                        min="0"
                                     />
                                 </div>
                             </div>
@@ -945,34 +844,30 @@
                                                 <div class="flex flex-col gap-1">
                                                     <div class="flex items-center gap-1">
                                                         <span class="text-xs text-muted-foreground">Speed:</span>
-                                                        <span class="text-xs font-medium">{formatNumber(machine.avg_speed_hour)}/h</span>
+                                                        <span class="text-xs font-medium">{machine.avg_speed}/day</span>
                                                     </div>
                                                     <div class="flex items-center gap-1">
                                                         <span class="text-xs text-muted-foreground">Quality:</span>
-                                                        <span class="text-xs font-medium">{formatNumber(machine.quality_factor)}%</span>
+                                                        <span class="text-xs font-medium">{machine.quality_factor}%</span>
                                                     </div>
                                                     <div class="flex items-center gap-1">
-                                                        <span class="text-xs text-muted-foreground">Energy:</span>
-                                                        <span class="text-xs font-medium">{formatNumber(machine.energy_consumption_hour)} kWh</span>
+                                                        <span class="text-xs text-muted-foreground">Operation Cost:</span>
+                                                        <span class="text-xs font-medium">{machine.operation_cost} DZD/day</span>
                                                     </div>
                                                     <div class="flex items-center gap-1">
-                                                        <span class="text-xs text-muted-foreground">Carbon:</span>
-                                                        <span class="text-xs font-medium">{formatNumber(machine.carbon_emissions_hour)} kg/h</span>
+                                                        <span class="text-xs text-muted-foreground">Carbon Footprint:</span>
+                                                        <span class="text-xs font-medium">{machine.carbon_footprint} kg CO2/unit</span>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td>
                                                 <div class="flex items-center gap-1">
-                                                    <span class="text-xs text-muted-foreground">Area Required:</span>
-                                                    <span class="text-xs font-medium">{formatNumber(machine.area_required)} m²</span>
-                                                </div>
-                                                <div class="flex items-center gap-1">
                                                     <span class="text-xs text-muted-foreground">Setup Time:</span>
                                                     <span class="text-xs font-medium">{machine.setup_time_days} days</span>
                                                 </div>
                                                 <div class="flex items-center gap-1">
-                                                    <span class="text-xs text-muted-foreground">Cost:</span>
-                                                    <span class="text-sm font-bold">DZD{machine.cost_to_acquire}</span>
+                                                    <span class="text-xs text-muted-foreground">Cost to Acquire:</span>
+                                                    <span class="text-xs font-medium">DZD{machine.cost_to_acquire}</span>
                                                 </div>
                                             </td>
                                             <td>

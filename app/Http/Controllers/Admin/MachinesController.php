@@ -25,26 +25,28 @@ class MachinesController extends Controller
 
         // Filter parameters
         $manufacturerFilter = IndexService::checkIfSearchEmpty($request->query('manufacturer'));
+
         $priceMin = IndexService::checkIfNumber($request->query('price_min'));
         $priceMax = IndexService::checkIfNumber($request->query('price_max'));
-        $energyMin = IndexService::checkIfNumber($request->query('energy_min'));
-        $energyMax = IndexService::checkIfNumber($request->query('energy_max'));
-        $speedMin = IndexService::checkIfNumber($request->query('speed_min'));
-        $speedMax = IndexService::checkIfNumber($request->query('speed_max'));
-        $qualityMin = IndexService::checkIfNumber($request->query('quality_min'));
-        $qualityMax = IndexService::checkIfNumber($request->query('quality_max'));
-        $areaMin = IndexService::checkIfNumber($request->query('area_min'));
-        $areaMax = IndexService::checkIfNumber($request->query('area_max'));
+
         $setupTimeMin = IndexService::checkIfNumber($request->query('setup_time_min'));
         $setupTimeMax = IndexService::checkIfNumber($request->query('setup_time_max'));
-        $carbonMin = IndexService::checkIfNumber($request->query('carbon_min'));
-        $carbonMax = IndexService::checkIfNumber($request->query('carbon_max'));
-        $failureMin = IndexService::checkIfNumber($request->query('failure_min'));
-        $failureMax = IndexService::checkIfNumber($request->query('failure_max'));
-        $decayMin = IndexService::checkIfNumber($request->query('decay_min'));
-        $decayMax = IndexService::checkIfNumber($request->query('decay_max'));
-        $maintenanceMin = IndexService::checkIfNumber($request->query('maintenance_min'));
-        $maintenanceMax = IndexService::checkIfNumber($request->query('maintenance_max'));
+
+        $operationCostMin = IndexService::checkIfNumber($request->query('operation_cost_min'));
+        $operationCostMax = IndexService::checkIfNumber($request->query('operation_cost_max'));
+
+        $minSpeed = IndexService::checkIfNumber($request->query('min_speed'));
+        $maxSpeed = IndexService::checkIfNumber($request->query('max_speed'));
+
+        $qualityFactorMin = IndexService::checkIfNumber($request->query('quality_factor_min'));
+        $qualityFactorMax = IndexService::checkIfNumber($request->query('quality_factor_max'));
+
+        $carbonFootprintMin = IndexService::checkIfNumber($request->query('carbon_footprint_min'));
+        $carbonFootprintMax = IndexService::checkIfNumber($request->query('carbon_footprint_max'));
+
+        $reliabilityDecayDaysMin = IndexService::checkIfNumber($request->query('reliability_decay_days_min'));
+        $reliabilityDecayDaysMax = IndexService::checkIfNumber($request->query('reliability_decay_days_max'));
+
         $productFilter = IndexService::checkIfSearchEmpty($request->query('product_id'));
         $employeeProfileFilter = IndexService::checkIfSearchEmpty($request->query('employee_profile_id'));
 
@@ -65,39 +67,39 @@ class MachinesController extends Controller
         }
 
         // Apply energy consumption range filters
-        if ($energyMin) {
-            $machines->where('energy_consumption_hour', '>=', $energyMin);
+        if ($operationCostMin) {
+            $machines->where('operation_cost', '>=', $operationCostMin);
         }
 
-        if ($energyMax) {
-            $machines->where('energy_consumption_hour', '<=', $energyMax);
+        if ($operationCostMax) {
+            $machines->where('operation_cost', '<=', $operationCostMax);
         }
 
         // Apply speed range filters (using average speed)
-        if ($speedMin) {
-            $machines->where('avg_speed_hour', '>=', $speedMin);
+        if ($minSpeed) {
+            $machines->where('avg_speed', '>=', $minSpeed);
         }
 
-        if ($speedMax) {
-            $machines->where('avg_speed_hour', '<=', $speedMax);
+        if ($maxSpeed) {
+            $machines->where('avg_speed', '<=', $maxSpeed);
         }
 
         // Apply quality range filters
-        if ($qualityMin) {
-            $machines->where('quality_factor', '>=', $qualityMin);
+        if ($qualityFactorMin) {
+            $machines->where('quality_factor', '>=', $qualityFactorMin);
         }
 
-        if ($qualityMax) {
-            $machines->where('quality_factor', '<=', $qualityMax);
+        if ($qualityFactorMax) {
+            $machines->where('quality_factor', '<=', $qualityFactorMax);
         }
 
         // Apply area range filters
-        if ($areaMin) {
-            $machines->where('area_required', '>=', $areaMin);
+        if ($carbonFootprintMin) {
+            $machines->where('carbon_footprint', '>=', $carbonFootprintMin);
         }
 
-        if ($areaMax) {
-            $machines->where('area_required', '<=', $areaMax);
+        if ($carbonFootprintMax) {
+            $machines->where('carbon_footprint', '<=', $carbonFootprintMax);
         }
 
         // Apply setup time range filters
@@ -110,39 +112,12 @@ class MachinesController extends Controller
         }
 
         // Apply carbon emissions range filters
-        if ($carbonMin) {
-            $machines->where('carbon_emissions_hour', '>=', $carbonMin);
+        if ($reliabilityDecayDaysMin) {
+            $machines->where('reliability_decay_days', '>=', $reliabilityDecayDaysMin);
         }
 
-        if ($carbonMax) {
-            $machines->where('carbon_emissions_hour', '<=', $carbonMax);
-        }
-
-        // Apply failure rate range filters
-        if ($failureMin) {
-            $machines->where('failure_chance_hour', '>=', $failureMin);
-        }
-
-        if ($failureMax) {
-            $machines->where('failure_chance_hour', '<=', $failureMax);
-        }
-
-        // Apply reliability decay range filters
-        if ($decayMin) {
-            $machines->where('reliability_decay_hour', '>=', $decayMin);
-        }
-
-        if ($decayMax) {
-            $machines->where('reliability_decay_hour', '<=', $decayMax);
-        }
-
-        // Apply maintenance interval range filters
-        if ($maintenanceMin) {
-            $machines->where('maintenance_interval_days', '>=', $maintenanceMin);
-        }
-
-        if ($maintenanceMax) {
-            $machines->where('maintenance_interval_days', '<=', $maintenanceMax);
+        if ($reliabilityDecayDaysMax) {
+            $machines->where('reliability_decay_days', '<=', $reliabilityDecayDaysMax);
         }
 
         // Apply product filter

@@ -33,30 +33,28 @@
         model: machine.model || '',
         manufacturer: machine.manufacturer || '',
         cost_to_acquire: machine.cost_to_acquire || '',
-        area_required: machine.area_required || '',
         setup_time_days: machine.setup_time_days || '',
         description: machine.description || '',
-        energy_consumption_hour: machine.energy_consumption_hour || '',
-        carbon_emissions_hour: machine.carbon_emissions_hour || '',
+        operation_cost: machine.operation_cost || '',
+        carbon_footprint: machine.carbon_footprint || '',
         quality_factor: machine.quality_factor || '',
-        min_speed_hour: machine.min_speed_hour || '',
-        avg_speed_hour: machine.avg_speed_hour || '',
-        max_speed_hour: machine.max_speed_hour || '',
-        failure_chance_hour: machine.failure_chance_hour || '',
-        reliability_decay_hour: machine.reliability_decay_hour || '',
+        min_speed: machine.min_speed || '',
+        avg_speed: machine.avg_speed || '',
+        max_speed: machine.max_speed || '',
+        reliability_decay_days: machine.reliability_decay_days || '',
         maintenance_interval_days: machine.maintenance_interval_days || '',
         min_predictive_maintenance_cost: machine.min_predictive_maintenance_cost || '',
         avg_predictive_maintenance_cost: machine.avg_predictive_maintenance_cost || '',
         max_predictive_maintenance_cost: machine.max_predictive_maintenance_cost || '',
-        min_predictive_maintenance_time_hours: machine.min_predictive_maintenance_time_hours || '',
-        avg_predictive_maintenance_time_hours: machine.avg_predictive_maintenance_time_hours || '',
-        max_predictive_maintenance_time_hours: machine.max_predictive_maintenance_time_hours || '',
+        min_predictive_maintenance_time_days: machine.min_predictive_maintenance_time_days || '',
+        avg_predictive_maintenance_time_days: machine.avg_predictive_maintenance_time_days || '',
+        max_predictive_maintenance_time_days: machine.max_predictive_maintenance_time_days || '',
         min_corrective_maintenance_cost: machine.min_corrective_maintenance_cost || '',
         avg_corrective_maintenance_cost: machine.avg_corrective_maintenance_cost || '',
         max_corrective_maintenance_cost: machine.max_corrective_maintenance_cost || '',
-        min_corrective_maintenance_time_hours: machine.min_corrective_maintenance_time_hours || '',
-        avg_corrective_maintenance_time_hours: machine.avg_corrective_maintenance_time_hours || '',
-        max_corrective_maintenance_time_hours: machine.max_corrective_maintenance_time_hours || '',
+        min_corrective_maintenance_time_days: machine.min_corrective_maintenance_time_days || '',
+        avg_corrective_maintenance_time_days: machine.avg_corrective_maintenance_time_days || '',
+        max_corrective_maintenance_time_days: machine.max_corrective_maintenance_time_days || '',
         file: null,
         employee_profiles: (machine.employee_profiles || []).map(profile => ({
             employee_profile_id: profile.id,
@@ -264,51 +262,27 @@
                                 </div>
                             </div>
 
-                            <!-- Area Required and Setup Time -->
-                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="area_required">
-                                        Area Required (sq m) <span class="text-destructive">*</span>
-                                    </label>
-                                    <input 
-                                        id="area_required"
-                                        type="number" 
-                                        bind:value={formData.area_required}
-                                        class="kt-input {errors.area_required ? 'kt-input-error' : ''}"
-                                        placeholder="Enter area in square meters"
-                                        min="0"
-                                        step="0.001"
-                                        required
-                                    />
-                                    <p class="text-xs text-secondary-foreground">
-                                        Floor space required for this machine
-                                    </p>
-                                    {#if errors.area_required}
-                                        <p class="text-sm text-destructive">{errors.area_required}</p>
-                                    {/if}
-                                </div>
-
-                                <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="setup_time_days">
-                                        Setup Time (days) <span class="text-destructive">*</span>
-                                    </label>
-                                    <input 
-                                        id="setup_time_days"
-                                        type="number" 
-                                        bind:value={formData.setup_time_days}
-                                        class="kt-input {errors.setup_time_days ? 'kt-input-error' : ''}"
-                                        placeholder="Enter setup time in days"
-                                        min="1"
-                                        step="1"
-                                        required
-                                    />
-                                    <p class="text-xs text-secondary-foreground">
-                                        Time required to set up this machine
-                                    </p>
-                                    {#if errors.setup_time_days}
-                                        <p class="text-sm text-destructive">{errors.setup_time_days}</p>
-                                    {/if}
-                                </div>
+                            <!-- Setup Time -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-medium text-mono" for="setup_time_days">
+                                    Setup Time (days) <span class="text-destructive">*</span>
+                                </label>
+                                <input 
+                                    id="setup_time_days"
+                                    type="number" 
+                                    bind:value={formData.setup_time_days}
+                                    class="kt-input {errors.setup_time_days ? 'kt-input-error' : ''}"
+                                    placeholder="Enter setup time in days"
+                                    min="1"
+                                    step="1"
+                                    required
+                                />
+                                <p class="text-xs text-secondary-foreground">
+                                    Time required to set up this machine
+                                </p>
+                                {#if errors.setup_time_days}
+                                    <p class="text-sm text-destructive">{errors.setup_time_days}</p>
+                                {/if}
                             </div>
 
                             <!-- Description -->
@@ -410,40 +384,40 @@
                             <!-- Energy Consumption, Carbon Emissions, and Quality Factor -->
                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="energy_consumption_hour">
-                                        Hourly Energy Consumption (kWh) <span class="text-destructive">*</span>
+                                    <label class="text-sm font-medium text-mono" for="operation_cost">
+                                        Operation Cost (DZD/day) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="energy_consumption_hour"
+                                        id="operation_cost"
                                         type="number" 
-                                        bind:value={formData.energy_consumption_hour}
-                                        class="kt-input {errors.energy_consumption_hour ? 'kt-input-error' : ''}"
-                                        placeholder="Enter hourly energy consumption"
+                                        bind:value={formData.operation_cost}
+                                        class="kt-input {errors.operation_cost ? 'kt-input-error' : ''}"
+                                        placeholder="Enter hourly operation cost"
                                         min="0"
                                         step="0.001"
                                         required
                                     />
-                                    {#if errors.energy_consumption_hour}
-                                        <p class="text-sm text-destructive">{errors.energy_consumption_hour}</p>
+                                    {#if errors.operation_cost}
+                                        <p class="text-sm text-destructive">{errors.operation_cost}</p>
                                     {/if}
                                 </div>
 
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="carbon_emissions_hour">
-                                        Hourly Carbon Emissions (CO2) <span class="text-destructive">*</span>
+                                    <label class="text-sm font-medium text-mono" for="carbon_footprint">
+                                        Carbon Footprint (kg CO2/day) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="carbon_emissions_hour"
+                                        id="carbon_footprint"
                                         type="number" 
-                                        bind:value={formData.carbon_emissions_hour}
-                                        class="kt-input {errors.carbon_emissions_hour ? 'kt-input-error' : ''}"
-                                        placeholder="Enter hourly carbon emissions"
+                                        bind:value={formData.carbon_footprint}
+                                        class="kt-input {errors.carbon_footprint ? 'kt-input-error' : ''}"
+                                        placeholder="Enter hourly carbon footprint"
                                         min="0"
                                         step="0.001"
                                         required
                                     />
-                                    {#if errors.carbon_emissions_hour}
-                                        <p class="text-sm text-destructive">{errors.carbon_emissions_hour}</p>
+                                    {#if errors.carbon_footprint}
+                                        <p class="text-sm text-destructive">{errors.carbon_footprint}</p>
                                     {/if}
                                 </div>
 
@@ -471,59 +445,59 @@
                             <!-- Speed Ranges -->
                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="min_speed_hour">
-                                        Minimum Speed (units/h) <span class="text-destructive">*</span>
+                                    <label class="text-sm font-medium text-mono" for="min_speed">
+                                        Minimum Speed (units/day) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="min_speed_hour"
+                                        id="min_speed"
                                         type="number" 
-                                        bind:value={formData.min_speed_hour}
-                                        class="kt-input {errors.min_speed_hour ? 'kt-input-error' : ''}"
+                                        bind:value={formData.min_speed}
+                                        class="kt-input {errors.min_speed ? 'kt-input-error' : ''}"
                                         placeholder="Enter minimum speed"
                                         min="0"
                                         step="0.001"
                                         required
                                     />
-                                    {#if errors.min_speed_hour}
-                                        <p class="text-sm text-destructive">{errors.min_speed_hour}</p>
+                                    {#if errors.min_speed}
+                                        <p class="text-sm text-destructive">{errors.min_speed}</p>
                                     {/if}
                                 </div>
 
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="avg_speed_hour">
-                                        Average Speed (units/h) <span class="text-destructive">*</span>
+                                    <label class="text-sm font-medium text-mono" for="avg_speed">
+                                        Average Speed (units/day) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="avg_speed_hour"
+                                        id="avg_speed"
                                         type="number" 
-                                        bind:value={formData.avg_speed_hour}
-                                        class="kt-input {errors.avg_speed_hour ? 'kt-input-error' : ''}"
+                                        bind:value={formData.avg_speed}
+                                        class="kt-input {errors.avg_speed ? 'kt-input-error' : ''}"
                                         placeholder="Enter average speed"
                                         min="0"
                                         step="0.001"
                                         required
                                     />
-                                    {#if errors.avg_speed_hour}
-                                        <p class="text-sm text-destructive">{errors.avg_speed_hour}</p>
+                                    {#if errors.avg_speed}
+                                        <p class="text-sm text-destructive">{errors.avg_speed}</p>
                                     {/if}
                                 </div>
 
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="max_speed_hour">
-                                        Maximum Speed (units/h) <span class="text-destructive">*</span>
+                                    <label class="text-sm font-medium text-mono" for="max_speed">
+                                        Maximum Speed (units/day) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="max_speed_hour"
+                                        id="max_speed"
                                         type="number" 
-                                        bind:value={formData.max_speed_hour}
-                                        class="kt-input {errors.max_speed_hour ? 'kt-input-error' : ''}"
+                                        bind:value={formData.max_speed}
+                                        class="kt-input {errors.max_speed ? 'kt-input-error' : ''}"
                                         placeholder="Enter maximum speed"
                                         min="0"
                                         step="0.001"
                                         required
                                     />
-                                    {#if errors.max_speed_hour}
-                                        <p class="text-sm text-destructive">{errors.max_speed_hour}</p>
+                                    {#if errors.max_speed}
+                                        <p class="text-sm text-destructive">{errors.max_speed}</p>
                                     {/if}
                                 </div>
                             </div>
@@ -531,42 +505,22 @@
                             <!-- Reliability -->
                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="failure_chance_hour">
-                                        Hourly Failure Chance (0-1) <span class="text-destructive">*</span>
+                                    <label class="text-sm font-medium text-mono" for="reliability_decay_days">
+                                        Reliability Decay Days <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="failure_chance_hour"
+                                        id="reliability_decay_days"
                                         type="number" 
-                                        bind:value={formData.failure_chance_hour}
-                                        class="kt-input {errors.failure_chance_hour ? 'kt-input-error' : ''}"
-                                        placeholder="Enter failure chance"
-                                        min="0"
-                                        max="1"
-                                        step="0.00001"
-                                        required
-                                    />
-                                    {#if errors.failure_chance_hour}
-                                        <p class="text-sm text-destructive">{errors.failure_chance_hour}</p>
-                                    {/if}
-                                </div>
-
-                                <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="reliability_decay_hour">
-                                        Hourly Reliability Decay (0-1) <span class="text-destructive">*</span>
-                                    </label>
-                                    <input 
-                                        id="reliability_decay_hour"
-                                        type="number" 
-                                        bind:value={formData.reliability_decay_hour}
-                                        class="kt-input {errors.reliability_decay_hour ? 'kt-input-error' : ''}"
+                                        bind:value={formData.reliability_decay_days}
+                                        class="kt-input {errors.reliability_decay_days ? 'kt-input-error' : ''}"
                                         placeholder="Enter reliability decay"
                                         min="0"
+                                        step="0.001"
                                         max="1"
-                                        step="0.00001"
                                         required
                                     />
-                                    {#if errors.reliability_decay_hour}
-                                        <p class="text-sm text-destructive">{errors.reliability_decay_hour}</p>
+                                    {#if errors.reliability_decay_days}
+                                        <p class="text-sm text-destructive">{errors.reliability_decay_days}</p>
                                     {/if}
                                 </div>
 
@@ -663,59 +617,59 @@
                             <!-- Predictive Maintenance Times -->
                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="min_predictive_maintenance_time_hours">
-                                        Minimum Time (hours) <span class="text-destructive">*</span>
+                                    <label class="text-sm font-medium text-mono" for="min_predictive_maintenance_time_days">
+                                        Minimum Time (days) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="min_predictive_maintenance_time_hours"
+                                        id="min_predictive_maintenance_time_days"
                                         type="number" 
-                                        bind:value={formData.min_predictive_maintenance_time_hours}
-                                        class="kt-input {errors.min_predictive_maintenance_time_hours ? 'kt-input-error' : ''}"
+                                        bind:value={formData.min_predictive_maintenance_time_days}
+                                        class="kt-input {errors.min_predictive_maintenance_time_days ? 'kt-input-error' : ''}"
                                         placeholder="Enter minimum time"
                                         min="0"
                                         step="1"
                                         required
                                     />
-                                    {#if errors.min_predictive_maintenance_time_hours}
-                                        <p class="text-sm text-destructive">{errors.min_predictive_maintenance_time_hours}</p>
+                                    {#if errors.min_predictive_maintenance_time_days}
+                                        <p class="text-sm text-destructive">{errors.min_predictive_maintenance_time_days}</p>
                                     {/if}
                                 </div>
 
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="avg_predictive_maintenance_time_hours">
-                                        Average Time (hours) <span class="text-destructive">*</span>
+                                    <label class="text-sm font-medium text-mono" for="avg_predictive_maintenance_time_days">
+                                        Average Time (days) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="avg_predictive_maintenance_time_hours"
+                                        id="avg_predictive_maintenance_time_days"
                                         type="number" 
-                                        bind:value={formData.avg_predictive_maintenance_time_hours}
-                                        class="kt-input {errors.avg_predictive_maintenance_time_hours ? 'kt-input-error' : ''}"
+                                        bind:value={formData.avg_predictive_maintenance_time_days}
+                                        class="kt-input {errors.avg_predictive_maintenance_time_days ? 'kt-input-error' : ''}"
                                         placeholder="Enter average time"
                                         min="0"
                                         step="1"
                                         required
                                     />
-                                    {#if errors.avg_predictive_maintenance_time_hours}
-                                        <p class="text-sm text-destructive">{errors.avg_predictive_maintenance_time_hours}</p>
+                                    {#if errors.avg_predictive_maintenance_time_days}
+                                        <p class="text-sm text-destructive">{errors.avg_predictive_maintenance_time_days}</p>
                                     {/if}
                                 </div>
 
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="max_predictive_maintenance_time_hours">
-                                        Maximum Time (hours) <span class="text-destructive">*</span>
+                                    <label class="text-sm font-medium text-mono" for="max_predictive_maintenance_time_days">
+                                        Maximum Time (days) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="max_predictive_maintenance_time_hours"
+                                        id="max_predictive_maintenance_time_days"
                                         type="number" 
-                                        bind:value={formData.max_predictive_maintenance_time_hours}
-                                        class="kt-input {errors.max_predictive_maintenance_time_hours ? 'kt-input-error' : ''}"
+                                        bind:value={formData.max_predictive_maintenance_time_days}
+                                        class="kt-input {errors.max_predictive_maintenance_time_days ? 'kt-input-error' : ''}"
                                         placeholder="Enter maximum time"
                                         min="0"
                                         step="1"
                                         required
                                     />
-                                    {#if errors.max_predictive_maintenance_time_hours}
-                                        <p class="text-sm text-destructive">{errors.max_predictive_maintenance_time_hours}</p>
+                                    {#if errors.max_predictive_maintenance_time_days}
+                                        <p class="text-sm text-destructive">{errors.max_predictive_maintenance_time_days}</p>
                                     {/if}
                                 </div>
                             </div>
@@ -793,59 +747,59 @@
                             <!-- Corrective Maintenance Times -->
                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="min_corrective_maintenance_time_hours">
-                                        Minimum Time (hours) <span class="text-destructive">*</span>
+                                    <label class="text-sm font-medium text-mono" for="min_corrective_maintenance_time_days">
+                                        Minimum Time (days) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="min_corrective_maintenance_time_hours"
+                                        id="min_corrective_maintenance_time_days"
                                         type="number" 
-                                        bind:value={formData.min_corrective_maintenance_time_hours}
-                                        class="kt-input {errors.min_corrective_maintenance_time_hours ? 'kt-input-error' : ''}"
+                                        bind:value={formData.min_corrective_maintenance_time_days}
+                                        class="kt-input {errors.min_corrective_maintenance_time_days ? 'kt-input-error' : ''}"
                                         placeholder="Enter minimum time"
                                         min="1"
                                         step="1"
                                         required
                                     />
-                                    {#if errors.min_corrective_maintenance_time_hours}
-                                        <p class="text-sm text-destructive">{errors.min_corrective_maintenance_time_hours}</p>
+                                    {#if errors.min_corrective_maintenance_time_days}
+                                        <p class="text-sm text-destructive">{errors.min_corrective_maintenance_time_days}</p>
                                     {/if}
                                 </div>
 
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="avg_corrective_maintenance_time_hours">
-                                        Average Time (hours) <span class="text-destructive">*</span>
+                                    <label class="text-sm font-medium text-mono" for="avg_corrective_maintenance_time_days">
+                                        Average Time (days) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="avg_corrective_maintenance_time_hours"
+                                        id="avg_corrective_maintenance_time_days"
                                         type="number" 
-                                        bind:value={formData.avg_corrective_maintenance_time_hours}
-                                        class="kt-input {errors.avg_corrective_maintenance_time_hours ? 'kt-input-error' : ''}"
+                                        bind:value={formData.avg_corrective_maintenance_time_days}
+                                        class="kt-input {errors.avg_corrective_maintenance_time_days ? 'kt-input-error' : ''}"
                                         placeholder="Enter average time"
                                         min="1"
                                         step="1"
                                         required
                                     />
-                                    {#if errors.avg_corrective_maintenance_time_hours}
-                                        <p class="text-sm text-destructive">{errors.avg_corrective_maintenance_time_hours}</p>
+                                    {#if errors.avg_corrective_maintenance_time_days}
+                                        <p class="text-sm text-destructive">{errors.avg_corrective_maintenance_time_days}</p>
                                     {/if}
                                 </div>
 
                                 <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="max_corrective_maintenance_time_hours">
-                                        Maximum Time (hours) <span class="text-destructive">*</span>
+                                    <label class="text-sm font-medium text-mono" for="max_corrective_maintenance_time_days">
+                                        Maximum Time (days) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
-                                        id="max_corrective_maintenance_time_hours"
+                                        id="max_corrective_maintenance_time_days"
                                         type="number" 
-                                        bind:value={formData.max_corrective_maintenance_time_hours}
-                                        class="kt-input {errors.max_corrective_maintenance_time_hours ? 'kt-input-error' : ''}"
+                                        bind:value={formData.max_corrective_maintenance_time_days}
+                                        class="kt-input {errors.max_corrective_maintenance_time_days ? 'kt-input-error' : ''}"
                                         placeholder="Enter maximum time"
                                         min="1"
                                         step="1"
                                         required
                                     />
-                                    {#if errors.max_corrective_maintenance_time_hours}
-                                        <p class="text-sm text-destructive">{errors.max_corrective_maintenance_time_hours}</p>
+                                    {#if errors.max_corrective_maintenance_time_days}
+                                        <p class="text-sm text-destructive">{errors.max_corrective_maintenance_time_days}</p>
                                     {/if}
                                 </div>
                             </div>

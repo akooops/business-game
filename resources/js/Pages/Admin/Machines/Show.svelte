@@ -20,31 +20,6 @@
     
     const pageTitle = 'Machine Details';
 
-    // Format currency
-    function formatCurrency(amount) {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-        }).format(amount);
-    }
-
-    // Format number with units
-    function formatNumber(value, decimals = 1) {
-        return parseFloat(value).toFixed(decimals);
-    }
-
-    // Format hours to days and hours
-    function formatHours(hours) {
-        if (hours >= 24) {
-            const days = Math.floor(hours / 24);
-            const remainingHours = hours % 24;
-            return remainingHours > 0 ? `${days}d ${remainingHours}h` : `${days}d`;
-        }
-        return `${hours}h`;
-    }
-
     // Map employee profiles for display
     const employeeRequirements = (machine.employee_profiles || []).map(profile => ({
         profile_id: profile.id,
@@ -167,20 +142,10 @@
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Acquisition Cost</h4>
                             <p class="text-sm text-secondary-foreground font-bold">
-                                {formatCurrency(machine.cost_to_acquire)}
+                                {machine.cost_to_acquire}
                             </p>
                         </div>
 
-                        <!-- Area Required -->
-                        <div class="flex flex-col gap-2">
-                            <h4 class="text-sm font-semibold text-mono">Area Required</h4>
-                            <p class="text-sm text-secondary-foreground">
-                                {machine.area_required} sq m
-                                <span class="text-xs text-muted-foreground ml-2">
-                                    (Floor space required)
-                                </span>
-                            </p>
-                        </div>
 
                         <!-- Setup Time -->
                         <div class="flex flex-col gap-2">
@@ -219,24 +184,24 @@
                 </div>
                 <div class="kt-card-content">
                     <div class="grid gap-4 w-full">
-                        <!-- Energy Consumption -->
+                        <!-- Operation Cost -->
                         <div class="flex flex-col gap-2">
-                            <h4 class="text-sm font-semibold text-mono">Energy Consumption</h4>
+                            <h4 class="text-sm font-semibold text-mono">Operation Cost</h4>
                             <p class="text-sm text-secondary-foreground">
-                                {formatNumber(machine.energy_consumption_hour)} kWh/hour
+                                {machine.operation_cost}/day
                                 <span class="text-xs text-muted-foreground ml-2">
-                                    (Electricity usage per hour)
+                                    (Daily operational expenses)
                                 </span>
                             </p>
                         </div>
 
-                        <!-- Carbon Emissions -->
+                        <!-- Carbon Footprint -->
                         <div class="flex flex-col gap-2">
-                            <h4 class="text-sm font-semibold text-mono">Carbon Emissions</h4>
+                            <h4 class="text-sm font-semibold text-mono">Carbon Footprint</h4>
                             <p class="text-sm text-secondary-foreground">
-                                {formatNumber(machine.carbon_emissions_hour)} kg CO2/hour
+                                {machine.carbon_footprint} kg CO2/unit
                                 <span class="text-xs text-muted-foreground ml-2">
-                                    (Environmental impact per hour)
+                                    (Environmental impact per unit)
                                 </span>
                             </p>
                         </div>
@@ -245,7 +210,7 @@
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Quality Factor</h4>
                             <p class="text-sm text-secondary-foreground">
-                                {formatNumber(machine.quality_factor, 2)}
+                                {machine.quality_factor}
                                 <span class="text-xs text-muted-foreground ml-2">
                                     (Quality output coefficient: 0.0 - 1.0)
                                 </span>
@@ -259,19 +224,19 @@
                                 <div class="flex flex-col gap-1">
                                     <span class="text-xs text-muted-foreground">Minimum</span>
                                     <p class="text-sm text-secondary-foreground">
-                                        {formatNumber(machine.min_speed_hour)} units/h
+                                        {machine.min_speed} units/day
                                     </p>
                                 </div>
                                 <div class="flex flex-col gap-1">
                                     <span class="text-xs text-muted-foreground">Average</span>
                                     <p class="text-sm text-secondary-foreground font-medium">
-                                        {formatNumber(machine.avg_speed_hour)} units/h
+                                        {machine.avg_speed} units/day
                                     </p>
                                 </div>
                                 <div class="flex flex-col gap-1">
                                     <span class="text-xs text-muted-foreground">Maximum</span>
                                     <p class="text-sm text-secondary-foreground">
-                                        {formatNumber(machine.max_speed_hour)} units/h
+                                        {machine.max_speed} units/day
                                     </p>
                                 </div>
                             </div>
@@ -287,24 +252,13 @@
                 </div>
                 <div class="kt-card-content">
                     <div class="grid gap-4 w-full">
-                        <!-- Failure Rate -->
-                        <div class="flex flex-col gap-2">
-                            <h4 class="text-sm font-semibold text-mono">Failure Rate</h4>
-                            <p class="text-sm text-secondary-foreground">
-                                {formatNumber(machine.failure_chance_hour, 3)}% per hour
-                                <span class="text-xs text-muted-foreground ml-2">
-                                    (Probability of breakdown per hour)
-                                </span>
-                            </p>
-                        </div>
-
                         <!-- Reliability Decay -->
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Reliability Decay</h4>
                             <p class="text-sm text-secondary-foreground">
-                                {formatNumber(machine.reliability_decay_hour, 3)}% per hour
+                                {machine.reliability_decay_days} days
                                 <span class="text-xs text-muted-foreground ml-2">
-                                    (Degradation of reliability over time)
+                                    (Time until reliability decreases)
                                 </span>
                             </p>
                         </div>
@@ -327,19 +281,19 @@
                                 <div class="flex flex-col gap-1">
                                     <span class="text-xs text-muted-foreground">Cost Range</span>
                                     <p class="text-sm text-secondary-foreground">
-                                        {formatCurrency(machine.min_predictive_maintenance_cost)} - {formatCurrency(machine.max_predictive_maintenance_cost)}
+                                        {machine.min_predictive_maintenance_cost} - {machine.max_predictive_maintenance_cost}
                                     </p>
                                     <p class="text-xs text-muted-foreground">
-                                        Avg: {formatCurrency(machine.avg_predictive_maintenance_cost)}
+                                        Avg: {machine.avg_predictive_maintenance_cost}
                                     </p>
                                 </div>
                                 <div class="flex flex-col gap-1">
                                     <span class="text-xs text-muted-foreground">Time Range</span>
                                     <p class="text-sm text-secondary-foreground">
-                                        {formatHours(machine.min_predictive_maintenance_time_hours)} - {formatHours(machine.max_predictive_maintenance_time_hours)}
+                                        {machine.min_predictive_maintenance_time_days} - {machine.max_predictive_maintenance_time_days} days
                                     </p>
                                     <p class="text-xs text-muted-foreground">
-                                        Avg: {formatHours(machine.avg_predictive_maintenance_time_hours)}
+                                        Avg: {machine.avg_predictive_maintenance_time_days} days
                                     </p>
                                 </div>
                             </div>
@@ -352,19 +306,19 @@
                                 <div class="flex flex-col gap-1">
                                     <span class="text-xs text-muted-foreground">Cost Range</span>
                                     <p class="text-sm text-secondary-foreground">
-                                        {formatCurrency(machine.min_corrective_maintenance_cost)} - {formatCurrency(machine.max_corrective_maintenance_cost)}
+                                        {machine.min_corrective_maintenance_cost} - {machine.max_corrective_maintenance_cost}
                                     </p>
                                     <p class="text-xs text-muted-foreground">
-                                        Avg: {formatCurrency(machine.avg_corrective_maintenance_cost)}
+                                        Avg: {machine.avg_corrective_maintenance_cost}
                                     </p>
                                 </div>
                                 <div class="flex flex-col gap-1">
                                     <span class="text-xs text-muted-foreground">Time Range</span>
                                     <p class="text-sm text-secondary-foreground">
-                                        {formatHours(machine.min_corrective_maintenance_time_hours)} - {formatHours(machine.max_corrective_maintenance_time_hours)}
+                                        {machine.min_corrective_maintenance_time_days} - {machine.max_corrective_maintenance_time_days} days
                                     </p>
                                     <p class="text-xs text-muted-foreground">
-                                        Avg: {formatHours(machine.avg_corrective_maintenance_time_hours)}
+                                        Avg: {machine.avg_corrective_maintenance_time_days} days
                                     </p>
                                 </div>
                             </div>
@@ -422,15 +376,9 @@
                                                         
                                                         <div class="flex items-center gap-4">
                                                             <div class="flex items-center gap-1">
-                                                                <span class="text-xs text-muted-foreground">Difficulty:</span>
-                                                                <span class={getRecruitmentDifficultyBadgeClass(requirement.recruitment_difficulty) + ' kt-badge-xs'}>
-                                                                    {requirement.recruitment_difficulty.replace('_', ' ')}
-                                                                </span>
-                                                            </div>
-                                                            <div class="flex items-center gap-1">
                                                                 <span class="text-xs text-muted-foreground">Avg Salary:</span>
                                                                 <span class="text-xs font-medium">
-                                                                    {formatCurrency(requirement.avg_salary)}/mo
+                                                                    {requirement.avg_salary}/mo
                                                                 </span>
                                                             </div>
                                                         </div>

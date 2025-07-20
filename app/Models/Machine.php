@@ -17,15 +17,13 @@ class Machine extends Model
 
     protected $casts = [
         'cost_to_acquire' => 'decimal:3',
-        'area_required' => 'decimal:3',
-        'energy_consumption_hour' => 'decimal:3',
-        'carbon_emissions_hour' => 'decimal:3',
+        'operation_cost' => 'decimal:3',
+        'carbon_footprint' => 'decimal:3',
         'quality_factor' => 'decimal:3',
-        'min_speed_hour' => 'decimal:3',
-        'avg_speed_hour' => 'decimal:3',
-        'max_speed_hour' => 'decimal:3',
-        'failure_chance_hour' => 'decimal:5',
-        'reliability_decay_hour' => 'decimal:5',
+        'min_speed' => 'decimal:3',
+        'avg_speed' => 'decimal:3',
+        'max_speed' => 'decimal:3',
+        'reliability_decay_days' => 'decimal:3',
         'min_predictive_maintenance_cost' => 'decimal:3',
         'avg_predictive_maintenance_cost' => 'decimal:3',
         'max_predictive_maintenance_cost' => 'decimal:3',
@@ -61,70 +59,5 @@ class Machine extends Model
     public function getImageUrlAttribute()
     {
         return ($this->image) ? $this->image->url : URL::to('assets/images/default-machine-image.jpg');
-    }
-
-    // PERT Distribution Methods
-    public function calculatePertValue($optimistic, $mostLikely, $pessimistic)
-    {
-        // PERT formula: (O + 4*M + P) / 6
-        // With some randomization around the expected value
-        
-        $expectedValue = ($optimistic + 4 * $mostLikely + $pessimistic) / 6;
-        $standardDeviation = ($pessimistic - $optimistic) / 6;
-        
-        // Add some randomness using normal distribution
-        $u1 = rand(0, 100000) / 100000;
-        $u2 = rand(0, 100000) / 100000;
-        
-        $z = sqrt(-2 * log($u1)) * cos(2 * pi() * $u2);
-        
-        $result = $expectedValue + ($z * $standardDeviation);
-        
-        return max($optimistic, min($pessimistic, $result));
-    }
-
-    public function getPredictiveMaintenanceCost()
-    {
-        return $this->calculatePertValue(
-            $this->min_predictive_maintenance_cost,
-            $this->avg_predictive_maintenance_cost,
-            $this->max_predictive_maintenance_cost
-        );
-    }
-
-    public function getPredictiveMaintenanceDelay()
-    {
-        return $this->calculatePertValue(
-            $this->min_predictive_maintenance_time_hours,
-            $this->avg_predictive_maintenance_time_hours,
-            $this->max_predictive_maintenance_time_hours
-        );
-    }
-
-    public function getCorrectiveMaintenanceCost()
-    {
-        return $this->calculatePertValue(
-            $this->min_corrective_maintenance_cost,
-            $this->avg_corrective_maintenance_cost,
-            $this->max_corrective_maintenance_cost
-        );
-    }
-
-    public function getCorrectiveMaintenanceDelay()
-    {
-        return $this->calculatePertValue(
-            $this->min_corrective_maintenance_time_hours,
-            $this->avg_corrective_maintenance_time_hours,
-            $this->max_corrective_maintenance_time_hours
-        );
-    }
-
-    public function getRandomSpeed()
-    {
-        return $this->calculatePertValue(
-            $this->min_speed_hour,
-            $this->avg_speed_hour,
-            $this->max_speed_hour
-        );
     }
 }
