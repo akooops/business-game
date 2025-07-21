@@ -34,26 +34,41 @@ class ProductionService
         return $errors;
     }
 
-    public static function validateAssignEmployees($company, $companyMachine, $employees){
+    public static function validateAssignEmployee($companyMachine, $employee){
         $errors = [];
 
         $machine = $companyMachine->machine;
 
-        foreach($employees as $employee){
-            if($employee->companyMachine){
-                $errors['employees'] = 'This employee is already assigned to another machine. Consider unassigning this employee first.';
-                continue;
-            }
+        if($machine->employee){
+            $errors['employee'] = 'This machine already has an employee.';
+        }
 
-            if($employee->status != Employee::STATUS_ACTIVE){
-                $errors['employees'] = 'This employee is not active.';
-            }
+        if($employee->companyMachine){
+            $errors['employee'] = 'This employee is already assigned to another machine. Consider unassigning this employee first.';
+        }
 
-            if(!$machine->machineEmployeeProfiles->contains($employee->employeeProfile)){
-                $errors['employees'] = 'This machine does not need this employee profile.';
-            }
+        if($employee->status != Employee::STATUS_ACTIVE){
+            $errors['employee'] = 'This employee is not active.';
+        }
+
+        if($machine->employeeProfile->id != $employee->employeeProfile->id){
+            $errors['employee'] = 'This machine does not need this employee profile.';
         }
 
         return $errors;
+    }
+
+    public static function assignEmployee($companyMachine, $employee){
+        $companyMachine->update([
+            'employee_id' => $employee->id,
+        ]);
+
+        NotificationService::createMachineAssignedEmployeeNotification($companyMachine->company, $companyMachine->machine, $employee);
+    }
+
+    public static function unassignEmployee($companyMachine){
+        $companyMachine->update([
+            'employee_id' => null,
+        ]);
     }
 }

@@ -333,6 +333,10 @@
                 // Reset form
                 selectedMachine = null;
                 setupData = null;
+                
+                if (productSelectComponent) {
+                    productSelectComponent.clear();
+                }
             } else {
                 const errorData = await response.json();
                 showToast(errorData.message || 'Error setting up machine. Please try again.', 'error');
@@ -969,26 +973,31 @@
                 </div>
 
                 <!-- Employee Requirements Section -->
-                {#if selectedMachine.employee_profile}
+                {#if selectedMachine.employee_profiles && selectedMachine.employee_profiles.length > 0}
                     <div class="border-t border-border pt-4">
                         <h3 class="text-sm font-semibold text-mono mb-3">Employee Requirements</h3>
-                            <div class="space-y-3">
+                        <div class="space-y-3">
+                            {#each selectedMachine.employee_profiles as profile}
                                 <div class="kt-card">
                                     <div class="kt-card-body p-3">
                                         <div class="flex items-center gap-3">
                                             <div class="flex-1 min-w-0">
                                                 <h4 class="text-sm font-semibold text-mono mb-1 truncate">
-                                                    {selectedMachine.employee_profile.name}
+                                                    {profile.name}
                                                 </h4>
-                                                {#if selectedMachine.employee_profile.description}
+                                                <p class="text-xs text-muted-foreground mb-1">
+                                                    Required: {profile.pivot.required_count} employees
+                                                </p>
+                                                {#if profile.description}
                                                     <p class="text-xs text-muted-foreground">
-                                                        {selectedMachine.employee_profile.description}
+                                                        {profile.description}
                                                     </p>
                                                 {/if}
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                            {/each}
                         </div>
                     </div>
                 {:else}

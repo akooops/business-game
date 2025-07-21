@@ -42,6 +42,6 @@ class Employee extends Model
 
     public function companyMachine()
     {
-        return $this->belongsTo(CompanyMachine::class);
+        return $this->hasOne(CompanyMachine::class);
     }
 }

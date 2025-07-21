@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Company;
 
 use App\Http\Requests\Company\Machines\SetupMachineRequest;
-use App\Http\Requests\Company\Machines\AssignEmployeesRequest;
+use App\Http\Requests\Company\Machines\AssignEmployeeRequest;
 use App\Services\FileService;
 use App\Services\IndexService;
 use App\Services\ProductionService;
 use Illuminate\Http\Request;
 use App\Models\Machine;
 use App\Models\CompanyMachine;
+use App\Models\Employee;
 use App\Http\Controllers\Controller;
 
 class MachinesController extends Controller
@@ -55,7 +56,7 @@ class MachinesController extends Controller
         $status = IndexService::checkIfSearchEmpty($request->query('status'));
 
         $company = $request->company;   
-        $machines = $company->companyMachines()->with(['machine', 'machine.products', 'machine.employeeProfile'])->latest();
+        $machines = $company->companyMachines()->with(['machine', 'machine.products', 'machine.employeeProfile', 'employee'])->latest();
 
         // Apply manufacturer filter
         if ($manufacturerFilter) {
@@ -219,16 +220,25 @@ class MachinesController extends Controller
         ]);
     }
 
-    public function assignEmployees(AssignEmployeesRequest $request, CompanyMachine $companyMachine)
+    public function assignEmployee(AssignEmployeeRequest $request, CompanyMachine $companyMachine)
     {
-        $company = $request->company;
-        $machine = $companyMachine->machine;
+        $employee = Employee::find($request->employee_id);
 
-        ProductionService::setupMachine($company, $machine);
+        ProductionService::assignEmployee($companyMachine, $employee);
         
         return response()->json([
             'status' => 'success',
-            'message' => 'Machine setup successfully!'
+            'message' => 'Employee assigned successfully!'
+        ]);
+    }
+
+    public function unassignEmployee(CompanyMachine $companyMachine)
+    {
+        ProductionService::unassignEmployee($companyMachine);
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Employee unassigned successfully!'
         ]);
     }
 } 

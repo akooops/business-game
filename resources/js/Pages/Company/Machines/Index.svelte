@@ -1,21 +1,27 @@
 <script>
+    // --- Config & Constants ---
     import CompanyLayout from '../../Layouts/CompanyLayout.svelte';
     import Pagination from '../../Components/Pagination.svelte';
     import { onMount, tick } from 'svelte';
     import { page } from '@inertiajs/svelte';
+    import Select2 from '../../Components/Forms/Select2.svelte';
 
-    // Define breadcrumbs for this page
+    // Breadcrumbs and page title
     const breadcrumbs = [
         {
             title: 'Machines',
             url: route('company.machines.index'),
+            active: false
+        },
+        {
+            title: 'Index',
+            url: route('company.machines.index'),
             active: true
         }
     ];
-    
     const pageTitle = 'My Machines';
 
-    // Reactive variables
+    // --- Reactive Variables ---
     let machines = [];
     let pagination = {};
     let loading = true;
@@ -43,15 +49,25 @@
     let productFilter = '';
     let employeeProfileFilter = '';
 
-    // Select2 component references
+    // --- Component References ---
     let productSelectComponent;
     let employeeProfileSelectComponent;
+    let employeeSelectComponent;
 
-    // Drawer state
+    // --- Modal/Drawer State ---
     let selectedMachine = null;
     let showMachineDrawer = false;
+    let showAssignModal = false;
+    let assignEmployeeId = null;
+    let loadingAssign = false;
+    let assignEmployeeData = null;
+    let selectedEmployeeId = '';
+// Unassign modal state
+let showUnassignModal = false;
+let unassigning = false;
+let machineToUnassign = null;
 
-    // Machine status mapping
+    // --- Machine Status Mapping ---
     const machineStatuses = {
         'active': 'Active',
         'inactive': 'Inactive',
@@ -74,7 +90,7 @@
         }
     }
 
-    // Fetch machines data
+    // --- Fetch Functions ---
     async function fetchMachines() {
         loading = true;
         try {
@@ -83,8 +99,6 @@
                 perPage: perPage,
                 search: search
             });
-
-            // Add filter parameters
             if (manufacturerFilter) params.append('manufacturer', manufacturerFilter);
             if (priceMin) params.append('price_min', priceMin);
             if (priceMax) params.append('price_max', priceMax);
@@ -107,12 +121,9 @@
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             });
-            
             const data = await response.json();
             machines = data.machines;
             pagination = data.pagination;
-            
-            // Wait for DOM to update, then initialize menus
             await tick();
             if (window.KTMenu) {
                 window.KTMenu.init();
@@ -124,7 +135,7 @@
         }
     }
 
-    // Handle search with debouncing
+    // --- Search/Filter Handlers ---
     function handleSearch() {
         if (searchTimeout) clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
@@ -137,17 +148,6 @@
         handleSearch();
     }
     function handleFilterChange() {
-        currentPage = 1;
-        fetchMachines();
-    }
-    function goToPage(page) {
-        if (page && page !== currentPage) {
-            currentPage = page;
-            fetchMachines();
-        }
-    }
-    function handlePerPageChange(newPerPage) {
-        perPage = newPerPage;
         currentPage = 1;
         fetchMachines();
     }
@@ -192,6 +192,21 @@
     function toggleFilters() {
         showFilters = !showFilters;
     }
+
+    // --- Pagination Handlers ---
+    function goToPage(page) {
+        if (page && page !== currentPage) {
+            currentPage = page;
+            fetchMachines();
+        }
+    }
+    function handlePerPageChange(newPerPage) {
+        perPage = newPerPage;
+        currentPage = 1;
+        fetchMachines();
+    }
+
+    // --- Modal/Drawer Handlers ---
     function openMachineDrawer(machine) {
         selectedMachine = machine;
         showMachineDrawer = true;
@@ -202,21 +217,124 @@
         showMachineDrawer = false;
         selectedMachine = null;
     }
+    function openAssignModal(machine) {
+        selectedMachine = machine;
+        assignEmployeeData = {
+            machine: machine,
+            employee: machine.employee || null,
+        };
+        selectedEmployeeId = '';
+        showAssignModal = true;
+        const toggleButton = document.querySelector('[data-kt-modal-toggle="#assign_employee_modal"]');
+        if (toggleButton) {
+            toggleButton.click();
+        }
+    }
+    function closeAssignModal() {
+        const dismissButton = document.querySelector('[data-kt-modal-dismiss="#assign_employee_modal"]');
+        if (dismissButton) {
+            dismissButton.click();
+        }
+        showAssignModal = false;
+        assignEmployeeData = null;
+        selectedEmployeeId = '';
+    }
+    
+    function openUnassignModal(machine) {
+        machineToUnassign = machine;
+        showUnassignModal = true;
+        const toggleButton = document.querySelector('[data-kt-modal-toggle="#unassign_employee_modal"]');
+        if (toggleButton) toggleButton.click();
+    }
+
+    function closeUnassignModal() {
+        const dismissButton = document.querySelector('[data-kt-modal-dismiss="#unassign_employee_modal"]');
+        if (dismissButton) dismissButton.click();
+        showUnassignModal = false;
+        machineToUnassign = null;
+    }
+
+    // --- Action Handlers ---
+    async function assignEmployee() {
+        if (!selectedMachine || !selectedEmployeeId) return;
+        try {
+            const response = await fetch(route('company.machines.assign-employee', selectedMachine.id), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    employee_id: selectedEmployeeId
+                })
+            });
+            if (response.ok) {
+                const data = await response.json();
+                showToast(data.message || 'Employee assigned successfully!', 'success');
+                closeAssignModal();
+                selectedMachine = null;
+                assignEmployeeData = null;
+                fetchMachines();
+            } else {
+                const errorData = await response.json();
+                showToast(errorData.message || 'Error assigning employee. Please try again.', 'error');
+            }
+        } catch (error) {
+            console.error('Error assigning employee:', error);
+            showToast('Network error. Please check your connection and try again.', 'error');
+        }
+    }
+    async function unassignEmployee() {
+        if (!machineToUnassign) return;
+        unassigning = true;
+        try {
+            const response = await fetch(route('company.machines.unassign-employee', machineToUnassign.id), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                showToast(data.message || 'Employee unassigned successfully!', 'success');
+                closeUnassignModal();
+                fetchMachines();
+            } else {
+                const errorData = await response.json();
+                showToast(errorData.message || 'Error unassigning employee. Please try again.', 'error');
+            }
+        } catch (error) {
+            console.error('Error unassigning employee:', error);
+            showToast('Network error. Please check your connection and try again.', 'error');
+        } finally {
+            unassigning = false;
+        }
+    }
+    function showToast(message, type = 'success') {
+        if (window.KTToast) {
+            KTToast.show({
+                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
+                message: message,
+                variant: type === 'success' ? 'success' : 'destructive',
+                position: 'bottom-right',
+            });
+        }
+    }
     function formatTimestamp(timestamp) {
         if (!timestamp) return 'N/A';
         return new Date(timestamp).toLocaleString();
     }
+
+    // --- Svelte Lifecycle ---
     onMount(() => {
         fetchMachines();
     });
     export let success;
     $: if (success) {
-        KTToast.show({
-            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-            message: success,
-            variant: "success",
-            position: "bottom-right",
-        });
+        showToast(success, 'success');
     }
 </script>
 
@@ -485,7 +603,15 @@
                                                     <span>Cost to Acquire:</span>
                                                     <span class="font-medium">DZD {companyMachine.machine?.cost_to_acquire}</span>
                                                 </div>
+                                                {#if companyMachine.employee}
+                                                    <div class="flex justify-between">
+                                                        <span>Assigned Employee:</span>
+                                                        <span class="font-medium">{companyMachine.employee.name}</span>
+                                                    </div>
+                                                {/if}
                                             </div>
+
+                                            <!-- Action Buttons -->
                                             <div class="flex items-center justify-between mt-4 pt-3 border-t border-border">
                                                 <button 
                                                     class="kt-btn kt-btn-sm kt-btn-outline kt-btn-primary"
@@ -494,6 +620,23 @@
                                                     <i class="ki-filled ki-eye text-sm"></i>
                                                     View Details
                                                 </button>
+                                                {#if companyMachine.employee}
+                                                    <button 
+                                                        class="kt-btn kt-btn-sm kt-btn-destructive"
+                                                        on:click={() => openUnassignModal(companyMachine)}
+                                                    >
+                                                        <i class="ki-filled ki-cross text-sm"></i>
+                                                        Unassign Employee
+                                                    </button>
+                                                {:else}
+                                                    <button 
+                                                        class="kt-btn kt-btn-sm kt-btn-primary"
+                                                        on:click={() => openAssignModal(companyMachine)}
+                                                    >
+                                                        <i class="ki-filled ki-setting-3 text-sm"></i>
+                                                        Assign Employee
+                                                    </button>
+                                                {/if}
                                             </div>
                                         </div>
                                     </div>
@@ -517,6 +660,13 @@
     </div>
     <!-- Hidden button to trigger drawer -->
     <button style="display:none" data-kt-drawer-toggle="#machine_drawer"></button>
+
+    <!-- Hidden button to trigger modal -->
+    <button style="display:none" data-kt-modal-toggle="#assign_employee_modal"></button>
+
+    <!-- Hidden button to trigger modal -->
+    <button style="display:none" data-kt-modal-toggle="#unassign_employee_modal"></button>        
+
     <!-- Machine Details Drawer -->
     <div class="hidden kt-drawer kt-drawer-end card flex-col max-w-[90%] w-[450px] top-5 bottom-5 end-5 rounded-xl border border-border" data-kt-drawer="true" data-kt-drawer-container="body" id="machine_drawer">
         <div class="flex items-center justify-between gap-2.5 text-sm text-mono font-semibold px-5 py-2.5 border-b border-b-border">
@@ -579,6 +729,18 @@
                             </span>
                         </div>
                     </div>
+                </div>
+                <!-- Employee Assignment Section -->
+                <div class="border-t border-border pt-4">
+                    <h3 class="text-sm font-semibold text-mono mb-3">Assigned Employee</h3>
+                    {#if selectedMachine.employee}
+                        <div class="flex flex-col gap-1">
+                            <span class="text-xs font-medium">{selectedMachine.employee.name}</span>
+                            <span class="text-xs text-muted-foreground">{selectedMachine.employee.employee_profile?.name}</span>
+                        </div>
+                    {:else}
+                        <span class="text-xs text-muted-foreground">No employee assigned</span>
+                    {/if}
                 </div>
                 <!-- Timestamps Section -->
                 <div class="border-t border-border pt-4">
@@ -653,6 +815,157 @@
                     </div>
                 </div>
             {/if}
+        </div>
+    </div>
+
+    <!-- Assign Employee Confirmation Modal -->
+    <div class="kt-modal" data-kt-modal="true" id="assign_employee_modal">
+        <div class="kt-modal-content max-w-[600px] top-[5%]">
+            <div class="kt-modal-header">
+                <h3 class="kt-modal-title">Assign Employee</h3>
+                <button
+                    type="button"
+                    class="kt-modal-close"
+                    aria-label="Close modal"
+                    data-kt-modal-dismiss="#assign_employee_modal"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-x"
+                        aria-hidden="true"
+                    >
+                        <path d="M18 6 6 18"></path>
+                        <path d="m6 6 12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="kt-modal-body">
+                <label class="text-sm font-medium text-mono mb-2 block">Select Employee</label>
+                <Select2
+                    bind:this={employeeSelectComponent}
+                    id="employee-select"
+                    placeholder="Choose an employee..."
+                    bind:value={selectedEmployeeId}
+                    on:select={e => selectedEmployeeId = e.detail.value}
+                    on:clear={() => selectedEmployeeId = ''}
+                    ajax={{
+                        url: route('company.employees.index') + '?status=active',
+                        dataType: 'json',
+                        delay: 300,
+                        data: function(params) {
+                            return {
+                                search: params.term,
+                                perPage: 10
+                            };
+                        },
+                        processResults: function(data) {
+                            return {
+                                results: data.employees.map(employee => ({
+                                    id: employee.id,
+                                    text: employee.name,
+                                    name: employee.name,
+                                    profile: employee.employee_profile?.name
+                                }))
+                            };
+                        },
+                        cache: true
+                    }}
+                    templateResult={function(data) {
+                        if (data.loading) return data.text;
+                        const $elem = globalThis.$('<div class="flex flex-col">' +
+                            '<span class="font-medium">' + data.name + '</span>' +
+                            (data.profile ? '<span class="kt-badge kt-badge-outline kt-badge-info kt-badge-sm w-fit mt-1">' + data.profile + '</span>' : '') +
+                            '</div>');
+                        return $elem;
+                    }}
+                    templateSelection={function(data) {
+                        if (!data.id) return data.text;
+                        return data.name + (data.profile ? ' (' + data.profile + ')' : '');
+                    }}
+                />
+            </div>
+            <div class="kt-modal-footer">
+                <div></div>
+                <div class="flex gap-4">
+                    <button
+                        class="kt-btn kt-btn-secondary"
+                        data-kt-modal-dismiss="#assign_employee_modal"
+                        on:click={closeAssignModal}
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        class="kt-btn kt-btn-primary"
+                        on:click={assignEmployee}
+                        disabled={!selectedEmployeeId || loadingAssign}
+                    >
+                        {loadingAssign ? 'Assigning...' : 'Assign Employee'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Unassign Employee Confirmation Modal -->
+    <div class="kt-modal" data-kt-modal="true" id="unassign_employee_modal">
+        <div class="kt-modal-content max-w-[600px] top-[5%]">
+            <div class="kt-modal-header">
+                <h3 class="kt-modal-title">Unassign Employee</h3>
+                <button
+                    type="button"
+                    class="kt-modal-close"
+                    aria-label="Close modal"
+                    data-kt-modal-dismiss="#unassign_employee_modal"
+                    on:click={closeUnassignModal}
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-x"
+                        aria-hidden="true"
+                    >
+                        <path d="M18 6 6 18"></path>
+                        <path d="m6 6 12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="kt-modal-body">
+                <p>Are you sure you want to unassign the employee from this machine?</p>
+            </div>
+            <div class="kt-modal-footer">
+                <div></div>
+                <div class="flex gap-4">
+                    <button
+                        class="kt-btn kt-btn-secondary"
+                        data-kt-modal-dismiss="#unassign_employee_modal"
+                        on:click={closeUnassignModal}
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        class="kt-btn kt-btn-destructive"
+                        on:click={unassignEmployee}
+                        disabled={unassigning}
+                    >
+                        {unassigning ? 'Unassigning...' : 'Unassign Employee'}
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </CompanyLayout> 

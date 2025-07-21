@@ -72,7 +72,8 @@ Route::prefix('company')->middleware(['auth', 'check.company', 'handle.inertia']
     Route::get('/machines/setup-page', [MachinesController::class, 'setupPage'])->middleware('check.permission:company.machines.index')->name('company.machines.setup-page');
     Route::post('/machines/{machine}/setup', [MachinesController::class, 'setup'])->middleware('check.permission:company.machines.store')->name('company.machines.setup');
 
-    Route::post('/machines/{companyMachine}/assign-employees', [MachinesController::class, 'assignEmployees'])->middleware('check.permission:company.machines.index')->name('company.machines.assign-employees');
+    Route::post('/machines/{companyMachine}/assign-employee', [MachinesController::class, 'assignEmployee'])->middleware('check.permission:company.machines.index')->name('company.machines.assign-employee');
+    Route::post('/machines/{companyMachine}/unassign-employee', [MachinesController::class, 'unassignEmployee'])->middleware('check.permission:company.machines.index')->name('company.machines.unassign-employee');
 });
 
 

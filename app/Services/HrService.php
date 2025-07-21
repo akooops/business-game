@@ -46,7 +46,7 @@ class HrService
                 'salary_month' => $realSalary,
                 'current_mood' => 1,
                 'mood_decay_rate_days' => $mood_decay_rate_days,
-                'efficiency_factor' => $efficiency_factor,
+                'efficiency_factor' => min(2, $efficiency_factor),
                 'status' => Employee::STATUS_APPLIED,
                 'applied_at' => SettingsService::getCurrentTimestamp(),
                 'timelimit_days' => rand(1, 7),
@@ -164,6 +164,10 @@ class HrService
                     'resigned_at' => SettingsService::getCurrentTimestamp(),
                     'current_mood' => $mood
                 ]);
+
+                $employee->companyMachine->update([
+                    'employee_id' => null,
+                ]);
                 
                 // Create resignation notification
                 NotificationService::createEmployeeResignedNotification($employee);
@@ -197,6 +201,10 @@ class HrService
         $employee->update([
             'status' => Employee::STATUS_FIRED,
             'fired_at' => SettingsService::getCurrentTimestamp(),
+        ]);
+
+        $employee->companyMachine->update([
+            'employee_id' => null,
         ]);
 
         $companyEmployees = $employee->company->employees()->where('status', Employee::STATUS_ACTIVE)->get();

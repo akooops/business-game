@@ -315,6 +315,16 @@ class NotificationService
         ]);
     }
 
+    public static function createMachineAssignedEmployeeNotification($company, $machine, $employee){
+        return Notification::create([
+            'type' => Notification::TYPE_MACHINE_ASSIGNED_EMPLOYEE,
+            'title' => 'Machine Assigned Employee',
+            'message' => "Machine {$machine->name} assigned to employee {$employee->name}.",
+            'url' => route('company.machines.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
     public static function getUnreadCount()
     {
         return Notification::where('user_id', auth()->user()->id)->whereNull('read_at')->count();
