@@ -157,7 +157,7 @@ class InventoryService
     }
 
     public static function productionStarted($productionOrder){
-        $company = $productionOrder->company;
+        $company = $productionOrder->companyMachine->company;
         $product = $productionOrder->product;
         $quantity = $productionOrder->quantity;
 
@@ -195,7 +195,7 @@ class InventoryService
     }
 
     public static function productionCompleted($productionOrder, $outputQuantity){
-        $company = $productionOrder->company;
+        $company = $productionOrder->companyMachine->company;
         $product = $productionOrder->product;
 
         $companyInventory = InventoryMovement::create([

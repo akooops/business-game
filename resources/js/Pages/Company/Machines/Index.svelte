@@ -67,6 +67,14 @@ let showUnassignModal = false;
 let unassigning = false;
 let machineToUnassign = null;
 
+// Production modal state
+let showProductionModal = false;
+let startingProduction = false;
+let machineToProduce = null;
+let selectedProductId = '';
+let productionQuantity = 1;
+let availableProducts = [];
+
     // --- Machine Status Mapping ---
     const machineStatuses = {
         'active': 'Active',
@@ -254,6 +262,27 @@ let machineToUnassign = null;
         machineToUnassign = null;
     }
 
+    function openProductionModal(machine) {
+        machineToProduce = machine;
+        selectedProductId = '';
+        productionQuantity = 1;
+        // Get available products from the machine
+        availableProducts = machine.machine?.products?.filter(product => product.is_researched) || [];
+        showProductionModal = true;
+        const toggleButton = document.querySelector('[data-kt-modal-toggle="#production_modal"]');
+        if (toggleButton) toggleButton.click();
+    }
+
+    function closeProductionModal() {
+        const dismissButton = document.querySelector('[data-kt-modal-dismiss="#production_modal"]');
+        if (dismissButton) dismissButton.click();
+        showProductionModal = false;
+        machineToProduce = null;
+        selectedProductId = '';
+        productionQuantity = 1;
+        availableProducts = [];
+    }
+
     // --- Action Handlers ---
     async function assignEmployee() {
         if (!selectedMachine || !selectedEmployeeId) return;
@@ -313,6 +342,40 @@ let machineToUnassign = null;
             unassigning = false;
         }
     }
+
+    async function startProduction() {
+        if (!machineToProduce || !selectedProductId || !productionQuantity) return;
+        startingProduction = true;
+        try {
+            const response = await fetch(route('company.production-orders.store', machineToProduce.id), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    product_id: selectedProductId,
+                    quantity: productionQuantity
+                })
+            });
+            if (response.ok) {
+                const data = await response.json();
+                showToast(data.message || 'Production started successfully!', 'success');
+                closeProductionModal();
+                fetchMachines();
+            } else {
+                const errorData = await response.json();
+                showToast(errorData.message || 'Error starting production. Please try again.', 'error');
+            }
+        } catch (error) {
+            console.error('Error starting production:', error);
+            showToast('Network error. Please check your connection and try again.', 'error');
+        } finally {
+            startingProduction = false;
+        }
+    }
+
     function showToast(message, type = 'success') {
         if (window.KTToast) {
             KTToast.show({
@@ -620,21 +683,29 @@ let machineToUnassign = null;
                                                     <i class="ki-filled ki-eye text-sm"></i>
                                                     View Details
                                                 </button>
-                                                {#if companyMachine.employee}
-                                                    <button 
-                                                        class="kt-btn kt-btn-sm kt-btn-destructive"
-                                                        on:click={() => openUnassignModal(companyMachine)}
-                                                    >
-                                                        <i class="ki-filled ki-cross text-sm"></i>
-                                                        Unassign Employee
-                                                    </button>
-                                                {:else}
+                                                {#if companyMachine.employee === null}
                                                     <button 
                                                         class="kt-btn kt-btn-sm kt-btn-primary"
                                                         on:click={() => openAssignModal(companyMachine)}
                                                     >
                                                         <i class="ki-filled ki-setting-3 text-sm"></i>
                                                         Assign Employee
+                                                    </button>
+                                                {:else if companyMachine.status === 'inactive' }
+                                                    <button 
+                                                        class="kt-btn kt-btn-sm kt-btn-primary"
+                                                        on:click={() => openProductionModal(companyMachine)}
+                                                    >
+                                                        <i class="ki-filled ki-play text-sm"></i>
+                                                        Start Production
+                                                    </button>                      
+                                                {:else}
+                                                    <button 
+                                                        class="kt-btn kt-btn-sm kt-btn-destructive"
+                                                        on:click={() => openUnassignModal(companyMachine)}
+                                                    >
+                                                        <i class="ki-filled ki-cross text-sm"></i>
+                                                        Unassign Employee
                                                     </button>
                                                 {/if}
                                             </div>
@@ -666,6 +737,9 @@ let machineToUnassign = null;
 
     <!-- Hidden button to trigger modal -->
     <button style="display:none" data-kt-modal-toggle="#unassign_employee_modal"></button>        
+
+    <!-- Hidden button to trigger production modal -->
+    <button style="display:none" data-kt-modal-toggle="#production_modal"></button>
 
     <!-- Machine Details Drawer -->
     <div class="hidden kt-drawer kt-drawer-end card flex-col max-w-[90%] w-[450px] top-5 bottom-5 end-5 rounded-xl border border-border" data-kt-drawer="true" data-kt-drawer-container="body" id="machine_drawer">
@@ -963,6 +1037,145 @@ let machineToUnassign = null;
                         disabled={unassigning}
                     >
                         {unassigning ? 'Unassigning...' : 'Unassign Employee'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Production Modal -->
+    <div class="kt-modal" data-kt-modal="true" id="production_modal">
+        <div class="kt-modal-content max-w-[600px] top-[5%]">
+            <div class="kt-modal-header">
+                <h3 class="kt-modal-title">Start Production</h3>
+                <button
+                    type="button"
+                    class="kt-modal-close"
+                    aria-label="Close modal"
+                    data-kt-modal-dismiss="#production_modal"
+                    on:click={closeProductionModal}
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-x"
+                        aria-hidden="true"
+                    >
+                        <path d="M18 6 6 18"></path>
+                        <path d="m6 6 12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="kt-modal-body">
+                {#if machineToProduce}
+                    <div class="space-y-4">
+                        <!-- Machine Info -->
+                        <div class="flex items-center gap-4">
+                            <div class="flex-shrink-0">
+                                {#if machineToProduce.machine?.image_url}
+                                    <img 
+                                        src={machineToProduce.machine.image_url} 
+                                        alt={machineToProduce.machine.name}
+                                        class="w-16 h-16 rounded-lg object-cover"
+                                    />
+                                {:else}
+                                    <div class="w-16 h-16 rounded-lg bg-accent/50 flex items-center justify-center">
+                                        <i class="ki-filled ki-setting-3 text-xl text-muted-foreground"></i>
+                                    </div>
+                                {/if}
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-mono mb-1">{machineToProduce.machine?.name}</h4>
+                                <p class="text-sm text-muted-foreground">{machineToProduce.machine?.model} - {machineToProduce.machine?.manufacturer}</p>
+                            </div>
+                        </div>
+
+                        <!-- Product Selection -->
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-mono">Select Product</label>
+                            {#if availableProducts.length > 0}
+                                <select 
+                                    class="kt-select w-full" 
+                                    bind:value={selectedProductId}
+                                >
+                                    <option value="">Choose a product...</option>
+                                    {#each availableProducts as product}
+                                        <option value={product.id}>{product.name} ({product.type_name})</option>
+                                    {/each}
+                                </select>
+                            {:else}
+                                <div class="kt-card bg-muted/50">
+                                    <div class="kt-card-body p-4">
+                                        <div class="flex flex-col items-center justify-center text-center">
+                                            <i class="ki-filled ki-abstract-26 text-2xl text-muted-foreground mb-2"></i>
+                                            <p class="text-sm text-muted-foreground">No products available for this machine</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {/if}
+                        </div>
+
+                        <!-- Quantity Input -->
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-mono">Production Quantity</label>
+                            <input 
+                                type="number" 
+                                class="kt-input w-full" 
+                                bind:value={productionQuantity}
+                                min="1"
+                                step="1"
+                                placeholder="Enter quantity"
+                            />
+                        </div>
+
+                        <!-- Production Details -->
+                        {#if selectedProductId && productionQuantity > 0}
+                            <div class="kt-card bg-accent/50">
+                                <div class="kt-card-header px-5">
+                                    <h3 class="kt-card-title">Production Details</h3>
+                                </div>
+                                <div class="kt-card-content px-5 py-4 space-y-2">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm font-normal text-secondary-foreground">Speed:</span>
+                                        <span class="text-sm font-medium text-mono">{machineToProduce.machine?.avg_speed} units/day</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm font-normal text-secondary-foreground">Quality Factor:</span>
+                                        <span class="text-sm font-medium text-mono">{machineToProduce.machine?.quality_factor}%</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm font-normal text-secondary-foreground">Carbon Footprint:</span>
+                                        <span class="text-sm font-medium text-mono">{machineToProduce.machine?.carbon_footprint} kg CO2/unit</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {/if}
+                    </div>
+                {/if}
+            </div>
+            <div class="kt-modal-footer">
+                <div></div>
+                <div class="flex gap-4">
+                    <button
+                        class="kt-btn kt-btn-secondary"
+                        data-kt-modal-dismiss="#production_modal"
+                        on:click={closeProductionModal}
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        class="kt-btn kt-btn-primary"
+                        on:click={startProduction}
+                        disabled={!selectedProductId || !productionQuantity || startingProduction}
+                    >
+                        {startingProduction ? 'Starting Production...' : 'Start Production'}
                     </button>
                 </div>
             </div>

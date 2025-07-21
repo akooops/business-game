@@ -93,8 +93,6 @@ class FinanceService
         $funds -= $machine->operation_cost;
         $company->update(['funds' => $funds]);
 
-        NotificationService::createFinanceFundsChangedNotification($company, $machine->operation_cost);
-
         return $funds;
     }
 }

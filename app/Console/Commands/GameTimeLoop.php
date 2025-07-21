@@ -70,6 +70,9 @@ class GameTimeLoop extends Command
         // Pay machines operation costs
         $this->call('game:pay-machines-operation-costs');
 
+        // Process production orders
+        $this->call('game:production-orders-processing');
+
         if($newTime->day == 1 ){
             // Pay employees salaries
             $this->call('game:pay-employees-salaries');

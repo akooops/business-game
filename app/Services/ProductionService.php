@@ -81,6 +81,10 @@ class ProductionService
             $errors['product_researched'] = 'This product is not researched yet.';
         }
 
+        if(!$companyMachine->machine->products->contains($product)){
+            $errors['product'] = 'This machine does not produce this product.';
+        }
+
         if($companyMachine->status != CompanyMachine::STATUS_INACTIVE){
             $errors['machine'] = 'This machine is not active.';
         }
@@ -99,6 +103,8 @@ class ProductionService
                 $errors['material'] = 'This company does not have enough stock of ' . $material->name . ' to produce this product.';
             }
         }
+
+        return $errors;
     }
 
     public static function startProduction($companyMachine, $product, $quantity){
@@ -115,7 +121,7 @@ class ProductionService
             $realSpeed = $machine->max_speed;
         }
 
-        $expectedSpeed = $machine->speed;
+        $expectedSpeed = $machine->avg_speed;
 
         $estimatedProductionTime = $quantity / $expectedSpeed;
         $realProductionTime = $quantity / $realSpeed;

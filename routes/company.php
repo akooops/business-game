@@ -14,6 +14,7 @@ use App\Http\Controllers\Company\SalesController;
 use App\Http\Controllers\Company\EmployeeProfilesController;
 use App\Http\Controllers\Company\EmployeesController;
 use App\Http\Controllers\Company\MachinesController;
+use App\Http\Controllers\Company\ProductionOrdersController;
 
 /*
 |--------------------------------------------------------------------------
@@ -74,6 +75,8 @@ Route::prefix('company')->middleware(['auth', 'check.company', 'handle.inertia']
 
     Route::post('/machines/{companyMachine}/assign-employee', [MachinesController::class, 'assignEmployee'])->middleware('check.permission:company.machines.index')->name('company.machines.assign-employee');
     Route::post('/machines/{companyMachine}/unassign-employee', [MachinesController::class, 'unassignEmployee'])->middleware('check.permission:company.machines.index')->name('company.machines.unassign-employee');
+
+    Route::post('/production-orders/{companyMachine}/produce', [ProductionOrdersController::class, 'produce'])->middleware('check.permission:company.production-orders.store')->name('company.production-orders.store');
 });
 
 

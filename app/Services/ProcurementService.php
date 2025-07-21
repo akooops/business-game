@@ -25,11 +25,12 @@ class ProcurementService
         if($supplier->country) {
             $customsDuties = $supplier->country->customs_duties_rate;
         }
+
         
         $totalSalePrice = $salePrice * $quantity;
         $totalShippingCost = $shippingCost * $quantity;
 
-        return $totalSalePrice + $totalShippingCost + $customsDuties * ($totalSalePrice *  + $totalShippingCost);
+        return $totalSalePrice + $totalShippingCost + $customsDuties * ($totalSalePrice + $totalShippingCost);
     }
 
     public static function validatePurchase($company, $supplier, $product, $quantity){
