@@ -25,7 +25,6 @@
         model: '',
         manufacturer: '',
         cost_to_acquire: '',
-        setup_time_days: '',
         operation_cost: '',
         carbon_footprint: '',
         quality_factor: '',
@@ -47,7 +46,7 @@
         avg_corrective_maintenance_time_days: '',
         max_corrective_maintenance_time_days: '',
         file: null,
-        employee_profiles: [],
+        employee_profile_id: '',
         outputs: []
     };
 
@@ -79,21 +78,10 @@
     // Handle employee profile selection
     function handleEmployeeProfileSelect(event) {
         const profileId = event.detail.value;
-        const profileData = event.detail.data;
         
         // Check if profile is already added
-        const exists = formData.employee_profiles.find(profile => profile.employee_profile_id === profileId);
-        if (!exists) {
-            formData.employee_profiles = [...formData.employee_profiles, { 
-                employee_profile_id: profileId,
-                employee_profile_name: profileData.name,
-                required_count: 1
-            }];
-        }
-        
-        // Clear the select2
-        if (employeeProfileSelectComponent) {
-            employeeProfileSelectComponent.clear();
+        if (!formData.employee_profile_id) {
+            formData.employee_profile_id = profileId;
         }
     }
 
@@ -117,12 +105,7 @@
         if (productSelectComponent) {
             productSelectComponent.clear();
         }
-    }
-
-    // Remove employee profile
-    function removeEmployeeProfile(index) {
-        formData.employee_profiles = formData.employee_profiles.filter((_, i) => i !== index);
-    }
+    }   
 
     // Remove output
     function removeOutput(index) {
@@ -259,28 +242,6 @@
                                 ></textarea>
                                 {#if errors.description}
                                     <p class="text-sm text-destructive">{errors.description}</p>
-                                {/if}
-                            </div>
-
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="setup_time_days">
-                                    Setup Time (days) <span class="text-destructive">*</span>
-                                </label>
-                                <input 
-                                    id="setup_time_days"
-                                    type="number" 
-                                    bind:value={formData.setup_time_days}
-                                    class="kt-input {errors.setup_time_days ? 'kt-input-error' : ''}"
-                                    placeholder="Enter setup time in days"
-                                    min="1"
-                                    step="1"
-                                    required
-                                />
-                                <p class="text-xs text-secondary-foreground">
-                                    Time required to set up this machine
-                                </p>
-                                {#if errors.setup_time_days}
-                                    <p class="text-sm text-destructive">{errors.setup_time_days}</p>
                                 {/if}
                             </div>
 
@@ -779,22 +740,22 @@
                 <!-- Employee Requirements Card -->
                 <div class="kt-card">
                     <div class="kt-card-header">
-                        <h4 class="kt-card-title">Employee Requirements</h4>
+                        <h4 class="kt-card-title">Employee Profile</h4>
                     </div>
                     <div class="kt-card-content">
                         <div class="grid gap-4">
                             <!-- Employee Profile Selector -->
                             <div>
                                 <label class="text-sm font-medium text-mono" for="employee-profile-selector">
-                                    Add Employee Profile Requirements
+                                    Add Employee Profile
                                 </label>
                                 <p class="text-xs text-secondary-foreground mb-2">
-                                    Search and select employee profiles required to operate this machine
+                                    Search and select employee profile required to operate this machine
                                 </p>
                                 <Select2
                                     bind:this={employeeProfileSelectComponent}
                                     id="employee-profile-selector"
-                                    placeholder="Search and select employee profiles..."
+                                    placeholder="Search and select employee profile..."
                                     on:select={handleEmployeeProfileSelect}
                                     ajax={{
                                         url: route('admin.employee-profiles.index'),
@@ -812,7 +773,6 @@
                                                     id: profile.id,
                                                     text: profile.name,
                                                     name: profile.name,
-                                                    recruitment_difficulty: profile.recruitment_difficulty
                                                 }))
                                             };
                                         },
@@ -827,7 +787,6 @@
                                             '</div>' +
                                             '<div class="flex flex-col">' +
                                             '<span class="font-medium text-sm">' + data.name + '</span>' +
-                                            '<span class="text-xs text-muted-foreground">Difficulty: ' + data.recruitment_difficulty + '</span>' +
                                             '</div>' +
                                             '</div>');
                                         return $elem;
@@ -837,65 +796,6 @@
                                         return data.name;
                                     }}
                                 />
-                            </div>
-                            
-                            <!-- Selected Employee Profiles -->
-                            <div>
-                                {#if formData.employee_profiles.length === 0}
-                                    <div class="kt-card bg-muted/20 border-dashed">
-                                        <div class="kt-card-content text-center py-8">
-                                            <i class="ki-filled ki-profile-circle text-2xl text-muted-foreground mb-2"></i>
-                                            <p class="text-sm text-muted-foreground">No employee profiles required yet</p>
-                                            <p class="text-xs text-muted-foreground mt-1">Use the search above to add employee requirements</p>
-                                        </div>
-                                    </div>
-                                {:else}
-                                    <div class="space-y-3">
-                                        {#each formData.employee_profiles as profile, index}
-                                            <div class="kt-card border">
-                                                <div class="kt-card-content p-4">
-                                                    <div class="flex items-center gap-4">
-                                                        <div class="flex items-center gap-3 flex-1">
-                                                            <div class="flex items-center justify-center size-10 shrink-0 rounded bg-accent/50">
-                                                                <i class="ki-filled ki-profile-circle text-lg text-muted-foreground"></i>
-                                                            </div>
-                                                            <div class="flex flex-col">
-                                                                <span class="text-sm font-medium text-mono">{profile.employee_profile_name}</span>
-                                                            </div>
-                                                        </div>
-                                                        
-                                                        <div class="flex items-center gap-2">
-                                                            <label class="text-sm font-medium text-mono" for="required-count-{index}">
-                                                                Required Count:
-                                                            </label>
-                                                            <input 
-                                                                id="required-count-{index}"
-                                                                type="number" 
-                                                                bind:value={profile.required_count}
-                                                                class="kt-input w-20 {errors[`employee_profiles.${index}.required_count`] ? 'kt-input-error' : ''}"
-                                                                min="1"
-                                                                required
-                                                            />
-                                                        </div>
-                                                        
-                                                        <button 
-                                                            type="button" 
-                                                            class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost text-destructive"
-                                                            on:click={() => removeEmployeeProfile(index)}
-                                                            title="Remove requirement"
-                                                        >
-                                                            <i class="ki-filled ki-trash"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        {/each}
-                                    </div>
-                                {/if}
-
-                                {#if errors.employee_profiles}
-                                    <p class="text-sm text-destructive mt-2">{errors.employee_profiles}</p>
-                                {/if}
                             </div>
                         </div>
                     </div>

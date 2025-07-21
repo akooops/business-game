@@ -67,5 +67,17 @@ class Company extends Model
         return $this->hasMany(Employee::class);
     }
 
+    public function companyMachines()
+    {
+        return $this->hasMany(CompanyMachine::class);
+    }   
+
+    public function machines()
+    {
+        return $this->belongsToMany(Machine::class, 'company_machines', 'company_id', 'machine_id')
+            ->withPivot('status', 'current_reliability', 'setup_at', 'last_maintenance_at', 'last_broken_at')
+            ->withTimestamps();
+    }
+
     // Accessors
 }

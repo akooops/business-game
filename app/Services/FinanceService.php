@@ -77,4 +77,14 @@ class FinanceService
 
         return $funds;
     }   
+
+    public static function payMachineSetupCost($company, $machine){
+        $funds = $company->funds;
+        $funds -= $machine->cost_to_acquire;
+        $company->update(['funds' => $funds]);
+
+        NotificationService::createFinanceFundsChangedNotification($company, $machine->cost_to_acquire);
+
+        return $funds;
+    }
 }

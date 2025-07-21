@@ -38,11 +38,9 @@ class Machine extends Model
         return $this->morphOne(File::class, 'model')->where('is_main', 1);
     }
 
-    public function employeeProfiles()
+    public function employeeProfile()
     {
-        return $this->belongsToMany(EmployeeProfile::class, 'machine_employee_profiles')
-                   ->withPivot('required_count')
-                   ->withTimestamps();
+        return $this->belongsTo(EmployeeProfile::class);
     }
 
     public function outputs()

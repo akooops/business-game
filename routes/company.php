@@ -13,6 +13,7 @@ use App\Http\Controllers\Company\InventoryController;
 use App\Http\Controllers\Company\SalesController;
 use App\Http\Controllers\Company\EmployeeProfilesController;
 use App\Http\Controllers\Company\EmployeesController;
+use App\Http\Controllers\Company\MachinesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -66,6 +67,12 @@ Route::prefix('company')->middleware(['auth', 'check.company', 'handle.inertia']
     Route::post('/employees/{employee}/recruit', [EmployeesController::class, 'recruit'])->middleware('check.permission:company.employees.store')->name('company.employees.store');
     Route::post('/employees/{employee}/promote', [EmployeesController::class, 'promote'])->middleware('check.permission:company.employees.store')->name('company.employees.promote');
     Route::post('/employees/{employee}/fire', [EmployeesController::class, 'fire'])->middleware('check.permission:company.employees.store')->name('company.employees.fire');
+
+    Route::get('/machines', [MachinesController::class, 'index'])->middleware('check.permission:company.machines.index')->name('company.machines.index');
+    Route::get('/machines/setup-page', [MachinesController::class, 'setupPage'])->middleware('check.permission:company.machines.index')->name('company.machines.setup-page');
+    Route::post('/machines/{machine}/setup', [MachinesController::class, 'setup'])->middleware('check.permission:company.machines.store')->name('company.machines.setup');
+
+    Route::post('/machines/{companyMachine}/assign-employees', [MachinesController::class, 'assignEmployees'])->middleware('check.permission:company.machines.index')->name('company.machines.assign-employees');
 });
 
 

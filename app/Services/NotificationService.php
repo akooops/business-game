@@ -305,6 +305,16 @@ class NotificationService
         ]);
     }
 
+    public static function createMachineSetupNotification($company, $machine){
+        return Notification::create([
+            'type' => Notification::TYPE_MACHINE_SETUP,
+            'title' => 'Machine Setup',
+            'message' => "Machine {$machine->name} setup.",
+            'url' => route('company.machines.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
     public static function getUnreadCount()
     {
         return Notification::where('user_id', auth()->user()->id)->whereNull('read_at')->count();

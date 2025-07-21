@@ -20,16 +20,6 @@
     
     const pageTitle = 'Machine Details';
 
-    // Map employee profiles for display
-    const employeeRequirements = (machine.employee_profiles || []).map(profile => ({
-        profile_id: profile.id,
-        profile_name: profile.name,
-        profile_description: profile.description,
-        required_count: profile.pivot.required_count,
-        recruitment_difficulty: profile.recruitment_difficulty,
-        avg_salary: profile.avg_salary_month
-    }));
-
     // Map machine outputs for display
     const outputs = (machine.products || []).map(product => ({
         product_id: product.id,
@@ -143,18 +133,6 @@
                             <h4 class="text-sm font-semibold text-mono">Acquisition Cost</h4>
                             <p class="text-sm text-secondary-foreground font-bold">
                                 {machine.cost_to_acquire}
-                            </p>
-                        </div>
-
-
-                        <!-- Setup Time -->
-                        <div class="flex flex-col gap-2">
-                            <h4 class="text-sm font-semibold text-mono">Setup Time</h4>
-                            <p class="text-sm text-secondary-foreground">
-                                {machine.setup_time_days} days
-                                <span class="text-xs text-muted-foreground ml-2">
-                                    (Time to install and configure)
-                                </span>
                             </p>
                         </div>
 
@@ -334,62 +312,42 @@
                 </div>
                 <div class="kt-card-content">
                     <div class="grid gap-4">
-                        {#if employeeRequirements.length === 0}
-                            <div class="kt-card bg-muted/20 border-dashed">
-                                <div class="kt-card-content text-center py-8">
-                                    <i class="ki-filled ki-profile-user text-2xl text-muted-foreground mb-2"></i>
-                                    <p class="text-sm text-muted-foreground">No employee requirements</p>
-                                    <p class="text-xs text-muted-foreground mt-1">This machine can operate without dedicated staff</p>
-                                </div>
-                            </div>
-                        {:else}
-                            <div>
-                                <h5 class="text-sm font-medium text-mono mb-3">
-                                    Required Employee Profiles ({employeeRequirements.length})
-                                </h5>
-                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                    {#each employeeRequirements as requirement}
-                                        <div class="kt-card">
-                                            <div class="kt-card-content p-4">
-                                                <div class="flex items-start gap-3">
-                                                    <!-- Employee Icon -->
-                                                    <div class="flex items-center justify-center w-10 h-10 bg-accent/50 rounded-lg">
-                                                        <i class="ki-filled ki-users text-lg text-muted-foreground"></i>
-                                                    </div>
-                                                    
-                                                    <!-- Employee Info -->
-                                                    <div class="flex-1 space-y-2">
-                                                        <div class="flex items-center gap-2">
-                                                            <h6 class="text-sm font-medium text-mono">
-                                                                {requirement.profile_name}
-                                                            </h6>
-                                                            <span class="kt-badge kt-badge-outline kt-badge-primary kt-badge-xs">
-                                                                {requirement.required_count}x required
-                                                            </span>
-                                                        </div>
-                                                        
-                                                        {#if requirement.profile_description}
-                                                        <p class="text-xs text-muted-foreground">
-                                                            {requirement.profile_description}
-                                                        </p>
-                                                        {/if}
-                                                        
-                                                        <div class="flex items-center gap-4">
-                                                            <div class="flex items-center gap-1">
-                                                                <span class="text-xs text-muted-foreground">Avg Salary:</span>
-                                                                <span class="text-xs font-medium">
-                                                                    {requirement.avg_salary}/mo
-                                                                </span>
-                                                            </div>
-                                                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                <div class="kt-card">
+                                    <div class="kt-card-content p-4">
+                                        <div class="flex items-start gap-3">
+                                            <!-- Employee Icon -->
+                                            <div class="flex items-center justify-center w-10 h-10 bg-accent/50 rounded-lg">
+                                                <i class="ki-filled ki-users text-lg text-muted-foreground"></i>
+                                            </div>
+                                            
+                                            <!-- Employee Info -->
+                                            <div class="flex-1 space-y-2">
+                                                <div class="flex items-center gap-2">
+                                                    <h6 class="text-sm font-medium text-mono">
+                                                        {machine.employeeProfile.name}
+                                                    </h6>
+                                                </div>
+                                                
+                                                {#if machine.employeeProfile.description}
+                                                <p class="text-xs text-muted-foreground">
+                                                    {machine.employeeProfile.description}
+                                                </p>
+                                                {/if}
+                                                
+                                                <div class="flex items-center gap-4">
+                                                    <div class="flex items-center gap-1">
+                                                        <span class="text-xs text-muted-foreground">Avg Salary:</span>
+                                                        <span class="text-xs font-medium">
+                                                            {machine.employeeProfile.avg_salary_month}/mo
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    {/each}
+                                    </div>
                                 </div>
-                            </div>
-                        {/if}
+                        </div>
                     </div>
                 </div>
             </div>

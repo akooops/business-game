@@ -672,6 +672,11 @@
                                             <span class="kt-table-col-label">Mood Decay</span>
                                         </span>
                                     </th>
+                                    <th class="min-w-[120px]">
+                                        <span class="kt-table-col">
+                                            <span class="kt-table-col-label">Machine</span>
+                                        </span>
+                                    </th>
                                     <th class="w-[80px]">
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">Actions</span>
@@ -713,6 +718,9 @@
                                             </td>
                                             <td class="p-4">
                                                 <div class="kt-skeleton w-16 h-6 rounded"></div>
+                                            </td>
+                                            <td class="p-4">
+                                                <div class="kt-skeleton w-12 h-4 rounded"></div>
                                             </td>
                                             <td class="p-4">
                                                 <div class="kt-skeleton w-12 h-4 rounded"></div>
@@ -786,6 +794,9 @@
                                             </td>
                                             <td>
                                                 <span class="text-sm text-muted-foreground">{(employee.mood_decay_rate_days * 100).toFixed(2)}%/day</span>
+                                            </td>
+                                            <td>
+                                                <span class="text-sm text-muted-foreground">{employee.companyMachine?.machine?.name || 'None'}</span>
                                             </td>
                                             <td class="text-center">
                                                 <div class="kt-menu flex-inline" data-kt-menu="true">

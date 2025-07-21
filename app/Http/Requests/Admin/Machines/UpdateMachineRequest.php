@@ -31,7 +31,6 @@ class UpdateMachineRequest extends FormRequest
             'model' => 'required|string|max:255',
             'manufacturer' => 'required|string|max:255',
             'cost_to_acquire' => 'required|numeric|min:0',
-            'setup_time_days' => 'required|integer|min:0',
 
             // Performance metrics
             'operation_cost' => 'required|numeric|min:0',
@@ -64,9 +63,7 @@ class UpdateMachineRequest extends FormRequest
             'max_corrective_maintenance_time_days' => 'required|integer|min:0|gte:min_corrective_maintenance_time_days',
             
             // Machine employee profiles validation
-            'employee_profiles' => 'nullable|array',
-            'employee_profiles.*.employee_profile_id' => 'required_with:employee_profiles|exists:employee_profiles,id',
-            'employee_profiles.*.required_count' => 'required_with:employee_profiles|integer|min:1',
+            'employee_profile_id' => 'required|exists:employee_profiles,id',
             
             // Machine outputs validation
             'outputs' => 'nullable|array',

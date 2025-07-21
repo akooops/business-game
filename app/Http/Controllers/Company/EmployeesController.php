@@ -33,7 +33,7 @@ class EmployeesController extends Controller
 
         $company = $request->company;
 
-        $employees = $company->employees()->with(['employeeProfile'])->latest();
+        $employees = $company->employees()->with(['employeeProfile', 'companyMachine'])->latest();
 
         if($employeeProfileId){
             $employees->where('employee_profile_id', $employeeProfileId);

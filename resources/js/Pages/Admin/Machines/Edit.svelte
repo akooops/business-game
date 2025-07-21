@@ -33,7 +33,6 @@
         model: machine.model || '',
         manufacturer: machine.manufacturer || '',
         cost_to_acquire: machine.cost_to_acquire || '',
-        setup_time_days: machine.setup_time_days || '',
         description: machine.description || '',
         operation_cost: machine.operation_cost || '',
         carbon_footprint: machine.carbon_footprint || '',
@@ -260,29 +259,6 @@
                                         <p class="text-sm text-destructive">{errors.manufacturer}</p>
                                     {/if}
                                 </div>
-                            </div>
-
-                            <!-- Setup Time -->
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="setup_time_days">
-                                    Setup Time (days) <span class="text-destructive">*</span>
-                                </label>
-                                <input 
-                                    id="setup_time_days"
-                                    type="number" 
-                                    bind:value={formData.setup_time_days}
-                                    class="kt-input {errors.setup_time_days ? 'kt-input-error' : ''}"
-                                    placeholder="Enter setup time in days"
-                                    min="1"
-                                    step="1"
-                                    required
-                                />
-                                <p class="text-xs text-secondary-foreground">
-                                    Time required to set up this machine
-                                </p>
-                                {#if errors.setup_time_days}
-                                    <p class="text-sm text-destructive">{errors.setup_time_days}</p>
-                                {/if}
                             </div>
 
                             <!-- Description -->

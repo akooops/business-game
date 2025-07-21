@@ -66,6 +66,9 @@ class Notification extends Model
     const TYPE_EMPLOYEE_RESIGNED = 'employee_resigned';
     const TYPE_EMPLOYEE_SALARY_PAID = 'employee_salary_paid';
 
+    // Machines
+    const TYPE_MACHINE_SETUP = 'machine_setup';
+
     // Icons for different notification types
     const ICONS = [
         self::TYPE_FINANCE_FUNDS_CHANGED => 'ki-filled ki-dollar',
@@ -94,6 +97,7 @@ class Notification extends Model
         self::TYPE_EMPLOYEE_MOOD_DECREASED => 'ki-filled ki-users',
         self::TYPE_EMPLOYEE_RESIGNED => 'ki-filled ki-users',
         self::TYPE_EMPLOYEE_SALARY_PAID => 'ki-filled ki-users',
+        self::TYPE_MACHINE_SETUP => 'ki-filled ki-setting-3',
     ];
 
     // Methods

@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('model');
             $table->string('manufacturer');
             $table->decimal('cost_to_acquire', 15, 3)->default(0);
-            $table->integer('setup_time_days')->default(1);
 
             // Performance
             $table->decimal('operation_cost', 15 ,3)->default(0);
@@ -51,6 +50,9 @@ return new class extends Migration
             $table->integer('min_corrective_maintenance_time_days')->default(1);
             $table->integer('avg_corrective_maintenance_time_days')->default(1);
             $table->integer('max_corrective_maintenance_time_days')->default(1);
+
+            // Foreign keys
+            $table->foreignId('employee_profile_id')->constrained()->onDelete('cascade');
 
             $table->timestamps();
         });

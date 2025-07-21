@@ -18,6 +18,9 @@
         if($page.url.includes('company/suppliers') || $page.url.includes('company/purchases')){
             return 'procurement';
         }
+        if($page.url.includes('company/employees')){
+            return 'hr';
+        }
 
         return 'dashboard'; // default fallback
     }
@@ -127,17 +130,17 @@
                 </button>
                 {/if}
 
-                {#if hasPermission('admin.employee-profiles.index')}
+                {#if hasPermission('company.employee-profiles.index')}
                 <button 
-                    class="kt-btn kt-btn-icon kt-btn-ghost rounded-md size-9 border border-transparent hover:bg-background hover:[&_i]:text-primary hover:border-border {activeSection === 'employees' ? 'bg-background [&_i]:text-primary border-border' : ''}" 
+                    class="kt-btn kt-btn-icon kt-btn-ghost rounded-md size-9 border border-transparent hover:bg-background hover:[&_i]:text-primary hover:border-border {activeSection === 'hr' ? 'bg-background [&_i]:text-primary border-border' : ''}" 
                     data-kt-tooltip="" 
                     data-kt-tooltip-placement="right"
-                    on:click={() => setActiveSection('employees')}>
+                    on:click={() => setActiveSection('hr')}>
                     <span class="kt-menu-icon">
                         <i class="ki-outline ki-users text-lg"></i>
                     </span>
                     <span class="kt-tooltip" data-kt-tooltip-content="true">
-                        HR Management
+                        HR
                     </span>
                 </button>
                 {/if}
@@ -329,9 +332,9 @@
                     </div>
                     {/if}
 
-                    {#if hasPermission('admin.machines.index')}
+                    {#if hasPermission('company.machines.index')}
                     <div class="kt-menu-item">
-                        <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('admin.machines.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.machines.index')}>
+                        <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('company.machines.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('company.machines.index')}>
                             <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
                                 <i class="ki-outline ki-setting-3"></i>
                             </span>
@@ -380,23 +383,34 @@
                 {/if}
 
                 <!-- Employee Profiles Management Section -->
-                {#if activeSection === 'employees'}
+                {#if activeSection === 'hr'}
                 <div class="mb-3">
                     <h3 class="text-xs text-muted-foreground uppercase ps-2.5 mb-2.5">
-                        HR Management
+                        HR
                     </h3>
-                    {#if hasPermission('admin.employee-profiles.index')}
+                    {#if hasPermission('company.employees.index')}
                     <div class="kt-menu-item">
-                        <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('admin.employee-profiles.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.employee-profiles.index')}>
+                        <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('company.employees.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('company.employees.index')}>
                             <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
                                 <i class="ki-outline ki-users"></i>
                             </span> 
                             <span class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono ms-2">
-                                Employee Profiles
+                                Employees
                             </span>
                         </a>
                     </div>
                     {/if}
+
+                    <div class="kt-menu-item">
+                        <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('company.employees.recruit-page')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('company.employees.recruit-page')}>
+                            <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
+                                <i class="ki-outline ki-users"></i>
+                            </span> 
+                            <span class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono ms-2">
+                                Recruitment
+                            </span>
+                        </a>
+                    </div>
                 </div>
                 {/if}
 

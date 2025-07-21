@@ -1,13 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Company;
 
-use App\Http\Requests\Admin\Machines\UpdateMachineRequest;
-use App\Http\Requests\Admin\Machines\StoreMachineRequest;
+use App\Http\Requests\Company\Machines\SetupMachineRequest;
+use App\Http\Requests\Company\Machines\AssignEmployeesRequest;
 use App\Services\FileService;
 use App\Services\IndexService;
+use App\Services\ProductionService;
 use Illuminate\Http\Request;
 use App\Models\Machine;
+use App\Models\CompanyMachine;
 use App\Http\Controllers\Controller;
 
 class MachinesController extends Controller
@@ -29,6 +31,9 @@ class MachinesController extends Controller
         $priceMin = IndexService::checkIfNumber($request->query('price_min'));
         $priceMax = IndexService::checkIfNumber($request->query('price_max'));
 
+        $setupTimeMin = IndexService::checkIfNumber($request->query('setup_time_min'));
+        $setupTimeMax = IndexService::checkIfNumber($request->query('setup_time_max'));
+
         $operationCostMin = IndexService::checkIfNumber($request->query('operation_cost_min'));
         $operationCostMax = IndexService::checkIfNumber($request->query('operation_cost_max'));
 
@@ -47,7 +52,10 @@ class MachinesController extends Controller
         $productFilter = IndexService::checkIfSearchEmpty($request->query('product_id'));
         $employeeProfileFilter = IndexService::checkIfSearchEmpty($request->query('employee_profile_id'));
 
-        $machines = Machine::with(['products', 'employeeProfile'])->latest();
+        $status = IndexService::checkIfSearchEmpty($request->query('status'));
+
+        $company = $request->company;   
+        $machines = $company->companyMachines()->with(['machine', 'machine.products', 'machine.employeeProfile'])->latest();
 
         // Apply manufacturer filter
         if ($manufacturerFilter) {
@@ -99,6 +107,15 @@ class MachinesController extends Controller
             $machines->where('carbon_footprint', '<=', $carbonFootprintMax);
         }
 
+        // Apply setup time range filters
+        if ($setupTimeMin) {
+            $machines->where('setup_time_days', '>=', $setupTimeMin);
+        }
+
+        if ($setupTimeMax) {
+            $machines->where('setup_time_days', '<=', $setupTimeMax);
+        }
+
         // Apply carbon emissions range filters
         if ($reliabilityDecayDaysMin) {
             $machines->where('reliability_decay_days', '>=', $reliabilityDecayDaysMin);
@@ -120,6 +137,10 @@ class MachinesController extends Controller
             $machines->whereHas('employeeProfile', function($query) use ($employeeProfileFilter) {
                 $query->where('employee_profile_id', $employeeProfileFilter);
             });
+        }
+
+        if($status){
+            $machines->where('status', $status);
         }
 
         // Apply search filter
@@ -147,148 +168,67 @@ class MachinesController extends Controller
             ]);
         }
 
-        return inertia('Admin/Machines/Index');
+        return inertia('Company/Machines/Index');
     }
-    
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {        
-        return inertia('Admin/Machines/Create');
-    }
-    
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(StoreMachineRequest $request)
+
+    public function setupPage(Request $request)
     {
-        $validated = $request->validated();
+        $perPage = IndexService::limitPerPage($request->query('perPage', 10));
+        $page = IndexService::checkPageIfNull($request->query('page', 1));
+        $search = IndexService::checkIfSearchEmpty($request->query('search'));
 
-        // Create the machine
-        $machine = Machine::create($validated);
+        $machines = Machine::with(['products', 'employeeProfile'])->latest();
 
-        // Handle production line outputs
-        if (isset($validated['outputs']) && is_array($validated['outputs'])) {
-            foreach ($validated['outputs'] as $output) {
-                $machine->outputs()->create([
-                    'product_id' => $output['product_id']
-                ]);
-            }
+        // Apply search filter
+        if ($search) {
+            $machines->where(function($query) use ($search) {
+                $query->where('id', $search)
+                      ->orWhere('name', 'like', '%' . $search . '%')
+                      ->orWhere('model', 'like', '%' . $search . '%')
+                      ->orWhere('manufacturer', 'like', '%' . $search . '%')
+                      ->orWhereHas('employeeProfile', function($q) use ($search) {
+                          $q->where('name', 'like', '%' . $search . '%');
+                      })
+                      ->orWhereHas('outputs.product', function($q) use ($search) {
+                        $q->where('name', 'like', '%' . $search . '%');
+                    });
+            });
         }
 
-        // Handle image upload
-        if($request->has('file')){
-            $file = FileService::upload($request->file('file'));
+        $machines = $machines->paginate($perPage, ['*'], 'page', $page);
 
-            //Link the file to the machine
-            FileService::linkModel($file, 'machine', $machine->id, 1);
+        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+            return response()->json([
+                'machines' => $machines->items(),
+                'pagination' => IndexService::handlePagination($machines)
+            ]);
         }
 
-        return inertia('Admin/Machines/Index', [
-            'success' => 'Machine created successfully!'
+        return inertia('Company/Machines/SetupPage');
+    }
+
+    public function setup(SetupMachineRequest $request, Machine $machine)
+    {
+        $company = $request->company;
+
+        ProductionService::setupMachine($company, $machine);
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Machine setup successfully!'
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Machine $machine)
-    {    
-        $machine->load([
-            'products',
-            'employeeProfile'
-        ]);
-
-        return inertia('Admin/Machines/Show', compact('machine'));
-    }
-    
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Machine $machine)
+    public function assignEmployees(AssignEmployeesRequest $request, CompanyMachine $companyMachine)
     {
-        $machine->load([
-            'products',
-            'employeeProfile'
+        $company = $request->company;
+        $machine = $companyMachine->machine;
+
+        ProductionService::setupMachine($company, $machine);
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Machine setup successfully!'
         ]);
-
-        return inertia('Admin/Machines/Edit', compact('machine'));
-    }
-    
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Machine $machine, UpdateMachineRequest $request)
-    {
-        $validated = $request->validated();
-
-        // Update the machine
-        $machine->update($validated);
-
-        // Handle production line outputs
-        if (isset($validated['outputs']) && is_array($validated['outputs'])) {
-            // Detach existing production line outputs
-            $machine->products()->detach();
-        }
-
-        // Handle production line outputs
-        if (isset($validated['outputs']) && is_array($validated['outputs'])) {
-            // Detach existing production line outputs
-            $machine->products()->detach();
-
-            // Attach new production line steps
-            foreach ($validated['outputs'] as $output) {
-                $machine->outputs()->create([
-                    'product_id' => $output['product_id']
-                ]);
-            }
-        }
-
-        // Handle image upload
-        if($request->file('file')){
-            //Delete the old file if it exists
-            if($machine->image){
-                FileService::delete($machine->image);
-            }
-
-            $file = FileService::upload($request->file('file'));
-
-            //Link the file to the machine
-            FileService::linkModel($file, 'machine', $machine->id, 1);
-        }
-    
-        return inertia('Admin/Machines/Index', [
-            'success' => 'Machine updated successfully!'
-        ]);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Machine $machine)
-    {
-        $machine->delete();
-
-        return redirect()->route('admin.machines.index')
-                        ->with('success','Machine deleted successfully');
     }
 } 

@@ -1,0 +1,50 @@
+<?php
+
+namespace App\Http\Requests\Company\Machines;
+
+use Illuminate\Foundation\Http\FormRequest;
+use App\Services\ProductionService;
+
+class SetupMachineRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [
+            
+        ];
+    }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $machine = request()->route('machine');
+            $company = $this->company;
+
+            if (!$machine) {
+                $validator->errors()->add('machine', 'The selected machine does not exist.');
+                return;
+            }
+
+            $errors = ProductionService::validateSetup($company, $machine);
+
+            if($errors) {
+                foreach($errors as $key => $error) {
+                    $validator->errors()->add($key, $error);
+                }
+            }
+        });
+    }
+}

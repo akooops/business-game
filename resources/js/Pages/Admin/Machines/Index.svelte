@@ -43,8 +43,6 @@
     let qualityMax = '';
     let carbonFootprintMin = '';
     let carbonFootprintMax = '';
-    let setupTimeMin = '';
-    let setupTimeMax = '';
     let minSpeed = '';
     let maxSpeed = '';
     let reliabilityDecayDaysMin = '';
@@ -99,12 +97,6 @@
             }
             if (carbonFootprintMax) {
                 params.append('carbon_footprint_max', carbonFootprintMax);
-            }
-            if (setupTimeMin) {
-                params.append('setup_time_min', setupTimeMin);
-            }
-            if (setupTimeMax) {
-                params.append('setup_time_max', setupTimeMax);
             }
             if (reliabilityDecayDaysMin) {
                 params.append('reliability_decay_days_min', reliabilityDecayDaysMin);
@@ -225,8 +217,6 @@
         qualityMax = '';
         carbonFootprintMin = '';
         carbonFootprintMax = '';
-        setupTimeMin = '';
-        setupTimeMax = '';
         minSpeed = '';
         maxSpeed = '';
         reliabilityDecayDaysMin = '';
@@ -373,7 +363,7 @@
                             </button>
                             
                             <!-- Clear Filters Button -->
-                                {#if manufacturerFilter || priceMin || priceMax || operationCostMin || operationCostMax || minSpeed || maxSpeed || qualityMin || qualityMax || carbonFootprintMin || carbonFootprintMax || setupTimeMin || setupTimeMax || reliabilityDecayDaysMin || reliabilityDecayDaysMax || productFilter || employeeProfileFilter}
+                                {#if manufacturerFilter || priceMin || priceMax || operationCostMin || operationCostMax || minSpeed || maxSpeed || qualityMin || qualityMax || carbonFootprintMin || carbonFootprintMax || reliabilityDecayDaysMin || reliabilityDecayDaysMax || productFilter || employeeProfileFilter}
                                 <button 
                                     class="kt-btn kt-btn-ghost kt-btn-sm"
                                     on:click={clearAllFilters}
@@ -449,30 +439,6 @@
                                         bind:value={carbonFootprintMax}
                                         on:input={handleFilterChange}
                                         step="0.1"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Setup Time Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Setup Time (days)</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min Days" 
-                                        bind:value={setupTimeMin}
-                                        on:input={handleFilterChange}
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max Days" 
-                                        bind:value={setupTimeMax}
-                                        on:input={handleFilterChange}
                                         min="0"
                                     />
                                 </div>
@@ -727,7 +693,7 @@
                                     </th>
                                     <th class="min-w-[150px]">
                                         <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Employees Required</span>
+                                            <span class="kt-table-col-label">Employee Profile</span>
                                         </span>
                                     </th>
                                     <th class="min-w-[150px]">
@@ -862,32 +828,18 @@
                                             </td>
                                             <td>
                                                 <div class="flex items-center gap-1">
-                                                    <span class="text-xs text-muted-foreground">Setup Time:</span>
-                                                    <span class="text-xs font-medium">{machine.setup_time_days} days</span>
-                                                </div>
-                                                <div class="flex items-center gap-1">
                                                     <span class="text-xs text-muted-foreground">Cost to Acquire:</span>
                                                     <span class="text-xs font-medium">DZD{machine.cost_to_acquire}</span>
                                                 </div>
                                             </td>
                                             <td>
                                                 <div class="flex flex-col gap-1">
-                                                    {#if machine.employee_profiles && machine.employee_profiles.length > 0}
-                                                        <div class="flex flex-wrap gap-1">
-                                                            {#each machine.employee_profiles.slice(0, 2) as profile}
-                                                                <span class="kt-badge kt-badge-outline kt-badge-primary kt-badge-xs">
-                                                                    {profile.pivot.required_count}x {profile.name}
-                                                                </span>
-                                                            {/each}
-                                                            {#if machine.employee_profiles.length > 2}
-                                                                <span class="kt-badge kt-badge-outline kt-badge-secondary kt-badge-xs">
-                                                                    +{machine.employee_profiles.length - 2} more
-                                                                </span>
-                                                            {/if}
-                                                        </div>
-                                                    {:else}
-                                                        <span class="text-xs text-muted-foreground">No requirements</span>
-                                                    {/if}
+                                                    <span class="text-xs text-muted-foreground">
+                                                        {machine.employee_profile.name}
+                                                    </span>
+                                                    <span class="text-xs text-muted-foreground">
+                                                        {machine.employee_profile.description}
+                                                    </span>
                                                 </div>
                                             </td>
                                             <td>
