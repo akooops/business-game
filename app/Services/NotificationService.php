@@ -325,6 +325,26 @@ class NotificationService
         ]);
     }
 
+    public static function createMachineProductionStartedNotification($company, $machine, $product, $quantity){
+        return Notification::create([
+            'type' => Notification::TYPE_MACHINE_PRODUCTION_STARTED,
+            'title' => 'Machine Production Started',
+            'message' => "Machine {$machine->name} production started for {$product->name} with quantity of {$quantity}.",
+            'url' => route('company.machines.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
+    public static function createMachineProductionCompletedNotification($company, $machine, $product, $quantity, $qualityFactor){
+        return Notification::create([
+            'type' => Notification::TYPE_MACHINE_PRODUCTION_COMPLETED,
+            'title' => 'Machine Production Completed',
+            'message' => "Machine {$machine->name} production completed for {$product->name} with quantity of {$quantity} and quality factor of {$qualityFactor}.",
+            'url' => route('company.machines.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
     public static function getUnreadCount()
     {
         return Notification::where('user_id', auth()->user()->id)->whereNull('read_at')->count();

@@ -155,4 +155,61 @@ class InventoryService
             'moved_at' => SettingsService::getCurrentTimestamp(),
         ]);
     }
+
+    public static function productionStarted($productionOrder){
+        $company = $productionOrder->company;
+        $product = $productionOrder->product;
+        $quantity = $productionOrder->quantity;
+
+        $companyInventory = $company->inventoryMovements()->where([
+            'product_id' => $product->id,
+            'movement_type' => InventoryMovement::MOVEMENT_TYPE_IN,
+        ])->get();
+
+        $remainingQuantity = $quantity;
+
+        foreach($companyInventory as $inventory){
+            $availableInThisBatch = $inventory->current_quantity;
+            $quantityToSubtract = min($remainingQuantity, $availableInThisBatch);
+
+            $inventory->update([
+                'current_quantity' => $inventory->current_quantity - $quantityToSubtract
+            ]);
+
+            $remainingQuantity -= $quantityToSubtract;
+        }
+
+        $companyProduct = $company->companyProducts()->where('product_id', $product->id)->first();
+        $companyProduct->update(['available_stock' => $companyProduct->available_stock - $quantity]);
+
+        $inventoryMovement = InventoryMovement::create([
+            'company_id' => $company->id,
+            'product_id' => $product->id,
+            'movement_type' => InventoryMovement::MOVEMENT_TYPE_OUT,
+            'original_quantity' => $quantity,
+            'current_quantity' => $quantity,
+            'reference_type' => 'production',
+            'reference_id' => $productionOrder->id,
+            'moved_at' => SettingsService::getCurrentTimestamp(),
+        ]);
+    }
+
+    public static function productionCompleted($productionOrder, $outputQuantity){
+        $company = $productionOrder->company;
+        $product = $productionOrder->product;
+
+        $companyInventory = InventoryMovement::create([
+            'company_id' => $company->id,
+            'product_id' => $product->id,
+            'movement_type' => InventoryMovement::MOVEMENT_TYPE_IN,
+            'original_quantity' => $outputQuantity,
+            'current_quantity' => $outputQuantity,
+            'reference_type' => 'production',
+            'reference_id' => $productionOrder->id,
+            'moved_at' => SettingsService::getCurrentTimestamp(),
+        ]);
+
+        $companyProduct = $company->companyProducts()->where('product_id', $product->id)->first();
+        $companyProduct->update(['available_stock' => $companyProduct->available_stock + $outputQuantity]);
+    }
 }

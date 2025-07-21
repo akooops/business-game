@@ -67,6 +67,9 @@ class GameTimeLoop extends Command
         // Process employees mood
         $this->call('game:process-employees-mood');
 
+        // Pay machines operation costs
+        $this->call('game:pay-machines-operation-costs');
+
         if($newTime->day == 1 ){
             // Pay employees salaries
             $this->call('game:pay-employees-salaries');

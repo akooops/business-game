@@ -69,6 +69,8 @@ class Notification extends Model
     // Machines
     const TYPE_MACHINE_SETUP = 'machine_setup';
     const TYPE_MACHINE_ASSIGNED_EMPLOYEE = 'machine_assigned_employee';
+    const TYPE_MACHINE_PRODUCTION_STARTED = 'machine_production_started';
+    const TYPE_MACHINE_PRODUCTION_COMPLETED = 'machine_production_completed';
 
     // Icons for different notification types
     const ICONS = [
@@ -100,6 +102,8 @@ class Notification extends Model
         self::TYPE_EMPLOYEE_SALARY_PAID => 'ki-filled ki-users',
         self::TYPE_MACHINE_SETUP => 'ki-filled ki-setting-3',
         self::TYPE_MACHINE_ASSIGNED_EMPLOYEE => 'ki-filled ki-setting-3',
+        self::TYPE_MACHINE_PRODUCTION_STARTED => 'ki-filled ki-setting-3',
+        self::TYPE_MACHINE_PRODUCTION_COMPLETED => 'ki-filled ki-setting-3',
     ];
 
     // Methods

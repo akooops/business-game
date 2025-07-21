@@ -796,7 +796,7 @@
                                                 <span class="text-sm text-muted-foreground">{(employee.mood_decay_rate_days * 100).toFixed(2)}%/day</span>
                                             </td>
                                             <td>
-                                                <span class="text-sm text-muted-foreground">{employee.companyMachine?.machine?.name || 'None'}</span>
+                                                <span class="text-sm text-muted-foreground">{employee.company_machine?.machine?.name || 'None'}</span>
                                             </td>
                                             <td class="text-center">
                                                 <div class="kt-menu flex-inline" data-kt-menu="true">
