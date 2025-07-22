@@ -111,12 +111,12 @@
                     <div class="grid gap-4 w-full">
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Funds</h4>
-                            <p class="text-sm text-secondary-foreground">{company.funds}</p>
+                            <p class="text-sm text-secondary-foreground">{company.funds} DZD</p>
                         </div>
                         
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Carbon Footprint</h4>
-                            <p class="text-sm text-secondary-foreground">{company.carbon_footprint}</p>
+                            <p class="text-sm text-secondary-foreground">{company.carbon_footprint} kg CO2</p>
                         </div>
 
                         <div class="flex flex-col gap-2">

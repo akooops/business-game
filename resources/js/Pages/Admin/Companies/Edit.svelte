@@ -299,6 +299,8 @@
                                     class="kt-input {errors.carbon_footprint ? 'kt-input-error' : ''}"
                                     placeholder="Enter carbon footprint"
                                     bind:value={form.carbon_footprint}
+                                    step="0.001"
+                                    min="0"
                                 />
                                 {#if errors.carbon_footprint}
                                     <p class="text-sm text-destructive">{errors.carbon_footprint}</p>

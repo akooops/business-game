@@ -28,15 +28,6 @@
     let perPage = 10;
     let currentPage = 1;
     let searchTimeout;
-    let showFilters = false;
-
-    // Filter variables
-    let fundsMin = '';
-    let fundsMax = '';
-    let carbonFootprintMin = '';
-    let carbonFootprintMax = '';
-    let researchLevelMin = '';
-    let researchLevelMax = '';
 
     // Fetch companies data
     async function fetchCompanies() {
@@ -47,26 +38,6 @@
                 perPage: perPage,
                 search: search
             });
-            
-            // Add filter parameters
-            if (fundsMin) {
-                params.append('funds_min', fundsMin);
-            }
-            if (fundsMax) {
-                params.append('funds_max', fundsMax);
-            }
-            if (carbonFootprintMin) {
-                params.append('carbon_footprint_min', carbonFootprintMin);
-            }
-            if (carbonFootprintMax) {
-                params.append('carbon_footprint_max', carbonFootprintMax);
-            }
-            if (researchLevelMin) {
-                params.append('research_level_min', researchLevelMin);
-            }
-            if (researchLevelMax) {
-                params.append('research_level_max', researchLevelMax);
-            }
             
             const response = await fetch(route('admin.companies.index') + '?' + params.toString(), {
                 headers: {
@@ -123,29 +94,6 @@
         perPage = newPerPage;
         currentPage = 1;
         fetchCompanies();
-    }
-
-    // Handle filter changes
-    function handleFilterChange() {
-        currentPage = 1;
-        fetchCompanies();
-    }
-
-    // Clear all filters
-    function clearAllFilters() {
-        fundsMin = '';
-        fundsMax = '';
-        carbonFootprintMin = '';
-        carbonFootprintMax = '';
-        researchLevelMin = '';
-        researchLevelMax = '';
-        currentPage = 1;
-        fetchCompanies();
-    }
-
-    // Toggle filters visibility
-    function toggleFilters() {
-        showFilters = !showFilters;
     }
 
     // Delete company
@@ -257,144 +205,38 @@
                                     on:input={handleSearchInput}
                                 />
                             </div>
-                            
-                            <!-- Filter Toggle Button -->
-                            <button 
-                                class="kt-btn kt-btn-outline"
-                                on:click={toggleFilters}
-                            >
-                                <i class="ki-filled ki-filter text-sm"></i>
-                                {showFilters ? 'Hide Filters' : 'Show Filters'}
-                            </button>
-                            
-                            <!-- Clear Filters Button -->
-                            {#if fundsMin || fundsMax || carbonFootprintMin || carbonFootprintMax || researchLevelMin || researchLevelMax}
-                                <button 
-                                    class="kt-btn kt-btn-ghost kt-btn-sm"
-                                    on:click={clearAllFilters}
-                                >
-                                    <i class="ki-filled ki-cross text-sm"></i>
-                                    Clear All
-                                </button>
-                            {/if}
                         </div>
                     </div>
                 </div>
-                
-                <!-- Advanced Filters Section -->
-                {#if showFilters}
-                    <div class="kt-card-body border-t border-gray-200 p-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                            <!-- Funds Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Funds (DZD)</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min Funds" 
-                                        bind:value={fundsMin}
-                                        on:input={handleFilterChange}
-                                        step="1000"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max Funds" 
-                                        bind:value={fundsMax}
-                                        on:input={handleFilterChange}
-                                        step="1000"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
 
-                            <!-- Carbon Footprint Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Carbon Footprint (kg CO2)</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min Carbon" 
-                                        bind:value={carbonFootprintMin}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max Carbon" 
-                                        bind:value={carbonFootprintMax}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Research Level Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Research Level</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min Level" 
-                                        bind:value={researchLevelMin}
-                                        on:input={handleFilterChange}
-                                        min="1"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max Level" 
-                                        bind:value={researchLevelMax}
-                                        on:input={handleFilterChange}
-                                        min="1"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {/if}
-                
                 <div class="kt-card-content p-0">
                     <div class="kt-scrollable-x-auto">
                         <table class="kt-table kt-table-border table-fixed">
                             <thead>
                                 <tr>
-                                    <th class="w-[50px]">
-                                        <input class="kt-checkbox kt-checkbox-sm" type="checkbox"/>
-                                    </th>
-                                    <th class="w-[80px]">
+                                    <th style="width: 75px;">
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">ID</span>
                                         </span>
                                     </th>
-                                    <th class="min-w-[200px]">
+                                    <th>
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">Company</span>
                                         </span>
                                     </th>
-                                    <th class="min-w-[150px]">
+                                    <th>
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">Name</span>
                                         </span>
                                     </th>
 
-                                    <th class="min-w-[150px]">
+                                    <th>
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">Performance</span>
                                         </span>
                                     </th>
 
-                                    <th class="w-[80px]">
+                                    <th style="width: 70px;">
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">Actions</span>
                                         </span>
@@ -406,9 +248,6 @@
                                     <!-- Loading skeleton rows -->
                                     {#each Array(perPage) as _, i}
                                         <tr>
-                                            <td class="p-4">
-                                                <div class="kt-skeleton w-4 h-4 rounded"></div>
-                                            </td>
                                             <td class="p-4">
                                                 <div class="kt-skeleton w-8 h-4 rounded"></div>
                                             </td>
@@ -456,9 +295,6 @@
                                     {#each companies as company}
                                         <tr class="hover:bg-muted/50">
                                             <td>
-                                                <input class="kt-checkbox kt-checkbox-sm" type="checkbox" value={company.id}/>
-                                            </td>
-                                            <td>
                                                 <span class="text-sm font-medium text-mono">#{company.id}</span>
                                             </td>
                                             <td>
@@ -491,11 +327,11 @@
                                                 <div class="flex flex-col gap-1">
                                                     <div class="flex items-center gap-1">
                                                         <span class="text-xs text-muted-foreground">Funds:</span>
-                                                        <span class="text-xs font-medium">{company.funds}</span>
+                                                        <span class="text-xs font-medium">{company.funds} DZD</span>
                                                     </div>
                                                     <div class="flex items-center gap-1">
                                                         <span class="text-xs text-muted-foreground">Carbon Footprint:</span>
-                                                        <span class="text-xs font-medium">{company.carbon_footprint}</span>
+                                                        <span class="text-xs font-medium">{company.carbon_footprint} kg CO2</span>
                                                     </div>
                                                     <div class="flex items-center gap-1">
                                                         <span class="text-xs text-muted-foreground">Research Level:</span>

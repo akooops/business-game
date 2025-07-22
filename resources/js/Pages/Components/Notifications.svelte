@@ -192,6 +192,7 @@
     function toggleDrawer() {
         drawerOpen = !drawerOpen;
         if (drawerOpen) {
+            markAllAsRead();
             fetchNotifications();
         }
     }
@@ -384,20 +385,7 @@
     {#if notifications.length > 0}
     <div class="flex items-center justify-between" id="notifications_footer">
         <div class="border-b border-b-border"></div>
-        <div class="grid grid-cols-2 p-5 gap-2.5" id="notifications_all_footer">
-            <button 
-                class="kt-btn kt-btn-outline justify-center transition-all duration-200 {markingAllAsRead ? 'opacity-75 cursor-not-allowed' : ''}" 
-                on:click={markAllAsRead}
-                disabled={markingAllAsRead}
-            >
-                {#if markingAllAsRead}
-                    <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
-                    Marking...
-                {:else}
-                    <i class="ki-filled ki-check text-base mr-2"></i>
-                    Mark all as read
-                {/if}
-            </button>
+        <div class="grid p-5 gap-2.5" id="notifications_all_footer">
             <a class="kt-btn kt-btn-primary justify-center" href={route('notifications.index')}>
                 View all
             </a>

@@ -213,28 +213,25 @@
                 
                 <div class="kt-card-content p-0">
                     <div class="kt-scrollable-x-auto">
-                        <table class="kt-table kt-table-border table-fixed">
+                        <table class="kt-table kt-table-border">
                             <thead>
                                 <tr>
-                                    <th class="w-[50px]">
-                                        <input class="kt-checkbox kt-checkbox-sm" type="checkbox"/>
-                                    </th>
-                                    <th class="w-[80px]">
+                                    <th style="width: 75px;">
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">ID</span>
                                         </span>
                                     </th>
-                                    <th class="min-w-[200px]">
+                                    <th>
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">User</span>
                                         </span>
                                     </th>
-                                    <th class="min-w-[150px]">
+                                    <th>
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">Name</span>
                                         </span>
                                     </th>
-                                    <th class="w-[80px]">
+                                    <th style="width: 70px;">
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">Actions</span>
                                         </span>
@@ -246,9 +243,6 @@
                                     <!-- Loading skeleton rows -->
                                     {#each Array(perPage) as _, i}
                                         <tr>
-                                            <td class="p-4">
-                                                <div class="kt-skeleton w-4 h-4 rounded"></div>
-                                            </td>
                                             <td class="p-4">
                                                 <div class="kt-skeleton w-8 h-4 rounded"></div>
                                             </td>
@@ -292,9 +286,6 @@
                                     <!-- Actual data rows -->
                                     {#each users as user}
                                         <tr class="hover:bg-muted/50">
-                                            <td>
-                                                <input class="kt-checkbox kt-checkbox-sm" type="checkbox" value={user.id}/>
-                                            </td>
                                             <td>
                                                 <span class="text-sm font-medium text-mono">#{user.id}</span>
                                             </td>

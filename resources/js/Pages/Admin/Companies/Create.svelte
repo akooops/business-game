@@ -291,7 +291,7 @@
                                     type="number"
                                     class="kt-input {errors.funds ? 'kt-input-error' : ''}"
                                     step="0.001"
-                                    placeholder="Enter funds"
+                                    placeholder="Enter funds (DZD)"
                                     bind:value={form.funds}
                                 />
                                 {#if errors.funds}
@@ -308,8 +308,10 @@
                                     id="carbon_footprint"
                                     type="number"
                                     class="kt-input {errors.carbon_footprint ? 'kt-input-error' : ''}"
-                                    placeholder="Enter carbon footprint"
+                                    placeholder="Enter carbon footprint (kg CO2)"
                                     bind:value={form.carbon_footprint}
+                                    step="0.001"
+                                    min="0"
                                 />
                                 {#if errors.carbon_footprint}
                                     <p class="text-sm text-destructive">{errors.carbon_footprint}</p>
