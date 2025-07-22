@@ -37,8 +37,8 @@ class MachinesController extends Controller
         $setupTimeMin = IndexService::checkIfNumber($request->query('setup_time_min'));
         $setupTimeMax = IndexService::checkIfNumber($request->query('setup_time_max'));
 
-        $operationCostMin = IndexService::checkIfNumber($request->query('operation_cost_min'));
-        $operationCostMax = IndexService::checkIfNumber($request->query('operation_cost_max'));
+        $operationCostMin = IndexService::checkIfNumber($request->query('operations_cost_min'));
+        $operationCostMax = IndexService::checkIfNumber($request->query('operations_cost_max'));
 
         $minSpeed = IndexService::checkIfNumber($request->query('min_speed'));
         $maxSpeed = IndexService::checkIfNumber($request->query('max_speed'));
@@ -76,11 +76,11 @@ class MachinesController extends Controller
 
         // Apply energy consumption range filters
         if ($operationCostMin) {
-            $machines->where('operation_cost', '>=', $operationCostMin);
+            $machines->where('operations_cost', '>=', $operationCostMin);
         }
 
         if ($operationCostMax) {
-            $machines->where('operation_cost', '<=', $operationCostMax);
+            $machines->where('operations_cost', '<=', $operationCostMax);
         }
 
         // Apply speed range filters (using average speed)

@@ -81,10 +81,10 @@
                 params.append('price_max', priceMax);
             }
             if (operationCostMin) {
-                params.append('operation_cost_min', operationCostMin);
+                params.append('operations_cost_min', operationCostMin);
             }
             if (operationCostMax) {
-                params.append('operation_cost_max', operationCostMax);
+                params.append('operations_cost_max', operationCostMax);
             }
             if (speedMin) {
                 params.append('min_speed', speedMin);
@@ -275,7 +275,7 @@
             setupCost: setupCost,
             employeeCost: totalEmployeeCost,
             totalSetupCost: totalSetupCost,
-            operationCost: machine.operation_cost,
+            operationCost: machine.operations_cost,
             carbonFootprint: machine.carbon_footprint
         };
 
@@ -816,7 +816,7 @@
                                                 </div>
                                                 <div class="flex justify-between">
                                                     <span>Operation Cost:</span>
-                                                    <span class="font-medium">DZD {machine.operation_cost}/day</span>
+                                                    <span class="font-medium">DZD {machine.operations_cost}/day</span>
                                                 </div>
                                                 <div class="flex justify-between">
                                                     <span>Carbon Footprint:</span>
@@ -944,7 +944,7 @@
                         </div>
                         <div class="flex justify-between">
                             <span class="text-xs text-muted-foreground">Operation Cost:</span>
-                            <span class="text-xs font-medium">DZD {selectedMachine.operation_cost}/day</span>
+                            <span class="text-xs font-medium">DZD {selectedMachine.operations_cost}/day</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-xs text-muted-foreground">Carbon Footprint:</span>

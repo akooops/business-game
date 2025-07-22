@@ -90,7 +90,7 @@ class FinanceService
 
     public static function payMachineOperationCost($company, $machine){
         $funds = $company->funds;
-        $funds -= $machine->operation_cost;
+        $funds -= $machine->operations_cost;
         $company->update(['funds' => $funds]);
 
         return $funds;

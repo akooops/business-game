@@ -25,19 +25,16 @@
         model: '',
         manufacturer: '',
         cost_to_acquire: '',
-        operation_cost: '',
+        operations_cost: '',
         carbon_footprint: '',
         quality_factor: '',
         min_speed: '',
-        avg_speed: '',
         max_speed: '',
         reliability_decay_days: '',
         maintenance_interval_days: '',
         min_maintenance_cost: '',
-        avg_maintenance_cost: '',
         max_maintenance_cost: '',
         min_maintenance_time_days: '',
-        avg_maintenance_time_days: '',
         max_maintenance_time_days: '',
         file: null,
         employee_profile_id: '',
@@ -304,69 +301,8 @@
                     </div>
                     <div class="kt-card-content">
                         <div class="grid gap-4">
-                            <!-- Operation Cost, Carbon Footprint, and Quality Factor -->
-                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                                <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="operation_cost">
-                                        Operation Cost (DZD/day) <span class="text-destructive">*</span>
-                                    </label>
-                                    <input 
-                                        id="operation_cost"
-                                        type="number" 
-                                        bind:value={formData.operation_cost}
-                                        class="kt-input {errors.operation_cost ? 'kt-input-error' : ''}"
-                                        placeholder="Enter operation cost"
-                                        min="0"
-                                        step="0.001"
-                                        required
-                                    />
-                                    {#if errors.operation_cost}
-                                        <p class="text-sm text-destructive">{errors.operation_cost}</p>
-                                    {/if}
-                                </div>
-
-                                <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="carbon_footprint">
-                                        Carbon Footprint (kg CO2/unit) <span class="text-destructive">*</span>
-                                    </label>
-                                    <input 
-                                        id="carbon_footprint"
-                                        type="number" 
-                                        bind:value={formData.carbon_footprint}
-                                        class="kt-input {errors.carbon_footprint ? 'kt-input-error' : ''}"
-                                        placeholder="Enter carbon footprint"
-                                        min="0"
-                                        step="0.001"
-                                        required
-                                    />
-                                    {#if errors.carbon_footprint}
-                                        <p class="text-sm text-destructive">{errors.carbon_footprint}</p>
-                                    {/if}
-                                </div>
-
-                                <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="quality_factor">
-                                        Quality Factor <span class="text-destructive">*</span>
-                                    </label>
-                                    <input 
-                                        id="quality_factor"
-                                        type="number" 
-                                        bind:value={formData.quality_factor}
-                                        class="kt-input {errors.quality_factor ? 'kt-input-error' : ''}"
-                                        placeholder="Enter quality factor"
-                                        min="0"
-                                        max="1"
-                                        step="0.001"
-                                        required
-                                    />
-                                    {#if errors.quality_factor}
-                                        <p class="text-sm text-destructive">{errors.quality_factor}</p>
-                                    {/if}
-                                </div>
-                            </div>
-
                             <!-- Speed Ranges -->
-                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                 <div class="flex flex-col gap-2">
                                     <label class="text-sm font-medium text-mono" for="min_speed">
                                         Minimum Speed (units/day) <span class="text-destructive">*</span>
@@ -383,25 +319,6 @@
                                     />
                                     {#if errors.min_speed}
                                         <p class="text-sm text-destructive">{errors.min_speed}</p>
-                                    {/if}
-                                </div>
-
-                                <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="avg_speed">
-                                        Average Speed (units/day) <span class="text-destructive">*</span>
-                                    </label>
-                                    <input 
-                                        id="avg_speed"
-                                        type="number" 
-                                        bind:value={formData.avg_speed}
-                                        class="kt-input {errors.avg_speed ? 'kt-input-error' : ''}"
-                                        placeholder="Enter average speed"
-                                        min="0"
-                                        step="0.001"
-                                        required
-                                    />
-                                    {#if errors.avg_speed}
-                                        <p class="text-sm text-destructive">{errors.avg_speed}</p>
                                     {/if}
                                 </div>
 
@@ -425,8 +342,69 @@
                                 </div>
                             </div>
 
+                            <!-- Operations Cost, Carbon Footprint, and Quality Factor -->
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                <div class="flex flex-col gap-2">
+                                    <label class="text-sm font-medium text-mono" for="operations_cost">
+                                        Operations Cost (DZD/day) <span class="text-destructive">*</span>
+                                    </label>
+                                    <input 
+                                        id="operations_cost"
+                                        type="number" 
+                                        bind:value={formData.operations_cost}
+                                        class="kt-input {errors.operations_cost ? 'kt-input-error' : ''}"
+                                        placeholder="Enter operation cost"
+                                        min="0"
+                                        step="0.001"
+                                        required
+                                    />
+                                    {#if errors.operations_cost}
+                                        <p class="text-sm text-destructive">{errors.operations_cost}</p>
+                                    {/if}
+                                </div>
+
+                                <div class="flex flex-col gap-2">
+                                    <label class="text-sm font-medium text-mono" for="carbon_footprint">
+                                        Carbon Footprint (kg CO2/unit) <span class="text-destructive">*</span>
+                                    </label>
+                                    <input 
+                                        id="carbon_footprint"
+                                        type="number" 
+                                        bind:value={formData.carbon_footprint}
+                                        class="kt-input {errors.carbon_footprint ? 'kt-input-error' : ''}"
+                                        placeholder="Enter carbon footprint"
+                                        min="0"
+                                        step="0.001"
+                                        required
+                                    />
+                                    {#if errors.carbon_footprint}
+                                        <p class="text-sm text-destructive">{errors.carbon_footprint}</p>
+                                    {/if}
+                                </div>
+                            </div>
+
                             <!-- Reliability -->
-                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                <div class="flex flex-col gap-2">
+                                    <label class="text-sm font-medium text-mono" for="quality_factor">
+                                        Quality Factor <span class="text-destructive">*</span>
+                                    </label>
+                                    <input 
+                                        id="quality_factor"
+                                        type="number" 
+                                        bind:value={formData.quality_factor}
+                                        class="kt-input {errors.quality_factor ? 'kt-input-error' : ''}"
+                                        placeholder="Enter quality factor"
+                                        min="0"
+                                        max="1"
+                                        step="0.001"
+                                        required
+                                    />
+                                    {#if errors.quality_factor}
+                                        <p class="text-sm text-destructive">{errors.quality_factor}</p>
+                                    {/if}
+                                </div>
+
                                 <div class="flex flex-col gap-2">
                                     <label class="text-sm font-medium text-mono" for="reliability_decay_days">
                                         Reliability Decay Days <span class="text-destructive">*</span>
@@ -459,7 +437,7 @@
                     <div class="kt-card-content">
                         <div class="grid gap-4">
                             <!-- Maintenance Costs -->
-                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                 <div class="flex flex-col gap-2">
                                     <label class="text-sm font-medium text-mono" for="min_maintenance_cost">
                                         Minimum Cost (DZD) <span class="text-destructive">*</span>
@@ -476,25 +454,6 @@
                                     />
                                     {#if errors.min_maintenance_cost}
                                         <p class="text-sm text-destructive">{errors.min_maintenance_cost}</p>
-                                    {/if}
-                                </div>
-
-                                <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="avg_maintenance_cost">
-                                        Average Cost (DZD) <span class="text-destructive">*</span>
-                                    </label>
-                                    <input 
-                                        id="avg_maintenance_cost"
-                                        type="number" 
-                                        bind:value={formData.avg_maintenance_cost}
-                                        class="kt-input {errors.avg_maintenance_cost ? 'kt-input-error' : ''}"
-                                        placeholder="Enter average cost"
-                                        min="0"
-                                        step="0.001"
-                                        required
-                                    />
-                                    {#if errors.avg_maintenance_cost}
-                                        <p class="text-sm text-destructive">{errors.avg_maintenance_cost}</p>
                                     {/if}
                                 </div>
 
@@ -519,7 +478,7 @@
                             </div>
 
                             <!-- Maintenance Times -->
-                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                 <div class="flex flex-col gap-2">
                                     <label class="text-sm font-medium text-mono" for="min_maintenance_time_days">
                                         Minimum Time (days) <span class="text-destructive">*</span>
@@ -536,25 +495,6 @@
                                     />
                                     {#if errors.min_maintenance_time_days}
                                         <p class="text-sm text-destructive">{errors.min_maintenance_time_days}</p>
-                                    {/if}
-                                </div>
-
-                                <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="avg_maintenance_time_days">
-                                        Average Time (days) <span class="text-destructive">*</span>
-                                    </label>
-                                    <input 
-                                        id="avg_maintenance_time_days"
-                                        type="number" 
-                                        bind:value={formData.avg_maintenance_time_days}
-                                        class="kt-input {errors.avg_maintenance_time_days ? 'kt-input-error' : ''}"
-                                        placeholder="Enter average time"
-                                        min="1"
-                                        step="1"
-                                        required
-                                    />
-                                    {#if errors.avg_maintenance_time_days}
-                                        <p class="text-sm text-destructive">{errors.avg_maintenance_time_days}</p>
                                     {/if}
                                 </div>
 
@@ -626,9 +566,6 @@
                                         if (data.loading) return data.text;
                                         
                                         const $elem = globalThis.$('<div class="flex items-center gap-3">' +
-                                            '<div class="flex items-center justify-center size-12 shrink-0 rounded bg-accent/50">' +
-                                            '<i class="ki-filled ki-profile-circle text-lg text-muted-foreground"></i>' +
-                                            '</div>' +
                                             '<div class="flex flex-col">' +
                                             '<span class="font-medium text-sm">' + data.name + '</span>' +
                                             '</div>' +

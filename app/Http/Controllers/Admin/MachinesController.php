@@ -23,104 +23,7 @@ class MachinesController extends Controller
         $page = IndexService::checkPageIfNull($request->query('page', 1));
         $search = IndexService::checkIfSearchEmpty($request->query('search'));
 
-        // Filter parameters
-        $manufacturerFilter = IndexService::checkIfSearchEmpty($request->query('manufacturer'));
-
-        $priceMin = IndexService::checkIfNumber($request->query('price_min'));
-        $priceMax = IndexService::checkIfNumber($request->query('price_max'));
-
-        $operationCostMin = IndexService::checkIfNumber($request->query('operation_cost_min'));
-        $operationCostMax = IndexService::checkIfNumber($request->query('operation_cost_max'));
-
-        $minSpeed = IndexService::checkIfNumber($request->query('min_speed'));
-        $maxSpeed = IndexService::checkIfNumber($request->query('max_speed'));
-
-        $qualityFactorMin = IndexService::checkIfNumber($request->query('quality_factor_min'));
-        $qualityFactorMax = IndexService::checkIfNumber($request->query('quality_factor_max'));
-
-        $carbonFootprintMin = IndexService::checkIfNumber($request->query('carbon_footprint_min'));
-        $carbonFootprintMax = IndexService::checkIfNumber($request->query('carbon_footprint_max'));
-
-        $reliabilityDecayDaysMin = IndexService::checkIfNumber($request->query('reliability_decay_days_min'));
-        $reliabilityDecayDaysMax = IndexService::checkIfNumber($request->query('reliability_decay_days_max'));
-
-        $productFilter = IndexService::checkIfSearchEmpty($request->query('product_id'));
-        $employeeProfileFilter = IndexService::checkIfSearchEmpty($request->query('employee_profile_id'));
-
-        $machines = Machine::with(['products', 'employeeProfile'])->latest();
-
-        // Apply manufacturer filter
-        if ($manufacturerFilter) {
-            $machines->where('manufacturer', $manufacturerFilter);
-        }
-
-        // Apply price range filters
-        if ($priceMin) {
-            $machines->where('cost_to_acquire', '>=', $priceMin);
-        }
-
-        if ($priceMax) {
-            $machines->where('cost_to_acquire', '<=', $priceMax);
-        }
-
-        // Apply energy consumption range filters
-        if ($operationCostMin) {
-            $machines->where('operation_cost', '>=', $operationCostMin);
-        }
-
-        if ($operationCostMax) {
-            $machines->where('operation_cost', '<=', $operationCostMax);
-        }
-
-        // Apply speed range filters (using average speed)
-        if ($minSpeed) {
-            $machines->where('avg_speed', '>=', $minSpeed);
-        }
-
-        if ($maxSpeed) {
-            $machines->where('avg_speed', '<=', $maxSpeed);
-        }
-
-        // Apply quality range filters
-        if ($qualityFactorMin) {
-            $machines->where('quality_factor', '>=', $qualityFactorMin);
-        }
-
-        if ($qualityFactorMax) {
-            $machines->where('quality_factor', '<=', $qualityFactorMax);
-        }
-
-        // Apply area range filters
-        if ($carbonFootprintMin) {
-            $machines->where('carbon_footprint', '>=', $carbonFootprintMin);
-        }
-
-        if ($carbonFootprintMax) {
-            $machines->where('carbon_footprint', '<=', $carbonFootprintMax);
-        }
-
-        // Apply carbon emissions range filters
-        if ($reliabilityDecayDaysMin) {
-            $machines->where('reliability_decay_days', '>=', $reliabilityDecayDaysMin);
-        }
-
-        if ($reliabilityDecayDaysMax) {
-            $machines->where('reliability_decay_days', '<=', $reliabilityDecayDaysMax);
-        }
-
-        // Apply product filter
-        if ($productFilter) {
-            $machines->whereHas('outputs', function($query) use ($productFilter) {
-                $query->where('product_id', $productFilter);
-            });
-        }
-
-        // Apply employee profile filter
-        if ($employeeProfileFilter) {
-            $machines->whereHas('employeeProfile', function($query) use ($employeeProfileFilter) {
-                $query->where('employee_profile_id', $employeeProfileFilter);
-            });
-        }
+        $machines = Machine::with(['outputs','outputs.product', 'employeeProfile'])->latest();
 
         // Apply search filter
         if ($search) {
@@ -204,7 +107,8 @@ class MachinesController extends Controller
     public function show(Machine $machine)
     {    
         $machine->load([
-            'products',
+            'outputs',
+            'outputs.product',
             'employeeProfile'
         ]);
 
@@ -220,7 +124,8 @@ class MachinesController extends Controller
     public function edit(Machine $machine)
     {
         $machine->load([
-            'products',
+            'outputs',
+            'outputs.product',
             'employeeProfile'
         ]);
 

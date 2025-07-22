@@ -17,15 +17,13 @@ class Machine extends Model
 
     protected $casts = [
         'cost_to_acquire' => 'decimal:3',
-        'operation_cost' => 'decimal:3',
+        'operations_cost' => 'decimal:3',
         'carbon_footprint' => 'decimal:3',
         'quality_factor' => 'decimal:3',
         'min_speed' => 'decimal:3',
-        'avg_speed' => 'decimal:3',
         'max_speed' => 'decimal:3',
         'reliability_decay_days' => 'decimal:3',
         'min_maintenance_cost' => 'decimal:3',
-        'avg_maintenance_cost' => 'decimal:3',
         'max_maintenance_cost' => 'decimal:3',
     ];
 

@@ -29,30 +29,6 @@
     let perPage = 10;
     let currentPage = 1;
     let searchTimeout;
-    let showFilters = false;
-
-    // Filter variables
-    let manufacturerFilter = '';
-    let priceMin = '';
-    let priceMax = '';
-    let operationCostMin = '';
-    let operationCostMax = '';
-    let speedMin = '';
-    let speedMax = '';
-    let qualityMin = '';
-    let qualityMax = '';
-    let carbonFootprintMin = '';
-    let carbonFootprintMax = '';
-    let minSpeed = '';
-    let maxSpeed = '';
-    let reliabilityDecayDaysMin = '';
-    let reliabilityDecayDaysMax = '';
-    let productFilter = '';
-    let employeeProfileFilter = '';
-
-    // Select2 component references
-    let productSelectComponent;
-    let employeeProfileSelectComponent;
 
     // Fetch machines data
     async function fetchMachines() {
@@ -63,59 +39,6 @@
                 perPage: perPage,
                 search: search
             });
-            
-            // Add filter parameters
-            if (manufacturerFilter) {
-                params.append('manufacturer', manufacturerFilter);
-            }
-            if (priceMin) {
-                params.append('price_min', priceMin);
-            }
-            if (priceMax) {
-                params.append('price_max', priceMax);
-            }
-            if (operationCostMin) {
-                params.append('operation_cost_min', operationCostMin);
-            }
-            if (operationCostMax) {
-                params.append('operation_cost_max', operationCostMax);
-            }
-            if (minSpeed) {
-                params.append('min_speed', minSpeed);
-            }
-            if (maxSpeed) {
-                params.append('max_speed', maxSpeed);
-            }
-            if (qualityMin) {
-                params.append('quality_min', qualityMin);
-            }
-            if (qualityMax) {
-                params.append('quality_max', qualityMax);
-            }
-            if (carbonFootprintMin) {
-                params.append('carbon_footprint_min', carbonFootprintMin);
-            }
-            if (carbonFootprintMax) {
-                params.append('carbon_footprint_max', carbonFootprintMax);
-            }
-            if (reliabilityDecayDaysMin) {
-                params.append('reliability_decay_days_min', reliabilityDecayDaysMin);
-            }
-            if (reliabilityDecayDaysMax) {
-                params.append('reliability_decay_days_max', reliabilityDecayDaysMax);
-            }
-            if (qualityMin) {
-                params.append('quality_factor_min', qualityMin);
-            }
-            if (qualityMax) {
-                params.append('quality_factor_max', qualityMax);
-            }
-            if (productFilter) {
-                params.append('product_id', productFilter);
-            }
-            if (employeeProfileFilter) {
-                params.append('employee_profile_id', employeeProfileFilter);
-            }
             
             const response = await fetch(route('admin.machines.index') + '?' + params.toString(), {
                 headers: {
@@ -174,73 +97,6 @@
         fetchMachines();
     }
 
-    // Handle filter changes
-    function handleFilterChange() {
-        currentPage = 1;
-        fetchMachines();
-    }
-
-    // Handle product selection
-    function handleProductSelect(event) {
-        productFilter = event.detail.value;
-        handleFilterChange();
-    }
-
-    // Handle product clear
-    function handleProductClear() {
-        productFilter = '';
-        handleFilterChange();
-    }
-
-    // Handle employee profile selection
-    function handleEmployeeProfileSelect(event) {
-        employeeProfileFilter = event.detail.value;
-        handleFilterChange();
-    }
-
-    // Handle employee profile clear
-    function handleEmployeeProfileClear() {
-        employeeProfileFilter = '';
-        handleFilterChange();
-    }
-
-    // Clear all filters
-    function clearAllFilters() {
-        manufacturerFilter = '';
-        priceMin = '';
-        priceMax = '';
-        operationCostMin = '';
-        operationCostMax = '';
-        speedMin = '';
-        speedMax = '';
-        qualityMin = '';
-        qualityMax = '';
-        carbonFootprintMin = '';
-        carbonFootprintMax = '';
-        minSpeed = '';
-        maxSpeed = '';
-        reliabilityDecayDaysMin = '';
-        reliabilityDecayDaysMax = '';
-        productFilter = '';
-        employeeProfileFilter = '';
-        currentPage = 1;
-        
-        // Clear the Select2 components
-        if (productSelectComponent) {
-            productSelectComponent.clear();
-        }
-        if (employeeProfileSelectComponent) {
-            employeeProfileSelectComponent.clear();
-        }
-        
-        fetchMachines();
-    }
-
-    // Toggle filters visibility
-    function toggleFilters() {
-        showFilters = !showFilters;
-    }
-
     // Delete machine
     async function deleteMachine(machineId) {
         if (!confirm('Are you sure you want to delete this machine? This action cannot be undone.')) {
@@ -262,12 +118,7 @@
 
             if (response.ok) {
                 // Show success toast
-                KTToast.show({
-                    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                    message: "Machine deleted successfully!",
-                    variant: "success",
-                    position: "bottom-right",
-                });
+                showToast("Machine deleted successfully!", 'success');
 
                 // Refresh the machines list
                 fetchMachines();
@@ -275,22 +126,11 @@
                 const errorData = await response.json().catch(() => ({}));
                 const errorMessage = errorData.message || 'Error deleting machine. Please try again.';
                 
-                KTToast.show({
-                    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                    message: errorMessage,
-                    variant: "destructive",
-                    position: "bottom-right",
-                });
+                showToast(errorMessage, 'destructive');
             }
         } catch (error) {
             console.error('Error deleting machine:', error);
-            
-            KTToast.show({
-                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                message: "Network error. Please check your connection and try again.",
-                variant: "destructive",
-                position: "bottom-right",
-            });
+            showToast("Network error. Please check your connection and try again.", 'destructive');
         }
     }
 
@@ -302,12 +142,7 @@
     export let success;
 
     $: if (success) {
-        KTToast.show({
-            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-            message: success,
-            variant: "success",
-            position: "bottom-right",
-        });
+        showToast(success, 'success');
     }
 </script>
 
@@ -349,357 +184,37 @@
                                     bind:value={search}
                                     on:input={handleSearchInput}
                                 />
-                            </div>
-                            
-                            <!-- Filter Toggle Button -->
-                            <button 
-                                class="kt-btn kt-btn-outline"
-                                on:click={toggleFilters}
-                            >
-                                <i class="ki-filled ki-filter text-sm"></i>
-                                {showFilters ? 'Hide Filters' : 'Show Filters'}
-                            </button>
-                            
-                            <!-- Clear Filters Button -->
-                                {#if manufacturerFilter || priceMin || priceMax || operationCostMin || operationCostMax || minSpeed || maxSpeed || qualityMin || qualityMax || carbonFootprintMin || carbonFootprintMax || reliabilityDecayDaysMin || reliabilityDecayDaysMax || productFilter || employeeProfileFilter}
-                                <button 
-                                    class="kt-btn kt-btn-ghost kt-btn-sm"
-                                    on:click={clearAllFilters}
-                                >
-                                    <i class="ki-filled ki-cross text-sm"></i>
-                                    Clear All
-                                </button>
-                            {/if}
+                            </div>              
                         </div>
                     </div>
                 </div>
-                
-                <!-- Advanced Filters Section -->
-                {#if showFilters}
-                    <div class="kt-card-body border-t border-gray-200 p-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                            <!-- Manufacturer Filter -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Manufacturer</h4>
-                                <input 
-                                    type="text" 
-                                    class="kt-input w-full" 
-                                    placeholder="Enter manufacturer" 
-                                    bind:value={manufacturerFilter}
-                                    on:input={handleFilterChange}
-                                />
-                            </div>
-
-                            <!-- Price Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Acquisition Cost (DZD)</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min Price" 
-                                        bind:value={priceMin}
-                                        on:input={handleFilterChange}
-                                        step="1000"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max Price" 
-                                        bind:value={priceMax}
-                                        on:input={handleFilterChange}
-                                        step="1000"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Carbon Footprint Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Carbon Footprint (kg CO2/unit)</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min Carbon Footprint" 
-                                        bind:value={carbonFootprintMin}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max Carbon Footprint" 
-                                        bind:value={carbonFootprintMax}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Energy Consumption Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Operation Cost (DZD/day)</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min Operation Cost" 
-                                        bind:value={operationCostMin}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max Operation Cost" 
-                                        bind:value={operationCostMax}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Quality Factor Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Quality Factor</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min Quality" 
-                                        bind:value={qualityMin}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max Quality" 
-                                        bind:value={qualityMax}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Speed Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Average Speed (units/day)</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min Speed" 
-                                        bind:value={speedMin}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max Speed" 
-                                        bind:value={speedMax}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Reliability Decay Days Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Reliability Decay Days</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min Reliability Decay Days" 
-                                        bind:value={reliabilityDecayDaysMin}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                        max="1"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max Reliability Decay Days" 
-                                        bind:value={reliabilityDecayDaysMax}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                        max="1"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Product Output Filter -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Product Output</h4>
-                                <Select2
-                                    bind:this={productSelectComponent}
-                                    id="product-filter"
-                                    placeholder="Search products..."
-                                    bind:value={productFilter}
-                                    on:select={handleProductSelect}
-                                    on:clear={handleProductClear}
-                                    ajax={{
-                                        url: route('admin.products.index'),
-                                        dataType: 'json',
-                                        delay: 300,
-                                        data: function(params) {
-                                            return {
-                                                search: params.term,
-                                                perPage: 10
-                                            };
-                                        },
-                                        processResults: function(data) {
-                                            return {
-                                                results: data.products.map(product => ({
-                                                    id: product.id,
-                                                    text: `${product.name}`,
-                                                    name: product.name,
-                                                    type: product.type,
-                                                    type_name: product.type_name,
-                                                    image_url: product.image_url
-                                                }))
-                                            };
-                                        },
-                                        cache: true
-                                    }}
-                                    templateResult={function(data) {
-                                        if (data.loading) return data.text;
-                                        
-                                        const $elem = globalThis.$('<div class="flex items-center gap-3">' +
-                                            '<div class="flex items-center justify-center size-8 shrink-0 rounded bg-accent/50">' +
-                                            (data.image_url ? '<img src="' + data.image_url + '" alt="" class="size-6 object-cover rounded">' : '<i class="ki-filled ki-abstract-26 text-xs text-muted-foreground"></i>') +
-                                            '</div>' +
-                                            '<div class="flex flex-col">' +
-                                            '<span class="font-medium text-sm">' + data.name + '</span>' +
-                                            '<span class="kt-badge kt-badge-outline kt-badge-primary kt-badge-xs w-fit">' + data.type_name + '</span>' +
-                                            '</div>' +
-                                            '</div>');
-                                        return $elem;
-                                    }}
-                                    templateSelection={function(data) {
-                                        if (!data.id) return data.text;
-                                        return data.name;
-                                    }}
-                                />
-                            </div>
-
-                            <!-- Employee Profile Filter -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Employee Profile</h4>
-                                <Select2
-                                    bind:this={employeeProfileSelectComponent}
-                                    id="employee-profile-filter"
-                                    placeholder="Search employee profiles..."
-                                    bind:value={employeeProfileFilter}
-                                    on:select={handleEmployeeProfileSelect}
-                                    on:clear={handleEmployeeProfileClear}
-                                    ajax={{
-                                        url: route('admin.employee-profiles.index'),
-                                        dataType: 'json',
-                                        delay: 300,
-                                        data: function(params) {
-                                            return {
-                                                search: params.term,
-                                                perPage: 10
-                                            };
-                                        },
-                                        processResults: function(data) {
-                                            return {
-                                                results: data.employeeProfiles.map(profile => ({
-                                                    id: profile.id,
-                                                    text: `${profile.name}`,
-                                                    name: profile.name,
-                                                    description: profile.description,
-                                                    recruitment_difficulty: profile.recruitment_difficulty,
-                                                    avg_salary: profile.avg_salary_month
-                                                }))
-                                            };
-                                        },
-                                        cache: true
-                                    }}
-                                    templateResult={function(data) {
-                                        if (data.loading) return data.text;
-                                        
-                                        const $elem = globalThis.$('<div class="flex items-center gap-3">' +
-                                            '<div class="flex items-center justify-center size-8 shrink-0 rounded bg-accent/50">' +
-                                            '<i class="ki-filled ki-profile-user text-xs text-muted-foreground"></i>' +
-                                            '</div>' +
-                                            '<div class="flex flex-col">' +
-                                            '<span class="font-medium text-sm">' + data.name + '</span>' +
-                                            '<span class="text-xs text-muted-foreground">' + (data.description || '').substring(0, 30) + (data.description && data.description.length > 30 ? '...' : '') + '</span>' +
-                                            '</div>' +
-                                            '</div>');
-                                        return $elem;
-                                    }}
-                                    templateSelection={function(data) {
-                                        if (!data.id) return data.text;
-                                        return data.name;
-                                    }}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                {/if}
                 
                 <div class="kt-card-content p-0">
                     <div class="kt-scrollable-x-auto">
                         <table class="kt-table kt-table-border table-fixed">
                             <thead>
                                 <tr>
-                                    <th class="w-[50px]">
-                                        <input class="kt-checkbox kt-checkbox-sm" type="checkbox"/>
-                                    </th>
-                                    <th class="w-[80px]">
+                                    <th style="width: 75px;">
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">ID</span>
                                         </span>
                                     </th>
-                                    <th class="min-w-[250px]">
+                                    <th>
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">Machine</span>
                                         </span>
                                     </th>
-                                    <th class="min-w-[140px]">
+                                    <th>
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">Performance</span>
                                         </span>
                                     </th>
-                                    <th class="min-w-[120px]">
+                                    <th>
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">Setup Requirements</span>
                                         </span>
                                     </th>
-                                    <th class="min-w-[150px]">
-                                        <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Employee Profile</span>
-                                        </span>
-                                    </th>
-                                    <th class="min-w-[150px]">
-                                        <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Outputs</span>
-                                        </span>
-                                    </th>
-                                    <th class="w-[80px]">
+                                    <th style="width: 80px;">
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">Actions</span>
                                         </span>
@@ -711,9 +226,6 @@
                                     <!-- Loading skeleton rows -->
                                     {#each Array(perPage) as _, i}
                                         <tr>
-                                            <td class="p-4">
-                                                <div class="kt-skeleton w-4 h-4 rounded"></div>
-                                            </td>
                                             <td class="p-4">
                                                 <div class="kt-skeleton w-8 h-4 rounded"></div>
                                             </td>
@@ -731,12 +243,6 @@
                                             </td>
                                             <td class="p-4">
                                                 <div class="kt-skeleton w-16 h-4 rounded"></div>
-                                            </td>
-                                            <td class="p-4">
-                                                <div class="kt-skeleton w-20 h-6 rounded"></div>
-                                            </td>
-                                            <td class="p-4">
-                                                <div class="kt-skeleton w-20 h-6 rounded"></div>
                                             </td>
                                             <td class="p-4">
                                                 <div class="kt-skeleton w-8 h-8 rounded"></div>
@@ -766,9 +272,6 @@
                                     <!-- Actual data rows -->
                                     {#each machines as machine}
                                         <tr class="hover:bg-muted/50">
-                                            <td>
-                                                <input class="kt-checkbox kt-checkbox-sm" type="checkbox" value={machine.id}/>
-                                            </td>
                                             <td>
                                                 <span class="text-sm font-medium text-mono">#{machine.id}</span>
                                             </td>
@@ -806,15 +309,15 @@
                                                 <div class="flex flex-col gap-1">
                                                     <div class="flex items-center gap-1">
                                                         <span class="text-xs text-muted-foreground">Speed:</span>
-                                                        <span class="text-xs font-medium">{machine.avg_speed}/day</span>
+                                                        <span class="text-xs font-medium">{machine.min_speed} - {machine.max_speed} units/day</span>
                                                     </div>
                                                     <div class="flex items-center gap-1">
                                                         <span class="text-xs text-muted-foreground">Quality:</span>
-                                                        <span class="text-xs font-medium">{machine.quality_factor}%</span>
+                                                        <span class="text-xs font-medium">{machine.quality_factor * 100}%</span>
                                                     </div>
                                                     <div class="flex items-center gap-1">
-                                                        <span class="text-xs text-muted-foreground">Operation Cost:</span>
-                                                        <span class="text-xs font-medium">{machine.operation_cost} DZD/day</span>
+                                                        <span class="text-xs text-muted-foreground">Operations Cost:</span>
+                                                        <span class="text-xs font-medium">{machine.operations_cost} DZD/day</span>
                                                     </div>
                                                     <div class="flex items-center gap-1">
                                                         <span class="text-xs text-muted-foreground">Carbon Footprint:</span>
@@ -825,37 +328,7 @@
                                             <td>
                                                 <div class="flex items-center gap-1">
                                                     <span class="text-xs text-muted-foreground">Cost to Acquire:</span>
-                                                    <span class="text-xs font-medium">DZD{machine.cost_to_acquire}</span>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="flex flex-col gap-1">
-                                                    <span class="text-xs text-muted-foreground">
-                                                        {machine.employee_profile.name}
-                                                    </span>
-                                                    <span class="text-xs text-muted-foreground">
-                                                        {machine.employee_profile.description}
-                                                    </span>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="flex flex-col gap-1">
-                                                    {#if machine.products && machine.products.length > 0}
-                                                        <div class="flex flex-wrap gap-1">
-                                                            {#each machine.products.slice(0, 2) as product}
-                                                                <span class="kt-badge kt-badge-outline kt-badge-success kt-badge-xs">
-                                                                    {product.name}
-                                                                </span>
-                                                            {/each}
-                                                            {#if machine.products.length > 2}
-                                                                <span class="kt-badge kt-badge-outline kt-badge-secondary kt-badge-xs">
-                                                                    +{machine.products.length - 2} more
-                                                                </span>
-                                                            {/if}
-                                                        </div>
-                                                    {:else}
-                                                        <span class="text-xs text-muted-foreground">No outputs</span>
-                                                    {/if}
+                                                    <span class="text-xs font-medium">{machine.cost_to_acquire} DZD</span>
                                                 </div>
                                             </td>
                                             <td class="text-center">

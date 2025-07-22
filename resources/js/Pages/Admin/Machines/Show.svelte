@@ -21,31 +21,13 @@
     const pageTitle = 'Machine Details';
 
     // Map machine outputs for display
-    const outputs = (machine.products || []).map(product => ({
-        product_id: product.id,
-        product_name: product.name,
-        product_type_name: product.type_name,
-        product_image: product.image_url,
-        product_type: product.type
+    const outputs = (machine.outputs || []).map(output => ({
+        product_id: output.product.id,
+        product_name: output.product.name,
+        product_type_name: output.product.type_name,
+        product_image: output.product.image_url,
+        product_type: output.product.type
     }));
-
-    // Get recruitment difficulty badge class
-    function getRecruitmentDifficultyBadgeClass(difficulty) {
-        switch(difficulty) {
-            case 'very_easy':
-                return 'kt-badge kt-badge-outline kt-badge-success';
-            case 'easy':
-                return 'kt-badge kt-badge-outline kt-badge-success';
-            case 'medium':
-                return 'kt-badge kt-badge-outline kt-badge-warning';
-            case 'hard':
-                return 'kt-badge kt-badge-outline kt-badge-danger';
-            case 'very_hard':
-                return 'kt-badge kt-badge-outline kt-badge-danger';
-            default:
-                return 'kt-badge kt-badge-outline';
-        }
-    }
 
     // Get product type badge class
     function getProductTypeBadgeClass(type) {
@@ -130,7 +112,7 @@
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Acquisition Cost</h4>
                             <p class="text-sm text-secondary-foreground font-bold">
-                                {machine.cost_to_acquire}
+                                {machine.cost_to_acquire} DZD
                             </p>
                         </div>
 
@@ -162,9 +144,9 @@
                     <div class="grid gap-4 w-full">
                         <!-- Operation Cost -->
                         <div class="flex flex-col gap-2">
-                            <h4 class="text-sm font-semibold text-mono">Operation Cost</h4>
+                            <h4 class="text-sm font-semibold text-mono">OperationS Cost</h4>
                             <p class="text-sm text-secondary-foreground">
-                                {machine.operation_cost}/day
+                                {machine.operations_cost} DZD/day
                                 <span class="text-xs text-muted-foreground ml-2">
                                     (Daily operational expenses)
                                 </span>
@@ -175,7 +157,7 @@
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Carbon Footprint</h4>
                             <p class="text-sm text-secondary-foreground">
-                                {machine.carbon_footprint} kg CO2/unit
+                                {machine.carbon_footprint} kg CO2/unit produced
                                 <span class="text-xs text-muted-foreground ml-2">
                                     (Environmental impact per unit)
                                 </span>
@@ -196,17 +178,11 @@
                         <!-- Speed Range -->
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Production Speed</h4>
-                            <div class="grid grid-cols-3 gap-4">
+                            <div class="grid grid-cols-2 gap-4">
                                 <div class="flex flex-col gap-1">
                                     <span class="text-xs text-muted-foreground">Minimum</span>
                                     <p class="text-sm text-secondary-foreground">
                                         {machine.min_speed} units/day
-                                    </p>
-                                </div>
-                                <div class="flex flex-col gap-1">
-                                    <span class="text-xs text-muted-foreground">Average</span>
-                                    <p class="text-sm text-secondary-foreground font-medium">
-                                        {machine.avg_speed} units/day
                                     </p>
                                 </div>
                                 <div class="flex flex-col gap-1">
@@ -246,19 +222,13 @@
                                 <div class="flex flex-col gap-1">
                                     <span class="text-xs text-muted-foreground">Cost Range</span>
                                     <p class="text-sm text-secondary-foreground">
-                                        {machine.min_maintenance_cost} - {machine.max_maintenance_cost}
-                                    </p>
-                                    <p class="text-xs text-muted-foreground">
-                                        Avg: {machine.avg_maintenance_cost}
+                                        {machine.min_maintenance_cost} - {machine.max_maintenance_cost} DZD
                                     </p>
                                 </div>
                                 <div class="flex flex-col gap-1">
                                     <span class="text-xs text-muted-foreground">Time Range</span>
                                     <p class="text-sm text-secondary-foreground">
                                         {machine.min_maintenance_time_days} - {machine.max_maintenance_time_days} days
-                                    </p>
-                                    <p class="text-xs text-muted-foreground">
-                                        Avg: {machine.avg_maintenance_time_days} days
                                     </p>
                                 </div>
                             </div>
@@ -278,32 +248,12 @@
                                 <div class="kt-card">
                                     <div class="kt-card-content p-4">
                                         <div class="flex items-start gap-3">
-                                            <!-- Employee Icon -->
-                                            <div class="flex items-center justify-center w-10 h-10 bg-accent/50 rounded-lg">
-                                                <i class="ki-filled ki-users text-lg text-muted-foreground"></i>
-                                            </div>
-                                            
                                             <!-- Employee Info -->
                                             <div class="flex-1 space-y-2">
                                                 <div class="flex items-center gap-2">
                                                     <h6 class="text-sm font-medium text-mono">
-                                                        {machine.employeeProfile.name}
+                                                        {machine.employee_profile.name}
                                                     </h6>
-                                                </div>
-                                                
-                                                {#if machine.employeeProfile.description}
-                                                <p class="text-xs text-muted-foreground">
-                                                    {machine.employeeProfile.description}
-                                                </p>
-                                                {/if}
-                                                
-                                                <div class="flex items-center gap-4">
-                                                    <div class="flex items-center gap-1">
-                                                        <span class="text-xs text-muted-foreground">Avg Salary:</span>
-                                                        <span class="text-xs font-medium">
-                                                            {machine.employeeProfile.avg_salary_month}/mo
-                                                        </span>
-                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
