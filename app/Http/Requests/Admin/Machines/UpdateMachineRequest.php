@@ -44,23 +44,14 @@ class UpdateMachineRequest extends FormRequest
             
             // Reliability
             'reliability_decay_days' => 'required|numeric|min:0|max:1',
-            'maintenance_interval_days' => 'required|integer|min:1',
             
-            // Predictive maintenance PERT
-            'min_predictive_maintenance_cost' => 'required|numeric|min:0',
-            'avg_predictive_maintenance_cost' => 'required|numeric|min:0|gte:min_predictive_maintenance_cost|lte:max_predictive_maintenance_cost',
-            'max_predictive_maintenance_cost' => 'required|numeric|min:0|gte:min_predictive_maintenance_cost',
-            'min_predictive_maintenance_time_days' => 'required|integer|min:0',
-            'avg_predictive_maintenance_time_days' => 'required|integer|min:0|gte:min_predictive_maintenance_time_days|lte:max_predictive_maintenance_time_days',
-            'max_predictive_maintenance_time_days' => 'required|integer|min:0|gte:min_predictive_maintenance_time_days',
-            
-            // Corrective maintenance PERT
-            'min_corrective_maintenance_cost' => 'required|numeric|min:0',
-            'avg_corrective_maintenance_cost' => 'required|numeric|min:0|gte:min_corrective_maintenance_cost|lte:max_corrective_maintenance_cost',
-            'max_corrective_maintenance_cost' => 'required|numeric|min:0|gte:min_corrective_maintenance_cost',
-            'min_corrective_maintenance_time_days' => 'required|integer|min:0',
-            'avg_corrective_maintenance_time_days' => 'required|integer|min:0|gte:min_corrective_maintenance_time_days|lte:max_corrective_maintenance_time_days',
-            'max_corrective_maintenance_time_days' => 'required|integer|min:0|gte:min_corrective_maintenance_time_days',
+            // Maintenance
+            'min_maintenance_cost' => 'required|numeric|min:0',
+            'avg_maintenance_cost' => 'required|numeric|min:0|gte:min_maintenance_cost|lte:max_maintenance_cost',
+            'max_maintenance_cost' => 'required|numeric|min:0|gte:min_maintenance_cost',
+            'min_maintenance_time_days' => 'required|integer|min:0',
+            'avg_maintenance_time_days' => 'required|integer|min:0|gte:min_maintenance_time_days|lte:max_maintenance_time_days',
+            'max_maintenance_time_days' => 'required|integer|min:0|gte:min_maintenance_time_days',
             
             // Machine employee profiles validation
             'employee_profile_id' => 'required|exists:employee_profiles,id',
@@ -91,7 +82,6 @@ class UpdateMachineRequest extends FormRequest
             'avg_speed' => 'average speed',
             'max_speed' => 'maximum speed',
             'reliability_decay_days' => 'reliability decay',
-            'maintenance_interval_days' => 'maintenance interval',
             'outputs.*.product_id' => 'product',
             'file' => 'machine image',
         ];

@@ -95,4 +95,14 @@ class FinanceService
 
         return $funds;
     }
+
+    public static function payMaintenanceCost($company, $maintenance){
+        $funds = $company->funds;
+        $funds -= $maintenance->maintenances_cost;
+        $company->update(['funds' => $funds]);
+
+        NotificationService::createFinanceFundsChangedNotification($company, $maintenance->maintenances_cost);
+
+        return $funds;
+    }
 }

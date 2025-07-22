@@ -345,6 +345,46 @@ class NotificationService
         ]);
     }
 
+    public static function createMachineBrokenNotification($company, $companyMachine){
+        return Notification::create([
+            'type' => Notification::TYPE_MACHINE_BROKEN,
+            'title' => 'Machine Broken',
+            'message' => "Machine {$companyMachine->machine->name} broken.",
+            'url' => route('company.machines.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
+    public static function createMachineReliabilityDecreasedNotification($company, $companyMachine){
+        return Notification::create([
+            'type' => Notification::TYPE_MACHINE_RELIABILITY_DECREASED,
+            'title' => 'Machine Reliability Decreased',
+            'message' => "Machine {$companyMachine->machine->name} reliability decreased to {$companyMachine->current_reliability}. Consider running a predictive maintenance.",
+            'url' => route('company.machines.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
+    public static function createMachineMaintenanceStartedNotification($company, $companyMachine){
+        return Notification::create([
+            'type' => Notification::TYPE_MACHINE_MAINTENANCE_STARTED,
+            'title' => 'Machine Maintenance Started',
+            'message' => "Machine {$companyMachine->machine->name} maintenance started.",
+            'url' => route('company.machines.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
+    public static function createMachineMaintenanceCompletedNotification($company, $companyMachine){
+        return Notification::create([
+            'type' => Notification::TYPE_MACHINE_MAINTENANCE_COMPLETED,
+            'title' => 'Machine Maintenance Completed',
+            'message' => "Machine {$companyMachine->machine->name} maintenance completed.",
+            'url' => route('company.machines.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
     public static function getUnreadCount()
     {
         return Notification::where('user_id', auth()->user()->id)->whereNull('read_at')->count();

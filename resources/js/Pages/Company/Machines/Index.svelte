@@ -75,6 +75,14 @@ let selectedProductId = '';
 let productionQuantity = 1;
 let availableProducts = [];
 
+// Maintenance modal state
+let showMaintenanceModal = false;
+let maintenanceType = '';
+let maintenanceLoading = false;
+let maintenanceMachine = null;
+let maintenanceCost = 0;
+let maintenanceTime = 0;
+
     // --- Machine Status Mapping ---
     const machineStatuses = {
         'active': 'Active',
@@ -281,6 +289,62 @@ let availableProducts = [];
         selectedProductId = '';
         productionQuantity = 1;
         availableProducts = [];
+    }
+
+    function openMaintenanceModal(machine, type) {
+        maintenanceMachine = machine;
+        maintenanceType = type;
+        showMaintenanceModal = true;
+        // Use avg cost/time for both types (can be customized if needed)
+        maintenanceCost = machine.machine?.avg_maintenance_cost || 0;
+        maintenanceTime = machine.machine?.avg_maintenance_time_days || 1;
+        if (type === 'corrective') {
+            // If you want to use different fields for corrective, set here
+            // maintenanceCost = machine.machine?.max_maintenance_cost || maintenanceCost;
+            // maintenanceTime = machine.machine?.max_maintenance_time_days || maintenanceTime;
+        }
+        const toggleButton = document.querySelector('[data-kt-modal-toggle="#maintenance_modal"]');
+        if (toggleButton) toggleButton.click();
+    }
+
+    function closeMaintenanceModal() {
+        const dismissButton = document.querySelector('[data-kt-modal-dismiss="#maintenance_modal"]');
+        if (dismissButton) dismissButton.click();
+        showMaintenanceModal = false;
+        maintenanceMachine = null;
+        maintenanceType = '';
+        maintenanceCost = 0;
+        maintenanceTime = 0;
+    }
+
+    async function startMaintenance() {
+        if (!maintenanceMachine) return;
+        maintenanceLoading = true;
+        try {
+            const response = await fetch(route('company.machines.start-maintenance', maintenanceMachine.id), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({})
+            });
+            if (response.ok) {
+                const data = await response.json();
+                showToast(data.message || 'Maintenance started successfully!', 'success');
+                closeMaintenanceModal();
+                fetchMachines();
+            } else {
+                const errorData = await response.json();
+                showToast(errorData.message || 'Error starting maintenance. Please try again.', 'error');
+            }
+        } catch (error) {
+            console.error('Error starting maintenance:', error);
+            showToast('Network error. Please check your connection and try again.', 'error');
+        } finally {
+            maintenanceLoading = false;
+        }
     }
 
     // --- Action Handlers ---
@@ -691,14 +755,29 @@ let availableProducts = [];
                                                         <i class="ki-filled ki-setting-3 text-sm"></i>
                                                         Assign Employee
                                                     </button>
-                                                {:else if companyMachine.status === 'inactive' }
+                                                {:else if companyMachine.status === 'inactive'}
+                                                    <button 
+                                                        class="kt-btn kt-btn-sm kt-btn-info"
+                                                        on:click={() => openMaintenanceModal(companyMachine, 'predictive')}
+                                                    >
+                                                        <i class="ki-filled ki-wrench text-sm"></i>
+                                                        Start Predictive Maintenance
+                                                    </button>
                                                     <button 
                                                         class="kt-btn kt-btn-sm kt-btn-primary"
                                                         on:click={() => openProductionModal(companyMachine)}
                                                     >
                                                         <i class="ki-filled ki-play text-sm"></i>
                                                         Start Production
-                                                    </button>                      
+                                                    </button>
+                                                {:else if companyMachine.status === 'broken'}
+                                                    <button 
+                                                        class="kt-btn kt-btn-sm kt-btn-destructive"
+                                                        on:click={() => openMaintenanceModal(companyMachine, 'corrective')}
+                                                    >
+                                                        <i class="ki-filled ki-wrench text-sm"></i>
+                                                        Start Corrective Maintenance
+                                                    </button>
                                                 {:else}
                                                     <button 
                                                         class="kt-btn kt-btn-sm kt-btn-destructive"
@@ -740,6 +819,9 @@ let availableProducts = [];
 
     <!-- Hidden button to trigger production modal -->
     <button style="display:none" data-kt-modal-toggle="#production_modal"></button>
+
+    <!-- Hidden button to trigger maintenance modal -->
+    <button style="display:none" data-kt-modal-toggle="#maintenance_modal"></button>
 
     <!-- Machine Details Drawer -->
     <div class="hidden kt-drawer kt-drawer-end card flex-col max-w-[90%] w-[450px] top-5 bottom-5 end-5 rounded-xl border border-border" data-kt-drawer="true" data-kt-drawer-container="body" id="machine_drawer">
@@ -1176,6 +1258,105 @@ let availableProducts = [];
                         disabled={!selectedProductId || !productionQuantity || startingProduction}
                     >
                         {startingProduction ? 'Starting Production...' : 'Start Production'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Maintenance Modal -->
+    <div class="kt-modal" data-kt-modal="true" id="maintenance_modal">
+        <div class="kt-modal-content max-w-[600px] top-[5%]">
+            <div class="kt-modal-header">
+                <h3 class="kt-modal-title">
+                    {maintenanceType === 'corrective' ? 'Start Corrective Maintenance' : 'Start Predictive Maintenance'}
+                </h3>
+                <button
+                    type="button"
+                    class="kt-modal-close"
+                    aria-label="Close modal"
+                    data-kt-modal-dismiss="#maintenance_modal"
+                    on:click={closeMaintenanceModal}
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-x"
+                        aria-hidden="true"
+                    >
+                        <path d="M18 6 6 18"></path>
+                        <path d="m6 6 12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="kt-modal-body">
+                {#if maintenanceMachine}
+                    <div class="space-y-4">
+                        <!-- Machine Info -->
+                        <div class="flex items-center gap-4">
+                            <div class="flex-shrink-0">
+                                {#if maintenanceMachine.machine?.image_url}
+                                    <img 
+                                        src={maintenanceMachine.machine.image_url} 
+                                        alt={maintenanceMachine.machine.name}
+                                        class="w-16 h-16 rounded-lg object-cover"
+                                    />
+                                {:else}
+                                    <div class="w-16 h-16 rounded-lg bg-accent/50 flex items-center justify-center">
+                                        <i class="ki-filled ki-setting-3 text-xl text-muted-foreground"></i>
+                                    </div>
+                                {/if}
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-mono mb-1">{maintenanceMachine.machine?.name}</h4>
+                                <p class="text-sm text-muted-foreground">{maintenanceMachine.machine?.model} - {maintenanceMachine.machine?.manufacturer}</p>
+                            </div>
+                        </div>
+                        <!-- Maintenance Details -->
+                        <div class="kt-card bg-accent/50">
+                            <div class="kt-card-header px-5">
+                                <h3 class="kt-card-title">Maintenance Details</h3>
+                            </div>
+                            <div class="kt-card-content px-5 py-4 space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm font-normal text-secondary-foreground">Cost:</span>
+                                    <span class="text-sm font-medium text-mono">DZD {maintenanceCost}</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm font-normal text-secondary-foreground">Estimated Time:</span>
+                                    <span class="text-sm font-medium text-mono">{maintenanceTime} days</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-sm text-muted-foreground">
+                            Are you sure you want to start {maintenanceType === 'corrective' ? 'corrective' : 'predictive'} maintenance for this machine?
+                        </div>
+                    </div>
+                {/if}
+            </div>
+            <div class="kt-modal-footer">
+                <div></div>
+                <div class="flex gap-4">
+                    <button
+                        class="kt-btn kt-btn-secondary"
+                        data-kt-modal-dismiss="#maintenance_modal"
+                        on:click={closeMaintenanceModal}
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        class="kt-btn kt-btn-primary"
+                        on:click={startMaintenance}
+                        disabled={maintenanceLoading}
+                    >
+                        {maintenanceLoading ? 'Starting...' : 'Start Maintenance'}
                     </button>
                 </div>
             </div>

@@ -73,6 +73,9 @@ class GameTimeLoop extends Command
         // Process production orders
         $this->call('game:production-orders-processing');
 
+        // Process machines reliability
+        $this->call('game:process-machines-reliability');
+
         if($newTime->day == 1 ){
             // Pay employees salaries
             $this->call('game:pay-employees-salaries');

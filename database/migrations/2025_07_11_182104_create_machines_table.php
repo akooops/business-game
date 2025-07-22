@@ -36,20 +36,12 @@ return new class extends Migration
             $table->integer('maintenance_interval_days')->default(1);
             
             // PERT Distribution for Predictive Maintenance
-            $table->decimal('min_predictive_maintenance_cost', 15, 3)->default(0);
-            $table->decimal('avg_predictive_maintenance_cost', 15, 3)->default(0);
-            $table->decimal('max_predictive_maintenance_cost', 15, 3)->default(0);
-            $table->integer('min_predictive_maintenance_time_days')->default(1);
-            $table->integer('avg_predictive_maintenance_time_days')->default(1);
-            $table->integer('max_predictive_maintenance_time_days')->default(1);
-            
-            // PERT Distribution for Corrective Maintenance
-            $table->decimal('min_corrective_maintenance_cost', 15, 3)->default(0);
-            $table->decimal('avg_corrective_maintenance_cost', 15, 3)->default(0);
-            $table->decimal('max_corrective_maintenance_cost', 15, 3)->default(0);
-            $table->integer('min_corrective_maintenance_time_days')->default(1);
-            $table->integer('avg_corrective_maintenance_time_days')->default(1);
-            $table->integer('max_corrective_maintenance_time_days')->default(1);
+            $table->decimal('min_maintenance_cost', 15, 3)->default(0);
+            $table->decimal('avg_maintenance_cost', 15, 3)->default(0);
+            $table->decimal('max_maintenance_cost', 15, 3)->default(0);
+            $table->integer('min_maintenance_time_days')->default(1);
+            $table->integer('avg_maintenance_time_days')->default(1);
+            $table->integer('max_maintenance_time_days')->default(1);
 
             // Foreign keys
             $table->foreignId('employee_profile_id')->constrained()->onDelete('cascade');

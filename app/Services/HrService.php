@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\CompanyMachine;
 use App\Models\Employee;
+use App\Models\ProductionOrder;
 use App\Services\SettingsService;
 
 class HrService
@@ -106,6 +108,12 @@ class HrService
             $errors['status'] = 'This employee is not active.';
         }
 
+        if($employee->companyMachine){
+            if($employee->companyMachine->status == CompanyMachine::STATUS_ACTIVE){
+                $errors['companyMachine'] = 'This employee is assigned to a machine that is active. Wait until the production is completed.';
+            }
+        }
+
         return $errors;
     }
 
@@ -168,7 +176,18 @@ class HrService
                 $employee->companyMachine->update([
                     'employee_id' => null,
                 ]);
-                
+
+                $productionOrders = ProductionOrder::where([
+                    'company_machine_id' => $employee->companyMachine->id,
+                    'status' => ProductionOrder::STATUS_IN_PROGRESS,
+                ])->get();
+
+                foreach($productionOrders as $productionOrder){ 
+                    $productionOrder->update([
+                        'status' => ProductionOrder::STATUS_CANCELLED,
+                    ]);
+                }
+
                 // Create resignation notification
                 NotificationService::createEmployeeResignedNotification($employee);
                 continue; // Skip mood update since employee resigned

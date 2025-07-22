@@ -24,12 +24,9 @@ class Machine extends Model
         'avg_speed' => 'decimal:3',
         'max_speed' => 'decimal:3',
         'reliability_decay_days' => 'decimal:3',
-        'min_predictive_maintenance_cost' => 'decimal:3',
-        'avg_predictive_maintenance_cost' => 'decimal:3',
-        'max_predictive_maintenance_cost' => 'decimal:3',
-        'min_corrective_maintenance_cost' => 'decimal:3',
-        'avg_corrective_maintenance_cost' => 'decimal:3',
-        'max_corrective_maintenance_cost' => 'decimal:3',
+        'min_maintenance_cost' => 'decimal:3',
+        'avg_maintenance_cost' => 'decimal:3',
+        'max_maintenance_cost' => 'decimal:3',
     ];
 
     // Relations

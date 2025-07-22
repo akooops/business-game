@@ -75,6 +75,7 @@ Route::prefix('company')->middleware(['auth', 'check.company', 'handle.inertia']
 
     Route::post('/machines/{companyMachine}/assign-employee', [MachinesController::class, 'assignEmployee'])->middleware('check.permission:company.machines.index')->name('company.machines.assign-employee');
     Route::post('/machines/{companyMachine}/unassign-employee', [MachinesController::class, 'unassignEmployee'])->middleware('check.permission:company.machines.index')->name('company.machines.unassign-employee');
+    Route::post('/machines/{companyMachine}/start-maintenance', [MachinesController::class, 'startMaintenance'])->middleware('check.permission:company.machines.index')->name('company.machines.start-maintenance');
 
     Route::post('/production-orders/{companyMachine}/produce', [ProductionOrdersController::class, 'produce'])->middleware('check.permission:company.production-orders.store')->name('company.production-orders.store');
 });

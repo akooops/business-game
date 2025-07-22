@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Company;
 
 use App\Http\Requests\Company\Machines\SetupMachineRequest;
 use App\Http\Requests\Company\Machines\AssignEmployeeRequest;
+use App\Http\Requests\Company\Machines\StartMaintenanceRequest;
 use App\Services\FileService;
 use App\Services\IndexService;
 use App\Services\ProductionService;
@@ -12,6 +13,7 @@ use App\Models\Machine;
 use App\Models\CompanyMachine;
 use App\Models\Employee;
 use App\Http\Controllers\Controller;
+use App\Services\MaintenanceService;
 
 class MachinesController extends Controller
 {
@@ -239,6 +241,16 @@ class MachinesController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Employee unassigned successfully!'
+        ]);
+    }
+
+    public function startMaintenance(StartMaintenanceRequest $request, CompanyMachine $companyMachine)
+    {
+        MaintenanceService::startMaintenance($companyMachine);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Maintenance started successfully!'
         ]);
     }
 } 

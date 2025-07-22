@@ -71,6 +71,12 @@ class Notification extends Model
     const TYPE_MACHINE_ASSIGNED_EMPLOYEE = 'machine_assigned_employee';
     const TYPE_MACHINE_PRODUCTION_STARTED = 'machine_production_started';
     const TYPE_MACHINE_PRODUCTION_COMPLETED = 'machine_production_completed';
+    const TYPE_MACHINE_BROKEN = 'machine_broken';
+    const TYPE_MACHINE_RELIABILITY_DECREASED = 'machine_reliability_decreased';
+
+    // Maintenance
+    const TYPE_MACHINE_MAINTENANCE_STARTED = 'machine_maintenance_started';
+    const TYPE_MACHINE_MAINTENANCE_COMPLETED = 'machine_maintenance_completed';
 
     // Icons for different notification types
     const ICONS = [
@@ -104,6 +110,10 @@ class Notification extends Model
         self::TYPE_MACHINE_ASSIGNED_EMPLOYEE => 'ki-filled ki-setting-3',
         self::TYPE_MACHINE_PRODUCTION_STARTED => 'ki-filled ki-setting-3',
         self::TYPE_MACHINE_PRODUCTION_COMPLETED => 'ki-filled ki-setting-3',
+        self::TYPE_MACHINE_BROKEN => 'ki-filled ki-setting-3',
+        self::TYPE_MACHINE_RELIABILITY_DECREASED => 'ki-filled ki-setting-3',
+        self::TYPE_MACHINE_MAINTENANCE_STARTED => 'ki-filled ki-setting-3',
+        self::TYPE_MACHINE_MAINTENANCE_COMPLETED => 'ki-filled ki-setting-3',
     ];
 
     // Methods

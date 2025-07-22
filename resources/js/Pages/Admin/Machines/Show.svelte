@@ -241,62 +241,26 @@
                             </p>
                         </div>
 
-                        <!-- Maintenance Interval -->
+                        <!-- Maintenance -->
                         <div class="flex flex-col gap-2">
-                            <h4 class="text-sm font-semibold text-mono">Maintenance Interval</h4>
-                            <p class="text-sm text-secondary-foreground">
-                                {machine.maintenance_interval_days} days
-                                <span class="text-xs text-muted-foreground ml-2">
-                                    (Scheduled maintenance frequency)
-                                </span>
-                            </p>
-                        </div>
-
-                        <!-- Predictive Maintenance -->
-                        <div class="flex flex-col gap-2">
-                            <h4 class="text-sm font-semibold text-mono">Predictive Maintenance (PERT)</h4>
+                            <h4 class="text-sm font-semibold text-mono">Maintenance</h4>
                             <div class="grid grid-cols-2 gap-4">
                                 <div class="flex flex-col gap-1">
                                     <span class="text-xs text-muted-foreground">Cost Range</span>
                                     <p class="text-sm text-secondary-foreground">
-                                        {machine.min_predictive_maintenance_cost} - {machine.max_predictive_maintenance_cost}
+                                        {machine.min_maintenance_cost} - {machine.max_maintenance_cost}
                                     </p>
                                     <p class="text-xs text-muted-foreground">
-                                        Avg: {machine.avg_predictive_maintenance_cost}
+                                        Avg: {machine.avg_maintenance_cost}
                                     </p>
                                 </div>
                                 <div class="flex flex-col gap-1">
                                     <span class="text-xs text-muted-foreground">Time Range</span>
                                     <p class="text-sm text-secondary-foreground">
-                                        {machine.min_predictive_maintenance_time_days} - {machine.max_predictive_maintenance_time_days} days
+                                        {machine.min_maintenance_time_days} - {machine.max_maintenance_time_days} days
                                     </p>
                                     <p class="text-xs text-muted-foreground">
-                                        Avg: {machine.avg_predictive_maintenance_time_days} days
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Corrective Maintenance -->
-                        <div class="flex flex-col gap-2">
-                            <h4 class="text-sm font-semibold text-mono">Corrective Maintenance (PERT)</h4>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="flex flex-col gap-1">
-                                    <span class="text-xs text-muted-foreground">Cost Range</span>
-                                    <p class="text-sm text-secondary-foreground">
-                                        {machine.min_corrective_maintenance_cost} - {machine.max_corrective_maintenance_cost}
-                                    </p>
-                                    <p class="text-xs text-muted-foreground">
-                                        Avg: {machine.avg_corrective_maintenance_cost}
-                                    </p>
-                                </div>
-                                <div class="flex flex-col gap-1">
-                                    <span class="text-xs text-muted-foreground">Time Range</span>
-                                    <p class="text-sm text-secondary-foreground">
-                                        {machine.min_corrective_maintenance_time_days} - {machine.max_corrective_maintenance_time_days} days
-                                    </p>
-                                    <p class="text-xs text-muted-foreground">
-                                        Avg: {machine.avg_corrective_maintenance_time_days} days
+                                        Avg: {machine.avg_maintenance_time_days} days
                                     </p>
                                 </div>
                             </div>
