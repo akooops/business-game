@@ -28,14 +28,6 @@
     let perPage = 10;
     let currentPage = 1;
     let searchTimeout;
-    let showFilters = false;
-    
-    // Filter variables
-    let levelFilter = '';
-    let researchCostMin = '';
-    let researchCostMax = '';
-    let researchTimeDaysMin = '';
-    let researchTimeDaysMax = '';
 
     // Fetch technologies data
     async function fetchTechnologies() {
@@ -46,23 +38,6 @@
                 perPage: perPage,
                 search: search
             });
-            
-            // Add filter parameters
-            if (levelFilter) {
-                params.append('level', levelFilter);
-            }
-            if (researchCostMin) {
-                params.append('research_cost_min', researchCostMin);
-            }
-            if (researchCostMax) {
-                params.append('research_cost_max', researchCostMax);
-            }
-            if (researchTimeDaysMin) {
-                params.append('research_time_days_min', researchTimeDaysMin);
-            }
-            if (researchTimeDaysMax) {
-                params.append('research_time_days_max', researchTimeDaysMax);
-            }
             
             const response = await fetch(route('admin.technologies.index') + '?' + params.toString(), {
                 headers: {
@@ -121,28 +96,6 @@
         fetchTechnologies();
     }
 
-    // Handle filter changes
-    function handleFilterChange() {
-        currentPage = 1;
-        fetchTechnologies();
-    }
-
-    // Clear all filters
-    function clearAllFilters() {
-        levelFilter = '';
-        researchCostMin = '';
-        researchCostMax = '';
-        researchTimeDaysMin = '';
-        researchTimeDaysMax = '';
-        currentPage = 1;
-        fetchTechnologies();
-    }
-
-    // Toggle filters visibility
-    function toggleFilters() {
-        showFilters = !showFilters;
-    }
-
     // Delete technology
     async function deleteTechnology(technologyId) {
         if (!confirm('Are you sure you want to delete this technology? This action cannot be undone.')) {
@@ -164,35 +117,20 @@
 
             if (response.ok) {
                 // Show success toast
-                KTToast.show({
-                    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                    message: "Technology deleted successfully!",
-                    variant: "success",
-                    position: "bottom-right",
-                });
+                showToast("Technology deleted successfully!", 'success');
 
                 // Refresh the technologies list
                 fetchTechnologies();
             } else {
                 const errorData = await response.json().catch(() => ({}));
                 const errorMessage = errorData.message || 'Error deleting technology. Please try again.';
-                
-                KTToast.show({
-                    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                    message: errorMessage,
-                    variant: "destructive",
-                    position: "bottom-right",
-                });
+
+                showToast(errorMessage, 'destructive'); 
             }
         } catch (error) {
             console.error('Error deleting technology:', error);
-            
-            KTToast.show({
-                    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                    message: "Network error. Please check your connection and try again.",
-                    variant: "destructive",
-                    position: "bottom-right",
-            });
+
+            showToast("Network error. Please check your connection and try again.", 'destructive');
         }
     }
 
@@ -204,12 +142,7 @@
     export let success;
 
     $: if (success) {
-        KTToast.show({
-            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-            message: success,
-            variant: "success",
-            position: "bottom-right",
-        });
+        showToast(success, 'success');
     }
 </script>
 
@@ -251,136 +184,42 @@
                                     bind:value={search}
                                     on:input={handleSearchInput}
                                 />
-                            </div>
-                            
-                            <!-- Filter Toggle Button -->
-                            <button 
-                                class="kt-btn kt-btn-outline"
-                                on:click={toggleFilters}
-                            >
-                                <i class="ki-filled ki-filter text-sm"></i>
-                                {showFilters ? 'Hide Filters' : 'Show Filters'}
-                            </button>
-                            
-                            <!-- Clear Filters Button -->
-                            {#if levelFilter || researchCostMin || researchCostMax || researchTimeDaysMin || researchTimeDaysMax}
-                                <button 
-                                    class="kt-btn kt-btn-ghost kt-btn-sm"
-                                    on:click={clearAllFilters}
-                                >
-                                    <i class="ki-filled ki-cross text-sm"></i>
-                                    Clear All
-                                </button>
-                            {/if}
+                            </div>    
                         </div>
                     </div>
                 </div>
-                
-                <!-- Advanced Filters Section -->
-                {#if showFilters}
-                    <div class="kt-card-body border-t border-gray-200 p-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                            <!-- Technology Properties -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Technology Properties</h4>                                    
-                                <!-- Technology level -->
-                                <input 
-                                    type="number" 
-                                    class="kt-input flex-1" 
-                                    placeholder="Level" 
-                                    bind:value={levelFilter}
-                                    on:input={handleFilterChange}
-                                    min="0"
-                                />
-                            </div>             
-                            
-                            <!-- Research Cost Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Research Cost</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min" 
-                                        bind:value={researchCostMin}
-                                        on:input={handleFilterChange}
-                                        step="0.01"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max" 
-                                        bind:value={researchCostMax}
-                                        on:input={handleFilterChange}
-                                        step="0.01"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Research Time Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Research Time (Days)</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min Days" 
-                                        bind:value={researchTimeDaysMin}
-                                        on:input={handleFilterChange}
-                                        min="1"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max Days" 
-                                        bind:value={researchTimeDaysMax}
-                                        on:input={handleFilterChange}
-                                        min="1"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {/if}
                 
                 <div class="kt-card-content p-0">
                     <div class="kt-scrollable-x-auto">
                         <table class="kt-table kt-table-border table-fixed">
                             <thead>
                                 <tr>
-                                    <th class="w-[50px]">
-                                        <input class="kt-checkbox kt-checkbox-sm" type="checkbox"/>
-                                    </th>
-                                    <th class="w-[80px]">
+                                    <th style="width: 75px;">
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">ID</span>
                                         </span>
                                     </th>
-                                    <th class="min-w-[200px]">
+                                    <th>
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">Technology</span>
                                         </span>
                                     </th>
-                                    <th class="min-w-[150px]">
+                                    <th>
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">Level</span>
                                         </span>
                                     </th>
-                                    <th class="min-w-[150px]">
+                                    <th>
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">Research Cost</span>
                                         </span>
                                     </th>
-                                    <th class="min-w-[150px]">
+                                    <th>
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">Research Time (Days)</span>
                                         </span>
                                     </th>
-                                    <th class="w-[80px]">
+                                    <th style="width: 70px;">
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">Actions</span>
                                         </span>
@@ -392,9 +231,6 @@
                                     <!-- Loading skeleton rows -->
                                     {#each Array(perPage) as _, i}
                                         <tr>
-                                            <td class="p-4">
-                                                <div class="kt-skeleton w-4 h-4 rounded"></div>
-                                            </td>
                                             <td class="p-4">
                                                 <div class="kt-skeleton w-8 h-4 rounded"></div>
                                             </td>
@@ -445,9 +281,6 @@
                                     {#each technologies as technology}
                                         <tr class="hover:bg-muted/50">
                                             <td>
-                                                <input class="kt-checkbox kt-checkbox-sm" type="checkbox" value={technology.id}/>
-                                            </td>
-                                            <td>
                                                 <span class="text-sm font-medium text-mono">#{technology.id}</span>
                                             </td>
                                             <td>
@@ -474,19 +307,19 @@
                                             </td>
 
                                             <td>
-                                                <span class="text-sm font-medium text-mono kt-badge kt-badge-light-primary">
+                                                <span class="text-sm font-medium text-white kt-badge kt-badge-light-primary">
                                                     {technology.level}
                                                 </span>
                                             </td>
                                             <td>
                                                 <span class="text-sm font-medium text-mono">
-                                                    {technology.research_cost}
+                                                    {technology.research_cost} DZD
                                                 </span>
                                             </td>
                                             
                                             <td>
                                                 <span class="text-sm font-medium text-mono">
-                                                    {technology.research_time_days}
+                                                    {technology.research_time_days} Days
                                                 </span>
                                             </td>
                                             

@@ -544,7 +544,6 @@
                                                     text: product.name,
                                                     name: product.name,
                                                     type: product.type,
-                                                    measurement_unit: product.measurement_unit
                                                 }))
                                             };
                                         },
@@ -559,7 +558,7 @@
                                             '</div>' +
                                             '<div class="flex flex-col">' +
                                             '<span class="font-medium text-sm">' + data.name + '</span>' +
-                                            '<span class="text-xs text-muted-foreground">' + data.type + ' | ' + data.measurement_unit + '</span>' +
+                                            '<span class="text-xs text-muted-foreground">' + data.type  + '</span>' +
                                             '</div>' +
                                             '</div>');
                                         return $elem;

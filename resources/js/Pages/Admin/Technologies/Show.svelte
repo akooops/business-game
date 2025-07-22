@@ -20,20 +20,6 @@
     ];
     
     const pageTitle = 'Technology Details';
-
-    // Product type badge colors
-    function getProductTypeBadgeClass(type) {
-        switch(type) {
-            case 'raw_material':
-                return 'kt-badge kt-badge-outline kt-badge-success';
-            case 'component':
-                return 'kt-badge kt-badge-outline kt-badge-warning';
-            case 'finished_product':
-                return 'kt-badge kt-badge-outline kt-badge-primary';
-            default:
-                return 'kt-badge kt-badge-outline';
-        }
-    }
 </script>
 
 <svelte:head>
@@ -100,7 +86,7 @@
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Technology Level</h4>
                             <div>
-                                <span class="kt-badge kt-badge kt-badge-light-primary">
+                                <span class="text-sm font-medium text-white kt-badge kt-badge-light-primary">
                                     {technology?.level}   
                                 </span>
                             </div>
@@ -136,15 +122,15 @@
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Research Cost</h4>
                             <p class="text-sm text-secondary-foreground">
-                                {technology?.research_cost}
+                                {technology?.research_cost} DZD
                             </p>
                         </div>
 
                         <!-- Research Time (Days) -->
                         <div class="flex flex-col gap-2">
-                            <h4 class="text-sm font-semibold text-mono">Research Time (Days)</h4>
+                            <h4 class="text-sm font-semibold text-mono">Research Time</h4>
                             <p class="text-sm text-secondary-foreground">
-                                {technology?.research_time_days}
+                                {technology?.research_time_days} Days
                             </p>
                         </div>
                     </div>

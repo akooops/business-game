@@ -85,7 +85,7 @@ class CompaniesController extends Controller
             'research_level' => $request->research_level,
         ]);
 
-        $products = Product::where('need_technology',false)->get();
+        $products = Product::where('technology_id', null)->get();
 
         foreach($products as $product){
             // Check if product already exists
@@ -169,7 +169,7 @@ class CompaniesController extends Controller
             'research_level' => $request->research_level,
         ]);
 
-        $products = Product::where('need_technology',false)->get();
+        $products = Product::where('technology_id', null)->get();
 
         foreach($products as $product){
             // Check if product already exists

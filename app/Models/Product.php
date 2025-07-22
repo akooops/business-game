@@ -17,7 +17,6 @@ class Product extends Model
         'elasticity_coefficient' => 'decimal:3',
         'storage_cost' => 'decimal:3',
         'has_expiration' => 'boolean',
-        'need_technology' => 'boolean',
     ];
 
     protected $appends = ['type_name', 'image_url', 'is_researched'];

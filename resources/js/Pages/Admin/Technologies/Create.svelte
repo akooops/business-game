@@ -193,7 +193,7 @@
                                     min="0"
                                     step="0.001"
                                     class="kt-input {errors.research_cost ? 'kt-input-error' : ''}"
-                                    placeholder="0"
+                                    placeholder="Enter research cost (DZD)"
                                     bind:value={form.research_cost}
                                 />
                                 {#if errors.research_cost}
@@ -211,7 +211,7 @@
                                         type="number"
                                         min="0"
                                         class="kt-input {errors.research_time_days ? 'kt-input-error' : ''}"
-                                        placeholder="0"
+                                        placeholder="Enter research time (Days)"
                                         bind:value={form.research_time_days}
                                     />
                                 {#if errors.research_time_days}

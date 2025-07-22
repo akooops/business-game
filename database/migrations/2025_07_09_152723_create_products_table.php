@@ -26,12 +26,6 @@ return new class extends Migration
             $table->integer('shelf_life_days')->nullable();
             $table->boolean('has_expiration')->default(false);
 
-            // Measurement unit
-            $table->string('measurement_unit')->default('unit');
-
-            // table need research
-            $table->boolean('need_technology')->default(false);
-
             // Technology
             $table->foreignId('technology_id')->nullable()->constrained()->onDelete('set null');
 

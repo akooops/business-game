@@ -32,8 +32,7 @@ class ProductsController extends Controller
             $products->whereHas('product', function($query) use ($search) {
                 $query->where('name', 'like', '%' . $search . '%')
                     ->orWhere('description', 'like', '%' . $search . '%')
-                    ->orWhere('type', 'like', '%' . $search . '%')
-                    ->orWhere('measurement_unit', 'like', '%' . $search . '%');
+                    ->orWhere('type', 'like', '%' . $search . '%');
             });
         }
 

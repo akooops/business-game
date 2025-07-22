@@ -473,16 +473,6 @@
                     </div>
                     <div class="flex items-center gap-2.5">
                         <span class="text-xs font-normal text-foreground min-w-14 xl:min-w-24 shrink-0">
-                            Unit
-                        </span>
-                        <div>
-                            <span class="text-xs font-medium text-foreground">
-                                {selectedProduct.product.measurement_unit}
-                            </span>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2.5">
-                        <span class="text-xs font-normal text-foreground min-w-14 xl:min-w-24 shrink-0">
                             Elasticity
                         </span>
                         <div>
@@ -547,7 +537,7 @@
                                                     {recipe.material ? recipe.material.name : 'Unknown Material'}
                                                 </h4>
                                                 <p class="text-xs text-muted-foreground">
-                                                    Quantity: {recipe.quantity} {recipe.material ? recipe.material.measurement_unit : 'units'}
+                                                    Quantity: {recipe.quantity}
                                                 </p>
                                             </div>
                                         </div>

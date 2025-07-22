@@ -117,12 +117,7 @@
 
             if (response.ok) {
                 // Show success toast
-                KTToast.show({
-                    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                    message: "Company deleted successfully!",
-                    variant: "success",
-                    position: "bottom-right",
-                });
+                showToast("Company deleted successfully!", 'success');
 
                 // Refresh the companies list
                 fetchCompanies();
@@ -130,22 +125,12 @@
                 const errorData = await response.json().catch(() => ({}));
                 const errorMessage = errorData.message || 'Error deleting company. Please try again.';
                 
-                KTToast.show({
-                    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                    message: errorMessage,
-                    variant: "destructive",
-                    position: "bottom-right",
-                });
+                showToast(errorMessage, 'destructive');
             }
         } catch (error) {
             console.error('Error deleting company:', error);
             
-            KTToast.show({
-                    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                    message: "Network error. Please check your connection and try again.",
-                    variant: "destructive",
-                    position: "bottom-right",
-            });
+            showToast("Network error. Please check your connection and try again.", 'destructive');
         }
     }
 
@@ -157,12 +142,7 @@
     export let success;
 
     $: if (success) {
-        KTToast.show({
-            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-            message: success,
-            variant: "success",
-            position: "bottom-right",
-        });
+        showToast(success, 'success');
     }
 </script>
 

@@ -22,37 +22,7 @@ class TechnologiesController extends Controller
         $page = IndexService::checkPageIfNull($request->query('page', 1));
         $search = IndexService::checkIfSearchEmpty($request->query('search'));
 
-        // Filter parameters
-        $levelFilter = IndexService::checkIfSearchEmpty($request->query('level'));
-        $researchCostMin = IndexService::checkIfNumber($request->query('research_cost_min'));
-        $researchCostMax = IndexService::checkIfNumber($request->query('research_cost_max'));
-        $researchTimeDaysMin = IndexService::checkIfNumber($request->query('research_time_days_min'));
-        $researchTimeDaysMax = IndexService::checkIfNumber($request->query('research_time_days_max'));
-
         $technologies = Technology::orderBy('level', 'asc');
-
-        // Apply level filter
-        if ($levelFilter) {
-            $technologies->where('level', $levelFilter);
-        }
-
-        // Apply research cost range filters
-        if ($researchCostMin) {
-            $technologies->where('research_cost', '>=', $researchCostMin);
-        }
-
-        if ($researchCostMax) {
-            $technologies->where('research_cost', '<=', $researchCostMax);
-        }
-
-        // Apply research time days range filters
-        if ($researchTimeDaysMin) {
-            $technologies->where('research_time_days', '>=', $researchTimeDaysMin);
-        }
-
-        if ($researchTimeDaysMax) {
-            $technologies->where('research_time_days', '<=', $researchTimeDaysMax);
-        }
 
         // Apply search filter
         if ($search) {

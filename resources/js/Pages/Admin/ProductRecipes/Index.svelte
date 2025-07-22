@@ -477,7 +477,6 @@
                                             <th>Material</th>
                                             <th>Type</th>
                                             <th>Quantity</th>
-                                            <th>Unit</th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -494,9 +493,6 @@
                                                     </td>
                                                     <td class="p-4">
                                                         <div class="kt-skeleton w-16 h-4 rounded"></div>
-                                                    </td>
-                                                    <td class="p-4">
-                                                        <div class="kt-skeleton w-12 h-4 rounded"></div>
                                                     </td>
                                                     <td class="p-4">
                                                         <div class="flex items-center gap-2">
@@ -524,7 +520,6 @@
                                                         </span>
                                                     </td>
                                                     <td class="font-medium">{recipe.quantity}</td>
-                                                    <td>{recipe.material.measurement_unit || '-'}</td>
                                                     <td>
                                                         <div class="flex items-center gap-2">
                                                             <button 

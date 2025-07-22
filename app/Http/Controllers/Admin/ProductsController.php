@@ -22,66 +22,7 @@ class ProductsController extends Controller
         $page = IndexService::checkPageIfNull($request->query('page', 1));
         $search = IndexService::checkIfSearchEmpty($request->query('search'));
 
-        // Filter parameters
-        $typeFilter = IndexService::checkIfSearchEmpty($request->query('type'));
-        $hasExpirationFilter = IndexService::checkIfBoolean($request->query('has_expiration'));
-        $elasticityMin = IndexService::checkIfNumber($request->query('elasticity_min'));
-        $elasticityMax = IndexService::checkIfNumber($request->query('elasticity_max'));
-        $storageCostMin = IndexService::checkIfNumber($request->query('storage_cost_min'));
-        $storageCostMax = IndexService::checkIfNumber($request->query('storage_cost_max'));
-        $shelfLifeMin = IndexService::checkIfNumber($request->query('shelf_life_min'));
-        $shelfLifeMax = IndexService::checkIfNumber($request->query('shelf_life_max'));
-        $needTechnology = IndexService::checkIfBoolean($request->query('need_technology'));
-        $technologyId = IndexService::checkIfNumber($request->query('technology_id'));
-
         $products = Product::with('technology')->latest();
-
-        // Apply type filter
-        if ($typeFilter) {
-            $products->where('type', $typeFilter);
-        }
-
-        // Apply has expiration filter
-        if ($hasExpirationFilter !== null) {
-            $products->where('has_expiration', $hasExpirationFilter);
-        }
-
-        // Apply elasticity range filters
-        if ($elasticityMin) {
-            $products->where('elasticity_coefficient', '>=', $elasticityMin);
-        }
-
-        if ($elasticityMax) {
-            $products->where('elasticity_coefficient', '<=', $elasticityMax);
-        }
-
-        // Apply storage cost range filters
-        if ($storageCostMin) {
-            $products->where('storage_cost', '>=', $storageCostMin);
-        }
-
-        if ($storageCostMax) {
-            $products->where('storage_cost', '<=', $storageCostMax);
-        }
-
-        // Apply shelf life range filters
-        if ($shelfLifeMin) {
-            $products->where('shelf_life_days', '>=', $shelfLifeMin);
-        }
-
-        if ($shelfLifeMax) {
-            $products->where('shelf_life_days', '<=', $shelfLifeMax);
-        }
-
-        // Apply need technology filter
-        if ($needTechnology !== null) {
-            $products->where('need_technology', $needTechnology);
-        }
-
-        // Apply technology filter
-        if ($technologyId) {
-            $products->where('technology_id', $technologyId);
-        }
 
         // Apply search filter
         if ($search) {
@@ -89,8 +30,7 @@ class ProductsController extends Controller
                 $query->where('id', $search)
                       ->orWhere('name', 'like', '%' . $search . '%')
                       ->orWhere('description', 'like', '%' . $search . '%')
-                      ->orWhere('type', 'like', '%' . $search . '%')
-                      ->orWhere('measurement_unit', 'like', '%' . $search . '%');
+                      ->orWhere('type', 'like', '%' . $search . '%');
             });
         }
 
@@ -124,7 +64,9 @@ class ProductsController extends Controller
      */
     public function store(StoreProductRequest $request)
     {
-        $product = Product::create($request->validated());
+        $product = Product::create(array_merge($request->validated(), [
+            'technology_id' => $request->input('needs_technology') ? $request->input('technology_id') : null,
+        ]));
 
         if($request->has('file')){
             $file = FileService::upload($request->file('file'));
@@ -172,7 +114,7 @@ class ProductsController extends Controller
     public function update(Product $product, UpdateProductRequest $request)
     {
         $product->update(array_merge($request->validated(), [
-            'technology_id' => $request->input('need_technology') ? $request->input('technology_id') : null,
+            'technology_id' => $request->input('needs_technology') ? $request->input('technology_id') : null,
         ]));
 
         if($request->file('file')){            
