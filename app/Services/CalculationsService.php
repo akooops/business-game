@@ -23,8 +23,8 @@ class CalculationsService
         
         $z = sqrt(-2 * log($u1)) * cos(2 * pi() * $u2);
         
-        $result = round($expectedValue + ($z * $standardDeviation));
+        $result = $expectedValue + ($z * $standardDeviation);
         
-        return max($min, min($max, $result));
+        return round(max($min, min($max, $result)));
     }
 }

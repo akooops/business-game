@@ -29,9 +29,7 @@
         is_international: supplier.is_international || false,
         min_shipping_cost: supplier.min_shipping_cost || '',
         max_shipping_cost: supplier.max_shipping_cost || '',
-        avg_shipping_cost: supplier.avg_shipping_cost || '',
         min_shipping_time_days: supplier.min_shipping_time_days || '',
-        avg_shipping_time_days: supplier.avg_shipping_time_days || '',
         max_shipping_time_days: supplier.max_shipping_time_days || '',
         carbon_footprint: supplier.carbon_footprint || '',
         country_id: supplier.country_id || null,
@@ -59,12 +57,11 @@
     let productSelectComponent;
 
     // Products array for the supplier - pre-populate with existing data
-    let supplierProducts = (supplier.products || []).map(product => ({
-        product_id: product.id,
-        product_name: product.name,
-        min_sale_price: product.pivot.min_sale_price || '',
-        avg_sale_price: product.pivot.avg_sale_price || '',
-        max_sale_price: product.pivot.max_sale_price || '',
+    let supplierProducts = (supplier.supplier_products || []).map(supplierProduct => ({
+        product_id: supplierProduct.product.id,
+        product_name: supplierProduct.product.name,
+        min_sale_price: supplierProduct.min_sale_price,
+        max_sale_price: supplierProduct.max_sale_price,
     }));
 
     // Handle file input change
@@ -127,7 +124,6 @@
             product_id: selectedProduct.id,
             product_name: selectedProduct.name,
             min_sale_price: '',
-            avg_sale_price: '',
             max_sale_price: '',
         }];
 
@@ -171,7 +167,6 @@
         supplierProducts.forEach((product, index) => {
             formData.append(`products[${index}][product_id]`, product.product_id);
             formData.append(`products[${index}][min_sale_price]`, product.min_sale_price);
-            formData.append(`products[${index}][avg_sale_price]`, product.avg_sale_price);
             formData.append(`products[${index}][max_sale_price]`, product.max_sale_price);
         });
 
@@ -381,7 +376,7 @@
                     <div class="kt-card-content">
                         <div class="grid gap-4">
                             <!-- Shipping Costs -->
-                            <div class="grid grid-cols-3 gap-4">
+                            <div class="grid grid-cols-2 gap-4">
                                 <!-- Min Shipping Cost -->
                                 <div class="flex flex-col gap-2">
                                     <label class="text-sm font-medium text-mono" for="min_shipping_cost">
@@ -393,30 +388,11 @@
                                         step="0.001"
                                         min="0"
                                         class="kt-input {errors.min_shipping_cost ? 'kt-input-error' : ''}"
-                                        placeholder="0.000"
+                                        placeholder="Enter min shipping cost"
                                         bind:value={form.min_shipping_cost}
                                     />
                                     {#if errors.min_shipping_cost}
                                         <p class="text-sm text-destructive">{errors.min_shipping_cost}</p>
-                                    {/if}
-                                </div>
-
-                                <!-- Avg Shipping Cost -->
-                                <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="avg_shipping_cost">
-                                        Avg Shipping Cost <span class="text-destructive">*</span>
-                                    </label>
-                                    <input
-                                        id="avg_shipping_cost"
-                                        type="number"
-                                        step="0.001"
-                                        min="0"
-                                        class="kt-input {errors.avg_shipping_cost ? 'kt-input-error' : ''}"
-                                        placeholder="0.000"
-                                        bind:value={form.avg_shipping_cost}
-                                    />
-                                    {#if errors.avg_shipping_cost}
-                                        <p class="text-sm text-destructive">{errors.avg_shipping_cost}</p>
                                     {/if}
                                 </div>
 
@@ -431,7 +407,7 @@
                                         step="0.001"
                                         min="0"
                                         class="kt-input {errors.max_shipping_cost ? 'kt-input-error' : ''}"
-                                        placeholder="0.000"
+                                        placeholder="Enter max shipping cost"
                                         bind:value={form.max_shipping_cost}
                                     />
                                     {#if errors.max_shipping_cost}
@@ -441,7 +417,7 @@
                             </div>
 
                             <!-- Shipping Times -->
-                            <div class="grid grid-cols-3 gap-4">
+                            <div class="grid grid-cols-2 gap-4">
                                 <!-- Min Shipping Time -->
                                 <div class="flex flex-col gap-2">
                                     <label class="text-sm font-medium text-mono" for="min_shipping_time_days">
@@ -452,7 +428,7 @@
                                         type="number"
                                         min="1"
                                         class="kt-input {errors.min_shipping_time_days ? 'kt-input-error' : ''}"
-                                        placeholder="1"
+                                        placeholder="Enter min shipping time"
                                         bind:value={form.min_shipping_time_days}
                                     />
                                     {#if errors.min_shipping_time_days}
@@ -460,23 +436,6 @@
                                     {/if}
                                 </div>
 
-                                <!-- Avg Shipping Time -->
-                                <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="avg_shipping_time_days">
-                                        Avg Shipping Time (Days) <span class="text-destructive">*</span>
-                                    </label>
-                                    <input
-                                        id="avg_shipping_time_days"
-                                        type="number"
-                                        min="1"
-                                        class="kt-input {errors.avg_shipping_time_days ? 'kt-input-error' : ''}"
-                                        placeholder="1"
-                                        bind:value={form.avg_shipping_time_days}
-                                    />
-                                    {#if errors.avg_shipping_time_days}
-                                        <p class="text-sm text-destructive">{errors.avg_shipping_time_days}</p>
-                                    {/if}
-                                </div>
 
                                 <!-- Max Shipping Time -->
                                 <div class="flex flex-col gap-2">
@@ -488,7 +447,7 @@
                                         type="number"
                                         min="1"
                                         class="kt-input {errors.max_shipping_time_days ? 'kt-input-error' : ''}"
-                                        placeholder="1"
+                                        placeholder="Enter max shipping time"
                                         bind:value={form.max_shipping_time_days}
                                     />
                                     {#if errors.max_shipping_time_days}
@@ -508,12 +467,9 @@
                                     step="0.001"
                                     min="0"
                                     class="kt-input {errors.carbon_footprint ? 'kt-input-error' : ''}"
-                                    placeholder="0.000"
+                                    placeholder="Enter carbon footprint (kg CO2/unit)"
                                     bind:value={form.carbon_footprint}
                                 />
-                                <p class="text-xs text-secondary-foreground">
-                                    Environmental impact measurement
-                                </p>
                                 {#if errors.carbon_footprint}
                                     <p class="text-sm text-destructive">{errors.carbon_footprint}</p>
                                 {/if}
@@ -565,9 +521,6 @@
                                         if (data.loading) return data.text;
                                         
                                         const $elem = globalThis.$('<div class="flex items-center gap-3">' +
-                                            '<div class="flex items-center justify-center size-12 shrink-0 rounded bg-accent/50">' +
-                                            '<i class="ki-filled ki-package text-lg text-muted-foreground"></i>' +
-                                            '</div>' +
                                             '<div class="flex flex-col">' +
                                             '<span class="font-medium text-sm">' + data.name + '</span>' +
                                             '<span class="text-xs text-muted-foreground">' + data.type + '</span>' +
@@ -604,7 +557,7 @@
                                                 </div>
                                             </div>
                                             <div class="kt-card-content">
-                                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                                     <!-- Min Sale Price -->
                                                     <div class="flex flex-col gap-2">
                                                         <label class="text-xs font-medium text-mono">
@@ -615,25 +568,9 @@
                                                             step="0.001"
                                                             min="0"
                                                             class="kt-input kt-input-sm"
-                                                            placeholder="0.000"
+                                                            placeholder="Enter min sale price (DZD)"
                                                             bind:value={product.min_sale_price}
                                                             on:input={() => updateProduct(index, 'min_sale_price', product.min_sale_price)}
-                                                        />
-                                                    </div>
-
-                                                    <!-- Avg Sale Price -->
-                                                    <div class="flex flex-col gap-2">
-                                                        <label class="text-xs font-medium text-mono">
-                                                            Avg Sale Price <span class="text-destructive">*</span>
-                                                        </label>
-                                                        <input
-                                                            type="number"
-                                                            step="0.001"
-                                                            min="0"
-                                                            class="kt-input kt-input-sm"
-                                                            placeholder="0.000"
-                                                            bind:value={product.avg_sale_price}
-                                                            on:input={() => updateProduct(index, 'avg_sale_price', product.avg_sale_price)}
                                                         />
                                                     </div>
 
@@ -647,7 +584,7 @@
                                                             step="0.001"
                                                             min="0"
                                                             class="kt-input kt-input-sm"
-                                                            placeholder="0.000"
+                                                            placeholder="Enter max sale price (DZD)"
                                                             bind:value={product.max_sale_price}
                                                             on:input={() => updateProduct(index, 'max_sale_price', product.max_sale_price)}
                                                         />

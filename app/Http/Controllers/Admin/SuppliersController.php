@@ -8,9 +8,7 @@ use App\Services\FileService;
 use App\Services\IndexService;
 use Illuminate\Http\Request;
 use App\Models\Supplier;
-use App\Models\Country;
-use App\Models\Wilaya;
-use App\Models\Product;
+use App\Services\CalculationsService;
 
 class SuppliersController extends Controller
 {
@@ -25,60 +23,7 @@ class SuppliersController extends Controller
         $page = IndexService::checkPageIfNull($request->query('page', 1));
         $search = IndexService::checkIfSearchEmpty($request->query('search'));
 
-        // Filter parameters
-        $isInternational = IndexService::checkIfBoolean($request->query('is_international'));
-        $countryId = IndexService::checkIfNumber($request->query('country_id'));
-        $wilayaId = IndexService::checkIfNumber($request->query('wilaya_id'));
-        $minShippingCost = IndexService::checkIfNumber($request->query('min_shipping_cost'));
-        $maxShippingCost = IndexService::checkIfNumber($request->query('max_shipping_cost'));
-        $minShippingTime = IndexService::checkIfNumber($request->query('min_shipping_time'));
-        $maxShippingTime = IndexService::checkIfNumber($request->query('max_shipping_time'));
-        $carbonFootprintMin = IndexService::checkIfNumber($request->query('carbon_footprint_min'));
-        $carbonFootprintMax = IndexService::checkIfNumber($request->query('carbon_footprint_max'));
-
-        $suppliers = Supplier::with(['country', 'wilaya', 'products'])->latest();
-
-        // Apply international/local filter
-        if ($isInternational !== null) {
-            $suppliers->where('is_international', $isInternational);
-        }
-
-        // Apply country filter
-        if ($countryId) {
-            $suppliers->where('country_id', $countryId);
-        }
-
-        // Apply wilaya filter
-        if ($wilayaId) {
-            $suppliers->where('wilaya_id', $wilayaId);
-        }
-
-        // Apply shipping cost range filters
-        if ($minShippingCost) {
-            $suppliers->where('avg_shipping_cost', '>=', $minShippingCost);
-        }
-
-        if ($maxShippingCost) {
-            $suppliers->where('avg_shipping_cost', '<=', $maxShippingCost);
-        }
-
-        // Apply shipping time range filters
-        if ($minShippingTime) {
-            $suppliers->where('avg_shipping_time_days', '>=', $minShippingTime);
-        }
-
-        if ($maxShippingTime) {
-            $suppliers->where('avg_shipping_time_days', '<=', $maxShippingTime);
-        }
-
-        // Apply carbon footprint range filters
-        if ($carbonFootprintMin) {
-            $suppliers->where('carbon_footprint', '>=', $carbonFootprintMin);
-        }
-
-        if ($carbonFootprintMax) {
-            $suppliers->where('carbon_footprint', '<=', $carbonFootprintMax);
-        }
+        $suppliers = Supplier::with(['country', 'wilaya', 'supplierProducts', 'supplierProducts.product'])->latest();
 
         // Apply search filter
         if ($search) {
@@ -137,6 +82,9 @@ class SuppliersController extends Controller
             $supplierData['country_id'] = null;
         }
 
+        $supplierData['real_shipping_cost'] = CalculationsService::calcaulteRandomBetweenMinMax($supplierData['min_shipping_cost'], $supplierData['max_shipping_cost']);
+        $supplierData['real_shipping_time_days'] = CalculationsService::calcaulteRandomBetweenMinMax($supplierData['min_shipping_time_days'], $supplierData['max_shipping_time_days']);
+
         $supplier = Supplier::create($supplierData);
 
         // Handle file upload
@@ -152,9 +100,8 @@ class SuppliersController extends Controller
             $supplier->supplierProducts()->create([
                 'product_id' => $productData['product_id'],
                 'min_sale_price' => $productData['min_sale_price'],
-                'avg_sale_price' => $productData['avg_sale_price'],
                 'max_sale_price' => $productData['max_sale_price'],
-                'real_sale_price' => $productData['avg_sale_price'], // Default to avg
+                'real_sale_price' => CalculationsService::calcaulteRandomBetweenMinMax($productData['min_sale_price'], $productData['max_sale_price']),
             ]);
         }
 
@@ -171,7 +118,7 @@ class SuppliersController extends Controller
      */
     public function show(Supplier $supplier)
     {    
-        $supplier->load(['country', 'wilaya', 'products']);
+        $supplier->load(['country', 'wilaya', 'supplierProducts', 'supplierProducts.product']);
         return inertia('Admin/Suppliers/Show', compact('supplier'));
     }
     
@@ -183,7 +130,7 @@ class SuppliersController extends Controller
      */
     public function edit(Supplier $supplier)
     {
-        $supplier->load(['country', 'wilaya', 'products']);
+        $supplier->load(['country', 'wilaya', 'supplierProducts', 'supplierProducts.product']);
 
         return inertia('Admin/Suppliers/Edit', compact('supplier'));
     }
@@ -207,6 +154,9 @@ class SuppliersController extends Controller
             $supplierData['country_id'] = null;
         }
 
+        $supplierData['real_shipping_cost'] = CalculationsService::calcaulteRandomBetweenMinMax($supplierData['min_shipping_cost'], $supplierData['max_shipping_cost']);
+        $supplierData['real_shipping_time_days'] = CalculationsService::calcaulteRandomBetweenMinMax($supplierData['min_shipping_time_days'], $supplierData['max_shipping_time_days']);
+
         $supplier->update($supplierData);
 
         // Handle file upload
@@ -229,9 +179,8 @@ class SuppliersController extends Controller
             $supplier->supplierProducts()->create([
                 'product_id' => $productData['product_id'],
                 'min_sale_price' => $productData['min_sale_price'],
-                'avg_sale_price' => $productData['avg_sale_price'],
                 'max_sale_price' => $productData['max_sale_price'],
-                'real_sale_price' => $productData['avg_sale_price'], // Default to avg
+                'real_sale_price' => CalculationsService::calcaulteRandomBetweenMinMax($productData['min_sale_price'], $productData['max_sale_price']),
             ]);
         }
     

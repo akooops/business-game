@@ -19,7 +19,6 @@ class Supplier extends Model
     protected $casts = [
         'min_shipping_cost' => 'decimal:3',
         'max_shipping_cost' => 'decimal:3',
-        'avg_shipping_cost' => 'decimal:3',
         'real_shipping_cost' => 'decimal:3',
         'carbon_footprint' => 'decimal:3',
     ];
@@ -56,9 +55,15 @@ class Supplier extends Model
         return $this->belongsToMany(Product::class, 'supplier_products')
             ->withPivot([
                 'min_sale_price',
-                'avg_sale_price',
                 'max_sale_price',
                 'real_sale_price',
+                'min_shipping_cost',
+                'max_shipping_cost',
+                'real_shipping_cost',
+                'min_shipping_time_days',
+                'max_shipping_time_days',
+                'real_shipping_time_days',
+                'carbon_footprint',
             ])
             ->withTimestamps();
     }

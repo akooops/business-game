@@ -20,21 +20,15 @@
     
     const pageTitle = 'Supplier Details';
 
-    // Format number with units
-    function formatNumber(value, decimals = 1) {
-        return parseFloat(value).toFixed(decimals);
-    }
-
     // Map supplier products for display
-    const supplierProducts = (supplier.products || []).map(product => ({
-        product_id: product.id,
-        product_name: product.name,
-        product_type: product.type,
-        product_type_name: product.type_name,
-        product_image: product.image_url,
-        min_sale_price: product.pivot.min_sale_price,
-        avg_sale_price: product.pivot.avg_sale_price,
-        max_sale_price: product.pivot.max_sale_price,
+    const supplierProducts = (supplier.supplier_products || []).map(supplierProduct => ({
+        product_id: supplierProduct.product.id,
+        product_name: supplierProduct.product.name,
+        product_type: supplierProduct.product.type,
+        product_type_name: supplierProduct.product.type_name,
+        product_image: supplierProduct.product.image_url,
+        min_sale_price: supplierProduct.min_sale_price,
+        max_sale_price: supplierProduct.max_sale_price,
     }));
 
     // Get product type badge class
@@ -176,23 +170,17 @@
                         <!-- Shipping Costs -->
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Shipping Costs</h4>
-                            <div class="grid grid-cols-3 gap-4">
+                            <div class="grid grid-cols-2 gap-4">
                                 <div class="flex flex-col gap-1">
                                     <span class="text-xs text-muted-foreground">Minimum</span>
                                     <p class="text-sm text-secondary-foreground">
-                                        {supplier.min_shipping_cost}
-                                    </p>
-                                </div>
-                                <div class="flex flex-col gap-1">
-                                    <span class="text-xs text-muted-foreground">Average</span>
-                                    <p class="text-sm text-secondary-foreground font-medium">
-                                        {supplier.avg_shipping_cost}
+                                        {supplier.min_shipping_cost} DZD
                                     </p>
                                 </div>
                                 <div class="flex flex-col gap-1">
                                     <span class="text-xs text-muted-foreground">Maximum</span>
                                     <p class="text-sm text-secondary-foreground">
-                                        {supplier.max_shipping_cost}
+                                        {supplier.max_shipping_cost} DZD
                                     </p>
                                 </div>
                             </div>
@@ -201,17 +189,11 @@
                         <!-- Shipping Times -->
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Shipping Times</h4>
-                            <div class="grid grid-cols-3 gap-4">
+                            <div class="grid grid-cols-2 gap-4">
                                 <div class="flex flex-col gap-1">
                                     <span class="text-xs text-muted-foreground">Minimum</span>
                                     <p class="text-sm text-secondary-foreground">
                                         {supplier.min_shipping_time_days} days
-                                    </p>
-                                </div>
-                                <div class="flex flex-col gap-1">
-                                    <span class="text-xs text-muted-foreground">Average</span>
-                                    <p class="text-sm text-secondary-foreground font-medium">
-                                        {supplier.avg_shipping_time_days} days
                                     </p>
                                 </div>
                                 <div class="flex flex-col gap-1">
@@ -227,10 +209,7 @@
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Carbon Footprint</h4>
                             <p class="text-sm text-secondary-foreground">
-                                {formatNumber(supplier.carbon_footprint)} kg CO2
-                                <span class="text-xs text-muted-foreground ml-2">
-                                    (Environmental impact measurement)
-                                </span>
+                                {supplier.carbon_footprint} kg CO2/unit
                             </p>
                         </div>
                     </div>
@@ -258,13 +237,13 @@
                                     Available Products ({supplierProducts.length})
                                 </h5>
                                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                    {#each supplierProducts as product}
+                                    {#each supplierProducts as supplierProduct}
                                         <div class="kt-card">
                                             <div class="kt-card-content flex flex-col p-3 gap-3">
                                                 <!-- Product Image -->
                                                 <div class="kt-card flex items-center justify-center relative bg-accent/50 w-full h-[120px] shadow-none rounded">
-                                                    {#if product.product_image}
-                                                        <img alt="" class="h-[100px] w-[100px] object-cover rounded" src="{product.product_image}"/>
+                                                    {#if supplierProduct.product_image}
+                                                        <img alt="" class="h-[100px] w-[100px] object-cover rounded" src="{supplierProduct.product_image}"/>
                                                     {:else}
                                                         <i class="ki-filled ki-package text-3xl text-muted-foreground"></i>
                                                     {/if}
@@ -272,26 +251,22 @@
                                                 
                                                 <!-- Product Info -->
                                                 <div class="flex flex-col gap-2">
-                                                    <h6 class="text-sm font-medium text-mono leading-5 line-clamp-2" title="{product.product_name}">
-                                                        {product.product_name}
+                                                    <h6 class="text-sm font-medium text-mono leading-5 line-clamp-2">
+                                                        {supplierProduct.product_name}
                                                     </h6>
-                                                    <span class={getProductTypeBadgeClass(product.product_type) + ' kt-badge-sm w-fit'}>
-                                                        {product.product_type_name}
+                                                    <span class={getProductTypeBadgeClass(supplierProduct.product_type) + ' kt-badge-sm w-fit'}>
+                                                        {supplierProduct.product_type_name}
                                                     </span>
                                                     
                                                     <!-- Pricing Information -->
                                                     <div class="space-y-1">
                                                         <div class="flex justify-between text-xs">
                                                             <span class="text-muted-foreground">Min Price:</span>
-                                                            <span class="font-medium">{product.min_sale_price}</span>
-                                                        </div>
-                                                        <div class="flex justify-between text-xs">
-                                                            <span class="text-muted-foreground">Avg Price:</span>
-                                                            <span class="font-medium">{product.avg_sale_price}</span>
+                                                            <span class="font-medium">{supplierProduct.min_sale_price} DZD</span>
                                                         </div>
                                                         <div class="flex justify-between text-xs">
                                                             <span class="text-muted-foreground">Max Price:</span>
-                                                            <span class="font-medium">{product.max_sale_price}</span>
+                                                            <span class="font-medium">{supplierProduct.max_sale_price} DZD</span>
                                                         </div>
                                                     </div>
                                                 </div>

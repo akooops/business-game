@@ -16,7 +16,6 @@ return new class extends Migration
             
             // Pricing structure
             $table->decimal('min_sale_price', 15, 3);
-            $table->decimal('avg_sale_price', 15, 3);
             $table->decimal('max_sale_price', 15, 3);
             $table->decimal('real_sale_price', 15, 3);
 

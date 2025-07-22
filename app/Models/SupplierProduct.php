@@ -14,7 +14,6 @@ class SupplierProduct extends Model
 
     protected $casts = [
         'min_sale_price' => 'decimal:3',
-        'avg_sale_price' => 'decimal:3',
         'max_sale_price' => 'decimal:3',
         'real_sale_price' => 'decimal:3',
     ];
