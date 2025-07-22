@@ -28,35 +28,6 @@ class StoreCountryRequest extends FormRequest
         
             // System flags
             'allows_imports' => 'required|boolean',
-            
-            // Flag image file
-            'file' => 'required|file|mimes:jpg,jpeg,png|max:2048',
-        ];
-    }
-
-    /**
-     * Get custom attributes for validator errors.
-     */
-    public function attributes(): array
-    {
-        return [
-            'name' => 'country name',
-            'customs_duties_rate' => 'customs duties rate',
-            'allows_imports' => 'allows imports',
-            'file' => 'flag image',
-        ];
-    }
-
-    /**
-     * Get custom error messages for validator errors.
-     */
-    public function messages(): array
-    {
-        return [
-            'name.unique' => 'A country with this name already exists.',
-            'customs_duties_rate.max' => 'Customs duties rate must be between 0 and 1 (0-100%).',
-            'file.required' => 'Flag image is required.',
-            'file.max' => 'Flag image must not exceed 2MB.',
         ];
     }
 } 

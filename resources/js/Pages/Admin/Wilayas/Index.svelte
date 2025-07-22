@@ -28,12 +28,6 @@
     let perPage = 10;
     let currentPage = 1;
     let searchTimeout;
-    let showFilters = false;
-
-    let avgShippingCostMin = '';
-    let avgShippingCostMax = '';
-    let avgShippingTimeMin = '';
-    let avgShippingTimeMax = '';
 
     // Fetch wilayas data
     async function fetchWilayas() {
@@ -44,20 +38,6 @@
                 perPage: perPage,
                 search: search
             });
-            
-            // Add filter parameters
-            if (avgShippingCostMin) {
-                params.append('min_shipping_cost', avgShippingCostMin);
-            }
-            if (avgShippingCostMax) {
-                params.append('max_shipping_cost', avgShippingCostMax);
-            }
-            if (avgShippingTimeMin) {
-                params.append('min_shipping_time_days', avgShippingTimeMin);
-            }
-            if (avgShippingTimeMax) {
-                params.append('max_shipping_time_days', avgShippingTimeMax);
-            }
             
             const response = await fetch(route('admin.wilayas.index') + '?' + params.toString(), {
                 headers: {
@@ -116,27 +96,6 @@
         fetchWilayas();
     }
 
-    // Handle filter changes
-    function handleFilterChange() {
-        currentPage = 1;
-        fetchWilayas();
-    }
-
-    // Clear all filters
-    function clearAllFilters() {
-        avgShippingCostMin = '';
-        avgShippingCostMax = '';
-        avgShippingTimeMin = '';
-        avgShippingTimeMax = '';
-        currentPage = 1;
-        fetchWilayas();
-    }
-
-    // Toggle filters visibility
-    function toggleFilters() {
-        showFilters = !showFilters;
-    }
-
     // Delete wilaya
     async function deleteWilaya(wilayaId) {
         if (!confirm('Are you sure you want to delete this wilaya? This action cannot be undone.')) {
@@ -158,12 +117,7 @@
 
             if (response.ok) {
                 // Show success toast
-                KTToast.show({
-                    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                    message: "Wilaya deleted successfully!",
-                    variant: "success",
-                    position: "bottom-right",
-                });
+                showToast("Wilaya deleted successfully!", 'success');
 
                 // Refresh the wilayas list
                 fetchWilayas();
@@ -171,22 +125,12 @@
                 const errorData = await response.json().catch(() => ({}));
                 const errorMessage = errorData.message || 'Error deleting wilaya. Please try again.';
                 
-                KTToast.show({
-                    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                    message: errorMessage,
-                    variant: "destructive",
-                    position: "bottom-right",
-                });
+                showToast(errorMessage, 'destructive');
             }
         } catch (error) {
             console.error('Error deleting wilaya:', error);
             
-            KTToast.show({
-                    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                    message: "Network error. Please check your connection and try again.",
-                    variant: "destructive",
-                    position: "bottom-right",
-            });
+            showToast("Network error. Please check your connection and try again.", 'destructive');
         }
     }
 
@@ -198,12 +142,7 @@
     export let success;
 
     $: if (success) {
-        KTToast.show({
-            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-            message: success,
-            variant: "success",
-            position: "bottom-right",
-        });
+        showToast(success, 'success');
     }
 </script>
 
@@ -246,116 +185,36 @@
                                     on:input={handleSearchInput}
                                 />
                             </div>
-                            
-                            <!-- Filter Toggle Button -->
-                            <button 
-                                class="kt-btn kt-btn-outline"
-                                on:click={toggleFilters}
-                            >
-                                <i class="ki-filled ki-filter text-sm"></i>
-                                {showFilters ? 'Hide Filters' : 'Show Filters'}
-                            </button>
-                            
-                            <!-- Clear Filters Button -->
-                            {#if avgShippingCostMin || avgShippingCostMax || avgShippingTimeMin || avgShippingTimeMax}
-                                <button 
-                                    class="kt-btn kt-btn-ghost kt-btn-sm"
-                                    on:click={clearAllFilters}
-                                >
-                                    <i class="ki-filled ki-cross text-sm"></i>
-                                    Clear All
-                                </button>
-                            {/if}
                         </div>
                     </div>
                 </div>
-                
-                <!-- Advanced Filters Section -->
-                {#if showFilters}
-                    <div class="kt-card-body border-t border-gray-200 p-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <!-- Avg Shipping Cost Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Avg Shipping Cost (DZD)</h4>
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min" 
-                                        bind:value={avgShippingCostMin}
-                                        on:input={handleFilterChange}
-                                        step="0.01"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max" 
-                                        bind:value={avgShippingCostMax}
-                                        on:input={handleFilterChange}
-                                        step="0.01"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Avg Shipping Time Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Avg Shipping Time (Days)</h4>
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min" 
-                                        bind:value={avgShippingTimeMin}
-                                        on:input={handleFilterChange}
-                                        step="1"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max" 
-                                        bind:value={avgShippingTimeMax}
-                                        on:input={handleFilterChange}
-                                        step="1"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {/if}
                 
                 <div class="kt-card-content p-0">
                     <div class="kt-scrollable-x-auto">
                         <table class="kt-table kt-table-border table-fixed">
                             <thead>
                                 <tr>
-                                    <th class="w-[50px]">
-                                        <input class="kt-checkbox kt-checkbox-sm" type="checkbox"/>
-                                    </th>
-                                    <th class="w-[80px]">
+                                    <th style="width: 75px;">
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">ID</span>
                                         </span>
                                     </th>
-                                    <th class="min-w-[200px]">
+                                    <th>
                                         <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Wilaya Name</span>
+                                            <span class="kt-table-col-label">Wilaya</span>
                                         </span>
                                     </th>
-                                    <th class="min-w-[120px]">
+                                    <th>
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">Shipping Cost Range</span>
                                         </span>
                                     </th>
-                                    <th class="min-w-[120px]">
+                                    <th>
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">Shipping Time Range</span>
                                         </span>
                                     </th>
-                                    <th class="w-[80px]">
+                                    <th style="width: 80px;">
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">Actions</span>
                                         </span>
@@ -367,12 +226,6 @@
                                     <!-- Loading skeleton rows -->
                                     {#each Array(perPage) as _, i}
                                         <tr>
-                                            <td class="p-4">
-                                                <div class="kt-skeleton w-4 h-4 rounded"></div>
-                                            </td>
-                                            <td class="p-4">
-                                                <div class="kt-skeleton w-8 h-4 rounded"></div>
-                                            </td>
                                             <td class="p-4">
                                                 <div class="kt-skeleton w-32 h-4 rounded"></div>
                                             </td>
@@ -414,9 +267,6 @@
                                     {#each wilayas as wilaya}
                                         <tr class="hover:bg-muted/50">
                                             <td>
-                                                <input class="kt-checkbox kt-checkbox-sm" type="checkbox" value={wilaya.id}/>
-                                            </td>
-                                            <td>
                                                 <span class="text-sm font-medium text-mono">#{wilaya.id}</span>
                                             </td>
                                             <td>
@@ -426,16 +276,16 @@
                                             </td>
                                             <td>
                                                 <div class="flex flex-col gap-1">
-                                                    <span class="text-xs text-secondary-foreground">Min: {wilaya.min_shipping_cost}</span>
-                                                    <span class="text-xs text-secondary-foreground">Avg: {wilaya.avg_shipping_cost}</span>
-                                                    <span class="text-xs text-secondary-foreground">Max: {wilaya.max_shipping_cost}</span>
+                                                    <span class="text-xs text-muted-foreground">
+                                                        ({wilaya.min_shipping_cost} - {wilaya.max_shipping_cost} DZD)
+                                                    </span>
                                                 </div>
                                             </td>
                                             <td>
                                                 <div class="flex flex-col gap-1">
-                                                    <span class="text-xs text-secondary-foreground">Min: {wilaya.min_shipping_time_days}d</span>
-                                                    <span class="text-xs text-secondary-foreground">Avg: {wilaya.avg_shipping_time_days}d</span>
-                                                    <span class="text-xs text-secondary-foreground">Max: {wilaya.max_shipping_time_days}d</span>
+                                                    <span class="text-xs text-muted-foreground">
+                                                        ({wilaya.min_shipping_time_days} - {wilaya.max_shipping_time_days} days)
+                                                    </span>
                                                 </div>
                                             </td>
                                             <td class="text-center">

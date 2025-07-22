@@ -220,7 +220,7 @@
                 </div>
                 <div class="kt-menu-dropdown kt-menu-default py-2.5 w-full max-w-[220px]">
                     <div class="kt-menu-item">
-                        <a class="kt-menu-link" href={route('admin.products.index')} tabindex="0">
+                        <a class="kt-menu-link" href={route('admin.countries.index')} tabindex="0">
                         <span class="kt-menu-icon">
                             <i class="fa-solid fa-globe text-sm"></i>
                         </span>
@@ -231,7 +231,7 @@
                     </div>
 
                     <div class="kt-menu-item">
-                        <a class="kt-menu-link" href={route('admin.product-recipes.index')} tabindex="0">
+                        <a class="kt-menu-link" href={route('admin.wilayas.index')} tabindex="0">
                         <span class="kt-menu-icon">
                             <i class="fa-solid fa-location-dot text-sm"></i>
                         </span>
@@ -242,7 +242,7 @@
                     </div>
 
                     <div class="kt-menu-item">
-                        <a class="kt-menu-link" href={route('admin.product-demand.index')} tabindex="0">
+                        <a class="kt-menu-link" href={route('admin.suppliers.index')} tabindex="0">
                         <span class="kt-menu-icon">
                             <i class="fa-solid fa-truck text-sm"></i>
                         </span>

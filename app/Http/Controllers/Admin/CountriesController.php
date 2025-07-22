@@ -23,27 +23,8 @@ class CountriesController extends Controller
         $page = IndexService::checkPageIfNull($request->query('page', 1));
         $search = IndexService::checkIfSearchEmpty($request->query('search'));
 
-        // Filter parameters
-        $allowsImportsFilter = $request->query('allows_imports');
-        $customsDutiesMin = IndexService::checkIfNumber($request->query('customs_duties_min'));
-        $customsDutiesMax = IndexService::checkIfNumber($request->query('customs_duties_max'));
-
         $countries = Country::latest();
 
-        // Apply import allowance filter
-        if ($allowsImportsFilter !== null) {
-            $countries->where('allows_imports', filter_var($allowsImportsFilter, FILTER_VALIDATE_BOOLEAN));
-        }
-
-        // Apply customs duties rate range filters
-        if ($customsDutiesMin) {
-            $countries->where('customs_duties_rate', '>=', $customsDutiesMin);
-        }
-
-        if ($customsDutiesMax) {
-            $countries->where('customs_duties_rate', '<=', $customsDutiesMax);
-        }
-        
         // Apply search filter
         if ($search) {
             $countries->where(function($query) use ($search) {
@@ -87,14 +68,6 @@ class CountriesController extends Controller
         // Create the country
         $country = Country::create($validated);
 
-        // Handle flag upload
-        if($request->has('file')){
-            $file = FileService::upload($request->file('file'));
-
-            //Link the file to the country
-            FileService::linkModel($file, 'country', $country->id, 1);
-        }
-
         return inertia('Admin/Countries/Index', [
             'success' => 'Country created successfully!'
         ]);
@@ -135,19 +108,6 @@ class CountriesController extends Controller
 
         // Update the country
         $country->update($validated);
-
-        // Handle flag upload
-        if($request->file('file')){
-            //Delete the old flag if it exists
-            if($country->flag){
-                FileService::delete($country->flag);
-            }
-
-            $file = FileService::upload($request->file('file'));
-
-            //Link the file to the country
-            FileService::linkModel($file, 'country', $country->id, 1);
-        }
     
         return inertia('Admin/Countries/Index', [
             'success' => 'Country updated successfully!'
