@@ -17,20 +17,16 @@ class ProductDemandController extends Controller
      */
     public function index(Request $request)
     {
-        // Filter parameters
-        $productId = IndexService::checkIfSearchEmpty($request->query('product_id'));
-        
-        $productDemands = ProductDemand::latest();
+        if($request->has('product_id')){
+            $product = Product::findOrFail($request->product_id);
 
-        // Apply type filter
-        if ($productId) {
-            $productDemands->where('product_id', $productId);
-        }
+            $productDemands = $product->demands()->latest();
 
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
-            return response()->json([
-                'productDemands' => $productDemands->get()
-            ]);
+            if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+                return response()->json([
+                    'productDemands' => $productDemands->get()
+                ]);
+            }
         }
 
         return inertia('Admin/ProductDemand/Index');
@@ -41,10 +37,12 @@ class ProductDemandController extends Controller
      */
     public function store(StoreProductDemandRequest $request)
     {
+        $product = Product::findOrFail($request->product_id);
+
         $validated = $request->validated();
         
         // Get the last gameweek for this product and add 1
-        $lastGameweek = ProductDemand::where('product_id', $validated['product_id'])
+        $lastGameweek = $product->demands()
             ->max('gameweek') ?? 0;
         $nextGameweek = $lastGameweek + 1;
 
@@ -82,13 +80,12 @@ class ProductDemandController extends Controller
     public function destroy(ProductDemand $productDemand)
     {
         $deletedGameweek = $productDemand->gameweek;
-        $productId = $productDemand->product_id;
         
         // Delete the record
         $productDemand->delete();
         
         // Update all gameweeks >= deleted gameweek to be -1 (shift down)
-        ProductDemand::where('product_id', $productId)
+        $productDemand->product->demands()
             ->where('gameweek', '>=', $deletedGameweek)
             ->decrement('gameweek');
         

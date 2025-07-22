@@ -15,7 +15,6 @@ class ProductDemand extends Model
     protected $casts = [
         'min_demand' => 'decimal:3',
         'max_demand' => 'decimal:3',
-        'avg_demand' => 'decimal:3',
         'real_demand' => 'decimal:3',
         'market_price' => 'decimal:3'
     ];
@@ -33,13 +32,8 @@ class ProductDemand extends Model
     {
         parent::boot();
 
-        //Calculate the real demand
-        static::creating(function ($model) {
-            $model->real_demand = CalculationsService::calculatePertValue($model->min_demand, $model->avg_demand, $model->max_demand);
-        });
-
         static::saving(function ($model) {
-            $model->real_demand = CalculationsService::calculatePertValue($model->min_demand, $model->avg_demand, $model->max_demand);
+            $model->real_demand = CalculationsService::calcaulteRandomBetweenMinMax($model->min_demand, $model->max_demand);
         });
     }
 }

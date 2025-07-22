@@ -20,7 +20,6 @@ return new class extends Migration
             // Demand fields
             $table->decimal('min_demand', 15, 3)->default(0);
             $table->decimal('max_demand', 15, 3)->default(0);
-            $table->decimal('avg_demand', 15, 3)->default(0);
             $table->decimal('real_demand', 15, 3)->default(0);
 
             // Market price

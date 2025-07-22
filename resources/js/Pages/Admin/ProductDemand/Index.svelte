@@ -18,7 +18,7 @@
         },
         ...(currentProduct ? [{
             title: currentProduct.name,
-            url: route('admin.product-demand.index', { product_id: currentProduct.id }),
+            url: route('admin.product-demand.index'),
             active: true
         }] : [])
     ];
@@ -37,7 +37,6 @@
     let formData = {
         gameweek: '',
         min_demand: '',
-        avg_demand: '',
         max_demand: '',
         market_price: '',
     };
@@ -66,7 +65,6 @@
         formData = {
             gameweek: nextGameweek,
             min_demand: '',
-            avg_demand: '',
             max_demand: '',
             market_price: '',
         };
@@ -87,7 +85,6 @@
         formData = {
             gameweek: gameweek.gameweek,
             min_demand: gameweek.min_demand,
-            avg_demand: gameweek.avg_demand,
             max_demand: gameweek.max_demand,
             market_price: gameweek.market_price,
             visibility_cost: gameweek.visibility_cost || '',
@@ -176,7 +173,6 @@
                 formData = {
                     gameweek: '',
                     min_demand: '',
-                    avg_demand: '',
                     max_demand: '',
                     market_price: ''
                 };
@@ -355,9 +351,7 @@
 
         loading = true;
         try {
-            const response = await fetch(route('admin.product-demand.index', { 
-                product_id: selectedProductId
-            }), {
+            const response = await fetch(route('admin.product-demand.index', { product_id: currentProduct.id }), {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
@@ -402,11 +396,6 @@
                 data: demandData.map(d => ({ x: parseInt(d.gameweek), y: parseFloat(d.min_demand) }))
             },
             {
-                name: 'Average Demand',
-                type: 'line',
-                data: demandData.map(d => ({ x: parseInt(d.gameweek), y: parseFloat(d.avg_demand) }))
-            },
-            {
                 name: 'Max Demand',
                 type: 'line',
                 data: demandData.map(d => ({ x: parseInt(d.gameweek), y: parseFloat(d.max_demand) }))
@@ -433,9 +422,6 @@
         await tick();
         const chartElement = document.querySelector('#demand-chart');
         
-        console.log('Chart element:', chartElement);
-        console.log('ApexCharts available:', !!window.ApexCharts);
-        
         if (chartElement && window.ApexCharts) {
             try {
                 chart = new ApexCharts(chartElement, chartOptions);
@@ -449,18 +435,6 @@
             console.error('Chart element or ApexCharts not found');
             if (!chartElement) console.error('Chart element #demand-chart not found');
             if (!window.ApexCharts) console.error('ApexCharts not loaded');
-        }
-    }
-
-    // Show toast notification
-    function showToast(message, type = 'success') {
-        if (window.KTToast) {
-            KTToast.show({
-                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                message: message,
-                variant: type === 'success' ? 'success' : 'destructive',
-                position: 'bottom-right',
-            });
         }
     }
 
@@ -691,7 +665,6 @@
                                             <tr>
                                                 <th>Gameweek</th>
                                                 <th>Min Demand</th>
-                                                <th>Avg Demand</th>
                                                 <th>Max Demand</th>
                                                 <th>Market Price</th>
                                                 <th>Actions</th>
@@ -704,9 +677,8 @@
                                                         <span class="font-medium text-mono">Week {demand.gameweek}</span>
                                                     </td>
                                                     <td>{demand.min_demand}</td>
-                                                    <td class="font-medium">{demand.avg_demand}</td>
                                                     <td>{demand.max_demand}</td>
-                                                    <td>DZD{demand.market_price}</td>
+                                                    <td>{demand.market_price} DZD</td>
                                                     <td>
                                                         <div class="flex items-center gap-2">
                                                             <button 
@@ -771,14 +743,14 @@
                         min="1"
                         class="kt-input w-full {errors.gameweek ? 'kt-input-error' : ''}"
                         disabled
-                        required
+                        placeholder="Enter gameweek"
                     />
                     {#if errors.gameweek}
                         <p class="text-sm text-destructive mt-1">{errors.gameweek}</p>
                     {/if}
                 </div>
 
-                    <div class="grid grid-cols-3 gap-4">
+                    <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-mono mb-2">Min Demand</label>
                             <input 
@@ -787,25 +759,10 @@
                                 min="0"
                                 step="0.001"
                                 class="kt-input w-full {errors.min_demand ? 'kt-input-error' : ''}"
-                                required
+                                placeholder="Enter min demand"
                             />
                             {#if errors.min_demand}
                                 <p class="text-sm text-destructive mt-1">{errors.min_demand}</p>
-                            {/if}
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-mono mb-2">Avg Demand</label>
-                            <input 
-                                type="number" 
-                                bind:value={formData.avg_demand}
-                                min="0"
-                                step="0.001"
-                                class="kt-input w-full {errors.avg_demand ? 'kt-input-error' : ''}"
-                                required
-                            />
-                            {#if errors.avg_demand}
-                                <p class="text-sm text-destructive mt-1">{errors.avg_demand}</p>
                             {/if}
                         </div>
                         
@@ -817,7 +774,7 @@
                                 min="0"
                                 step="0.001"
                                 class="kt-input w-full {errors.max_demand ? 'kt-input-error' : ''}"
-                                required
+                                placeholder="Enter max demand"
                             />
                             {#if errors.max_demand}
                                 <p class="text-sm text-destructive mt-1">{errors.max_demand}</p>
@@ -833,7 +790,7 @@
                             min="0"
                             step="0.001"
                             class="kt-input w-full {errors.market_price ? 'kt-input-error' : ''}"
-                            required
+                            placeholder="Enter market price (DZD)"
                         />
                         {#if errors.market_price}
                             <p class="text-sm text-destructive mt-1">{errors.market_price}</p>

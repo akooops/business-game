@@ -31,25 +31,7 @@ class StoreProductRecipeRequest extends FormRequest
                     ->where('product_id', $this->product_id)
                     ->where('material_id', $this->material_id)
             ],
-            'quantity' => ['required', 'numeric', 'min:0.01'],
-        ];
-    }
-
-    /**
-     * Get custom validation messages.
-     */
-    public function messages(): array
-    {
-        return [
-            'product_id.required' => 'Product is required.',
-            'product_id.exists' => 'Selected product does not exist.',
-            'material_id.required' => 'Material is required.',
-            'material_id.exists' => 'Selected material does not exist.',
-            'material_id.different' => 'A product cannot be a material of itself.',
-            'material_id.unique' => 'This material is already added to the recipe.',
-            'quantity.required' => 'Quantity is required.',
-            'quantity.numeric' => 'Quantity must be a number.',
-            'quantity.min' => 'Quantity must be at least 0.01.',
+            'quantity' => ['required', 'numeric', 'min:0.001'],
         ];
     }
 } 
