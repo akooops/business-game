@@ -42,12 +42,10 @@
                         <i class="ki-filled ki-arrow-left text-base"></i>
                         Back to Employee Profiles
                     </a>
-                    {#if hasPermission('admin.employee-profiles.update')}
                     <a href="{route('admin.employee-profiles.edit', { employeeProfile: employeeProfile.id })}" class="kt-btn kt-btn-primary">
                         <i class="ki-filled ki-pencil text-base"></i>
                         Edit Profile
                     </a>
-                    {/if}
                 </div>
             </div>
 

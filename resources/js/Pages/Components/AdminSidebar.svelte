@@ -11,28 +11,26 @@
         if (url.includes('/admin/users') || url.includes('/admin/roles') || url.includes('/admin/permissions') || url.includes('/admin/companies')) {
             return 'users';
         }
-        if (url.includes('/admin/dashboard') || url === '/admin' || url === '/admin/') {
-            return 'dashboard';
-        }
+
         if (url.includes('/admin/technologies')) {
             return 'technologies';
         }
+
         if (url.includes('/admin/products') || url.includes('/admin/product-recipes') || url.includes('/admin/product-demand') || url.includes('/admin/machines')) {
-            return 'products';
+            return 'production';
         }
+
         if (url.includes('/admin/employee-profiles')) {
-            return 'employees';
+            return 'hr';
         }
 
         if (url.includes('/admin/countries') || url.includes('/admin/wilayas') || url.includes('/admin/suppliers')) {
             return 'logistics';
         }
+
         if (url.includes('/admin/settings')) {
             return 'settings';
         }
-
-        // Add more route-to-section mappings here as needed
-        return 'dashboard'; // default fallback
     }
     
     // Reactive statement to update activeSection when route changes
@@ -79,23 +77,6 @@
         
         <div class="flex grow shrink-0" id="sidebar_primary_content">
             <div class="kt-scrollable-y-hover grow gap-2.5 shrink-0 flex ps-4 flex-col" data-kt-scrollable="true" data-kt-scrollable-dependencies="#sidebar_primary_header,#sidebar_primary_footer" data-kt-scrollable-height="auto" data-kt-scrollable-offset="80px" data-kt-scrollable-wrappers="#sidebar_primary_content">
-                
-                {#if hasPermission('admin.dashboard.index')}
-                <button 
-                    class="kt-btn kt-btn-icon kt-btn-ghost rounded-md size-9 border border-transparent hover:bg-background hover:[&_i]:text-primary hover:border-border {activeSection === 'dashboard' ? 'bg-background [&_i]:text-primary border-border' : ''}" 
-                    data-kt-tooltip="" 
-                    data-kt-tooltip-placement="right"
-                    on:click={() => setActiveSection('dashboard')}>
-                    <span class="kt-menu-icon">
-                        <i class="ki-outline ki-home-3 text-lg"></i>
-                    </span>
-                    <span class="kt-tooltip" data-kt-tooltip-content="true">
-                        Dashboard
-                    </span>
-                </button>
-                {/if}
-
-                {#if hasPermission('admin.users.index')}
                 <button 
                     class="kt-btn kt-btn-icon kt-btn-ghost rounded-md size-9 border border-transparent hover:bg-background hover:[&_i]:text-primary hover:border-border {activeSection === 'users' ? 'bg-background [&_i]:text-primary border-border' : ''}" 
                     data-kt-tooltip="" 
@@ -105,12 +86,10 @@
                         <i class="ki-outline ki-users text-lg"></i>
                     </span>
                     <span class="kt-tooltip" data-kt-tooltip-content="true">
-                        User Management
+                        Users
                     </span>
                 </button>
-                {/if}
 
-                {#if hasPermission('admin.technologies.index')}
                 <button 
                     class="kt-btn kt-btn-icon kt-btn-ghost rounded-md size-9 border border-transparent hover:bg-background hover:[&_i]:text-primary hover:border-border {activeSection === 'technologies' ? 'bg-background [&_i]:text-primary border-border' : ''}" 
                     data-kt-tooltip="" 
@@ -120,42 +99,36 @@
                         <i class="ki-outline ki-technology-1 text-lg"></i>
                     </span>
                     <span class="kt-tooltip" data-kt-tooltip-content="true">
-                        Technologies Management
+                        Technologies
                     </span>
                 </button>
-                {/if}
 
-                {#if hasPermission('admin.products.index')}
                 <button 
-                    class="kt-btn kt-btn-icon kt-btn-ghost rounded-md size-9 border border-transparent hover:bg-background hover:[&_i]:text-primary hover:border-border {activeSection === 'products' ? 'bg-background [&_i]:text-primary border-border' : ''}" 
+                    class="kt-btn kt-btn-icon kt-btn-ghost rounded-md size-9 border border-transparent hover:bg-background hover:[&_i]:text-primary hover:border-border {activeSection === 'production' ? 'bg-background [&_i]:text-primary border-border' : ''}" 
                     data-kt-tooltip="" 
                     data-kt-tooltip-placement="right"
-                    on:click={() => setActiveSection('products')}>
+                    on:click={() => setActiveSection('production')}>
                     <span class="kt-menu-icon">
                         <i class="ki-outline ki-handcart text-lg"></i>
                     </span>
                     <span class="kt-tooltip" data-kt-tooltip-content="true">
-                        Production Management
+                        Production
                     </span>
                 </button>
-                {/if}
 
-                {#if hasPermission('admin.employee-profiles.index')}
                 <button 
-                    class="kt-btn kt-btn-icon kt-btn-ghost rounded-md size-9 border border-transparent hover:bg-background hover:[&_i]:text-primary hover:border-border {activeSection === 'employees' ? 'bg-background [&_i]:text-primary border-border' : ''}" 
+                    class="kt-btn kt-btn-icon kt-btn-ghost rounded-md size-9 border border-transparent hover:bg-background hover:[&_i]:text-primary hover:border-border {activeSection === 'hr' ? 'bg-background [&_i]:text-primary border-border' : ''}" 
                     data-kt-tooltip="" 
                     data-kt-tooltip-placement="right"
-                    on:click={() => setActiveSection('employees')}>
+                    on:click={() => setActiveSection('hr')}>
                     <span class="kt-menu-icon">
                         <i class="ki-outline ki-users text-lg"></i>
                     </span>
                     <span class="kt-tooltip" data-kt-tooltip-content="true">
-                        HR Management
+                        HR
                     </span>
                 </button>
-                {/if}
 
-                {#if hasPermission('admin.countries.index')}
                 <button 
                     class="kt-btn kt-btn-icon kt-btn-ghost rounded-md size-9 border border-transparent hover:bg-background hover:[&_i]:text-primary hover:border-border {activeSection === 'logistics' ? 'bg-background [&_i]:text-primary border-border' : ''}" 
                     data-kt-tooltip="" 
@@ -165,12 +138,10 @@
                         <i class="ki-outline ki-logistic text-lg"></i>
                     </span>
                     <span class="kt-tooltip" data-kt-tooltip-content="true">
-                        Logistics Management
+                        Logistics
                     </span>
                 </button>
-                {/if}
 
-                {#if hasPermission('admin.settings.index')}
                 <button 
                     class="kt-btn kt-btn-icon kt-btn-ghost rounded-md size-9 border border-transparent hover:bg-background hover:[&_i]:text-primary hover:border-border {activeSection === 'settings' ? 'bg-background [&_i]:text-primary border-border' : ''}" 
                     data-kt-tooltip="" 
@@ -183,7 +154,6 @@
                         Settings
                     </span>
                 </button>
-                {/if}
             </div>
         </div>
         
@@ -244,58 +214,9 @@
         <div class="kt-scrollable-y-auto grow" data-kt-scrollable="true" data-kt-scrollable-height="auto" data-kt-scrollable-offset="0px" data-kt-scrollable-wrappers="#sidebar_secondary">
             <!-- Sidebar Menu -->
             <div class="kt-menu flex flex-col w-full gap-px px-2.5" data-kt-menu="true" data-kt-menu-accordion-expand-all="false" id="sidebar_menu">
-                
-                <!-- Dashboard Section -->
-                {#if activeSection === 'dashboard'}
-                <div class="mb-3">
-                    <h3 class="text-xs text-muted-foreground uppercase ps-2.5 mb-2.5">
-                        Dashboard
-                    </h3>
-                    {#if hasPermission('admin.dashboard.index')}
-                    <div class="kt-menu-item">
-                        <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('admin.dashboard.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.dashboard.index')}>
-                            <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
-                                <i class="ki-outline ki-home-3"></i>
-                            </span>
-                            <span class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono ms-2">
-                                Dashboard Home
-                            </span>
-                        </a>
-                    </div>
-                    {/if}
-                    
-                    <!-- Add more dashboard-related links here -->
-                    <div class="kt-menu-item">
-                        <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute('/admin/analytics') ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href="#">
-                            <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
-                                <i class="ki-outline ki-chart-line"></i>
-                            </span>
-                            <span class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono ms-2">
-                                Analytics
-                            </span>
-                        </a>
-                    </div>
-                    
-                    <div class="kt-menu-item">
-                        <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute('/admin/reports') ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href="#">
-                            <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
-                                <i class="ki-outline ki-graph-up"></i>
-                            </span>
-                            <span class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono ms-2">
-                                Reports
-                            </span>
-                        </a>
-                    </div>
-                </div>
-                {/if}
-
                 <!-- User Management Section -->
                 {#if activeSection === 'users'}
                 <div class="mb-3">
-                    <h3 class="text-xs text-muted-foreground uppercase ps-2.5 mb-2.5">
-                        User Management
-                    </h3>
-                    {#if hasPermission('admin.users.index')}
                     <div class="kt-menu-item">
                         <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('admin.users.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.users.index')}>
                             <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
@@ -306,35 +227,7 @@
                             </span>
                         </a>
                     </div>
-                    {/if}
 
-                    {#if hasPermission('admin.roles.index')}
-                    <div class="kt-menu-item">
-                        <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('admin.roles.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.roles.index')}>
-                            <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
-                                <i class="ki-outline ki-shield-tick"></i>
-                            </span>
-                            <span class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono ms-2">
-                                Roles
-                            </span>
-                        </a>
-                    </div>
-                    {/if}
-
-                    {#if hasPermission('admin.permissions.index')}
-                    <div class="kt-menu-item">
-                        <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('admin.permissions.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.permissions.index')}>
-                            <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
-                                <i class="ki-outline ki-lock"></i>
-                            </span>
-                            <span class="kt-menu-title text-sm text-foreground font-medium kt-menu-item-here:text-mono kt-menu-item-active:text-mono kt-menu-link-hover:text-mono ms-2">
-                                Permissions
-                            </span>
-                        </a>
-                    </div>
-                    {/if}
-
-                    {#if hasPermission('admin.companies.index')}
                     <div class="kt-menu-item">
                         <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('admin.companies.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.companies.index')}>
                             <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
@@ -345,17 +238,12 @@
                             </span>
                         </a>
                     </div>
-                    {/if}
                 </div>
                 {/if}
 
                 <!-- Technologies Management Section -->
                 {#if activeSection === 'technologies'}
                 <div class="mb-3">
-                    <h3 class="text-xs text-muted-foreground uppercase ps-2.5 mb-2.5">
-                        Technologies Management
-                    </h3>
-                    {#if hasPermission('admin.technologies.index')}
                     <div class="kt-menu-item">
                         <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('admin.technologies.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.technologies.index')}>
                             <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
@@ -366,17 +254,12 @@
                             </span>
                         </a>
                     </div>
-                    {/if}
                 </div>
                 {/if}
                 
                 <!-- Products Management Section -->
-                {#if activeSection === 'products'}
+                {#if activeSection === 'production'}
                 <div class="mb-3">
-                    <h3 class="text-xs text-muted-foreground uppercase ps-2.5 mb-2.5">
-                        Production Management
-                    </h3>
-                    {#if hasPermission('admin.products.index')}
                     <div class="kt-menu-item">
                         <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('admin.products.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.products.index')}>
                             <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
@@ -387,9 +270,7 @@
                             </span>
                         </a>
                     </div>
-                    {/if}
 
-                    {#if hasPermission('admin.product-recipes.index')}
                     <div class="kt-menu-item">
                         <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('admin.product-recipes.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.product-recipes.index')}>
                             <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
@@ -400,9 +281,7 @@
                             </span>
                         </a>
                     </div>
-                    {/if}
 
-                    {#if hasPermission('admin.product-demand.index')}
                     <div class="kt-menu-item">
                         <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('admin.product-demand.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.product-demand.index')}>
                             <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
@@ -413,9 +292,7 @@
                             </span>
                         </a>
                     </div>
-                    {/if}
 
-                    {#if hasPermission('admin.machines.index')}
                     <div class="kt-menu-item">
                         <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('admin.machines.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.machines.index')}>
                             <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
@@ -426,17 +303,12 @@
                             </span>
                         </a>
                     </div>
-                    {/if}
                 </div>
                 {/if}
 
                 <!-- Employee Profiles Management Section -->
-                {#if activeSection === 'employees'}
+                {#if activeSection === 'hr'}
                 <div class="mb-3">
-                    <h3 class="text-xs text-muted-foreground uppercase ps-2.5 mb-2.5">
-                        HR Management
-                    </h3>
-                    {#if hasPermission('admin.employee-profiles.index')}
                     <div class="kt-menu-item">
                         <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('admin.employee-profiles.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.employee-profiles.index')}>
                             <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
@@ -447,17 +319,12 @@
                             </span>
                         </a>
                     </div>
-                    {/if}
                 </div>
                 {/if}
 
                 <!-- Logistics Management Section -->
                 {#if activeSection === 'logistics'}
                 <div class="mb-3">
-                    <h3 class="text-xs text-muted-foreground uppercase ps-2.5 mb-2.5">
-                        Logistics Management
-                    </h3>
-                    {#if hasPermission('admin.countries.index')}
                     <div class="kt-menu-item">
                         <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('admin.countries.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.countries.index')}>
                             <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
@@ -468,9 +335,7 @@
                             </span>
                         </a>
                     </div>
-                    {/if}
 
-                    {#if hasPermission('admin.wilayas.index')}
                     <div class="kt-menu-item">
                         <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('admin.wilayas.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.wilayas.index')}>
                             <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
@@ -481,9 +346,7 @@
                             </span>
                         </a>
                     </div>
-                    {/if}
 
-                    {#if hasPermission('admin.suppliers.index')}
                     <div class="kt-menu-item">
                         <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('admin.suppliers.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.suppliers.index')}>
                             <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
@@ -494,17 +357,12 @@
                             </span>
                         </a>
                     </div>
-                    {/if}
                 </div>
                 {/if}
 
                 <!-- Settings Section -->
                 {#if activeSection === 'settings'}
                 <div class="mb-3">
-                    <h3 class="text-xs text-muted-foreground uppercase ps-2.5 mb-2.5">
-                        Settings
-                    </h3>
-                    {#if hasPermission('admin.settings.index')}
                     <div class="kt-menu-item">
                         <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('admin.settings.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.settings.index')}>
                             <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
@@ -515,7 +373,6 @@
                             </span>
                         </a>
                     </div>
-                    {/if}
                 </div>
                 {/if}
             </div>

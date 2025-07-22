@@ -73,12 +73,11 @@
                         <i class="ki-filled ki-arrow-left text-base"></i>
                         Back to Suppliers
                     </a>
-                    {#if hasPermission('admin.suppliers.update')}
+
                     <a href="{route('admin.suppliers.edit', { supplier: supplier.id })}" class="kt-btn kt-btn-primary">
                         <i class="ki-filled ki-pencil text-base"></i>
                         Edit Supplier
                     </a>
-                    {/if}
                 </div>
             </div>
 

@@ -47,12 +47,10 @@
                         <i class="ki-filled ki-arrow-left text-base"></i>
                         Back to Countries
                     </a>
-                    {#if hasPermission('admin.countries.update')}
                     <a href="{route('admin.countries.edit', { country: country.id })}" class="kt-btn kt-btn-primary">
                         <i class="ki-filled ki-pencil text-base"></i>
                         Edit Country
                     </a>
-                    {/if}
                 </div>
             </div>
 

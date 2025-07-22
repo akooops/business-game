@@ -328,12 +328,10 @@
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
-                    {#if hasPermission('admin.machines.store')}
                     <a href="{route('admin.machines.create')}" class="kt-btn kt-btn-primary">
                         <i class="ki-filled ki-plus text-base"></i>
                         Add New Machine
                     </a>
-                    {/if}
                 </div>                      
             </div>
 
@@ -757,12 +755,10 @@
                                                 <p class="text-sm text-secondary-foreground mb-4">
                                                     {search ? 'No machines match your search criteria.' : 'Get started by adding your first machine.'}
                                                 </p>
-                                                {#if hasPermission('admin.machines.store')}
                                                 <a href="{route('admin.machines.create')}" class="kt-btn kt-btn-primary">
                                                     <i class="ki-filled ki-plus text-base"></i>
                                                     Add First Machine
                                                 </a>
-                                                {/if}
                                             </div>
                                         </td>
                                     </tr>
@@ -869,7 +865,6 @@
                                                             <i class="ki-filled ki-dots-vertical text-lg"></i>
                                                         </button>
                                                         <div class="kt-menu-dropdown kt-menu-default w-full max-w-[175px]" data-kt-menu-dismiss="true">
-                                                            {#if hasPermission('admin.machines.show')}
                                                             <div class="kt-menu-item">
                                                                 <a class="kt-menu-link" href={route('admin.machines.show', { machine: machine.id })}>
                                                                     <span class="kt-menu-icon">
@@ -878,8 +873,6 @@
                                                                     <span class="kt-menu-title">View</span>
                                                                 </a>
                                                             </div>
-                                                            {/if}
-                                                            {#if hasPermission('admin.machines.update')}
                                                             <div class="kt-menu-item">
                                                                 <a class="kt-menu-link" href={route('admin.machines.edit', { machine: machine.id })}>
                                                                     <span class="kt-menu-icon">
@@ -888,18 +881,16 @@
                                                                     <span class="kt-menu-title">Edit</span>
                                                                 </a>
                                                             </div>
-                                                            {/if}
-                                                            {#if hasPermission('admin.machines.destroy')}
-                                                                <div class="kt-menu-separator"></div>
-                                                                <div class="kt-menu-item">
-                                                                    <button class="kt-menu-link" on:click={() => deleteMachine(machine.id)}>
-                                                                        <span class="kt-menu-icon">
-                                                                            <i class="ki-filled ki-trash"></i>
-                                                                        </span>
-                                                                        <span class="kt-menu-title">Delete</span>
-                                                                    </button>
-                                                                </div>
-                                                            {/if}
+                                                            <div class="kt-menu-separator"></div>
+
+                                                            <div class="kt-menu-item">
+                                                                <button class="kt-menu-link" on:click={() => deleteMachine(machine.id)}>
+                                                                    <span class="kt-menu-icon">
+                                                                        <i class="ki-filled ki-trash"></i>
+                                                                    </span>
+                                                                    <span class="kt-menu-title">Delete</span>
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>

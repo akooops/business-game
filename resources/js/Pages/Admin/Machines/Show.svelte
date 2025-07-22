@@ -83,12 +83,10 @@
                         <i class="ki-filled ki-arrow-left text-base"></i>
                         Back to Machines
                     </a>
-                    {#if hasPermission('admin.machines.update')}
                     <a href="{route('admin.machines.edit', { machine: machine.id })}" class="kt-btn kt-btn-primary">
                         <i class="ki-filled ki-pencil text-base"></i>
                         Edit Machine
                     </a>
-                    {/if}
                 </div>
             </div>
 

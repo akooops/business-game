@@ -42,12 +42,10 @@
                         <i class="ki-filled ki-arrow-left text-base"></i>
                         Back to Wilayas
                     </a>
-                    {#if hasPermission('admin.wilayas.update')}
                     <a href="{route('admin.wilayas.edit', { wilaya: wilaya.id })}" class="kt-btn kt-btn-primary">
                         <i class="ki-filled ki-pencil text-base"></i>
                         Edit Wilaya
                     </a>
-                    {/if}
                 </div>
             </div>
 

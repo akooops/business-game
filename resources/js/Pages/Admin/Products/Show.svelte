@@ -56,12 +56,10 @@
                         <i class="ki-filled ki-arrow-left text-base"></i>
                         Back to Products
                     </a>
-                    {#if hasPermission('admin.products.update')}
                     <a href="{route('admin.products.edit', { product: product.id })}" class="kt-btn kt-btn-primary">
                         <i class="ki-filled ki-pencil text-base"></i>
                         Edit Product
                     </a>
-                    {/if}
                 </div>
             </div>
 

@@ -56,12 +56,10 @@
                         <i class="ki-filled ki-arrow-left text-base"></i>
                         Back to Technologies
                     </a>
-                    {#if hasPermission('admin.technologies.update')}
                     <a href="{route('admin.technologies.edit', { technology: technology.id })}" class="kt-btn kt-btn-primary">
                         <i class="ki-filled ki-pencil text-base"></i>
                         Edit Technology
                     </a>
-                    {/if}
                 </div>
             </div>
 

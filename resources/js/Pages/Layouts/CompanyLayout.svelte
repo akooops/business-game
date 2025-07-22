@@ -8,17 +8,6 @@
   export let breadcrumbs = [];
   export let pageTitle = 'Dashboard';
 
-  // Global utility functions for admin components
-  function hasPermission(permission) {
-    // Check if permissions are globally disabled for debugging
-    if ($page.props.app?.permissions_enabled === false) {
-      return true; // Allow all permissions when disabled
-    }
-    
-    if (!$page.props.auth.permissions) return false;
-    return $page.props.auth.permissions.some(p => p === permission);
-  }
-
   function isActiveRoute(pattern) {
     return window.location.href.includes(pattern);
   }
@@ -35,7 +24,6 @@
   }
 
   // Make functions globally available for child components
-  window.hasPermission = hasPermission;
   window.isActiveRoute = isActiveRoute;
   window.formatTimestamp = formatTimestamp;
 </script>

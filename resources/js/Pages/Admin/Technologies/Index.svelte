@@ -230,12 +230,10 @@
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
-                    {#if hasPermission('admin.technologies.store')}
                     <a href="{route('admin.technologies.create')}" class="kt-btn kt-btn-primary">
                         <i class="ki-filled ki-plus text-base"></i>
                         Add New Technology
                     </a>
-                    {/if}
                 </div>                      
             </div>
 
@@ -435,12 +433,10 @@
                                                 <p class="text-sm text-secondary-foreground mb-4">
                                                     {search ? 'No technologies match your search criteria.' : 'Get started by creating your first technology.'}
                                                 </p>
-                                                {#if hasPermission('admin.technologies.store')}
                                                 <a href="{route('admin.technologies.create')}" class="kt-btn kt-btn-primary">
                                                     <i class="ki-filled ki-plus text-base"></i>
                                                     Create First Technology
                                                 </a>
-                                                {/if}
                                             </div>
                                         </td>
                                     </tr>
@@ -501,7 +497,7 @@
                                                             <i class="ki-filled ki-dots-vertical text-lg"></i>
                                                         </button>
                                                         <div class="kt-menu-dropdown kt-menu-default w-full max-w-[175px]" data-kt-menu-dismiss="true">
-                                                            {#if hasPermission('admin.technologies.show')}
+                                                            
                                                             <div class="kt-menu-item">
                                                                 <a class="kt-menu-link" href={route('admin.technologies.show', { technology: technology.id })}>
                                                                     <span class="kt-menu-icon">
@@ -510,8 +506,7 @@
                                                                     <span class="kt-menu-title">View</span>
                                                                 </a>
                                                             </div>
-                                                            {/if}
-                                                            {#if hasPermission('admin.technologies.update')}
+                                                            
                                                             <div class="kt-menu-item">
                                                                 <a class="kt-menu-link" href={route('admin.technologies.edit', { technology: technology.id })}>
                                                                     <span class="kt-menu-icon">
@@ -520,18 +515,17 @@
                                                                     <span class="kt-menu-title">Edit</span>
                                                                 </a>
                                                             </div>
-                                                            {/if}
-                                                            {#if hasPermission('admin.technologies.destroy')}
-                                                                <div class="kt-menu-separator"></div>
-                                                                <div class="kt-menu-item">
-                                                                    <button class="kt-menu-link" on:click={() => deleteTechnology(technology.id)}>
-                                                                        <span class="kt-menu-icon">
-                                                                            <i class="ki-filled ki-trash"></i>
-                                                                        </span>
-                                                                        <span class="kt-menu-title">Delete</span>
-                                                                    </button>
-                                                                </div>
-                                                            {/if}
+                                                            
+                                                            <div class="kt-menu-separator"></div>
+                                                            
+                                                            <div class="kt-menu-item">
+                                                                <button class="kt-menu-link" on:click={() => deleteTechnology(technology.id)}>
+                                                                    <span class="kt-menu-icon">
+                                                                        <i class="ki-filled ki-trash"></i>
+                                                                    </span>
+                                                                    <span class="kt-menu-title">Delete</span>
+                                                                </button>
+                                                            </div>                                                  
                                                         </div>
                                                     </div>
                                                 </div>

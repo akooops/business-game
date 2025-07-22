@@ -70,7 +70,6 @@
         <div class="flex grow shrink-0" id="sidebar_primary_content">
             <div class="kt-scrollable-y-hover grow gap-2.5 shrink-0 flex ps-4 flex-col" data-kt-scrollable="true" data-kt-scrollable-dependencies="#sidebar_primary_header,#sidebar_primary_footer" data-kt-scrollable-height="auto" data-kt-scrollable-offset="80px" data-kt-scrollable-wrappers="#sidebar_primary_content">
                 
-                {#if hasPermission('admin.dashboard.index')}
                 <button 
                     class="kt-btn kt-btn-icon kt-btn-ghost rounded-md size-9 border border-transparent hover:bg-background hover:[&_i]:text-primary hover:border-border {activeSection === 'dashboard' ? 'bg-background [&_i]:text-primary border-border' : ''}" 
                     data-kt-tooltip="" 
@@ -83,9 +82,7 @@
                         Dashboard
                     </span>
                 </button>
-                {/if}
 
-                {#if hasPermission('admin.technologies.index')}
                 <button 
                     class="kt-btn kt-btn-icon kt-btn-ghost rounded-md size-9 border border-transparent hover:bg-background hover:[&_i]:text-primary hover:border-border {activeSection === 'technologies' ? 'bg-background [&_i]:text-primary border-border' : ''}" 
                     data-kt-tooltip="" 
@@ -98,9 +95,7 @@
                         R&D
                     </span>
                 </button>
-                {/if}
 
-                {#if hasPermission('admin.products.index')}
                 <button 
                     class="kt-btn kt-btn-icon kt-btn-ghost rounded-md size-9 border border-transparent hover:bg-background hover:[&_i]:text-primary hover:border-border {activeSection === 'production' ? 'bg-background [&_i]:text-primary border-border' : ''}" 
                     data-kt-tooltip="" 
@@ -113,9 +108,7 @@
                         Production
                     </span>
                 </button>
-                {/if}
                 
-                {#if hasPermission('company.suppliers.index')}
                 <button 
                     class="kt-btn kt-btn-icon kt-btn-ghost rounded-md size-9 border border-transparent hover:bg-background hover:[&_i]:text-primary hover:border-border {activeSection === 'procurement' ? 'bg-background [&_i]:text-primary border-border' : ''}" 
                     data-kt-tooltip="" 
@@ -128,9 +121,7 @@
                         Procurement
                     </span>
                 </button>
-                {/if}
 
-                {#if hasPermission('company.employee-profiles.index')}
                 <button 
                     class="kt-btn kt-btn-icon kt-btn-ghost rounded-md size-9 border border-transparent hover:bg-background hover:[&_i]:text-primary hover:border-border {activeSection === 'hr' ? 'bg-background [&_i]:text-primary border-border' : ''}" 
                     data-kt-tooltip="" 
@@ -143,9 +134,7 @@
                         HR
                     </span>
                 </button>
-                {/if}
 
-                {#if hasPermission('admin.countries.index')}
                 <button 
                     class="kt-btn kt-btn-icon kt-btn-ghost rounded-md size-9 border border-transparent hover:bg-background hover:[&_i]:text-primary hover:border-border {activeSection === 'logistics' ? 'bg-background [&_i]:text-primary border-border' : ''}" 
                     data-kt-tooltip="" 
@@ -158,9 +147,7 @@
                         Logistics Management
                     </span>
                 </button>
-                {/if}
 
-                {#if hasPermission('admin.settings.index')}
                 <button 
                     class="kt-btn kt-btn-icon kt-btn-ghost rounded-md size-9 border border-transparent hover:bg-background hover:[&_i]:text-primary hover:border-border {activeSection === 'settings' ? 'bg-background [&_i]:text-primary border-border' : ''}" 
                     data-kt-tooltip="" 
@@ -173,7 +160,6 @@
                         Settings
                     </span>
                 </button>
-                {/if}
             </div>
         </div>
         
@@ -241,7 +227,6 @@
                     <h3 class="text-xs text-muted-foreground uppercase ps-2.5 mb-2.5">
                         Dashboard
                     </h3>
-                    {#if hasPermission('admin.dashboard.index')}
                     <div class="kt-menu-item">
                         <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute('admin.dashboard.index') ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.dashboard.index')}>
                             <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
@@ -252,7 +237,6 @@
                             </span>
                         </a>
                     </div>
-                    {/if}
                     
                     <!-- Add more dashboard-related links here -->
                     <div class="kt-menu-item">
@@ -285,7 +269,6 @@
                     <h3 class="text-xs text-muted-foreground uppercase ps-2.5 mb-2.5">
                         R&D
                     </h3>
-                    {#if hasPermission('company.technologies.index')}
                     <div class="kt-menu-item">
                         <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('company.technologies.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('company.technologies.index')}>
                             <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
@@ -296,7 +279,6 @@
                             </span>
                         </a>
                     </div>
-                    {/if}
                 </div>
                 {/if}
                 
@@ -306,7 +288,6 @@
                     <h3 class="text-xs text-muted-foreground uppercase ps-2.5 mb-2.5">
                         Production
                     </h3>
-                    {#if hasPermission('company.products.index')}
                     <div class="kt-menu-item">
                         <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('company.products.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('company.products.index')}>
                             <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
@@ -317,9 +298,7 @@
                             </span>
                         </a>
                     </div>
-                    {/if}
 
-                    {#if hasPermission('company.product-demand.index')}
                     <div class="kt-menu-item">
                         <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('company.product-demand.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('company.product-demand.index')}>
                             <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
@@ -330,9 +309,7 @@
                             </span>
                         </a>
                     </div>
-                    {/if}
 
-                    {#if hasPermission('company.machines.index')}
                     <div class="kt-menu-item">
                         <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('company.machines.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('company.machines.index')}>
                             <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
@@ -343,7 +320,6 @@
                             </span>
                         </a>
                     </div>
-                    {/if}
                 </div>
                 {/if}
 
@@ -354,7 +330,6 @@
                     <h3 class="text-xs text-muted-foreground uppercase ps-2.5 mb-2.5">
                         Procurement Management
                     </h3>
-                    {#if hasPermission('company.suppliers.index')}
                     <div class="kt-menu-item">
                         <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('company.suppliers.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('company.suppliers.index')}>
                             <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
@@ -365,9 +340,7 @@
                             </span>
                         </a>
                     </div>
-                    {/if}
 
-                    {#if hasPermission('company.purchases.index')}
                     <div class="kt-menu-item">
                         <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('company.purchases.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('company.purchases.index')}>
                             <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
@@ -378,7 +351,6 @@
                             </span>
                         </a>
                     </div>
-                    {/if}
                 </div>
                 {/if}
 
@@ -388,7 +360,6 @@
                     <h3 class="text-xs text-muted-foreground uppercase ps-2.5 mb-2.5">
                         HR
                     </h3>
-                    {#if hasPermission('company.employees.index')}
                     <div class="kt-menu-item">
                         <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('company.employees.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('company.employees.index')}>
                             <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
@@ -399,7 +370,6 @@
                             </span>
                         </a>
                     </div>
-                    {/if}
 
                     <div class="kt-menu-item">
                         <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('company.employees.recruit-page')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('company.employees.recruit-page')}>
@@ -420,7 +390,6 @@
                     <h3 class="text-xs text-muted-foreground uppercase ps-2.5 mb-2.5">
                         Logistics Management
                     </h3>
-                    {#if hasPermission('admin.countries.index')}
                     <div class="kt-menu-item">
                         <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('admin.countries.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.countries.index')}>
                             <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
@@ -431,9 +400,7 @@
                             </span>
                         </a>
                     </div>
-                    {/if}
 
-                    {#if hasPermission('admin.wilayas.index')}
                     <div class="kt-menu-item">
                         <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('admin.wilayas.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.wilayas.index')}>
                             <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
@@ -444,7 +411,6 @@
                             </span>
                         </a>
                     </div>
-                    {/if}
                 </div>
                 {/if}
 
@@ -454,7 +420,6 @@
                     <h3 class="text-xs text-muted-foreground uppercase ps-2.5 mb-2.5">
                         Settings
                     </h3>
-                    {#if hasPermission('admin.settings.index')}
                     <div class="kt-menu-item">
                         <a class="kt-menu-link py-2 ps-2.5 pe-2.5 rounded-md border border-transparent {isActiveRoute(route('admin.settings.index')) ? 'border-border bg-background' : ''} kt-menu-link-hover:bg-background kt-menu-link-hover:border-border" href={route('admin.settings.index')}>
                             <span class="kt-menu-icon items-start text-lg text-secondary-foreground kt-menu-item-active:text-mono kt-menu-item-here:text-mono">
@@ -465,7 +430,6 @@
                             </span>
                         </a>
                     </div>
-                    {/if}
                 </div>
                 {/if}
             </div>

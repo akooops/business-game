@@ -187,12 +187,10 @@
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
-                    {#if hasPermission('admin.users.store')}
                     <a href="{route('admin.users.create')}" class="kt-btn kt-btn-primary">
                         <i class="ki-filled ki-plus text-base"></i>
                         Add New User
                     </a>
-                    {/if}
                 </div>                      
             </div>
 
@@ -283,12 +281,10 @@
                                                 <p class="text-sm text-secondary-foreground mb-4">
                                                     {search ? 'No users match your search criteria.' : 'Get started by creating your first user.'}
                                                 </p>
-                                                {#if hasPermission('admin.users.store')}
                                                 <a href="{route('admin.users.create')}" class="kt-btn kt-btn-primary">
                                                     <i class="ki-filled ki-plus text-base"></i>
                                                     Create First User
                                                 </a>
-                                                {/if}
                                             </div>
                                         </td>
                                     </tr>
@@ -334,7 +330,6 @@
                                                             <i class="ki-filled ki-dots-vertical text-lg"></i>
                                                         </button>
                                                         <div class="kt-menu-dropdown kt-menu-default w-full max-w-[175px]" data-kt-menu-dismiss="true">
-                                                            {#if hasPermission('admin.users.show')}
                                                             <div class="kt-menu-item">
                                                                 <a class="kt-menu-link" href={route('admin.users.show', { user: user.id })}>
                                                                     <span class="kt-menu-icon">
@@ -343,8 +338,6 @@
                                                                     <span class="kt-menu-title">View</span>
                                                                 </a>
                                                             </div>
-                                                            {/if}
-                                                            {#if hasPermission('admin.users.update')}
                                                             <div class="kt-menu-item">
                                                                 <a class="kt-menu-link" href={route('admin.users.edit', { user: user.id })}>
                                                                     <span class="kt-menu-icon">
@@ -353,18 +346,17 @@
                                                                     <span class="kt-menu-title">Edit</span>
                                                                 </a>
                                                             </div>
-                                                            {/if}
-                                                            {#if !user.is_default && hasPermission('admin.users.destroy')}
-                                                                <div class="kt-menu-separator"></div>
-                                                                <div class="kt-menu-item">
-                                                                    <button class="kt-menu-link" on:click={() => deleteUser(user.id)}>
-                                                                        <span class="kt-menu-icon">
-                                                                            <i class="ki-filled ki-trash"></i>
-                                                                        </span>
-                                                                        <span class="kt-menu-title">Remove</span>
-                                                                    </button>
-                                                                </div>
-                                                            {/if}
+
+                                                            <div class="kt-menu-separator"></div>
+                                                            
+                                                            <div class="kt-menu-item">
+                                                                <button class="kt-menu-link" on:click={() => deleteUser(user.id)}>
+                                                                    <span class="kt-menu-icon">
+                                                                        <i class="ki-filled ki-trash"></i>
+                                                                    </span>
+                                                                    <span class="kt-menu-title">Delete</span>
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>

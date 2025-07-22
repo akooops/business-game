@@ -32,52 +32,63 @@ Route::get('/', function () {
 });
 
 Route::prefix('company')->middleware(['auth', 'check.company', 'handle.inertia'])->group(function () {
-    Route::get('/', [DashboardController::class, 'index'])->middleware('check.permission:company.dashboard.index')->name('company.dashboard.index');
+    // Dashboard
+    Route::get('/', [DashboardController::class, 'index'])->name('company.dashboard.index');
 
-    Route::get('/technologies', [TechnologiesController::class, 'index'])->middleware('check.permission:company.technologies.index')->name('company.technologies.index');
-    Route::get('/technologies/research', [TechnologiesController::class, 'researchPage'])->middleware('check.permission:company.technologies.index')->name('company.technologies.research-page');
-    Route::post('/technologies/{technology}/research', [TechnologiesController::class, 'research'])->middleware('check.permission:company.technologies.research')->name('company.technologies.research');
+    // Countries
+    Route::get('/countries', [CountriesController::class, 'index'])->name('company.countries.index');
 
-    Route::get('/products', [ProductsController::class, 'index'])->middleware('check.permission:company.products.index')->name('company.products.index');
-    Route::post('/products/{product}/fix-sale-price', [ProductsController::class, 'fixProductSalePrice'])->middleware('check.permission:company.products.index')->name('company.products.fix-sale-price');
-    
-    Route::get('/product-demand', [ProductDemandController::class, 'index'])->middleware('check.permission:company.product-demand.index')->name('company.product-demand.index');
+    // Employee Profiles
+    Route::get('/employee-profiles', [EmployeeProfilesController::class, 'index'])->name('company.employee-profiles.index');
+    Route::get('/employee-profiles/{employeeProfile}/find-employees', [EmployeeProfilesController::class, 'findEmployees'])->name('company.employee-profiles.find-employees');
 
-    Route::get('/wilayas', [WilayasController::class, 'index'])->middleware('check.permission:company.wilayas.index')->name('company.wilayas.index');
-    Route::get('/countries', [CountriesController::class, 'index'])->middleware('check.permission:company.countries.index')->name('company.countries.index');
+    // Employees
+    Route::get('/employees', [EmployeesController::class, 'index'])->name('company.employees.index');
+    Route::get('/employees/recruit-page', [EmployeesController::class, 'recruitPage'])->name('company.employees.recruit-page');
+    Route::post('/employees/{employee}/fire', [EmployeesController::class, 'fire'])->name('company.employees.fire');
+    Route::post('/employees/{employee}/promote', [EmployeesController::class, 'promote'])->name('company.employees.promote');
+    Route::post('/employees/{employee}/recruit', [EmployeesController::class, 'recruit'])->name('company.employees.store');
 
-    Route::get('/suppliers', [SuppliersController::class, 'index'])->middleware('check.permission:company.suppliers.index')->name('company.suppliers.index');
+    // Inventory
+    Route::get('/inventory', [InventoryController::class, 'index'])->name('company.inventory.index');
 
-    Route::get('/purchases', [PurchasesController::class, 'index'])->middleware('check.permission:company.purchases.index')->name('company.purchases.index');
-    Route::post('/purchases/{product}/purchase', [PurchasesController::class, 'purchase'])->middleware('check.permission:company.purchases.store')->name('company.purchases.store');
+    // Machines
+    Route::get('/machines', [MachinesController::class, 'index'])->name('company.machines.index');
+    Route::get('/machines/setup-page', [MachinesController::class, 'setupPage'])->name('company.machines.setup-page');
+    Route::post('/machines/{machine}/setup', [MachinesController::class, 'setup'])->name('company.machines.setup');
+    Route::post('/machines/{companyMachine}/assign-employee', [MachinesController::class, 'assignEmployee'])->name('company.machines.assign-employee');
+    Route::post('/machines/{companyMachine}/unassign-employee', [MachinesController::class, 'unassignEmployee'])->name('company.machines.unassign-employee');
+    Route::post('/machines/{companyMachine}/start-maintenance', [MachinesController::class, 'startMaintenance'])->name('company.machines.start-maintenance');
 
-    Route::get('/purchases/purchase-page', [PurchasesController::class, 'purchasePage'])->middleware('check.permission:company.purchases.index')->name('company.purchases.purchase-page');
+    // Product Demand
+    Route::get('/product-demand', [ProductDemandController::class, 'index'])->name('company.product-demand.index');
 
-    Route::get('/inventory', [InventoryController::class, 'index'])->middleware('check.permission:company.inventory.index')->name('company.inventory.index');
+    // Products
+    Route::get('/products', [ProductsController::class, 'index'])->name('company.products.index');
+    Route::post('/products/{product}/fix-sale-price', [ProductsController::class, 'fixProductSalePrice'])->name('company.products.fix-sale-price');
 
-    Route::get('/sales', [SalesController::class, 'index'])->middleware('check.permission:company.sales.index')->name('company.sales.index');
-    Route::post('/sales/{sale}/confirm', [SalesController::class, 'confirm'])->middleware('check.permission:company.sales.store')->name('company.sales.store');
+    // Production Orders
+    Route::post('/production-orders/{companyMachine}/produce', [ProductionOrdersController::class, 'produce'])->name('company.production-orders.store');
 
+    // Purchases
+    Route::get('/purchases', [PurchasesController::class, 'index'])->name('company.purchases.index');
+    Route::get('/purchases/purchase-page', [PurchasesController::class, 'purchasePage'])->name('company.purchases.purchase-page');
+    Route::post('/purchases/{product}/purchase', [PurchasesController::class, 'purchase'])->name('company.purchases.store');
 
-    Route::get('/employee-profiles', [EmployeeProfilesController::class, 'index'])->middleware('check.permission:company.employee-profiles.index')->name('company.employee-profiles.index');
-    Route::get('/employee-profiles/{employeeProfile}/find-employees', [EmployeeProfilesController::class, 'findEmployees'])->middleware('check.permission:company.employee-profiles.index')->name('company.employee-profiles.find-employees');
+    // Sales
+    Route::get('/sales', [SalesController::class, 'index'])->name('company.sales.index');
+    Route::post('/sales/{sale}/confirm', [SalesController::class, 'confirm'])->name('company.sales.store');
 
+    // Suppliers
+    Route::get('/suppliers', [SuppliersController::class, 'index'])->name('company.suppliers.index');
 
-    Route::get('/employees', [EmployeesController::class, 'index'])->middleware('check.permission:company.employees.index')->name('company.employees.index');
-    Route::get('/employees/recruit-page', [EmployeesController::class, 'recruitPage'])->middleware('check.permission:company.employees.index')->name('company.employees.recruit-page');
-    Route::post('/employees/{employee}/recruit', [EmployeesController::class, 'recruit'])->middleware('check.permission:company.employees.store')->name('company.employees.store');
-    Route::post('/employees/{employee}/promote', [EmployeesController::class, 'promote'])->middleware('check.permission:company.employees.store')->name('company.employees.promote');
-    Route::post('/employees/{employee}/fire', [EmployeesController::class, 'fire'])->middleware('check.permission:company.employees.store')->name('company.employees.fire');
+    // Technologies
+    Route::get('/technologies', [TechnologiesController::class, 'index'])->name('company.technologies.index');
+    Route::get('/technologies/research', [TechnologiesController::class, 'researchPage'])->name('company.technologies.research-page');
+    Route::post('/technologies/{technology}/research', [TechnologiesController::class, 'research'])->name('company.technologies.research');
 
-    Route::get('/machines', [MachinesController::class, 'index'])->middleware('check.permission:company.machines.index')->name('company.machines.index');
-    Route::get('/machines/setup-page', [MachinesController::class, 'setupPage'])->middleware('check.permission:company.machines.index')->name('company.machines.setup-page');
-    Route::post('/machines/{machine}/setup', [MachinesController::class, 'setup'])->middleware('check.permission:company.machines.store')->name('company.machines.setup');
-
-    Route::post('/machines/{companyMachine}/assign-employee', [MachinesController::class, 'assignEmployee'])->middleware('check.permission:company.machines.index')->name('company.machines.assign-employee');
-    Route::post('/machines/{companyMachine}/unassign-employee', [MachinesController::class, 'unassignEmployee'])->middleware('check.permission:company.machines.index')->name('company.machines.unassign-employee');
-    Route::post('/machines/{companyMachine}/start-maintenance', [MachinesController::class, 'startMaintenance'])->middleware('check.permission:company.machines.index')->name('company.machines.start-maintenance');
-
-    Route::post('/production-orders/{companyMachine}/produce', [ProductionOrdersController::class, 'produce'])->middleware('check.permission:company.production-orders.store')->name('company.production-orders.store');
+    // Wilayas
+    Route::get('/wilayas', [WilayasController::class, 'index'])->name('company.wilayas.index');
 });
 
 

@@ -28,10 +28,6 @@ class AppServiceProvider extends ServiceProvider
             'product_recipe' => 'App\\Models\\ProductRecipe',
             'product_demand' => 'App\\Models\\ProductDemand',
             'file' => 'App\\Models\\File',
-            'role' => 'App\\Models\\Role',
-            'permission' => 'App\\Models\\Permission',
-            'user_role' => 'App\\Models\\UserRole',
-            'role_permission' => 'App\\Models\\RolePermission',
             'machine' => 'App\\Models\\Machine',
             'machine_output' => 'App\\Models\\MachineOutput',
             'country' => 'App\\Models\\Country',
@@ -44,18 +40,5 @@ class AppServiceProvider extends ServiceProvider
             'inventory_movement' => 'App\\Models\\InventoryMovement',
             // Add more models as needed
         ]);
-
-        Blade::if('haspermission', function ($permission) {
-            if (!config('app.enable_permissions')) {
-                return true;
-            }
-            
-            $user = auth()->user();
-            if (!$user) {
-                return false;
-            }
-            
-            return $user->hasPermission($permission);
-        });
     }
 }
