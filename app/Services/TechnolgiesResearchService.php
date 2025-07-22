@@ -71,8 +71,7 @@ class TechnolgiesResearchService
             CompanyProduct::create([
                 'company_id' => $companyTechnology->company_id,
                 'product_id' => $product->id,
-                'total_stock' => 0,
-                'in_sale_stock' => 0,
+                'available_stock' => 0,
                 'sale_price' => SalesService::getCurrentGameweekProductMarketPrice($product),
             ]);
         }

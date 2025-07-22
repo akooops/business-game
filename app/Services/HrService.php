@@ -15,12 +15,11 @@ class HrService
         $employees = [];
 
         for($i = 0; $i < $numberOfEmployees; $i++){
-            $salary = CalculationsService::calculatePertValue($employeeProfile->min_salary_month, $employeeProfile->avg_salary_month, $employeeProfile->max_salary_month);
+            $salary = CalculationsService::calcaulteRandomBetweenMinMax($employeeProfile->min_salary_month, $employeeProfile->max_salary_month);
+            $recruitmentCost = CalculationsService::calcaulteRandomBetweenMinMax($employeeProfile->min_recruitment_cost, $employeeProfile->max_recruitment_cost);
 
-            // Add salary variation (-10% to +10%)
-            $salaryVariation = rand(-10, 10) / 100;
-            $salaryVariation = $salary * $salaryVariation;
-            $realSalary = $salary + $salaryVariation;
+            $realSalary = self::addVariationToSalary($salary);
+            $realRecruitmentCost = self::addVariationToRecruitmentCost($recruitmentCost);
 
             if($realSalary < $employeeProfile->min_salary_month){
                 $realSalary = $employeeProfile->min_salary_month;
@@ -28,6 +27,14 @@ class HrService
             
             if($realSalary > $employeeProfile->max_salary_month){
                 $realSalary = $employeeProfile->max_salary_month;
+            }
+
+            if($realRecruitmentCost < $employeeProfile->min_recruitment_cost){
+                $realRecruitmentCost = $employeeProfile->min_recruitment_cost;
+            }
+            
+            if($realRecruitmentCost > $employeeProfile->max_recruitment_cost){
+                $realRecruitmentCost = $employeeProfile->max_recruitment_cost;
             }
 
             // Calculate factor based on real salary vs expected salary
@@ -46,6 +53,7 @@ class HrService
             $employee = Employee::create([
                 'name' => self::getRandomName(),
                 'salary_month' => $realSalary,
+                'recruitment_cost' => $realRecruitmentCost,
                 'current_mood' => 1,
                 'mood_decay_rate_days' => $mood_decay_rate_days,
                 'efficiency_factor' => min(2, $efficiency_factor),
@@ -60,6 +68,23 @@ class HrService
         }
 
         return $employees;
+    }
+
+    public static function addVariationToSalary($salary){
+        // Add salary variation (-10% to +10%)
+        $salaryVariation = rand(-10, 10) / 100;
+        $salaryVariation = $salary * $salaryVariation;
+        $realSalary = round($salary + $salaryVariation);
+
+        return $realSalary;
+    }
+
+    public static function addVariationToRecruitmentCost($recruitmentCost){
+        $variation = rand(-10, 10) / 100;
+        $recruitmentCostVariation = $recruitmentCost * $variation;
+        $realRecruitmentCost = round($recruitmentCost + $recruitmentCostVariation);
+
+        return $realRecruitmentCost;
     }
 
     public static function getRandomName(){
@@ -78,7 +103,7 @@ class HrService
     public static function validateRecruitment($employee){
         $errors = [];
 
-        $recruitmentCost = $employee->employeeProfile->real_recruitment_cost;
+        $recruitmentCost = $employee->recruitment_cost;
 
         if(!FinanceService::haveSufficientFunds($employee->company, $recruitmentCost)){
             $errors['funds'] = 'This company does not have enough funds to recruit this employee.';

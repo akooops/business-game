@@ -27,10 +27,8 @@
         name: employeeProfile.name || '',
         description: employeeProfile.description || '',
         min_salary_month: employeeProfile.min_salary_month || '',
-        avg_salary_month: employeeProfile.avg_salary_month || '',
         max_salary_month: employeeProfile.max_salary_month || '',
         min_recruitment_cost: employeeProfile.min_recruitment_cost || '',
-        avg_recruitment_cost: employeeProfile.avg_recruitment_cost || '',
         max_recruitment_cost: employeeProfile.max_recruitment_cost || ''
     };
 
@@ -161,30 +159,11 @@
                                     step="0.001"
                                     min="0"
                                     class="kt-input {errors.min_salary_month ? 'kt-input-error' : ''}"
-                                    placeholder="0.000"
+                                    placeholder="Enter minimum monthly salary"
                                     bind:value={form.min_salary_month}
                                 />
                                 {#if errors.min_salary_month}
                                     <p class="text-sm text-destructive">{errors.min_salary_month}</p>
-                                {/if}
-                            </div>
-
-                            <!-- Average Salary -->
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="avg_salary_month">
-                                    Average Monthly Salary <span class="text-destructive">*</span>
-                                </label>
-                                <input
-                                    id="avg_salary_month"
-                                    type="number"
-                                    step="0.001"
-                                    min="0"
-                                    class="kt-input {errors.avg_salary_month ? 'kt-input-error' : ''}"
-                                    placeholder="0.000"
-                                    bind:value={form.avg_salary_month}
-                                />
-                                {#if errors.avg_salary_month}
-                                    <p class="text-sm text-destructive">{errors.avg_salary_month}</p>
                                 {/if}
                             </div>
 
@@ -199,7 +178,7 @@
                                     step="0.001"
                                     min="0"
                                     class="kt-input {errors.max_salary_month ? 'kt-input-error' : ''}"
-                                    placeholder="0.000"
+                                    placeholder="Enter maximum monthly salary"
                                     bind:value={form.max_salary_month}
                                 />
                                 {#if errors.max_salary_month}
@@ -231,30 +210,11 @@
                                     step="0.001"
                                     min="0"
                                     class="kt-input {errors.min_recruitment_cost ? 'kt-input-error' : ''}"
-                                    placeholder="0.000"
+                                    placeholder="Enter minimum recruitment cost"
                                     bind:value={form.min_recruitment_cost}
                                 />
                                 {#if errors.min_recruitment_cost}
                                     <p class="text-sm text-destructive">{errors.min_recruitment_cost}</p>
-                                {/if}
-                            </div>
-
-                            <!-- Average Salary -->
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="avg_recruitment_cost">
-                                    Average Recruitment Cost <span class="text-destructive">*</span>
-                                </label>
-                                <input
-                                    id="avg_recruitment_cost"
-                                    type="number"
-                                    step="0.001"
-                                    min="0"
-                                    class="kt-input {errors.avg_recruitment_cost ? 'kt-input-error' : ''}"
-                                    placeholder="0.000"
-                                    bind:value={form.avg_recruitment_cost}
-                                />
-                                {#if errors.avg_recruitment_cost}
-                                    <p class="text-sm text-destructive">{errors.avg_recruitment_cost}</p>
                                 {/if}
                             </div>
 
@@ -269,7 +229,7 @@
                                     step="0.001"
                                     min="0"
                                     class="kt-input {errors.max_recruitment_cost ? 'kt-input-error' : ''}"
-                                    placeholder="0.000"
+                                    placeholder="Enter maximum recruitment cost"
                                     bind:value={form.max_recruitment_cost}
                                 />
                                 {#if errors.max_recruitment_cost}

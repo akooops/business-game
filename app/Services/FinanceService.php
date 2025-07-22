@@ -60,10 +60,10 @@ class FinanceService
 
     public static function payEmployeeRecruitmentCost($company, $employee){
         $funds = $company->funds;
-        $funds -= $employee->employeeProfile->real_recruitment_cost;
+        $funds -= $employee->recruitment_cost;
         $company->update(['funds' => $funds]);
 
-        NotificationService::createFinanceFundsChangedNotification($company, $employee->employeeProfile->real_recruitment_cost);
+        NotificationService::createFinanceFundsChangedNotification($company, $employee->recruitment_cost);
 
         return $funds;
     }

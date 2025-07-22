@@ -22,27 +22,7 @@ class EmployeeProfilesController extends Controller
         $page = IndexService::checkPageIfNull($request->query('page', 1));
         $search = IndexService::checkIfSearchEmpty($request->query('search'));
 
-        // Filter parameters
-        $salaryMin = IndexService::checkIfNumber($request->query('salary_min'));
-        $salaryMax = IndexService::checkIfNumber($request->query('salary_max'));
-        $recruitmentCostMin = IndexService::checkIfNumber($request->query('recruitment_cost_min'));
-        $recruitmentCostMax = IndexService::checkIfNumber($request->query('recruitment_cost_max'));
-
         $employeeProfiles = EmployeeProfile::latest();
-
-        // Apply salary range filters (using average salary for filtering)
-        if ($salaryMin) {
-            $employeeProfiles->where('avg_salary_month', '>=', $salaryMin);
-        }
-
-        if ($salaryMax) {
-            $employeeProfiles->where('avg_salary_month', '<=', $salaryMax);
-        }
-
-        // Apply recruitment cost range filters
-        if ($recruitmentCostMin) {
-            $employeeProfiles->where('avg_recruitment_cost', '>=', $recruitmentCostMin);
-        }
 
         // Apply search filter
         if ($search) {
@@ -83,10 +63,8 @@ class EmployeeProfilesController extends Controller
      */
     public function store(StoreEmployeeProfileRequest $request)
     {
-        $validated = $request->validated();
-
         // Create the employee profile
-        $employeeProfile = EmployeeProfile::create($validated);
+        $employeeProfile = EmployeeProfile::create($request->validated());
 
         return inertia('Admin/EmployeeProfiles/Index', [
             'success' => 'Employee profile created successfully!'
@@ -124,10 +102,8 @@ class EmployeeProfilesController extends Controller
      */
     public function update(EmployeeProfile $employeeProfile, UpdateEmployeeProfileRequest $request)
     {
-        $validated = $request->validated();
-
         // Update the employee profile
-        $employeeProfile->update($validated);
+        $employeeProfile->update($request->validated());
     
         return inertia('Admin/EmployeeProfiles/Index', [
             'success' => 'Employee profile updated successfully!'

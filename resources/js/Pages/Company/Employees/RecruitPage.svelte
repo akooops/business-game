@@ -91,14 +91,11 @@
             showToast('Please select an employee to recruit', 'error');
             return;
         }
-
-        // Get recruitment cost from employee profile if available, otherwise use a default
-        const recruitmentCost = employee.employee_profile?.real_recruitment_cost || selectedEmployeeProfile?.real_recruitment_cost || 0;
         
         recruitData = {
             employee: employee,
             employeeProfile: employee.employee_profile || selectedEmployeeProfile,
-            recruitmentCost: recruitmentCost,
+            recruitmentCost: employee.recruitment_cost,
             salary: employee.salary_month,
             efficiencyFactor: employee.efficiency_factor,
             moodDecayRate: (employee.mood_decay_rate_days * 100).toFixed(2) + '%'
@@ -165,18 +162,6 @@
         } catch (error) {
             console.error('Error recruiting employee:', error);
             showToast('Network error. Please check your connection and try again.', 'error');
-        }
-    }
-
-    // Show toast notification
-    function showToast(message, type = 'success') {
-        if (window.KTToast) {
-            KTToast.show({
-                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                message: message,
-                variant: type === 'success' ? 'success' : 'destructive',
-                position: 'bottom-right',
-            });
         }
     }
 
@@ -340,10 +325,6 @@
                                                                         text: profile.name,
                                                                         name: profile.name,
                                                                         description: profile.description,
-                                                                        min_salary_month: profile.min_salary_month,
-                                                                        avg_salary_month: profile.avg_salary_month,
-                                                                        max_salary_month: profile.max_salary_month,
-                                                                        real_recruitment_cost: profile.real_recruitment_cost
                                                                     }))
                                                                 };
                                                             },
@@ -355,7 +336,6 @@
                                                             const $elem = globalThis.$('<div class="flex flex-col">' +
                                                                 '<span class="font-medium">' + data.name + '</span>' +
                                                                 '<span class="text-sm text-muted-foreground">' + (data.description || 'No description') + '</span>' +
-                                                                '<span class="text-xs text-muted-foreground mt-1">Salary: DZD ' + data.avg_salary_month + '</span>' +
                                                                 '</div>');
                                                             return $elem;
                                                         }}
@@ -381,35 +361,37 @@
                                                     <table class="kt-table kt-table-border table-fixed">
                                                         <thead>
                                                             <tr>
-                                                                <th class="w-[50px]">
-                                                                    <input class="kt-checkbox kt-checkbox-sm" type="checkbox"/>
-                                                                </th>
-                                                                <th class="w-[80px]">
+                                                                <th style="width: 75px;">
                                                                     <span class="kt-table-col">
                                                                         <span class="kt-table-col-label">ID</span>
                                                                     </span>
                                                                 </th>
-                                                                <th class="min-w-[200px]">
+                                                                <th>
                                                                     <span class="kt-table-col">
                                                                         <span class="kt-table-col-label">Candidate</span>
                                                                     </span>
                                                                 </th>
-                                                                <th class="min-w-[150px]">
+                                                                <th>
                                                                     <span class="kt-table-col">
                                                                         <span class="kt-table-col-label">Salary</span>
                                                                     </span>
                                                                 </th>
-                                                                <th class="min-w-[150px]">
+                                                                <th>
+                                                                    <span class="kt-table-col">
+                                                                        <span class="kt-table-col-label">Recruitment Cost</span>
+                                                                    </span>
+                                                                </th>
+                                                                <th>
                                                                     <span class="kt-table-col">
                                                                         <span class="kt-table-col-label">Efficiency</span>
                                                                     </span>
                                                                 </th>
-                                                                <th class="min-w-[150px]">
+                                                                <th>
                                                                     <span class="kt-table-col">
                                                                         <span class="kt-table-col-label">Mood Decay</span>
                                                                     </span>
                                                                 </th>
-                                                                <th class="w-[120px]">
+                                                                <th style="width: 120px;">
                                                                     <span class="kt-table-col">
                                                                         <span class="kt-table-col-label">Actions</span>
                                                                     </span>
@@ -421,9 +403,6 @@
                                                                 <!-- Loading skeleton rows -->
                                                                 {#each Array(5) as _, i}
                                                                     <tr>
-                                                                        <td class="p-4">
-                                                                            <div class="kt-skeleton w-4 h-4 rounded"></div>
-                                                                        </td>
                                                                         <td class="p-4">
                                                                             <div class="kt-skeleton w-8 h-4 rounded"></div>
                                                                         </td>
@@ -441,6 +420,9 @@
                                                                         </td>
                                                                         <td class="p-4">
                                                                             <div class="kt-skeleton w-16 h-6 rounded"></div>
+                                                                        </td>
+                                                                        <td class="p-4">
+                                                                            <div class="kt-skeleton w-12 h-4 rounded"></div>
                                                                         </td>
                                                                         <td class="p-4">
                                                                             <div class="kt-skeleton w-12 h-4 rounded"></div>
@@ -470,27 +452,18 @@
                                                                 {#each availableEmployees as employee}
                                                                     <tr class="hover:bg-muted/50">
                                                                         <td>
-                                                                            <input class="kt-checkbox kt-checkbox-sm" type="checkbox" value={employee.id}/>
-                                                                        </td>
-                                                                        <td>
                                                                             <span class="text-sm font-medium text-mono">#{employee.id}</span>
                                                                         </td>
                                                                         <td>
-                                                                            <div class="flex items-center gap-3">
-                                                                                <div class="flex-shrink-0">
-                                                                                    <div class="w-10 h-10 rounded-lg bg-accent/50 flex items-center justify-center">
-                                                                                        <i class="ki-filled ki-user text-lg text-muted-foreground"></i>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="flex flex-col gap-1">
-                                                                                    <span class="text-sm font-medium text-mono hover:text-primary">
-                                                                                        {employee.name}
-                                                                                    </span>
-                                                                                </div>
-                                                                            </div>
+                                                                            <span class="text-sm font-medium text-mono hover:text-primary">
+                                                                                {employee.name}
+                                                                            </span>
                                                                         </td>
                                                                         <td>
                                                                             <span class="text-sm font-medium text-mono">DZD {employee.salary_month}</span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span class="text-sm font-medium text-mono">DZD {employee.recruitment_cost}</span>
                                                                         </td>
                                                                         <td>
                                                                             <span class="kt-badge kt-badge-{employee.efficiency_factor > 1 ? 'success' : 'warning'} kt-badge-sm">
@@ -547,40 +520,42 @@
                                         <table class="kt-table kt-table-border table-fixed">
                                             <thead>
                                                 <tr>
-                                                    <th class="w-[50px]">
-                                                        <input class="kt-checkbox kt-checkbox-sm" type="checkbox"/>
-                                                    </th>
-                                                    <th class="w-[80px]">
+                                                    <th style="width: 75px;">
                                                         <span class="kt-table-col">
                                                             <span class="kt-table-col-label">ID</span>
                                                         </span>
                                                     </th>
-                                                    <th class="min-w-[250px]">
+                                                    <th>
                                                         <span class="kt-table-col">
                                                             <span class="kt-table-col-label">Employee</span>
                                                         </span>
                                                     </th>
-                                                    <th class="min-w-[150px]">
+                                                    <th>
                                                         <span class="kt-table-col">
                                                             <span class="kt-table-col-label">Profile</span>
                                                         </span>
                                                     </th>
-                                                    <th class="min-w-[150px]">
+                                                    <th>
                                                         <span class="kt-table-col">
                                                             <span class="kt-table-col-label">Salary</span>
                                                         </span>
                                                     </th>
-                                                    <th class="min-w-[150px]">
+                                                    <th>
+                                                        <span class="kt-table-col">
+                                                            <span class="kt-table-col-label">Recruitment Cost</span>
+                                                        </span>
+                                                    </th>
+                                                    <th>
                                                         <span class="kt-table-col">
                                                             <span class="kt-table-col-label">Efficiency</span>
                                                         </span>
                                                     </th>
-                                                    <th class="min-w-[150px]">
+                                                    <th>
                                                         <span class="kt-table-col">
                                                             <span class="kt-table-col-label">Mood Decay</span>
                                                         </span>
                                                     </th>
-                                                    <th class="w-[120px]">
+                                                    <th style="width: 120px;">
                                                         <span class="kt-table-col">
                                                             <span class="kt-table-col-label">Actions</span>
                                                         </span>
@@ -592,9 +567,6 @@
                                                     <!-- Loading skeleton rows -->
                                                     {#each Array(perPage) as _, i}
                                                         <tr>
-                                                            <td class="p-4">
-                                                                <div class="kt-skeleton w-4 h-4 rounded"></div>
-                                                            </td>
                                                             <td class="p-4">
                                                                 <div class="kt-skeleton w-8 h-4 rounded"></div>
                                                             </td>
@@ -615,6 +587,9 @@
                                                             </td>
                                                             <td class="p-4">
                                                                 <div class="kt-skeleton w-16 h-6 rounded"></div>
+                                                            </td>
+                                                            <td class="p-4">
+                                                                <div class="kt-skeleton w-12 h-4 rounded"></div>
                                                             </td>
                                                             <td class="p-4">
                                                                 <div class="kt-skeleton w-12 h-4 rounded"></div>
@@ -644,30 +619,21 @@
                                                     {#each appliedEmployees as employee}
                                                         <tr class="hover:bg-muted/50">
                                                             <td>
-                                                                <input class="kt-checkbox kt-checkbox-sm" type="checkbox" value={employee.id}/>
-                                                            </td>
-                                                            <td>
                                                                 <span class="text-sm font-medium text-mono">#{employee.id}</span>
                                                             </td>
                                                             <td>
-                                                                <div class="flex items-center gap-3">
-                                                                    <div class="flex-shrink-0">
-                                                                        <div class="w-10 h-10 rounded-lg bg-accent/50 flex items-center justify-center">
-                                                                            <i class="ki-filled ki-user text-lg text-muted-foreground"></i>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="flex flex-col gap-1">
-                                                                        <span class="text-sm font-medium text-mono hover:text-primary">
-                                                                            {employee.name}
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
+                                                                <span class="text-sm font-medium text-mono hover:text-primary">
+                                                                    {employee.name}
+                                                                </span>
                                                             </td>
                                                             <td>
                                                                 <span class="text-sm text-muted-foreground">{employee.employee_profile?.name || 'Unknown'}</span>
                                                             </td>
                                                             <td>
                                                                 <span class="text-sm font-medium text-mono">DZD {employee.salary_month}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span class="text-sm font-medium text-mono">DZD {employee.recruitment_cost}</span>
                                                             </td>
                                                             <td>
                                                                 <span class="kt-badge kt-badge-{employee.efficiency_factor > 1 ? 'success' : 'warning'} kt-badge-sm">
@@ -819,7 +785,7 @@
                 <div></div>
                 <div class="flex gap-4">
                     <button
-                        class="kt-btn kt-btn-secondary"
+                        class="kt-btn kt-btn-secondary text-white"
                         data-kt-modal-dismiss="#recruit_modal"
                         on:click={closeRecruitModal}
                     >
