@@ -344,12 +344,12 @@
                                                 },
                                                 processResults: function(data) {
                                                     return {
-                                                        results: data.products.map(product => ({
-                                                            id: product.product.id,
-                                                            text: `${product.product.name}`,
-                                                            name: product.product.name,
-                                                            type: product.product.type,
-                                                            type_name: product.product.type_name
+                                                        results: data.companyProducts.map(companyProduct => ({
+                                                            id: companyProduct.product.id,
+                                                            text: `${companyProduct.product.name}`,
+                                                            name: companyProduct.product.name,
+                                                            type: companyProduct.product.type,
+                                                            type_name: companyProduct.product.type_name
                                                         }))
                                                     };
                                                 },

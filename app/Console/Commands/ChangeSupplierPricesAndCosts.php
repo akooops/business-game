@@ -2,14 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Models\CompanyTechnology;
-use App\Models\Technology;
-use App\Models\Company;
 use App\Models\Supplier;
 use Illuminate\Console\Command;
-use App\Services\SettingsService;
-use App\Services\TechnolgiesResearchService;
-use App\Services\CalculationsService;
+use App\Services\ProcurementService;
 
 class ChangeSupplierPricesAndCosts extends Command
 {
@@ -39,21 +34,9 @@ class ChangeSupplierPricesAndCosts extends Command
         foreach($suppliers as $supplier){
             $this->info('Processing supplier: ' . $supplier->name);
 
-            $supplier->update([
-                'real_shipping_cost' => CalculationsService::calculatePertValue($supplier->min_shipping_cost, $supplier->avg_shipping_cost, $supplier->max_shipping_cost),
-            ]);
-
-            $supplierProducts = $supplier->supplierProducts()->get();
-
-            foreach($supplierProducts as $supplierProduct){
-                $this->info('Processing supplier product: ' . $supplierProduct->product->name);
-
-                $supplierProduct->update([
-                    'real_sale_price' => CalculationsService::calculatePertValue($supplierProduct->min_sale_price, $supplierProduct->avg_sale_price, $supplierProduct->max_sale_price),
-                ]);
-            }
+            ProcurementService::changeSupplierPricesAndCosts($supplier);
         }
         
-        $this->info('Technologies research processing completed successfully!');
+        $this->info('Supplier prices and costs changed successfully!');
     }
 } 

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\URL;
 use App\Traits\HasFiles;
+use App\Services\CalculationsService;
 
 class Supplier extends Model
 {
@@ -90,5 +91,16 @@ class Supplier extends Model
         }
         
         return 'Unknown Location';
+    }
+
+    //Boot
+    public static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($model) {
+            $model->real_shipping_cost = CalculationsService::calcaulteRandomBetweenMinMax($model->min_shipping_cost, $model->max_shipping_cost);
+            $model->real_shipping_time_days = CalculationsService::calcaulteRandomBetweenMinMax($model->min_shipping_time_days, $model->max_shipping_time_days);
+        });
     }
 } 

@@ -24,6 +24,14 @@ class SalesService
         ]);
     }
 
+    //Change wilaya shipping costs
+    public static function changeWilayaShippingCosts($wilaya){
+        $wilaya->update([
+            'real_shipping_time_days' => CalculationsService::calcaulteRandomBetweenMinMax($wilaya->min_shipping_time_days, $wilaya->max_shipping_time_days),
+            'real_shipping_cost' => CalculationsService::calcaulteRandomBetweenMinMax($wilaya->min_shipping_cost, $wilaya->max_shipping_cost),
+        ]);
+    }
+
     // Create a new sale
     public static function generateDemand($company)
     {

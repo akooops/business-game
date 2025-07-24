@@ -54,10 +54,6 @@ class GameTimeLoop extends Command
         // Pay inventory costs
         $this->call('game:pay-inventory-costs');
 
-        // Change supplier prices and costs
-        $this->call('game:change-supplier-prices-and-costs');
-        $this->call('game:change-wilayas-costs');
-
         // Process sales
         $this->call('game:generate-new-sales');
 
@@ -76,9 +72,19 @@ class GameTimeLoop extends Command
         // Process machines reliability
         $this->call('game:process-machines-reliability');
 
+        // Every start of the month
         if($newTime->day == 1 ){
             // Pay employees salaries
             $this->call('game:pay-employees-salaries');
+        }
+
+        // Every week
+        if($newTime->day % 7 == 0){
+            // Change supplier prices and costs and shipping times
+            $this->call('game:change-supplier-prices-and-costs');
+
+            // Change wilayas costs and shipping times
+            $this->call('game:change-wilayas-costs');
         }
 
         $this->info("New game time: " . $newTime->format('Y-m-d H:i:s'));

@@ -284,7 +284,15 @@
                                             </div>
 
                                             <!-- Action Buttons -->
+                                             
                                             <div class="flex items-center justify-between mt-4 pt-3 border-t border-border">
+                                                <a class="kt-btn kt-btn-secondary w-full mt-4" href={route('company.product-demand.index', { product_id: companyProduct.product.id })}>
+                                                    <i class="fa-solid fa-chart-line text-base"></i>
+                                                    Demand
+                                                </a>
+                                            </div>
+
+                                            <div class="flex items-center justify-between">
                                                 <button class="kt-btn kt-btn-primary w-full mt-4" on:click|stopPropagation={() => openPriceModal(companyProduct)}>
                                                     <i class="fa-solid fa-coins text-base"></i>
                                                     Set Price
@@ -369,6 +377,16 @@
                                 {selectedProduct.product.elasticity_coefficient}
                             </span>
                         </div>
+                    </div>
+                    <div class="flex items-center gap-2.5"> 
+                        <span class="text-xs font-normal text-foreground min-w-14 xl:min-w-24 shrink-0">
+                            Storage Cost
+                        </span>
+                        <div>
+                            <span class="text-xs font-medium text-foreground">
+                                DZD {selectedProduct.product.storage_cost} / day
+                            </span>
+                        </div> 
                     </div>
                     {#if selectedProduct.product.has_expiration}
                         <div class="flex items-center gap-2.5">

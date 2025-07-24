@@ -113,20 +113,16 @@ class PurchasesController extends Controller
         return inertia('Company/Purchases/PurchasePage');
     }
 
-    public function purchase(PurchaseProductRequest $request, Product $product){
+    public function purchase(PurchaseProductRequest $request){
         $supplier = Supplier::find($request->supplier_id);
+        $product = Product::find($request->product_id);
+        $quantity = $request->quantity;
 
-        ProcurementService::purchase($request->company, $supplier, $product, $request->quantity);
+        ProcurementService::purchase($request->company, $supplier, $product, $quantity);
 
-        if($request->expectsJson() || $request->hasHeader('X-Requested-With')){
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Product purchased successfully!'
-            ]);
-        }
-
-        return inertia('Company/Purchases/Index', [
-            'success' => 'Product purchased successfully!'
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Product purchased successfully!'
         ]);
     }
 }

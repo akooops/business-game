@@ -73,7 +73,7 @@ Route::prefix('company')->middleware(['auth', 'check.company', 'handle.inertia']
     // Purchases
     Route::get('/purchases', [PurchasesController::class, 'index'])->name('company.purchases.index');
     Route::get('/purchases/purchase-page', [PurchasesController::class, 'purchasePage'])->name('company.purchases.purchase-page');
-    Route::post('/purchases/{product}/purchase', [PurchasesController::class, 'purchase'])->name('company.purchases.store');
+    Route::post('/purchases', [PurchasesController::class, 'purchase'])->name('company.purchases.store');
 
     // Sales
     Route::get('/sales', [SalesController::class, 'index'])->name('company.sales.index');

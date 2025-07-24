@@ -7,6 +7,22 @@ use App\Models\SupplierProduct;
 
 class ProcurementService
 {
+    //Change supplier prices and costs
+    public static function changeSupplierPricesAndCosts($supplier){
+        $supplier->update([
+            'real_shipping_time_days' => CalculationsService::calcaulteRandomBetweenMinMax($supplier->min_shipping_time_days, $supplier->max_shipping_time_days),
+            'real_shipping_cost' => CalculationsService::calcaulteRandomBetweenMinMax($supplier->min_shipping_cost, $supplier->max_shipping_cost),
+        ]);
+
+        $supplierProducts = $supplier->supplierProducts()->get();
+
+        foreach($supplierProducts as $supplierProduct){
+            $supplierProduct->update([
+                'real_sale_price' => CalculationsService::calcaulteRandomBetweenMinMax($supplierProduct->min_sale_price, $supplierProduct->max_sale_price),
+            ]);
+        }
+    }
+
     // Calculate the total cost of the product
     public static function calcaulteTotalCost($supplier, $product, $quantity)
     {
@@ -16,55 +32,31 @@ class ProcurementService
             'product_id' => $product->id
         ])->first();
 
+        // Get the real sale price of the product
         $salePrice = $supplierProduct->real_sale_price;
 
+        // Get the real shipping cost of the supplier
         $shippingCost = $supplier->real_shipping_cost;
+
+        // Get the customs duties rate of the supplier
         $customsDuties = 0;
 
-        
         if($supplier->country) {
             $customsDuties = $supplier->country->customs_duties_rate;
         }
 
-        
+        // Calculate the total cost of the product
         $totalSalePrice = $salePrice * $quantity;
         $totalShippingCost = $shippingCost * $quantity;
+        $totalCustomsDuties = $customsDuties * ($totalSalePrice + $totalShippingCost);
 
-        return $totalSalePrice + $totalShippingCost + $customsDuties * ($totalSalePrice + $totalShippingCost);
+        return $totalSalePrice + $totalShippingCost + $totalCustomsDuties;
     }
 
-    public static function validatePurchase($company, $supplier, $product, $quantity){
-        $errors = [];
-
-        $totalCost = self::calcaulteTotalCost($supplier, $product, $quantity);
-
-        //product is reseached
-        if(!$product->is_researched) {
-            $errors['product_researched'] = 'This product is not researched yet.';
-        }
-        
-        // Check if company has sufficient funds
-        if (!FinanceService::haveSufficientFunds($company, $totalCost)) {
-            $errors['funds'] = 'You do not have enough funds to purchase this product. Required: DZD ' . $totalCost . ', Available: DZD ' . $company->funds;
-        }
-
-        if($supplier->country && !$supplier->country->allows_imports) {
-            $errors['country_id'] = 'This supplier is in a country that our government does not allow imports from.';
-        }
-
-        $supplierProduct = SupplierProduct::where([
-            'supplier_id' => $supplier->id, 
-            'product_id' => $product->id
-        ])->first();
-
-        if(!$supplierProduct) {
-            $errors['supplier_product'] = 'This supplier does not sell this product.';
-        }
-        
-        return $errors;
-    }
-
+    // Initiate a purchase
     public static function purchase($company, $supplier, $product, $quantity){
+        return;
+        
         $supplierProduct = SupplierProduct::where([
             'supplier_id' => $supplier->id, 
             'product_id' => $product->id
