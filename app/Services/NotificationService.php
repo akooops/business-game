@@ -18,28 +18,34 @@ class NotificationService
         ]);
     }
 
-    public static function createTechnologyResearchStartedNotification($companyTechnology)
+    // ------------------------------------------------------------
+    // Technologies
+    // ------------------------------------------------------------
+    public static function createTechnologyResearchStartedNotification($company, $technology, $companyTechnology)
     {
         return Notification::create([
             'type' => Notification::TYPE_TECHNOLOGY_RESEARCH_STARTED,
             'title' => 'Technology Research Started',
-            'message' => "Technology research started for {$companyTechnology->technology->name} at " . $companyTechnology->started_at->format('Y-m-d H:i:s'),
+            'message' => "Technology ({$technology->name}) research started at {$companyTechnology->started_at->format('Y-m-d')}",
             'url' => route('company.technologies.index'),
-            'user_id' => $companyTechnology->company->user_id,
+            'user_id' => $company->user->id,
         ]);
     }
 
-    public static function createTechnologyResearchCompletedNotification($companyTechnology)
+    public static function createTechnologyResearchCompletedNotification($company, $technology, $companyTechnology)
     {
         return Notification::create([
             'type' => Notification::TYPE_TECHNOLOGY_RESEARCH_COMPLETED,
             'title' => 'Technology Research Completed',
-            'message' => "Technology research completed for {$companyTechnology->technology->name} at " . $companyTechnology->completed_at->format('Y-m-d H:i:s') . ". You have unlocked {$companyTechnology->technology->products->count()} products!",
+            'message' => "Technology ({$technology->name}) research completed at {$companyTechnology->completed_at->format('Y-m-d')}. You have unlocked {$technology->products->count()} products!",
             'url' => route('company.technologies.index'),
-            'user_id' => $companyTechnology->company->user_id,
+            'user_id' => $company->user->id,
         ]);
     }
 
+    // ------------------------------------------------------------
+    // Purchases
+    // ------------------------------------------------------------
     public static function createPurchaseOrderedNotification($purchase){
         return Notification::create([
             'type' => Notification::TYPE_PURCHASE_ORDERED,

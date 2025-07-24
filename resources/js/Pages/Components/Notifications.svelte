@@ -7,7 +7,7 @@
     let previousUnreadCount = 0;
     let loading = false;
     let search = '';
-    let perPage = 10;
+    let perPage = 20;
     let currentPage = 1;
     let searchTimeout;
     let drawerOpen = false;
@@ -209,21 +209,6 @@
         return `${Math.floor(diffInSeconds / 86400)}d ago`;
     }
 
-    // Get notification type label
-    function getNotificationTypeLabel(type) {
-        const labels = {
-            'finance_funds_changed': 'Funds Changed',
-            'technology_research_started': 'Technology Research Started',
-            'technology_research_completed': 'Technology Research Completed',
-        };
-        return labels[type] || type;
-    }
-
-    // Get status badge class
-    function getStatusBadgeClass(isRead) {
-        return isRead ? 'kt-badge-secondary' : 'kt-badge-success';
-    }
-
     onMount(() => {
         initNotificationSound();
         fetchUnreadCount();
@@ -270,15 +255,7 @@
         </button>
     </div>
     
-    <div class="kt-tabs kt-tabs-line justify-between px-5 mb-2" data-kt-tabs="true" id="notifications_tabs">
-        <div class="flex items-center gap-5">
-            <button class="kt-tab-toggle py-3 active" data-kt-tab-toggle="#notifications_tab_all">
-                All
-            </button>
-        </div>
-    </div>
-    
-    <div class="grow flex flex-col kt-scrollable-y-auto" id="notifications_tab_all" data-kt-scrollable="true" data-kt-scrollable-dependencies="#header" data-kt-scrollable-max-height="auto" data-kt-scrollable-offset="150px">
+    <div class="grow flex flex-col mt-4 kt-scrollable-y-auto" data-kt-scrollable="true" data-kt-scrollable-dependencies="#header" data-kt-scrollable-max-height="auto" data-kt-scrollable-offset="0px">
         <!-- Search Bar -->
         <div class="px-5 pb-3">
             <div class="kt-input max-w-full">
@@ -308,7 +285,7 @@
             {:else}
                 <div class="grow flex flex-col gap-5 pt-3 pb-4 divider-y divider-border">
                     {#each notifications as notification, index}
-                        <div class="flex grow gap-2.5 px-5 transition-all duration-300 {notification.read_at ? 'opacity-75' : ''}">
+                        <div class="flex grow gap-2.5 px-5 transition-all duration-300">
                             <div class="kt-avatar size-8">
                                 <div class="kt-avatar-image">
                                     <i class="{notification.icon} text-lg text-primary"></i>
@@ -335,11 +312,6 @@
                                 <div class="flex items-center justify-between">
                                     <span class="flex items-center text-xs font-medium text-muted-foreground">
                                         {formatTimeAgo(notification.created_at)}
-                                        <span class="rounded-full size-1 bg-mono/30 mx-1.5"></span>
-                                        {getNotificationTypeLabel(notification.type)}
-                                    </span>
-                                    <span class="kt-badge {getStatusBadgeClass(notification.read_at)} text-xs transition-all duration-300 transform {notification.read_at ? 'scale-95' : 'scale-100'}">
-                                        {notification.read_at ? 'Read' : 'New'}
                                     </span>
                                 </div>
                             </div>

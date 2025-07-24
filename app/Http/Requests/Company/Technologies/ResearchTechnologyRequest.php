@@ -4,9 +4,9 @@ namespace App\Http\Requests\Company\Technologies;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Services\FinanceService;
-use App\Services\TechnolgiesResearchService;
+use App\Services\ValidationService;
 
-class ResearchTechnolgyRequest extends FormRequest
+class ResearchTechnologyRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -34,7 +34,7 @@ class ResearchTechnolgyRequest extends FormRequest
             $technology = request()->route('technology');
             $company = $this->company;
 
-            $errors = TechnolgiesResearchService::validateTechnologyResearch($company, $technology);
+            $errors = ValidationService::validateTechnologyResearch($company, $technology);
 
             if($errors) {
                 foreach($errors as $key => $error) {
@@ -42,14 +42,5 @@ class ResearchTechnolgyRequest extends FormRequest
                 }
             }
         });
-    }
-
-    public function messages(): array
-    {
-        return [
-            'funds.max' => 'You do not have enough funds to research this technology.',
-            'technology_id.unique' => 'You are already researching this technology.',
-            'technology_id.exists' => 'The selected technology does not exist.',
-        ];
     }
 }

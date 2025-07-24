@@ -1,6 +1,5 @@
 :root{
     --primary: #0c3c3c;
-    --secondary: #256b6b; 
     --card: #fdfff7;
 }
 
@@ -95,7 +94,7 @@
 }
 
 .header{
-    background-color: var(--secondary);
+    background-color: #256b6b;
 }
 
 .navbar{
@@ -105,4 +104,12 @@
 
 .navbar .text-foreground{
     color: #fff !important;
+}
+
+.bg-company-technology-completed-level{
+    background-color: #256b6b27;
+}
+
+.bg-company-technology-current-level{
+    background-color: #256b6b08;
 }

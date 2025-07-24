@@ -81,8 +81,8 @@ class Notification extends Model
     // Icons for different notification types
     const ICONS = [
         self::TYPE_FINANCE_FUNDS_CHANGED => 'ki-filled ki-dollar',
-        self::TYPE_TECHNOLOGY_RESEARCH_STARTED => 'ki-filled ki-technology-1',
-        self::TYPE_TECHNOLOGY_RESEARCH_COMPLETED => 'ki-filled ki-technology-1',
+        self::TYPE_TECHNOLOGY_RESEARCH_STARTED => 'fa-solid fa-rocket',
+        self::TYPE_TECHNOLOGY_RESEARCH_COMPLETED => 'fa-solid fa-microchip',
         self::TYPE_PURCHASE_ORDERED => 'ki-filled ki-ship',
         self::TYPE_PURCHASE_DELIVERED => 'ki-filled ki-ship',
         self::TYPE_PURCHASE_CANCELLED => 'ki-filled ki-ship',

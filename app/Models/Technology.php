@@ -13,7 +13,7 @@ class Technology extends Model
 
     protected $guarded = ['id'];
 
-    protected $appends = ['image_url'];
+    protected $appends = ['image_url', 'is_researched'];
 
     protected $casts = [
         'research_cost' => 'decimal:3',
@@ -34,5 +34,17 @@ class Technology extends Model
     public function getImageUrlAttribute()
     {
         return ($this->image) ? $this->image->url : URL::to('assets/images/default-technology-image.jpg');
+    }
+
+    public function getIsResearchedAttribute()
+    {
+        if(!auth()->user()->company) return false;
+
+        $companyTechnology = CompanyTechnology::where([
+            'company_id' => auth()->user()->company->id, 
+            'technology_id' => $this->id
+        ])->exists();
+
+        return $companyTechnology;
     }
 }

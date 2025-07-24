@@ -15,7 +15,6 @@ class CompanyTechnology extends Model
     protected $casts = [
         'research_cost' => 'decimal:3',
         'started_at' => 'datetime',
-        'estimated_completed_at' => 'datetime',
         'completed_at' => 'datetime',
     ];
 
@@ -46,14 +45,14 @@ class CompanyTechnology extends Model
 
         $currentTimestamp = SettingsService::getCurrentTimestamp();
         $startedAt = $this->started_at;
-        $estimatedCompletedAt = $this->estimated_completed_at;
+        $completedAt = $this->completed_at;
 
-        if (!$startedAt || !$estimatedCompletedAt) {
+        if (!$startedAt || !$completedAt) {
             return 0;
         }
 
         $progress = $startedAt->diffInHours($currentTimestamp);
-        $totalDays = $startedAt->diffInHours($estimatedCompletedAt);
+        $totalDays = $startedAt->diffInHours($completedAt);
 
         if($totalDays == 0){
             return 100;

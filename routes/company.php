@@ -84,7 +84,6 @@ Route::prefix('company')->middleware(['auth', 'check.company', 'handle.inertia']
 
     // Technologies
     Route::get('/technologies', [TechnologiesController::class, 'index'])->name('company.technologies.index');
-    Route::get('/technologies/research', [TechnologiesController::class, 'researchPage'])->name('company.technologies.research-page');
     Route::post('/technologies/{technology}/research', [TechnologiesController::class, 'research'])->name('company.technologies.research');
 
     // Wilayas

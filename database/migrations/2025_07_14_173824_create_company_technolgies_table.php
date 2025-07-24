@@ -18,8 +18,6 @@ return new class extends Migration
             $table->integer('research_time_days')->default(0);
 
             $table->timestamp('started_at')->nullable();
-            
-            $table->timestamp('estimated_completed_at')->nullable();
             $table->timestamp('completed_at')->nullable();
 
             $table->foreignId('company_id')->constrained()->onDelete('cascade');
