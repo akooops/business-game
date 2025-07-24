@@ -117,8 +117,10 @@ class InventoryService
                 continue;
             }
 
-            FinanceService::payInventoryCosts($company, $product, $leftAvailableStock);
-            NotificationService::createInventoryCostsPaidNotification($company, $product, $leftAvailableStock);
+            $totalCost = $product->storage_cost * $leftAvailableStock;
+            
+            FinanceService::payInventoryCosts($company, $product, $totalCost);
+            NotificationService::createInventoryCostsPaidNotification($company, $product, $leftAvailableStock, $totalCost);
         }
     }
 

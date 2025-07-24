@@ -16,8 +16,6 @@ class Notification extends Model
     ];
 
     // Notification types
-    // Finance
-    const TYPE_FINANCE_FUNDS_CHANGED = 'finance_funds_changed';
 
     // Technology research
     const TYPE_TECHNOLOGY_RESEARCH_STARTED = 'technology_research_started';
@@ -79,7 +77,6 @@ class Notification extends Model
 
     // Icons for different notification types
     const ICONS = [
-        self::TYPE_FINANCE_FUNDS_CHANGED => 'ki-filled ki-dollar',
         self::TYPE_TECHNOLOGY_RESEARCH_STARTED => 'fa-solid fa-rocket',
         self::TYPE_TECHNOLOGY_RESEARCH_COMPLETED => 'fa-solid fa-microchip',
         self::TYPE_PURCHASE_ORDERED => 'fa-solid fa-coins',
@@ -93,9 +90,9 @@ class Notification extends Model
         self::TYPE_OIL_PRICE_LOWERED => 'ki-filled ki-ship',
         self::TYPE_SUEZ_CANAL_CLOSED => 'ki-filled ki-ship',
         self::TYPE_SUEZ_CANAL_OPENED => 'ki-filled ki-ship',
-        self::TYPE_INVENTORY_EXPIRED => 'ki-filled ki-dropbox',
-        self::TYPE_INVENTORY_DAMAGED => 'ki-filled ki-dropbox',
-        self::TYPE_INVENTORY_COSTS_PAID => 'ki-filled ki-dropbox',
+        self::TYPE_INVENTORY_EXPIRED => 'fa-solid fa-clock',
+        self::TYPE_INVENTORY_DAMAGED => 'fa-solid circle-exclamation',
+        self::TYPE_INVENTORY_COSTS_PAID => 'fa-solid fa-coins',
         self::TYPE_SALE_INITIATED => 'ki-filled ki-ship',
         self::TYPE_SALE_DELIVERED => 'ki-filled ki-ship',
         self::TYPE_SALE_CANCELLED => 'ki-filled ki-ship',

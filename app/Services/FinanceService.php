@@ -16,8 +16,6 @@ class FinanceService
         $funds -= $technology->research_cost;
         $company->update(['funds' => $funds]);
 
-        NotificationService::createFinanceFundsChangedNotification($company, $technology->research_cost);
-
         return $funds;  
     }
 
@@ -29,17 +27,28 @@ class FinanceService
         $funds -= $purchase->total_cost;
         $company->update(['funds' => $funds]);
 
-        NotificationService::createFinanceFundsChangedNotification($company, $purchase->total_cost);
 
         return $funds;
     }
 
+    //-------------------------------------
+    // Inventory
+    //-------------------------------------
+    public static function payInventoryCosts($company, $product, $totalCost){
+        $funds = $company->funds;
+        $funds -= $totalCost;
+        $company->update(['funds' => $funds]);
+
+        return $funds;
+    }
+
+    //-------------------------------------
+    // Sales
+    //-------------------------------------
     public static function paySaleShippingCost($company, $sale){
         $funds = $company->funds;
         $funds -= $sale->shipping_cost * $sale->quantity;
         $company->update(['funds' => $funds]);
-
-        NotificationService::createFinanceFundsChangedNotification($company, $sale->shipping_cost * $sale->quantity);
 
         return $funds;
     }
@@ -49,27 +58,16 @@ class FinanceService
         $funds += $sale->sale_price * $sale->quantity;
         $company->update(['funds' => $funds]);
 
-        NotificationService::createFinanceFundsChangedNotification($company, $sale->sale_price * $sale->quantity);
-
         return $funds;
     }
 
-    public static function payInventoryCosts($company, $product, $leftAvailableStock){
-        $funds = $company->funds;
-        $funds -= $product->storage_cost * $leftAvailableStock;
-        $company->update(['funds' => $funds]);
-
-        NotificationService::createFinanceFundsChangedNotification($company, $product->storage_cost * $leftAvailableStock);
-
-        return $funds;
-    }
-
+    //-------------------------------------
+    // Employees
+    //-------------------------------------
     public static function payEmployeeRecruitmentCost($company, $employee){
         $funds = $company->funds;
         $funds -= $employee->recruitment_cost;
         $company->update(['funds' => $funds]);
-
-        NotificationService::createFinanceFundsChangedNotification($company, $employee->recruitment_cost);
 
         return $funds;
     }
@@ -79,17 +77,16 @@ class FinanceService
         $funds -= $totalSalaries;
         $company->update(['funds' => $funds]);
 
-        NotificationService::createFinanceFundsChangedNotification($company, $totalSalaries);
-
         return $funds;
     }   
 
+    //-------------------------------------
+    // Machines
+    //-------------------------------------
     public static function payMachineSetupCost($company, $machine){
         $funds = $company->funds;
         $funds -= $machine->cost_to_acquire;
         $company->update(['funds' => $funds]);
-
-        NotificationService::createFinanceFundsChangedNotification($company, $machine->cost_to_acquire);
 
         return $funds;
     }
@@ -102,12 +99,13 @@ class FinanceService
         return $funds;
     }
 
+    //-------------------------------------
+    // Maintenance
+    //-------------------------------------
     public static function payMaintenanceCost($company, $maintenance){
         $funds = $company->funds;
         $funds -= $maintenance->maintenances_cost;
         $company->update(['funds' => $funds]);
-
-        NotificationService::createFinanceFundsChangedNotification($company, $maintenance->maintenances_cost);
 
         return $funds;
     }

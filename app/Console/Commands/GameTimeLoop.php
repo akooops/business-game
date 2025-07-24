@@ -51,9 +51,6 @@ class GameTimeLoop extends Command
         // Process sales
         $this->call('game:sales-processing');
 
-        // Pay inventory costs
-        $this->call('game:pay-inventory-costs');
-
         // Process sales
         $this->call('game:generate-new-sales');
 
@@ -85,6 +82,9 @@ class GameTimeLoop extends Command
 
             // Change wilayas costs and shipping times
             $this->call('game:change-wilayas-costs');
+
+            // Pay inventory costs
+            $this->call('game:pay-inventory-costs');
         }
 
         $this->info("New game time: " . $newTime->format('Y-m-d H:i:s'));
