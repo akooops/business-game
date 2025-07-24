@@ -17,27 +17,11 @@ class EmployeeProfilesController extends Controller
      */
     public function index(Request $request)
     {
-        $perPage = IndexService::limitPerPage($request->query('perPage', 10));
-        $page = IndexService::checkPageIfNull($request->query('page', 1));
-        $search = IndexService::checkIfSearchEmpty($request->query('search'));
-
         $employeeProfiles = EmployeeProfile::latest();
-
-        // Apply search filter
-        if ($search) {
-            $employeeProfiles->where(function($query) use ($search) {
-                $query->where('id', $search)
-                      ->orWhere('name', 'like', '%' . $search . '%')
-                      ->orWhere('description', 'like', '%' . $search . '%');
-            });
-        }
-
-        $employeeProfiles = $employeeProfiles->paginate($perPage, ['*'], 'page', $page);
 
         if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
             return response()->json([
-                'employeeProfiles' => $employeeProfiles->items(),
-                'pagination' => IndexService::handlePagination($employeeProfiles)
+                'employeeProfiles' => $employeeProfiles->get(),
             ]);
         }
 

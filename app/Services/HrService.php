@@ -10,7 +10,7 @@ use App\Services\SettingsService;
 class HrService
 {
     public static function generateEmployees($company, $employeeProfile){
-        $numberOfEmployees = rand(1, 4);
+        $numberOfEmployees = rand(1, 3);
 
         $employees = [];
 
@@ -100,56 +100,16 @@ class HrService
         return $names[array_rand($names)];
     }
 
-    public static function validateRecruitment($employee){
-        $errors = [];
-
-        $recruitmentCost = $employee->recruitment_cost;
-
-        if(!FinanceService::haveSufficientFunds($employee->company, $recruitmentCost)){
-            $errors['funds'] = 'This company does not have enough funds to recruit this employee.';
-        }
-
-        if($employee->status != Employee::STATUS_APPLIED){
-            $errors['status'] = 'This employee is not available for recruitment.';
-        }
-        
-        return $errors;
-    }
-
-    public static function validatePromotion($employee){    
-        $errors = [];
-
-        if($employee->status != Employee::STATUS_ACTIVE){
-            $errors['status'] = 'This employee is not active.';
-        }
-
-        return $errors;
-    }
-
-    public static function validateFiring($employee){
-        $errors = [];
-
-        if($employee->status != Employee::STATUS_ACTIVE){
-            $errors['status'] = 'This employee is not active.';
-        }
-
-        if($employee->companyMachine){
-            if($employee->companyMachine->status == CompanyMachine::STATUS_ACTIVE){
-                $errors['companyMachine'] = 'This employee is assigned to a machine that is active. Wait until the production is completed.';
-            }
-        }
-
-        return $errors;
-    }
-
-    public static function recruitEmployee($employee){       
+    public static function recruitEmployee($employee){    
+        // Recruit the employee
         $employee->update([
             'status' => Employee::STATUS_ACTIVE,
             'hired_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
+        // Pay the recruitment cost
         FinanceService::payEmployeeRecruitmentCost($employee->company, $employee);
-        NotificationService::createEmployeeHiredNotification($employee);
+        NotificationService::createEmployeeHiredNotification($employee->company, $employee->employeeProfile, $employee);
     }
 
     public static function paySalaries($company){
@@ -229,9 +189,11 @@ class HrService
     }
 
     public static function promoteEmployee($employee, $newSalary){
+        // Promote the employee
         $factor = $newSalary / $employee->salary_month;
         $mood_decay_rate_days = $employee->mood_decay_rate_days / $factor;
 
+        // Update the employee's salary, mood, efficiency, and mood decay rate
         $employee->update([
             'salary_month' => $newSalary,
             'current_mood' => min(1, $employee->current_mood * $factor),
@@ -242,15 +204,18 @@ class HrService
     }
 
     public static function fireEmployee($employee){
+        // Fire the employee
         $employee->update([
             'status' => Employee::STATUS_FIRED,
             'fired_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
+        // Remove the employee from the machine
         $employee->companyMachine->update([
             'employee_id' => null,
         ]);
 
+        // Decrease the mood of the other employees
         $companyEmployees = $employee->company->employees()->where('status', Employee::STATUS_ACTIVE)->get();
 
         foreach($companyEmployees as $companyEmployee){

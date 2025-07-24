@@ -95,7 +95,7 @@ class Notification extends Model
         self::TYPE_SALE_INITIATED => 'fa-solid fa-cart-shopping',
         self::TYPE_SALE_DELIVERED => 'fa-solid fa-truck',
         self::TYPE_SALE_CANCELLED => 'fa-solid fa-circle-xmark',
-        self::TYPE_EMPLOYEE_HIRED => 'ki-filled ki-users',
+        self::TYPE_EMPLOYEE_HIRED => 'fa-solid fa-user-plus',
         self::TYPE_EMPLOYEE_MOOD_DECREASED => 'ki-filled ki-users',
         self::TYPE_EMPLOYEE_RESIGNED => 'ki-filled ki-users',
         self::TYPE_EMPLOYEE_SALARY_PAID => 'ki-filled ki-users',

@@ -339,7 +339,7 @@
                                                 data: function(params) {
                                                     return {
                                                         search: params.term,
-                                                        perPage: 10
+                                                        perPage: 100
                                                     };
                                                 },
                                                 processResults: function(data) {

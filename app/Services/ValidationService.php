@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\Employee;
+use App\Models\CompanyMachine;
 use App\Models\Sale;
 use App\Models\SupplierProduct;
 
@@ -121,6 +123,54 @@ class ValidationService
 
         if(!$companyProduct) {
             $errors['company_product'] = 'This company does not sell this product.';
+        }
+
+        return $errors;
+    }
+
+    //-------------------------------------
+    // Employees
+    //-------------------------------------
+    public static function validateEmployeeRecruitment($employee){
+        $errors = [];
+
+        $recruitmentCost = $employee->recruitment_cost;
+
+        // Check if the company has enough funds to recruit the employee
+        $hasSufficientFunds = FinanceService::haveSufficientFunds($employee->company, $recruitmentCost);
+        if(!$hasSufficientFunds){
+            $errors['funds'] = 'This company does not have enough funds to recruit this employee.';
+        }
+
+        // Check if the employee is available for recruitment
+        if($employee->status != Employee::STATUS_APPLIED){
+            $errors['status'] = 'This employee is not available for recruitment.';
+        }
+        
+        return $errors;
+    }
+
+    public static function validateEmployeePromotion($employee){    
+        $errors = [];
+
+        if($employee->status != Employee::STATUS_ACTIVE){
+            $errors['status'] = 'This employee is not active.';
+        }
+
+        return $errors;
+    }
+
+    public static function validateEmployeeFiring($employee){
+        $errors = [];
+
+        if($employee->status != Employee::STATUS_ACTIVE){
+            $errors['status'] = 'This employee is not active.';
+        }
+
+        if($employee->companyMachine){
+            if($employee->companyMachine->status == CompanyMachine::STATUS_ACTIVE){
+                $errors['companyMachine'] = 'This employee is assigned to a machine that is active. Wait until the production is completed.';
+            }
         }
 
         return $errors;

@@ -124,13 +124,13 @@ class NotificationService
     // ------------------------------------------------------------
     // Employees
     // ------------------------------------------------------------
-    public static function createEmployeeHiredNotification($employee){
+    public static function createEmployeeHiredNotification($company, $employeeProfile, $employee){
         return Notification::create([
             'type' => Notification::TYPE_EMPLOYEE_HIRED,
             'title' => 'Employee Hired',
-            'message' => "Employee {$employee->name} hired for {$employee->employeeProfile->name} with salary of {$employee->salary_month}.",
+            'message' => "Employee {$employeeProfile->name} hired for {$employee->salary_month}.",
             'url' => route('company.employees.index'),
-            'user_id' => $employee->company->user_id,
+            'user_id' => $company->user_id,
         ]);
     }
 

@@ -47,7 +47,7 @@ Route::prefix('company')->middleware(['auth', 'check.company', 'handle.inertia']
     Route::get('/employees/recruit-page', [EmployeesController::class, 'recruitPage'])->name('company.employees.recruit-page');
     Route::post('/employees/{employee}/fire', [EmployeesController::class, 'fire'])->name('company.employees.fire');
     Route::post('/employees/{employee}/promote', [EmployeesController::class, 'promote'])->name('company.employees.promote');
-    Route::post('/employees/{employee}/recruit', [EmployeesController::class, 'recruit'])->name('company.employees.store');
+    Route::post('/employees/{employee}/recruit', [EmployeesController::class, 'recruit'])->name('company.employees.recruit');
 
     // Inventory
     Route::get('/inventory', [InventoryController::class, 'index'])->name('company.inventory.index');

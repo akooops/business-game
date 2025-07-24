@@ -127,7 +127,7 @@
         if (!recruitData) return;
 
         try {
-            const response = await fetch(route('company.employees.store', recruitData.employee.id), {
+            const response = await fetch(route('company.employees.recruit', recruitData.employee.id), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -234,6 +234,18 @@
     $: if (success) {
         showToast(success, 'success');
     }
+
+    // Show toast notification
+    function showToast(message, type = 'success') {
+        if (window.KTToast) {
+            KTToast.show({
+                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
+                message: message,
+                variant: type === 'success' ? 'success' : 'destructive',
+                position: 'bottom-right',
+            });
+        }
+    }
 </script>
 
 <svelte:head>
@@ -242,7 +254,7 @@
 
 <CompanyLayout {breadcrumbs} {pageTitle}>
     <!-- Container -->
-    <div class="kt-container-fluid">
+    <div class="kt-container-fixed">
         <div class="grid gap-5 lg:gap-7.5">
             <!-- Recruitment Header -->
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -315,7 +327,7 @@
                                                             data: function(params) {
                                                                 return {
                                                                     search: params.term,
-                                                                    perPage: 10
+                                                                    perPage: 100
                                                                 };
                                                             },
                                                             processResults: function(data) {
@@ -351,143 +363,108 @@
                                     </div>
 
                                     {#if selectedEmployeeProfile}
-                                        <!-- Available Employees Table -->
+                                        <!-- Available Employees Grid -->
                                         <div class="kt-card">
                                             <div class="kt-card-header">
                                                 <h4 class="kt-card-title">Available Candidates</h4>
                                             </div>
                                             <div class="kt-card-content p-0">
-                                                <div class="kt-scrollable-x-auto">
-                                                    <table class="kt-table kt-table-border table-fixed">
-                                                        <thead>
-                                                            <tr>
-                                                                <th style="width: 75px;">
-                                                                    <span class="kt-table-col">
-                                                                        <span class="kt-table-col-label">ID</span>
-                                                                    </span>
-                                                                </th>
-                                                                <th>
-                                                                    <span class="kt-table-col">
-                                                                        <span class="kt-table-col-label">Candidate</span>
-                                                                    </span>
-                                                                </th>
-                                                                <th>
-                                                                    <span class="kt-table-col">
-                                                                        <span class="kt-table-col-label">Salary</span>
-                                                                    </span>
-                                                                </th>
-                                                                <th>
-                                                                    <span class="kt-table-col">
-                                                                        <span class="kt-table-col-label">Recruitment Cost</span>
-                                                                    </span>
-                                                                </th>
-                                                                <th>
-                                                                    <span class="kt-table-col">
-                                                                        <span class="kt-table-col-label">Efficiency</span>
-                                                                    </span>
-                                                                </th>
-                                                                <th>
-                                                                    <span class="kt-table-col">
-                                                                        <span class="kt-table-col-label">Mood Decay</span>
-                                                                    </span>
-                                                                </th>
-                                                                <th style="width: 120px;">
-                                                                    <span class="kt-table-col">
-                                                                        <span class="kt-table-col-label">Actions</span>
-                                                                    </span>
-                                                                </th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            {#if loadingEmployees}
-                                                                <!-- Loading skeleton rows -->
-                                                                {#each Array(5) as _, i}
-                                                                    <tr>
-                                                                        <td class="p-4">
-                                                                            <div class="kt-skeleton w-8 h-4 rounded"></div>
-                                                                        </td>
-                                                                        <td class="p-4">
-                                                                            <div class="flex items-center gap-3">
-                                                                                <div class="kt-skeleton w-10 h-10 rounded-lg"></div>
-                                                                                <div class="flex flex-col gap-1">
-                                                                                    <div class="kt-skeleton w-24 h-4 rounded"></div>
-                                                                                    <div class="kt-skeleton w-16 h-3 rounded"></div>
-                                                                                </div>
+                                                {#if loadingEmployees}
+                                                    <!-- Loading skeleton -->
+                                                    <div class="p-6">
+                                                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
+                                                            {#each Array(8) as _, i}
+                                                                <div class="kt-card animate-pulse">
+                                                                    <div class="kt-card-content flex flex-col items-center lg:pt-10">
+                                                                        <div class="mb-3">
+                                                                            <div class="size-20 relative">
+                                                                                <div class="kt-skeleton w-20 h-20 rounded-full"></div>
+                                                                                <div class="kt-skeleton w-2.5 h-2.5 rounded-full ring-2 ring-background absolute bottom-0.5 start-16 transform -translate-y-1/2"></div>
                                                                             </div>
-                                                                        </td>
-                                                                        <td class="p-4">
-                                                                            <div class="kt-skeleton w-16 h-4 rounded"></div>
-                                                                        </td>
-                                                                        <td class="p-4">
-                                                                            <div class="kt-skeleton w-16 h-6 rounded"></div>
-                                                                        </td>
-                                                                        <td class="p-4">
-                                                                            <div class="kt-skeleton w-12 h-4 rounded"></div>
-                                                                        </td>
-                                                                        <td class="p-4">
-                                                                            <div class="kt-skeleton w-12 h-4 rounded"></div>
-                                                                        </td>
-                                                                        <td class="p-4">
-                                                                            <div class="kt-skeleton w-8 h-8 rounded"></div>
-                                                                        </td>
-                                                                    </tr>
-                                                                {/each}
-                                                            {:else if availableEmployees.length === 0}
-                                                                <!-- Empty state -->
-                                                                <tr>
-                                                                    <td colspan="8" class="p-10">
-                                                                        <div class="flex flex-col items-center justify-center text-center">
-                                                                            <div class="mb-4">
-                                                                                <i class="ki-filled ki-user text-4xl text-muted-foreground"></i>
-                                                                            </div>
-                                                                            <h3 class="text-lg font-semibold text-mono mb-2">No candidates found</h3>
-                                                                            <p class="text-sm text-secondary-foreground mb-4">
-                                                                                No candidates are available for this profile
-                                                                            </p>
                                                                         </div>
-                                                                    </td>
-                                                                </tr>
-                                                            {:else}
-                                                                <!-- Actual data rows -->
-                                                                {#each availableEmployees as employee}
-                                                                    <tr class="hover:bg-muted/50">
-                                                                        <td>
-                                                                            <span class="text-sm font-medium text-mono">#{employee.id}</span>
-                                                                        </td>
-                                                                        <td>
-                                                                            <span class="text-sm font-medium text-mono hover:text-primary">
+                                                                        <div class="flex items-center justify-center gap-1.5 mb-3">
+                                                                            <div class="kt-skeleton h-5 w-24"></div>
+                                                                        </div>
+                                                                        <div class="kt-skeleton h-3 w-32 mb-4"></div>
+                                                                        <div class="flex items-center gap-2.5">
+                                                                            <div class="kt-skeleton w-6 h-6 rounded"></div>
+                                                                            <div class="kt-skeleton w-6 h-6 rounded"></div>
+                                                                            <div class="kt-skeleton w-6 h-6 rounded"></div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            {/each}
+                                                        </div>
+                                                    </div>
+                                                {:else if availableEmployees.length === 0}
+                                                    <!-- Empty state -->
+                                                    <div class="p-10">
+                                                        <div class="flex flex-col items-center justify-center text-center">
+                                                            <div class="mb-4">
+                                                                <i class="ki-filled ki-user text-4xl text-muted-foreground"></i>
+                                                            </div>
+                                                            <h3 class="text-lg font-semibold text-mono mb-2">No candidates found</h3>
+                                                            <p class="text-sm text-secondary-foreground mb-4">
+                                                                No candidates are available for this profile
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                {:else}
+                                                    <!-- Candidates Grid -->
+                                                    <div class="p-6">
+                                                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
+                                                            {#each availableEmployees as employee}
+                                                                <div class="kt-card kt-card-hover cursor-pointer" on:click={() => openRecruitModal(employee)}>
+                                                                    <div class="kt-card-content flex flex-col items-center lg:pt-10">
+                                                                        <div class="mb-3">
+                                                                            <div class="size-20 relative">
+                                                                                <div class="w-20 h-20 rounded-full bg-accent/50 flex items-center justify-center">
+                                                                                    <i class="ki-filled ki-user text-2xl text-muted-foreground"></i>
+                                                                                </div>
+                                                                                <div class="w-2.5 h-2.5 rounded-full ring-2 ring-background absolute bottom-0.5 start-16 transform -translate-y-1/2 bg-yellow-500"></div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="flex items-center justify-center gap-1.5 mb-3">
+                                                                            <a class="hover:text-primary text-center text-base leading-5 font-medium text-mono" href="#">
                                                                                 {employee.name}
-                                                                            </span>
-                                                                        </td>
-                                                                        <td>
-                                                                            <span class="text-sm font-medium text-mono">DZD {employee.salary_month}</span>
-                                                                        </td>
-                                                                        <td>
-                                                                            <span class="text-sm font-medium text-mono">DZD {employee.recruitment_cost}</span>
-                                                                        </td>
-                                                                        <td>
-                                                                            <span class="kt-badge kt-badge-{employee.efficiency_factor > 1 ? 'success' : 'warning'} kt-badge-sm">
-                                                                                {employee.efficiency_factor}x
-                                                                            </span>
-                                                                        </td>
-                                                                        <td>
-                                                                            <span class="text-sm text-muted-foreground">{(employee.mood_decay_rate_days * 100).toFixed(2)}%/day</span>
-                                                                        </td>   
-                                                                        <td class="text-center">    
+                                                                            </a>
+                                                                        </div>
+
+                                                                        <div class="flex flex-col gap-1 text-xs text-secondary-foreground">
+                                                                            <div class="flex justify-center gap-1">
+                                                                                <i class="fa-solid fa-dollar-sign text-green-500"></i>
+                                                                                <span>DZD {employee.salary_month}</span>
+                                                                            </div>
+                                                                            <div class="flex justify-center gap-1">
+                                                                                <i class="fa-solid fa-coins text-blue-500"></i>
+                                                                                <span>DZD {employee.recruitment_cost}</span>
+                                                                            </div>
+                                                                            <div class="flex justify-center gap-1">
+                                                                                <i class="fa-solid fa-chart-line text-primary"></i>
+                                                                                <span>{employee.efficiency_factor}x Efficiency</span>
+                                                                            </div>
+                                                                            <div class="flex justify-center gap-1">
+                                                                                <i class="fa-solid fa-clock text-orange-500"></i>
+                                                                                <span>{(employee.mood_decay_rate_days * 100).toFixed(2)}%/day</span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <!-- Action Button -->
+                                                                        <div class="flex items-center gap-2 mt-4">
                                                                             <button 
                                                                                 class="kt-btn kt-btn-sm kt-btn-primary"
-                                                                                on:click={() => openRecruitModal(employee)}
+                                                                                on:click|stopPropagation={() => openRecruitModal(employee)}
                                                                             >
                                                                                 <i class="ki-filled ki-check text-sm"></i>
                                                                                 Recruit
                                                                             </button>
-                                                                        </td>
-                                                                    </tr>
-                                                                {/each}
-                                                            {/if}
-                                                        </tbody>
-                                                    </table>
-                                                </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>      
+                                                            {/each}
+                                                        </div>
+                                                    </div>
+                                                {/if}
                                             </div>
                                         </div>
                                     {:else}
@@ -516,157 +493,117 @@
                                         </p>
                                     </div>
 
-                                    <div class="kt-scrollable-x-auto">
-                                        <table class="kt-table kt-table-border table-fixed">
-                                            <thead>
-                                                <tr>
-                                                    <th style="width: 75px;">
-                                                        <span class="kt-table-col">
-                                                            <span class="kt-table-col-label">ID</span>
-                                                        </span>
-                                                    </th>
-                                                    <th>
-                                                        <span class="kt-table-col">
-                                                            <span class="kt-table-col-label">Employee</span>
-                                                        </span>
-                                                    </th>
-                                                    <th>
-                                                        <span class="kt-table-col">
-                                                            <span class="kt-table-col-label">Profile</span>
-                                                        </span>
-                                                    </th>
-                                                    <th>
-                                                        <span class="kt-table-col">
-                                                            <span class="kt-table-col-label">Salary</span>
-                                                        </span>
-                                                    </th>
-                                                    <th>
-                                                        <span class="kt-table-col">
-                                                            <span class="kt-table-col-label">Recruitment Cost</span>
-                                                        </span>
-                                                    </th>
-                                                    <th>
-                                                        <span class="kt-table-col">
-                                                            <span class="kt-table-col-label">Efficiency</span>
-                                                        </span>
-                                                    </th>
-                                                    <th>
-                                                        <span class="kt-table-col">
-                                                            <span class="kt-table-col-label">Mood Decay</span>
-                                                        </span>
-                                                    </th>
-                                                    <th style="width: 120px;">
-                                                        <span class="kt-table-col">
-                                                            <span class="kt-table-col-label">Actions</span>
-                                                        </span>
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {#if loadingAppliedEmployees}
-                                                    <!-- Loading skeleton rows -->
-                                                    {#each Array(perPage) as _, i}
-                                                        <tr>
-                                                            <td class="p-4">
-                                                                <div class="kt-skeleton w-8 h-4 rounded"></div>
-                                                            </td>
-                                                            <td class="p-4">
-                                                                <div class="flex items-center gap-3">
-                                                                    <div class="kt-skeleton w-10 h-10 rounded-lg"></div>
-                                                                    <div class="flex flex-col gap-1">
-                                                                        <div class="kt-skeleton w-24 h-4 rounded"></div>
-                                                                        <div class="kt-skeleton w-16 h-3 rounded"></div>
-                                                                    </div>
+                                    {#if loadingAppliedEmployees}
+                                        <!-- Loading skeleton -->
+                                        <div class="p-6">
+                                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
+                                                {#each Array(8) as _, i}
+                                                    <div class="kt-card animate-pulse">
+                                                        <div class="kt-card-content flex flex-col items-center lg:pt-10">
+                                                            <div class="mb-3">
+                                                                <div class="size-20 relative">
+                                                                    <div class="kt-skeleton w-20 h-20 rounded-full"></div>
+                                                                    <div class="kt-skeleton w-2.5 h-2.5 rounded-full ring-2 ring-background absolute bottom-0.5 start-16 transform -translate-y-1/2"></div>
                                                                 </div>
-                                                            </td>
-                                                            <td class="p-4">
-                                                                <div class="kt-skeleton w-20 h-4 rounded"></div>
-                                                            </td>
-                                                            <td class="p-4">
-                                                                <div class="kt-skeleton w-16 h-4 rounded"></div>
-                                                            </td>
-                                                            <td class="p-4">
-                                                                <div class="kt-skeleton w-16 h-6 rounded"></div>
-                                                            </td>
-                                                            <td class="p-4">
-                                                                <div class="kt-skeleton w-12 h-4 rounded"></div>
-                                                            </td>
-                                                            <td class="p-4">
-                                                                <div class="kt-skeleton w-12 h-4 rounded"></div>
-                                                            </td>
-                                                            <td class="p-4">
-                                                                <div class="kt-skeleton w-8 h-8 rounded"></div>
-                                                            </td>
-                                                        </tr>
-                                                    {/each}
-                                                {:else if appliedEmployees.length === 0}
-                                                    <!-- Empty state -->
-                                                    <tr>
-                                                        <td colspan="10" class="p-10">
-                                                            <div class="flex flex-col items-center justify-center text-center">
-                                                                <div class="mb-4">
-                                                                    <i class="ki-filled ki-user-tick text-4xl text-muted-foreground"></i>
-                                                                </div>
-                                                                <h3 class="text-lg font-semibold text-mono mb-2">No applied employees</h3>
-                                                                <p class="text-sm text-secondary-foreground mb-4">
-                                                                    No employees have applied to your company yet
-                                                                </p>
                                                             </div>
-                                                        </td>
-                                                    </tr>
-                                                {:else}
-                                                    <!-- Actual data rows -->
-                                                    {#each appliedEmployees as employee}
-                                                        <tr class="hover:bg-muted/50">
-                                                            <td>
-                                                                <span class="text-sm font-medium text-mono">#{employee.id}</span>
-                                                            </td>
-                                                            <td>
-                                                                <span class="text-sm font-medium text-mono hover:text-primary">
+                                                            <div class="flex items-center justify-center gap-1.5 mb-3">
+                                                                <div class="kt-skeleton h-5 w-24"></div>
+                                                            </div>
+                                                            <div class="kt-skeleton h-3 w-32 mb-4"></div>
+                                                            <div class="flex items-center gap-2.5">
+                                                                <div class="kt-skeleton w-6 h-6 rounded"></div>
+                                                                <div class="kt-skeleton w-6 h-6 rounded"></div>
+                                                                <div class="kt-skeleton w-6 h-6 rounded"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {/each}
+                                            </div>
+                                        </div>
+                                    {:else if appliedEmployees.length === 0}
+                                        <!-- Empty state -->
+                                        <div class="p-10">
+                                            <div class="flex flex-col items-center justify-center text-center">
+                                                <div class="mb-4">
+                                                    <i class="ki-filled ki-user-tick text-4xl text-muted-foreground"></i>
+                                                </div>
+                                                <h3 class="text-lg font-semibold text-mono mb-2">No applied employees</h3>
+                                                <p class="text-sm text-secondary-foreground mb-4">
+                                                    No employees have applied to your company yet
+                                                </p>
+                                            </div>
+                                        </div>
+                                    {:else}
+                                        <!-- Applied Employees Grid -->
+                                        <div class="p-6">
+                                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
+                                                {#each appliedEmployees as employee}
+                                                    <div class="kt-card kt-card-hover cursor-pointer" on:click={() => openRecruitModal(employee)}>
+                                                        <div class="kt-card-content flex flex-col items-center lg:pt-10">
+                                                            <div class="mb-3">
+                                                                <div class="size-20 relative">
+                                                                    <div class="w-20 h-20 rounded-full bg-accent/50 flex items-center justify-center">
+                                                                        <i class="ki-filled ki-user text-2xl text-muted-foreground"></i>
+                                                                    </div>
+                                                                    <div class="w-2.5 h-2.5 rounded-full ring-2 ring-background absolute bottom-0.5 start-16 transform -translate-y-1/2 bg-yellow-500"></div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="flex items-center justify-center gap-1.5 mb-3">
+                                                                <a class="hover:text-primary text-center text-base leading-5 font-medium text-mono" href="#">
                                                                     {employee.name}
+                                                                </a>
+                                                            </div>
+
+                                                            <div class="flex items-center gap-2.5 mb-2">
+                                                                <span class="kt-badge kt-badge-outline kt-badge-sm">
+                                                                    {employee.employee_profile?.name || 'Unknown'}
                                                                 </span>
-                                                            </td>
-                                                            <td>
-                                                                <span class="text-sm text-muted-foreground">{employee.employee_profile?.name || 'Unknown'}</span>
-                                                            </td>
-                                                            <td>
-                                                                <span class="text-sm font-medium text-mono">DZD {employee.salary_month}</span>
-                                                            </td>
-                                                            <td>
-                                                                <span class="text-sm font-medium text-mono">DZD {employee.recruitment_cost}</span>
-                                                            </td>
-                                                            <td>
-                                                                <span class="kt-badge kt-badge-{employee.efficiency_factor > 1 ? 'success' : 'warning'} kt-badge-sm">
-                                                                    {employee.efficiency_factor}x
-                                                                </span>
-                                                            </td>
-                                                            <td>
-                                                                <span class="text-sm text-muted-foreground">{(employee.mood_decay_rate_days * 100).toFixed(2)}%/day</span>
-                                                            </td>
-                                                            <td class="text-center">
+                                                            </div>
+
+                                                            <div class="flex flex-col gap-1 text-xs text-secondary-foreground">
+                                                                <div class="flex justify-center gap-1">
+                                                                    <i class="fa-solid fa-dollar-sign text-green-500"></i>
+                                                                    <span>DZD {employee.salary_month}</span>
+                                                                </div>
+                                                                <div class="flex justify-center gap-1">
+                                                                    <i class="fa-solid fa-coins text-blue-500"></i>
+                                                                    <span>DZD {employee.recruitment_cost}</span>
+                                                                </div>
+                                                                <div class="flex justify-center gap-1">
+                                                                    <i class="fa-solid fa-chart-line text-primary"></i>
+                                                                    <span>{employee.efficiency_factor}x Efficiency</span>
+                                                                </div>
+                                                                <div class="flex justify-center gap-1">
+                                                                    <i class="fa-solid fa-clock text-orange-500"></i>
+                                                                    <span>{(employee.mood_decay_rate_days * 100).toFixed(2)}%/day</span>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Action Button -->
+                                                            <div class="flex items-center gap-2 mt-4">
                                                                 <button 
                                                                     class="kt-btn kt-btn-sm kt-btn-primary"
-                                                                    on:click={() => openRecruitModal(employee)}
+                                                                    on:click|stopPropagation={() => openRecruitModal(employee)}
                                                                 >
                                                                     <i class="ki-filled ki-check text-sm"></i>
                                                                     Recruit
                                                                 </button>
-                                                            </td>
-                                                        </tr>
-                                                    {/each}
-                                                {/if}
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>      
+                                                {/each}
+                                            </div>
+                                        </div>
 
-                                    <!-- Pagination -->
-                                    {#if appliedPagination && appliedPagination.total > 0}
-                                        <Pagination 
-                                            pagination={appliedPagination} 
-                                            perPage={appliedPerPage}
-                                            onPageChange={goToAppliedPage} 
-                                            onPerPageChange={handleAppliedPerPageChange}
-                                        />
+                                        <!-- Pagination -->
+                                        {#if appliedPagination && appliedPagination.total > 0}
+                                            <Pagination 
+                                                pagination={appliedPagination} 
+                                                perPage={appliedPerPage}
+                                                onPageChange={goToAppliedPage} 
+                                                onPerPageChange={handleAppliedPerPageChange}
+                                            />
+                                        {/if}
                                     {/if}
                                 </div>
                             </div>

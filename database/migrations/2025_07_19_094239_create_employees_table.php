@@ -21,7 +21,7 @@ return new class extends Migration
             $table->decimal('mood_decay_rate_days', 15, 3)->default(0);
             $table->decimal('efficiency_factor', 15, 3)->default(0);
 
-            $table->enum('status', ['active', 'inactive', 'fired', 'resigned','applied'])->default('applied');
+            $table->enum('status', ['active', 'fired', 'resigned','applied'])->default('applied');
 
             // Timestamps
             $table->timestamp('applied_at')->nullable();
