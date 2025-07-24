@@ -328,7 +328,7 @@
                                                 <div class="kt-card-body p-4">
                                                     <div class="size-20 mb-4">
                                                         <img 
-                                                            class="rounded-lg w-20 h-20 object-cover" 
+                                                            class="rounded-lg w-full h-full object-cover" 
                                                             src={technology.image_url}
                                                             alt={technology.name}
                                                         />
@@ -363,7 +363,7 @@
                                                     </div>
                                                     {#if level === currentResearchLevel}
                                                         <button class="kt-btn kt-btn-primary w-full mt-4" on:click|stopPropagation={() => openResearchModal(technology)}>
-                                                            <i class="ki-filled ki-plus text-base"></i>
+                                                            <i class="fa-solid fa-rocket text-base"></i>
                                                             Research
                                                         </button>
                                                     {/if}

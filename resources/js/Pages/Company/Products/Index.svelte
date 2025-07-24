@@ -1,7 +1,6 @@
 <script>
     import CompanyLayout from '../../Layouts/CompanyLayout.svelte';
-    import Pagination from '../../Components/Pagination.svelte';
-    import { onMount, tick } from 'svelte';
+    import { onMount, onDestroy, tick } from 'svelte';
     import { page } from '@inertiajs/svelte'
 
     // Define breadcrumbs for this page
@@ -21,13 +20,9 @@
     const pageTitle = 'My Products';
 
     // Reactive variables
-    let products = [];
-    let pagination = {};
+    let companyProducts = [];
     let loading = true;
-    let search = '';
-    let perPage = 10;
-    let currentPage = 1;
-    let searchTimeout;
+    let fetchInterval = null;
 
     // Drawer state
     let selectedProduct = null;
@@ -41,23 +36,17 @@
 
     // Fetch products data
     async function fetchProducts() {
-        loading = true;
+        if(companyProducts.length == 0) loading = true;
+
         try {
-            const params = new URLSearchParams({
-                page: currentPage,
-                perPage: perPage,
-                search: search
-            });
-            
-            const response = await fetch(route('company.products.index') + '?' + params.toString(), {
+            const response = await fetch(route('company.products.index'), {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             });
             
             const data = await response.json();
-            products = data.products;
-            pagination = data.pagination;
+            companyProducts = data.companyProducts;
             
             // Wait for DOM to update, then initialize menus
             await tick();
@@ -69,41 +58,6 @@
         } finally {
             loading = false;
         }
-    }
-
-    // Handle search with debouncing
-    function handleSearch() {
-        // Clear existing timeout
-        if (searchTimeout) {
-            clearTimeout(searchTimeout);
-        }
-        
-        // Set new timeout for 500ms
-        searchTimeout = setTimeout(() => {
-            currentPage = 1;
-            fetchProducts();
-        }, 500);
-    }
-
-    // Handle search input change
-    function handleSearchInput(event) {
-        search = event.target.value;
-        handleSearch();
-    }
-
-    // Handle pagination
-    function goToPage(page) {
-        if (page && page !== currentPage) {
-            currentPage = page;
-            fetchProducts();
-        }
-    }
-
-    // Handle per page change
-    function handlePerPageChange(newPerPage) {
-        perPage = newPerPage;
-        currentPage = 1;
-        fetchProducts();
     }
 
     // Open product drawer
@@ -194,38 +148,21 @@
         }
     }
 
-    // Show toast notification
-    function showToast(message, type = 'success') {
-        if (window.KTToast) {
-            KTToast.show({
-                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                message: message,
-                variant: type === 'success' ? 'success' : 'destructive',
-                position: 'bottom-right',
-            });
-        }
-    }
-
-    // Format timestamp
-    function formatTimestamp(timestamp) {
-        if (!timestamp) return 'N/A';
-        return new Date(timestamp).toLocaleString();
-    }
-
     onMount(() => {
         fetchProducts();
+        fetchInterval = setInterval(fetchProducts, 60000);
+    });
+    onDestroy(() => {
+        if (fetchInterval) {
+            clearInterval(fetchInterval);
+        }
     });
 
     // Flash message handling
     export let success;
 
     $: if (success) {
-        KTToast.show({
-            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-            message: success,
-            variant: "success",
-            position: "bottom-right",
-        });
+        showToast(success, 'success');
     }
 </script>
 
@@ -235,7 +172,7 @@
 
 <CompanyLayout {breadcrumbs} {pageTitle}>
     <!-- Container -->
-    <div class="kt-container-fluid">
+    <div class="kt-container-fixed">
         <div class="grid gap-5 lg:gap-7.5">
             <!-- Products Header -->
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -249,29 +186,12 @@
 
             <!-- Products Grid -->
             <div class="kt-card">
-                <div class="kt-card-header">
-                    <div class="kt-card-toolbar">
-                        <div class="flex items-center gap-4">
-                            <div class="kt-input max-w-64 w-64">
-                                <i class="ki-filled ki-magnifier"></i>
-                                <input 
-                                    type="text" 
-                                    class="kt-input" 
-                                    placeholder="Search products..." 
-                                    bind:value={search}
-                                    on:input={handleSearchInput}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="kt-card-content p-0">
                     {#if loading}
                         <!-- Loading skeleton -->
                         <div class="p-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-                                {#each Array(perPage) as _, i}
+                                {#each Array(10) as _, i}
                                     <div class="kt-card animate-pulse">
                                         <div class="kt-card-body p-4">
                                             <!-- Product Image Skeleton -->
@@ -306,7 +226,7 @@
                                 {/each}
                             </div>
                         </div>
-                    {:else if products.length === 0}
+                    {:else if companyProducts.length === 0}
                         <!-- Empty state -->
                         <div class="p-10">
                             <div class="flex flex-col items-center justify-center text-center">
@@ -314,12 +234,9 @@
                                     <i class="ki-filled ki-abstract-26 text-4xl text-muted-foreground"></i>
                                 </div>
                                 <h3 class="text-lg font-semibold text-mono mb-2">No products found</h3>
-                                <p class="text-sm text-secondary-foreground mb-4">
-                                    {search ? 'No products match your search criteria.' : 'Research technologies to unlock products.'}
-                                </p>
-                                <a href="{route('company.technologies.research-page')}" class="kt-btn kt-btn-primary">
-                                    <i class="ki-filled ki-plus text-base"></i>
-                                    Research Technologies
+                                <a href="{route('company.technologies.index')}" class="kt-btn kt-btn-primary">
+                                    <i class="fa-solid fa-rocket text-base"></i>
+                                    Research Technologies to unlock products
                                 </a>
                             </div>
                         </div>
@@ -327,35 +244,29 @@
                         <!-- Products Grid -->
                         <div class="p-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-                                {#each products as product}
-                                    <div class="kt-card kt-card-hover">
+                                {#each companyProducts as companyProduct}
+                                    <div class="kt-card kt-card-hover cursor-pointer" on:click={() => openProductDrawer(companyProduct)}>
                                         <div class="kt-card-body p-4">
                                             <!-- Product Image -->
-                                            <div class="flex items-center justify-center mb-4 cursor-pointer" on:click={() => openProductDrawer(product)}>
-                                                {#if product.product.image_url}
-                                                    <img 
-                                                        src={product.product.image_url} 
-                                                        alt={product.product.name}
-                                                        class="h-[180px] w-full object-cover rounded-sm"
-                                                    />
-                                                {:else}
-                                                    <div class="w-16 h-16 rounded-lg bg-accent/50 flex items-center justify-center">
-                                                        <i class="ki-filled ki-abstract-26 text-2xl text-muted-foreground"></i>
-                                                    </div>
-                                                {/if}
+                                            <div class="size-20 mb-4">
+                                                <img 
+                                                    class="rounded-lg w-full h-full object-cover bg-gray-100" 
+                                                    src={companyProduct.product.image_url}
+                                                    alt={companyProduct.product.name}
+                                                />
                                             </div>
 
                                             <!-- Product Info -->
-                                            <div class="mb-4 cursor-pointer" on:click={() => openProductDrawer(product)}>
+                                            <div class="mb-4">
                                                 <h3 class="text-lg font-semibold text-mono mb-1">
-                                                    {product.product.name}
+                                                    {companyProduct.product.name}
                                                 </h3>
-                                                <p class="text-sm text-muted-foreground mb-2">
-                                                    {product.product.type_name}
+                                                <p class="kt-badge kt-badge-{companyProduct.product.type === 'finished_product' ? 'success' : companyProduct.product.type === 'component' ? 'warning' : 'info'} kt-badge-sm">
+                                                    {companyProduct.product.type_name}
                                                 </p>
-                                                {#if product.product.description}
-                                                    <p class="text-xs text-muted-foreground line-clamp-2">
-                                                        {product.product.description}
+                                                {#if companyProduct.product.description}
+                                                    <p class="text-xs text-muted-foreground line-clamp-2 mt-2">
+                                                        {companyProduct.product.description}
                                                     </p>
                                                 {/if}
                                             </div>
@@ -364,28 +275,18 @@
                                             <div class="text-xs text-muted-foreground space-y-1 cursor-pointer" on:click={() => openProductDrawer(product)}>
                                                 <div class="flex justify-between">
                                                     <span>Available Stock:</span>
-                                                    <span class="font-medium">{product.available_stock}</span>
+                                                    <span class="font-medium">{companyProduct.available_stock}</span>
                                                 </div>
                                                 <div class="flex justify-between">
                                                     <span>Sale Price:</span>
-                                                    <span class="font-medium">DZD {product.sale_price}</span>
+                                                    <span class="font-medium">DZD {companyProduct.sale_price}</span>
                                                 </div>
                                             </div>
 
                                             <!-- Action Buttons -->
                                             <div class="flex items-center justify-between mt-4 pt-3 border-t border-border">
-                                                <button 
-                                                    class="kt-btn kt-btn-sm kt-btn-outline kt-btn-primary"
-                                                    on:click={() => openProductDrawer(product)}
-                                                >
-                                                    <i class="ki-filled ki-eye text-sm"></i>
-                                                    View Details
-                                                </button>
-                                                <button 
-                                                    class="kt-btn kt-btn-sm kt-btn-primary"
-                                                    on:click={() => openPriceModal(product)}
-                                                >
-                                                    <i class="ki-filled ki-dollar text-sm"></i>
+                                                <button class="kt-btn kt-btn-primary w-full mt-4" on:click|stopPropagation={() => openPriceModal(companyProduct)}>
+                                                    <i class="fa-solid fa-coins text-base"></i>
                                                     Set Price
                                                 </button>
                                             </div>
@@ -394,18 +295,6 @@
                                 {/each}
                             </div>
                         </div>
-
-                        <!-- Pagination -->
-                        {#if pagination && pagination.total > 0}
-                            <div class="border-t border-gray-200">
-                                <Pagination 
-                                    {pagination} 
-                                    {perPage}
-                                    onPageChange={goToPage} 
-                                    onPerPageChange={handlePerPageChange}
-                                />
-                            </div>
-                        {/if}
                     {/if}
                 </div>
             </div>
@@ -613,7 +502,7 @@
                             <div class="flex-1">
                                 <h4 class="font-semibold text-mono mb-1">{selectedProductForPrice.product.name}</h4>
                                 <p class="text-sm text-muted-foreground mb-1">{selectedProductForPrice.product.type_name}</p>
-                                <p class="text-xs text-muted-foreground">Current Price: DZD {selectedProductForPrice.sale_price}</p>
+                                <p class="text-xs text-muted-foreground">Current Market Price: DZD {selectedProductForPrice.product.current_market_sale_price}</p>
                             </div>
                         </div>
 
@@ -659,8 +548,12 @@
                                     <h5 class="font-medium text-mono mb-3">Price Change Preview</h5>
                                     <div class="space-y-2">
                                         <div class="flex justify-between">
-                                            <span class="text-sm text-muted-foreground">Current Price:</span>
+                                            <span class="text-sm text-muted-foreground">Current Fixed Price:</span>
                                             <span class="text-sm font-medium">DZD {selectedProductForPrice.sale_price}</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-sm text-muted-foreground">Current Market Price:</span>
+                                            <span class="text-sm font-medium">DZD {selectedProductForPrice.product.current_market_sale_price}</span>
                                         </div>
                                         <div class="flex justify-between">
                                             <span class="text-sm text-muted-foreground">New Price:</span>
@@ -668,8 +561,8 @@
                                         </div>
                                         <div class="flex justify-between">
                                             <span class="text-sm text-muted-foreground">Change:</span>
-                                            <span class="text-sm font-medium {newSalePrice > selectedProductForPrice.sale_price ? 'text-destructive' : 'text-green-600'}">
-                                                {newSalePrice > selectedProductForPrice.sale_price ? '+' : ''}DZD {(newSalePrice - selectedProductForPrice.sale_price).toFixed(3)}
+                                            <span class="text-sm font-medium {newSalePrice > selectedProductForPrice.product.current_market_sale_price ? 'text-destructive' : 'text-green-600'}">
+                                                {newSalePrice > selectedProductForPrice.product.current_market_sale_price ? '+' : ''}DZD {(newSalePrice - selectedProductForPrice.product.current_market_sale_price).toFixed(3)}
                                             </span>
                                         </div>
                                     </div>

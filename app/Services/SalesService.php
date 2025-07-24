@@ -12,7 +12,16 @@ class SalesService
     {
         $productDemand = $product->demands()->where('gameweek', SettingsService::getCurrentGameWeek())->first();
 
-        return ($productDemand) ? $productDemand->market_price : 0;
+        return ($productDemand) ? $productDemand->market_price : 0.000;
+    }
+
+    //Fix the sale price of a product
+    public static function fixProductSalePrice($company, $product, $salePrice){
+        $companyProduct = $company->companyProducts()->where('product_id', $product->id)->first();
+        
+        $companyProduct->update([
+            'sale_price' => $salePrice,
+        ]);
     }
 
     // Create a new sale

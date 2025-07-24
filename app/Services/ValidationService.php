@@ -30,4 +30,16 @@ class ValidationService
 
         return $errors;
     }
+
+    public static function validateProductSalePriceChange($company, $product){
+        $errors = [];
+
+        $companyProduct = $company->companyProducts()->where('product_id', $product->id)->first();
+
+        if(!$companyProduct){
+            $errors['product_id'] = 'This product is not in researched yet by your company';
+        }
+
+        return $errors;
+    }
 }

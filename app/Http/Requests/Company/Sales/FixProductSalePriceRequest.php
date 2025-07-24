@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Requests\Company\Products;
+namespace App\Http\Requests\Company\Sales;
 
+use App\Services\ValidationService;
 use Illuminate\Foundation\Http\FormRequest;
 
 class FixProductSalePriceRequest extends FormRequest
@@ -32,10 +33,12 @@ class FixProductSalePriceRequest extends FormRequest
             $company = $this->company;
             $product = request()->route('product');
 
-            $companyProduct = $company->companyProducts()->where('product_id', $product->id)->first();
+            $errors = ValidationService::validateProductSalePriceChange($company, $product);
 
-            if(!$companyProduct){
-                $validator->errors()->add('product_id', 'This product is not in researched yet by your company');
+            if($errors){
+                foreach($errors as $key => $error){
+                    $validator->errors()->add($key, $error);
+                }
                 return;
             }
         });

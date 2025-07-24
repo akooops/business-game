@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\URL;
 use App\Traits\HasFiles;
+use App\Services\SalesService;
 
 class Product extends Model
 {
@@ -19,7 +20,7 @@ class Product extends Model
         'has_expiration' => 'boolean',
     ];
 
-    protected $appends = ['type_name', 'image_url', 'is_researched'];
+    protected $appends = ['type_name', 'image_url', 'is_researched', 'current_market_sale_price'];
 
     // Product types
     const TYPE_RAW_MATERIAL = 'raw_material';
@@ -100,5 +101,10 @@ class Product extends Model
         ])->exists();
 
         return $companyProduct;
+    }
+
+    public function getCurrentMarketSalePriceAttribute()
+    {
+        return SalesService::getCurrentGameweekProductMarketPrice($this);
     }
 }
