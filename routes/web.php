@@ -59,7 +59,7 @@ Route::middleware(['auth', 'handle.inertia'])->group(function () {
     Route::patch('notifications/{notification}/mark-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
     Route::patch('notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
 
-    Route::get('utilities/current-timestamp', [UtilitiesController::class, 'currentTimeStamp'])->name('utilities.current-timestamp');
+    Route::get('utilities', [UtilitiesController::class, 'index'])->name('utilities.index');
 });
 
 Route::prefix('admin')->middleware(['auth', 'check.admin', 'handle.inertia'])->group(function () {

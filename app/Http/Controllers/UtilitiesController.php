@@ -10,11 +10,12 @@ class UtilitiesController extends Controller
     /**
      * Display a listing of notifications
      */
-    public function currentTimeStamp(Request $request)
+    public function index(Request $request)
     {
         return response()->json([
             'status' => 'success',
-            'timestamp' => SettingsService::getCurrentTimestamp()->format('Y-m-d H:i')
+            'timestamp' => SettingsService::getCurrentTimestamp()->format('Y-m-d H:i'),
+            'currentGameWeek' => SettingsService::getCurrentGameWeek(),
         ]);
     }
 } 

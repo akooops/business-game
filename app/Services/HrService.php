@@ -174,12 +174,12 @@ class HrService
                 }
 
                 // Create resignation notification
-                NotificationService::createEmployeeResignedNotification($employee);
+                NotificationService::createEmployeeResignedNotification($employee->company, $employee);
                 continue; // Skip mood update since employee resigned
             }
 
             if($mood < 0.5){
-                NotificationService::createEmployeeMoodDecreasedNotification($employee);
+                NotificationService::createEmployeeMoodDecreasedNotification($employee->company, $employee);
             }
             
             $employee->update([

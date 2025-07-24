@@ -1,5 +1,6 @@
 <script>
     import { page } from '@inertiajs/svelte'
+    import Timer from './Timer.svelte';
     import Notifications from './Notifications.svelte';
 
     function handleLogout() {
@@ -46,6 +47,10 @@
       <!-- Topbar -->
       <div class="flex items-center gap-2 lg:gap-3.5 lg:w-[400px] justify-end">
           <div class="flex items-center gap-2 me-0.5">
+                <!-- Timer -->
+                <Timer />
+                <!-- End of Timer -->
+
               <!-- Notifications -->
               <Notifications />
               <!-- End of Notifications -->

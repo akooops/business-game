@@ -10,6 +10,11 @@
         {
             title: 'Employees',
             url: route('company.employees.index'),
+            active: false
+        },
+        {
+            title: 'Index',
+            url: route('company.employees.index'),
             active: true
         }
     ];

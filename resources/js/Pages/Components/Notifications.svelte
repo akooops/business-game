@@ -112,14 +112,7 @@
             fetchNotifications();
         }
     }
-
-    // Handle per page change
-    function handlePerPageChange(newPerPage) {
-        perPage = newPerPage;
-        currentPage = 1;
-            fetchNotifications();
-    }
-
+    
     // Mark notification as read
     async function markAsRead(notificationId) {
         try {

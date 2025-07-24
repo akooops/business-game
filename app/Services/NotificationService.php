@@ -134,17 +134,17 @@ class NotificationService
         ]);
     }
 
-    public static function createEmployeeMoodDecreasedNotification($employee){
+    public static function createEmployeeMoodDecreasedNotification($company, $employee){
         return Notification::create([
             'type' => Notification::TYPE_EMPLOYEE_MOOD_DECREASED,
             'title' => 'Employee Mood Decreased',
             'message' => "Employee {$employee->name} mood decreased to {$employee->current_mood}. Consider promoting or firing him.",
             'url' => route('company.employees.index'),
-            'user_id' => $employee->company->user_id,
+            'user_id' => $company->user_id,
         ]);
     }
 
-    public static function createEmployeeResignedNotification($employee){
+    public static function createEmployeeResignedNotification($company, $employee){
         return Notification::create([
             'type' => Notification::TYPE_EMPLOYEE_RESIGNED,
             'title' => 'Employee Resigned',
@@ -158,12 +158,15 @@ class NotificationService
         return Notification::create([
             'type' => Notification::TYPE_EMPLOYEE_SALARY_PAID,
             'title' => 'Employee Salary Paid',
-            'message' => "Employee salary paid for DZD {$totalSalaries}.",
+            'message' => "Monthly employee salaries paid for DZD {$totalSalaries}.",
             'url' => route('company.employees.index'),	
             'user_id' => $company->user_id,
         ]);
     }
 
+    // ------------------------------------------------------------
+    // Machines
+    // ------------------------------------------------------------
     public static function createMachineSetupNotification($company, $machine){
         return Notification::create([
             'type' => Notification::TYPE_MACHINE_SETUP,
