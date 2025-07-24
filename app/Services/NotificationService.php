@@ -46,46 +46,39 @@ class NotificationService
     // ------------------------------------------------------------
     // Purchases
     // ------------------------------------------------------------
-    public static function createPurchaseOrderedNotification($purchase){
+    public static function createPurchaseOrderedNotification($company, $purchase, $supplier, $product, $quantity){
         return Notification::create([
             'type' => Notification::TYPE_PURCHASE_ORDERED,
             'title' => 'Purchase Ordered',
-            'message' => "Purchase ordered for {$purchase->product->name} at " . $purchase->ordered_at->format('Y-m-d H:i:s') . ". Estimated delivery date: " . $purchase->estimated_delivered_at->format('Y-m-d H:i:s') . ".",
+            'message' => "Purchase initiated for {$product->name} at " . $purchase->ordered_at->format('Y-m-d') . " from {$supplier->name} with quantity of {$quantity}.",
             'url' => route('company.purchases.index'),
-            'user_id' => $purchase->company->user_id,
+            'user_id' => $company->user->id,
         ]);
     }
 
-    public static function createPurchaseDeliveredNotification($purchase){
+    public static function createPurchaseDeliveredNotification($company, $purchase, $supplier, $product, $quantity){
         return Notification::create([
             'type' => Notification::TYPE_PURCHASE_DELIVERED,
             'title' => 'Purchase Delivered',
-            'message' => "Purchase delivered for {$purchase->product->name} at " . $purchase->delivered_at->format('Y-m-d H:i:s') . ".",
+            'message' => "Purchase delivered for {$product->name} at " . $purchase->delivered_at->format('Y-m-d') . " from {$supplier->name} with quantity of {$quantity}.",
             'url' => route('company.purchases.index'),
-            'user_id' => $purchase->company->user_id,
+            'user_id' => $company->user->id,
         ]);
     }
 
-    public static function createPurchaseCancelledNotification($purchase, $reason){
+    public static function createPurchaseCancelledNotification($company, $purchase, $supplier, $product, $quantity, $cancelledReason){
         return Notification::create([
             'type' => Notification::TYPE_PURCHASE_CANCELLED,
             'title' => 'Purchase Cancelled',
-            'message' => "Purchase cancelled for {$purchase->product->name} at " . $purchase->cancelled_at->format('Y-m-d H:i:s') . ". Reason: " . $reason . ".",
+            'message' => "Purchase cancelled for {$product->name} at " . $purchase->cancelled_at->format('Y-m-d') . " from {$supplier->name} with quantity of {$quantity}. Reason: " . $cancelledReason . ".",
             'url' => route('company.purchases.index'),
-            'user_id' => $purchase->company->user_id,
+            'user_id' => $company->user->id,
         ]);
     }
 
-    public static function createPurchaseDeliveryDelayedNotification($purchase){
-        return Notification::create([
-            'type' => Notification::TYPE_PURCHASE_DELIVERY_DELAYED,
-            'title' => 'Purchase Delivery Delayed',
-            'message' => "Purchase delivery delayed for {$purchase->product->name} until " . $purchase->real_delivered_at->format('Y-m-d H:i:s') . ".",
-            'url' => route('company.purchases.index'),
-            'user_id' => $purchase->company->user_id,
-        ]);
-    }
-
+    // ------------------------------------------------------------
+    // Events
+    // ------------------------------------------------------------
     public static function createCountriesImportBlockedNotification($countries){
         $companies = Company::get();
 

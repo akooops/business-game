@@ -8,6 +8,9 @@ class FinanceService
         return $company->funds >= $amount;
     }
 
+    //-------------------------------------
+    // Technologies
+    //-------------------------------------
     public static function payTechnologyResearch($company, $technology){
         $funds = $company->funds;
         $funds -= $technology->research_cost;
@@ -18,6 +21,9 @@ class FinanceService
         return $funds;  
     }
 
+    //-------------------------------------
+    // Purchases
+    //-------------------------------------
     public static function payPurchase($company, $purchase){
         $funds = $company->funds;
         $funds -= $purchase->total_cost;

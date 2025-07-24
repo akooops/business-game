@@ -27,7 +27,6 @@ class Notification extends Model
     const TYPE_PURCHASE_ORDERED = 'purchase_ordered';
     const TYPE_PURCHASE_DELIVERED = 'purchase_delivered';
     const TYPE_PURCHASE_CANCELLED = 'purchase_cancelled';
-    const TYPE_PURCHASE_DELIVERY_DELAYED = 'purchase_delivery_delayed';
 
     // Countries import
     const TYPE_COUNTRIES_IMPORT_BLOCKED = 'countries_import_blocked';
@@ -83,10 +82,9 @@ class Notification extends Model
         self::TYPE_FINANCE_FUNDS_CHANGED => 'ki-filled ki-dollar',
         self::TYPE_TECHNOLOGY_RESEARCH_STARTED => 'fa-solid fa-rocket',
         self::TYPE_TECHNOLOGY_RESEARCH_COMPLETED => 'fa-solid fa-microchip',
-        self::TYPE_PURCHASE_ORDERED => 'ki-filled ki-ship',
-        self::TYPE_PURCHASE_DELIVERED => 'ki-filled ki-ship',
-        self::TYPE_PURCHASE_CANCELLED => 'ki-filled ki-ship',
-        self::TYPE_PURCHASE_DELIVERY_DELAYED => 'ki-filled ki-ship',
+        self::TYPE_PURCHASE_ORDERED => 'fa-solid fa-coins',
+        self::TYPE_PURCHASE_DELIVERED => 'fa-solid fa-truck',
+        self::TYPE_PURCHASE_CANCELLED => 'fa-solid fa-circle-xmark',
         self::TYPE_COUNTRIES_IMPORT_BLOCKED => 'ki-filled ki-ship',
         self::TYPE_COUNTRIES_IMPORT_ALLOWED => 'ki-filled ki-ship',
         self::TYPE_COUNTRIES_CUSTOMS_DUTIES_RATE_RAISED => 'ki-filled ki-ship',

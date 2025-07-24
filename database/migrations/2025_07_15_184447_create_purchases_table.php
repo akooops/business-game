@@ -30,12 +30,10 @@ return new class extends Migration
             $table->integer('shipping_time_days')->default(1);
 
             // Status
-            $table->enum('status', ['pending', 'ordered', 'delivered', 'cancelled'])->default('pending');
+            $table->enum('status', ['ordered', 'delivered', 'cancelled'])->default('ordered');
 
             // Timestamps
             $table->timestamp('ordered_at')->nullable();
-            $table->timestamp('estimated_delivered_at')->nullable();
-            $table->timestamp('real_delivered_at')->nullable();
             $table->timestamp('delivered_at')->nullable();
 
             // Foreign keys

@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Services\SettingsService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -20,15 +19,12 @@ class Purchase extends Model
         'total_cost' => 'decimal:3',
         'carbon_footprint' => 'decimal:3',
         'ordered_at' => 'datetime',
-        'estimated_delivered_at' => 'datetime',
-        'real_delivered_at' => 'datetime',
         'delivered_at' => 'datetime',
     ];
 
     protected $appends = ['total_sale_price', 'total_shipping_cost', 'total_customs_duties', 'total_carbon_footprint'];
 
     // Statuses
-    const STATUS_PENDING = 'pending';
     const STATUS_ORDERED = 'ordered';
     const STATUS_DELIVERED = 'delivered';
     const STATUS_CANCELLED = 'cancelled';

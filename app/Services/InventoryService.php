@@ -7,6 +7,9 @@ use App\Models\Product;
 
 class InventoryService
 {
+    //-------------------------------------
+    // Inventory
+    //-------------------------------------
     public static function haveSufficientStock($company, $product, $quantity){
         $companyProduct = $company->companyProducts()->where('product_id', $product->id)->first();
         
@@ -17,6 +20,9 @@ class InventoryService
         return $companyProduct->available_stock >= $quantity;
     }
 
+    //-------------------------------------
+    // Purchases
+    //-------------------------------------
     public static function purchaseDelivered($purchase){
         $company = $purchase->company;
         $product = $purchase->product;
@@ -37,6 +43,9 @@ class InventoryService
         ]);
     }
 
+    //-------------------------------------
+    // Expiration
+    //-------------------------------------
     public static function expireInventory($company){
         $products = Product::where('has_expiration', true)->get();
 
@@ -90,6 +99,9 @@ class InventoryService
         }
     }
 
+    //-------------------------------------
+    // Inventory costs
+    //-------------------------------------
     public static function payInventoryCosts($company){
         $products = Product::where('storage_cost', '>', 0)->get();
 
@@ -110,6 +122,9 @@ class InventoryService
         }
     }
 
+    //-------------------------------------
+    // Sales
+    //-------------------------------------
     public static function saleConfirmed($sale){
         $company = $sale->company;
         $product = $sale->product;
@@ -156,6 +171,9 @@ class InventoryService
         ]);
     }
 
+    //-------------------------------------
+    // Production
+    //-------------------------------------
     public static function productionStarted($productionOrder){
         $company = $productionOrder->companyMachine->company;
         $product = $productionOrder->product;
@@ -194,6 +212,9 @@ class InventoryService
         ]);
     }
 
+    //-------------------------------------
+    // Production
+    //-------------------------------------
     public static function productionCompleted($productionOrder, $outputQuantity){
         $company = $productionOrder->companyMachine->company;
         $product = $productionOrder->product;
