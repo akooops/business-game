@@ -233,4 +233,20 @@ class HrService
             ]);
         }
     }
+
+    public static function processAppliedEmployees($company){
+        // Process applied employees
+        $appliedEmployees = $company->employees()->where('status', Employee::STATUS_APPLIED)->get();
+
+        foreach($appliedEmployees as $employee){
+            $currentTimestamp = SettingsService::getCurrentTimestamp();
+            $appliedAt = $employee->applied_at;
+            $timeLimitDays = $employee->timelimit_days;
+            
+            // Check if employee has exceeded its time limit
+            if($appliedAt->addDays($timeLimitDays) <= $currentTimestamp){
+                $employee->delete();
+            }
+        }
+    }
 }

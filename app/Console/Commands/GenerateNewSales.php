@@ -2,15 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\CompanyTechnology;
-use App\Models\Technology;
 use App\Models\Company;
-use App\Models\Purchase;
 use Illuminate\Console\Command;
-use App\Services\SettingsService;
-use App\Services\TechnolgiesResearchService;
-use App\Services\ProcurementService;
-use App\Services\NotificationService;
 use App\Services\SalesService;
 
 class GenerateNewSales extends Command
