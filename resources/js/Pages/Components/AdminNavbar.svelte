@@ -1,35 +1,5 @@
 <script>
     import { page } from '@inertiajs/svelte'
-    
-    // State to track which primary menu is active
-    let activeSection = 'dashboard'; // default to dashboard
-    
-    // Function to determine active section based on current route
-    function getActiveSectionFromRoute(url) {
-        if (url.includes('/admin/users') || url.includes('/admin/roles') || url.includes('/admin/permissions') || url.includes('/admin/companies')) {
-            return 'users';
-        }
-
-        if (url.includes('/admin/technologies')) {
-            return 'technologies';
-        }
-
-        if (url.includes('/admin/products') || url.includes('/admin/product-recipes') || url.includes('/admin/product-demand') || url.includes('/admin/machines')) {
-            return 'production';
-        }
-
-        if (url.includes('/admin/employee-profiles')) {
-            return 'hr';
-        }
-
-        if (url.includes('/admin/countries') || url.includes('/admin/wilayas') || url.includes('/admin/suppliers')) {
-            return 'logistics';
-        }
-
-        if (url.includes('/admin/settings')) {
-            return 'settings';
-        }
-    }
 </script>
 
 <!-- Navbar -->

@@ -55,7 +55,6 @@ class Notification extends Model
     const TYPE_SALE_INITIATED = 'sale_initiated';
     const TYPE_SALE_DELIVERED = 'sale_delivered';
     const TYPE_SALE_CANCELLED = 'sale_cancelled';
-    const TYPE_SALE_DELIVERY_DELAYED = 'sale_delivery_delayed';
 
     // Employees
     const TYPE_EMPLOYEE_HIRED = 'employee_hired';
@@ -93,10 +92,9 @@ class Notification extends Model
         self::TYPE_INVENTORY_EXPIRED => 'fa-solid fa-clock',
         self::TYPE_INVENTORY_DAMAGED => 'fa-solid circle-exclamation',
         self::TYPE_INVENTORY_COSTS_PAID => 'fa-solid fa-coins',
-        self::TYPE_SALE_INITIATED => 'ki-filled ki-ship',
-        self::TYPE_SALE_DELIVERED => 'ki-filled ki-ship',
-        self::TYPE_SALE_CANCELLED => 'ki-filled ki-ship',
-        self::TYPE_SALE_DELIVERY_DELAYED => 'ki-filled ki-ship',
+        self::TYPE_SALE_INITIATED => 'fa-solid fa-cart-shopping',
+        self::TYPE_SALE_DELIVERED => 'fa-solid fa-truck',
+        self::TYPE_SALE_CANCELLED => 'fa-solid fa-circle-xmark',
         self::TYPE_EMPLOYEE_HIRED => 'ki-filled ki-users',
         self::TYPE_EMPLOYEE_MOOD_DECREASED => 'ki-filled ki-users',
         self::TYPE_EMPLOYEE_RESIGNED => 'ki-filled ki-users',

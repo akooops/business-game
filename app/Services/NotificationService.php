@@ -101,36 +101,29 @@ class NotificationService
         ]);
     }
 
-    public static function createSaleDeliveredNotification($sale){
+    public static function createSaleDeliveredNotification($company, $sale, $product, $quantity){
         return Notification::create([
             'type' => Notification::TYPE_SALE_DELIVERED,
             'title' => 'Sale Delivered',
-            'message' => "Sale delivered for {$sale->product->name} with quantity of {$sale->quantity}.",
+            'message' => "Sale delivered for {$product->name} with quantity of {$quantity}.",
             'url' => route('company.sales.index'),
-            'user_id' => $sale->company->user_id,
+            'user_id' => $company->user_id,
         ]);
     }
 
-    public static function createSaleCancelledNotification($sale){
+    public static function createSaleCancelledNotification($company, $sale, $product, $quantity){
         return Notification::create([
             'type' => Notification::TYPE_SALE_CANCELLED,
             'title' => 'Sale Cancelled',
-            'message' => "Sale cancelled for {$sale->product->name} with quantity of {$sale->quantity}.",
+            'message' => "Sale cancelled for {$product->name} with quantity of {$quantity} because it exceeded the time limit.",
             'url' => route('company.sales.index'),
-            'user_id' => $sale->company->user_id,
+            'user_id' => $company->user_id,
         ]);
     }
 
-    public static function createSaleDeliveryDelayedNotification($sale){
-        return Notification::create([
-            'type' => Notification::TYPE_SALE_DELIVERY_DELAYED,
-            'title' => 'Sale Delivery Delayed',
-            'message' => "Sale delivery delayed for {$sale->product->name} until " . $sale->real_delivered_at->format('Y-m-d H:i:s') . ".",
-            'url' => route('company.sales.index'),
-            'user_id' => $sale->company->user_id,
-        ]);
-    }
-
+    // ------------------------------------------------------------
+    // Employees
+    // ------------------------------------------------------------
     public static function createEmployeeHiredNotification($employee){
         return Notification::create([
             'type' => Notification::TYPE_EMPLOYEE_HIRED,

@@ -4,6 +4,7 @@ namespace App\Http\Requests\Company\Sales;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Services\SalesService;
+use App\Services\ValidationService;
 
 class ConfirmSaleRequest extends FormRequest
 {
@@ -33,12 +34,7 @@ class ConfirmSaleRequest extends FormRequest
             $company = $this->company;
             $sale = request()->route('sale');
 
-            if (!$sale) {
-                $validator->errors()->add('sale', 'The selected sale does not exist.');
-                return;
-            }
-
-            $errors = SalesService::validateSaleConfirmation($sale);
+            $errors = ValidationService::validateSaleConfirmation($company, $sale);
 
             if($errors) {
                 foreach($errors as $key => $error) {

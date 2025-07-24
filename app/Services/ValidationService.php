@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Sale;
 use App\Models\SupplierProduct;
 
 class ValidationService
@@ -89,6 +90,39 @@ class ValidationService
             $errors['supplier_product'] = 'This supplier does not sell this product.';
         }
         
+        return $errors;
+    }
+
+    //-------------------------------------
+    // Sales
+    //-------------------------------------
+    public static function validateSaleConfirmation($company, $sale){
+        $errors = [];
+
+        // Check if the sale is available for confirmation
+        if($sale->status != Sale::STATUS_INITIATED){
+            $errors['status'] = 'This sale is not available for confirmation.';
+        }
+
+        // Check if the company has enough stock of the product
+        $hasSufficientStock = InventoryService::haveSufficientStock($company, $sale->product, $sale->quantity);
+        if(!$hasSufficientStock){
+            $errors['stock'] = 'This company does not have enough stock of this product.';
+        }
+
+        // Check if the company has enough funds to confirm the sale
+        $hasSufficientFunds = FinanceService::haveSufficientFunds($company, $sale->total_cost);
+        if(!$hasSufficientFunds){
+            $errors['funds'] = 'This company does not have enough funds to confirm this sale shipping cost.';
+        }
+
+        // Check if the company sells the product
+        $companyProduct = $sale->company->companyProducts()->where('product_id', $sale->product->id)->first();
+
+        if(!$companyProduct) {
+            $errors['company_product'] = 'This company does not sell this product.';
+        }
+
         return $errors;
     }
 }

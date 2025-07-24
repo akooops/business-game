@@ -30,7 +30,8 @@
 
     // Fetch purchases data
     async function fetchPurchases() {
-        loading = true;
+        if(purchases.length == 0) loading = true;
+
         try {
             const response = await fetch(route('company.purchases.index'), {
                 headers: {

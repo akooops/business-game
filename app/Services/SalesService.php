@@ -32,43 +32,36 @@ class SalesService
         ]);
     }
 
-    // Create a new sale
+    // Generate demand for a company
     public static function generateDemand($company)
     {
+        // Get all company products
         $companyProducts = $company->companyProducts()->get();
 
         foreach($companyProducts as $companyProduct){
+            // Get the product demand for the current gameweek
             $product = $companyProduct->product;
             $productDemand = $product->demands()->where('gameweek', SettingsService::getCurrentGameWeek())->first();
-
             if(!$productDemand){
                 continue;
             }
 
+            // Calculate the price difference between the market price and the company product sale price
             $priceDifference = $productDemand->market_price - $companyProduct->sale_price;
 
             // Later we should add marketing efforts to the demand formula
+            // Calculate the demand for the week based on the price difference and the elasticity coefficient
             $demandForWeek = $productDemand->real_demand - $product->elasticity_coefficient * $productDemand->real_demand * ($priceDifference / $productDemand->market_price);
 
             if($demandForWeek > $productDemand->max_demand){
                 $demandForWeek = $productDemand->max_demand;
             }
 
-            if($demandForWeek <= 0){
+            if($demandForWeek < 0){
                 $demandForWeek = 0;
             }
 
-            $weekSalesQuantity = $company->sales()->where('product_id', $product->id)->where('gameweek', SettingsService::getCurrentGameWeek())->sum('quantity');
-
-            $demandForWeek = $demandForWeek - $weekSalesQuantity;
-
-            // Calculate base daily demand
-            $baseDailyDemand = $demandForWeek / 7;
-            
-            $dailyDemand = CalculationsService::calculatePertValue($baseDailyDemand * 0.9, $baseDailyDemand, $baseDailyDemand * 1.1);
-
-            // Generate the number of sales
-            $numberOfSales = rand(0, 3);
+            $numberOfSales = rand(1, 4);
             
             // Generate individual sale quantities with fluctuations
             $saleQuantities = [];
@@ -84,38 +77,41 @@ class SalesService
             
             // Normalize the weights to ensure they sum to the daily demand
             for($i = 0; $i < $numberOfSales; $i++){
-                $saleQuantities[$i] = ($saleQuantities[$i] / $totalAllocated) * $dailyDemand;
+                $saleQuantities[$i] = ($saleQuantities[$i] / $totalAllocated) * $demandForWeek;
             }
-            
+
             // Create the sales
             for($i = 0; $i < $numberOfSales; $i++){
+                // Calculate the demand for each sale
                 $saleDemand = round($saleQuantities[$i]);
 
+                // Get a random wilaya
                 $randomWilaya = Wilaya::inRandomOrder()->first();
 
+                // Get the wilaya shipping cost
                 $wilayaShippingCost = $randomWilaya->real_shipping_cost;
 
+                // Get the current gameweek and the timelimit days
                 // Get current timestamp
                 $gameWeek = SettingsService::getCurrentGameWeek();
-                $timelimit_days = CalculationsService::calculatePertValue(2, 5, 12);
+                $timelimit_days = CalculationsService::calcaulteRandomBetweenMinMax(2, 10);
 
-                $company->sales()->create([
-                    'company_id' => $company->id,
-                    'product_id' => $product->id,
-                    'wilaya_id' => $randomWilaya->id,
-
-                    'quantity' => $saleDemand,
-                    'sale_price' => $companyProduct->sale_price,
-
-                    'shipping_cost' => $wilayaShippingCost,
-                    'shipping_time_days' => $randomWilaya->avg_shipping_time_days,
-
-                    'status' => Sale::STATUS_INITIATED,
-
+                // Create the sale
+                $sale = Sale::create([
                     'gameweek' => $gameWeek,
                     'timelimit_days' => $timelimit_days,
 
+                    'quantity' => $saleDemand,
+                    'sale_price' => $companyProduct->sale_price,
+                    'shipping_cost' => $wilayaShippingCost,
+                    'shipping_time_days' => $randomWilaya->real_shipping_time_days,
+
+                    'status' => Sale::STATUS_INITIATED,
                     'initiated_at' => SettingsService::getCurrentTimestamp(),
+
+                    'company_id' => $company->id,
+                    'product_id' => $product->id,
+                    'wilaya_id' => $randomWilaya->id,
                 ]);
             }
 
@@ -125,60 +121,62 @@ class SalesService
         }
     }
 
+    // Confirm a sale
     public static function confirmSale($sale){
         // Get current timestamp
         $confirmedAt = SettingsService::getCurrentTimestamp();
-        $estimatedArrivalAt = $confirmedAt->copy()->addDays($sale->shipping_time_days);
-
-        // Calculate real delivery date
-        $wilayaShippingTimeDays = CalculationsService::calculatePertValue($sale->wilaya->min_shipping_time_days, $sale->wilaya->avg_shipping_time_days, $sale->wilaya->max_shipping_time_days);
-        $realDeliveredAt = $confirmedAt->copy()->addDays($wilayaShippingTimeDays);
 
         $sale->update([
-            'status' => 'confirmed',
+            'status' => Sale::STATUS_CONFIRMED,
             'confirmed_at' => $confirmedAt,
-            'estimated_delivered_at' => $estimatedArrivalAt,
-            'real_delivered_at' => $realDeliveredAt,
         ]);
 
+        // Pay the sale shipping cost
         FinanceService::paySaleShippingCost($sale->company, $sale);
+
+        // Update the inventory
         InventoryService::saleConfirmed($sale);
     }
 
-    public static function deliveredSale($sale){
-        $sale->update([
-            'status' => 'delivered',
-            'delivered_at' => SettingsService::getCurrentTimestamp(),
-        ]);
+    // Deliver a sale
+    public static function processDeliveredSale($company){
+        $sales = $company->sales()->where('status', Sale::STATUS_CONFIRMED)->get();
 
-        FinanceService::receiveSalePayment($sale->company, $sale);
-        NotificationService::createSaleDeliveredNotification($sale);
+        foreach($sales as $sale){
+            $currentTimestamp = SettingsService::getCurrentTimestamp();
+            $deliveredAt = $sale->confirmed_at->copy()->addDays($sale->shipping_time_days);
+
+            if($deliveredAt <= $currentTimestamp){
+                $sale->update([
+                    'status' => Sale::STATUS_DELIVERED,
+                    'delivered_at' => $currentTimestamp,
+                ]);
+
+                // Receive the sale payment
+                FinanceService::receiveSalePayment($sale->company, $sale);
+
+                // Create notification
+                NotificationService::createSaleDeliveredNotification($company, $sale, $sale->product, $sale->quantity);
+            }
+        }
     }
 
-    public static function validateSaleConfirmation($sale){
-        $errors = [];
-
-        $shippingCost = $sale->shipping_cost;
-        $totalCost = $shippingCost;
-
-        if(!InventoryService::haveSufficientStock($sale->company, $sale->product, $sale->quantity)){
-            $errors['stock'] = 'This company does not have enough stock of this product.';
-        }
-
-        if(!FinanceService::haveSufficientFunds($sale->company, $totalCost)){
-            $errors['funds'] = 'This company does not have enough funds to confirm this sale shipping cost.';
-        }
-
-        if($sale->status != Sale::STATUS_INITIATED){
-            $errors['status'] = 'This sale is not available for confirmation.';
-        }
-
-        $companyProduct = $sale->company->companyProducts()->where('product_id', $sale->product->id)->first();
-
-        if(!$companyProduct) {
-            $errors['company_product'] = 'This company does not sell this product.';
-        }
+    // Cancel sales that have exceeded their time limit
+    public static function cancelSales($company){
+        $sales = $company->sales()->where('status', Sale::STATUS_INITIATED)->get();
         
-        return $errors;
+        foreach($sales as $sale){
+            $currentTimestamp = SettingsService::getCurrentTimestamp();
+            $saleInitiatedAt = $sale->initiated_at;
+            $timeLimitDays = $sale->timelimit_days;
+
+            if($saleInitiatedAt->addDays($timeLimitDays) <= $currentTimestamp){
+                $sale->update([
+                    'status' => Sale::STATUS_CANCELLED,
+                ]);
+
+                NotificationService::createSaleCancelledNotification($company, $sale, $sale->product, $sale->quantity);
+            }
+        }
     }
 }

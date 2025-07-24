@@ -14,6 +14,10 @@ return new class extends Migration
         Schema::create('sales', function (Blueprint $table) {
             $table->id();
 
+            // Timelimit 
+            $table->integer('gameweek')->default(1);
+            $table->integer('timelimit_days')->default(1);
+
             // Quantity
             $table->decimal('quantity', 15, 3)->default(0);
 
@@ -27,16 +31,9 @@ return new class extends Migration
             // Status
             $table->enum('status', ['initiated', 'confirmed', 'delivered', 'cancelled'])->default('initiated');
 
-            // Timelimit 
-            $table->integer('gameweek')->default(1);
-            $table->integer('timelimit_days')->default(1);
-
-            $table->timestamp('initiated_at')->nullable();
-
             // Timestamps
+            $table->timestamp('initiated_at')->nullable();
             $table->timestamp('confirmed_at')->nullable();
-            $table->timestamp('estimated_delivered_at')->nullable();
-            $table->timestamp('real_delivered_at')->nullable();
             $table->timestamp('delivered_at')->nullable();
 
             // Foreign keys
