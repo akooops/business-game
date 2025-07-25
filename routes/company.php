@@ -68,7 +68,9 @@ Route::prefix('company')->middleware(['auth', 'check.company', 'handle.inertia']
     Route::post('/products/{product}/fix-sale-price', [ProductsController::class, 'fixProductSalePrice'])->name('company.products.fix-sale-price');
 
     // Production Orders
+    Route::get('/production-orders', [ProductionOrdersController::class, 'index'])->name('company.production-orders.index');
     Route::post('/production-orders/{companyMachine}/produce', [ProductionOrdersController::class, 'produce'])->name('company.production-orders.store');
+    Route::post('/production-orders/{productionOrder}/cancel', [ProductionOrdersController::class, 'cancel'])->name('company.production-orders.cancel');
 
     // Purchases
     Route::get('/purchases', [PurchasesController::class, 'index'])->name('company.purchases.index');

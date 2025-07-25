@@ -61,6 +61,14 @@
                             <span class="kt-menu-title grow-0">Machines</span>
                         </a>
                     </div>
+                    <div class="kt-menu-item">
+                        <a class="kt-menu-link" href={route('company.production-orders.index')} tabindex="0">
+                            <span class="kt-menu-icon">
+                                <i class="fa-solid fa-list-check text-sm"></i>
+                            </span>
+                            <span class="kt-menu-title grow-0">Production Orders</span>
+                        </a>
+                    </div>
                 </div>
             </div>
             

@@ -126,6 +126,17 @@ class ProductionService
         }
     }
 
+    public static function cancelProductionOrder($productionOrder){
+        $productionOrder->update([
+            'status' => ProductionOrder::STATUS_CANCELLED,
+        ]);
+
+        $companyMachine = $productionOrder->companyMachine;
+        $companyMachine->update([
+            'status' => CompanyMachine::STATUS_INACTIVE,
+        ]);
+    }
+
     public static function payMachineOperationCost($company){
         $machines = $company->machines;
         $totalCost = 0;

@@ -292,7 +292,7 @@
                             <div class="flex flex-col gap-1 flex-1">
                                 <div class="text-sm font-medium mb-px">
                                     <button 
-                                        class="hover:text-primary text-mono font-semibold text-left {notification.read_at ? 'text-muted-foreground' : ''}"
+                                        class="hover:text-primary text-mono font-semibold text-left"
                                         style="cursor: pointer;"
                                         on:click={() => handleNotificationClick(notification)}
                                     >

@@ -47,7 +47,7 @@ class ProductionOrder extends Model
     // Accessors
     public function getIsProducingAttribute()
     {
-        return $this->started_at && !$this->completed_at;
+        return $this->started_at && !$this->completed_at && $this->status == self::STATUS_IN_PROGRESS;
     }
 
     public function getProducingProgressAttribute()

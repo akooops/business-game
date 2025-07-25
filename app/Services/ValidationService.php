@@ -6,6 +6,7 @@ use App\Models\Employee;
 use App\Models\CompanyMachine;
 use App\Models\Sale;
 use App\Models\SupplierProduct;
+use App\Models\ProductionOrder;
 
 class ValidationService
 {
@@ -286,4 +287,14 @@ class ValidationService
 
         return $errors;
     }   
+
+    public static function validateCancelProductionOrder($company, $productionOrder){
+        $errors = [];
+
+        if($productionOrder->status != ProductionOrder::STATUS_IN_PROGRESS){
+            $errors['status'] = 'This production order is not in progress.';
+        }
+
+        return $errors;
+    }
 }
