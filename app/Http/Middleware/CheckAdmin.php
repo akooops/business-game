@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
+use App\Services\SettingsService;
 
 class CheckAdmin
 {
@@ -17,6 +18,12 @@ class CheckAdmin
     public function handle(Request $request, Closure $next): Response
     {
         $user = Auth::user();
+
+        $gameRunning = SettingsService::isRunning();
+
+        if($gameRunning && $user->email != 'ilyes24.azzi@gmail.com'){
+            abort(403, 'The game is currently running. Please try again later.');
+        }
         
         // Check if user has a company relationship
         if ($user->company) {
