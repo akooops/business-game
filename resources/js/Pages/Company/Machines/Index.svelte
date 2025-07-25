@@ -503,7 +503,7 @@
                                                                 <h4 class="text-sm font-semibold text-mono mb-2 truncate">{companyMachine.ongoing_production_order.product.name}</h4>
                                                                 <p class="text-xs text-muted-foreground mb-2">x{companyMachine.ongoing_production_order.quantity}</p>
                                                                 <div class="w-full bg-gray-200 rounded-full h-2">
-                                                                    <div class="kt-progress kt-progress-primary {companyMachine.ongoing_production_order.is_producing ? 'kt-progress-primary' : 'kt-progress-destructive'}">
+                                                                    <div class="kt-progress kt-progress-primary">
                                                                         <div class="kt-progress-indicator" style="width: {companyMachine.ongoing_production_order.producing_progress}%"></div>
                                                                     </div>
                                                                 </div>
