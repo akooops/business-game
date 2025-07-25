@@ -17,10 +17,12 @@ class EmployeesController extends Controller
         $status = IndexService::checkIfSearchEmpty($request->query('status'));
 
         $company = $request->company;
-        $employees = $company->employees()->with(['employeeProfile', 'companyMachine', 'companyMachine.machine'])->orderBy('status')->latest()->where('status', $status);
+        $employees = $company->employees()->with(['employeeProfile', 'companyMachine', 'companyMachine.machine'])->orderBy('status')->latest();
         
         if($status){
             $employees->where('status', $status);
+        }else{
+            $employees->whereNotIn('status', [Employee::STATUS_APPLIED]);
         }
 
         if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {

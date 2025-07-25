@@ -412,7 +412,7 @@
 
                                             <!-- Mood Progress Bar -->
                                             <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
-                                                <div class="kt-progress kt-progress-primary {employee.current_mood > 0.7 ? 'kt-progress-success' : employee.current_mood > 0.4 ? 'kt-progress-warning' : 'kt-progress-destructive'}">
+                                                <div class="kt-progress kt-progress-primary {employee.current_mood > 0.7 ? 'kt-progress-primary' : employee.current_mood > 0.4 ? 'kt-progress-warning' : 'kt-progress-destructive'}">
                                                     <div class="kt-progress-indicator" style="width: {(employee.current_mood * 100)}%"></div>
                                                 </div>
                                             </div>
@@ -547,7 +547,7 @@
                             <span class="text-xs font-medium">{(selectedEmployee.current_mood * 100).toFixed(0)}%</span>
 
                             <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
-                                <div class="kt-progress kt-progress-primary {selectedEmployee.current_mood > 0.7 ? 'kt-progress-success' : selectedEmployee.current_mood > 0.4 ? 'kt-progress-warning' : 'kt-progress-destructive'}">
+                                <div class="kt-progress kt-progress-primary {selectedEmployee.current_mood > 0.7 ? 'kt-progress-primary' : selectedEmployee.current_mood > 0.4 ? 'kt-progress-warning' : 'kt-progress-destructive'}">
                                     <div class="kt-progress-indicator" style="width: {(selectedEmployee.current_mood * 100)}%"></div>
                                 </div>
                             </div>

@@ -69,7 +69,8 @@ class Notification extends Model
     const TYPE_MACHINE_PRODUCTION_COMPLETED = 'machine_production_completed';
     const TYPE_MACHINE_BROKEN = 'machine_broken';
     const TYPE_MACHINE_RELIABILITY_DECREASED = 'machine_reliability_decreased';
-
+    const TYPE_MACHINE_OPERATION_COSTS_PAID = 'machine_operation_costs_paid';
+    
     // Maintenance
     const TYPE_MACHINE_MAINTENANCE_STARTED = 'machine_maintenance_started';
     const TYPE_MACHINE_MAINTENANCE_COMPLETED = 'machine_maintenance_completed';
@@ -106,6 +107,7 @@ class Notification extends Model
         self::TYPE_MACHINE_BROKEN => 'fa-solid fa-screwdriver-wrench',
         self::TYPE_MACHINE_RELIABILITY_DECREASED => 'fa-solid fa-screwdriver-wrench',
         self::TYPE_MACHINE_MAINTENANCE_STARTED => 'fa-solid fa-hammer',
+        self::TYPE_MACHINE_OPERATION_COSTS_PAID => 'fa-solid fa-coins',
         self::TYPE_MACHINE_MAINTENANCE_COMPLETED => 'fa-solid fa-hammer',
     ];
 

@@ -4,7 +4,7 @@ namespace App\Http\Requests\Company\Machines;
 
 use App\Models\Employee;
 use Illuminate\Foundation\Http\FormRequest;
-use App\Services\ProductionService;
+use App\Services\ValidationService;
 
 class AssignEmployeeRequest extends FormRequest
 {
@@ -34,15 +34,9 @@ class AssignEmployeeRequest extends FormRequest
             $company = $this->company;
             $companyMachine = $this->route('companyMachine');
 
-            $employee = $this->input('employee_id');
-            $employee = Employee::find($employee);
+            $employee = Employee::find($this->input('employee_id'));
 
-            if(!$employee){
-                $validator->errors()->add('employee', 'Employee not found.');
-                return;
-            }
-
-            $errors = ProductionService::validateAssignEmployee($companyMachine, $employee);
+            $errors = ValidationService::validateAssignEmployee($companyMachine, $employee);
 
             if($errors) {
                 foreach($errors as $key => $error) {

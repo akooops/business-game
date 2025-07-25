@@ -191,5 +191,56 @@ class ValidationService
         }
 
         return $errors;
-    }   
+    }  
+    
+    public static function validateAssignEmployee($companyMachine, $employee){
+        $errors = [];
+
+        $machine = $companyMachine->machine;
+
+        if(!$employee){
+            $errors['employee'] = 'Employee not found.';
+        }
+
+        if($machine->employee){
+            $errors['employee'] = 'This machine already has an employee.';
+        }
+
+        if($employee->companyMachine){
+            $errors['employee'] = 'This employee is already assigned to another machine. Consider unassigning this employee first.';
+        }
+
+        if($employee->status != Employee::STATUS_ACTIVE){
+            $errors['employee'] = 'This employee is not active.';
+        }
+
+        if($machine->employeeProfile->id != $employee->employeeProfile->id){
+            $errors['employee'] = 'This machine does not need this employee profile.';
+        }
+
+        return $errors;
+    }
+
+    //-------------------------------------
+    // Maintenance
+    //-------------------------------------
+    public static function validateMaintenance($companyMachine){
+        $errors = [];
+
+        if($companyMachine->status == CompanyMachine::STATUS_ACTIVE){
+            $errors['machine'] = 'This machine is active, it cannot be maintained.';
+        }
+
+        if($companyMachine->status == CompanyMachine::STATUS_MAINTENANCE){
+            $errors['machine'] = 'This machine is already being maintained.';
+        }
+
+        // Check if company has sufficient funds
+        $hasSufficientFunds = FinanceService::haveSufficientFunds($companyMachine->company, $companyMachine->mmaintenance_cost);
+        if (!$hasSufficientFunds) {
+            $errors['funds'] = 'You do not have enough funds to maintain this machine.';
+        }
+        
+        return $errors;
+    }
 }

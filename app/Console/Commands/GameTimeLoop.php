@@ -57,9 +57,6 @@ class GameTimeLoop extends Command
         // Process employees mood
         $this->call('game:process-employees-mood');
 
-        // Pay machines operation costs
-        $this->call('game:pay-machines-operation-costs');
-
         // Process production orders
         $this->call('game:production-orders-processing');
 
@@ -82,6 +79,9 @@ class GameTimeLoop extends Command
 
             // Pay inventory costs
             $this->call('game:pay-inventory-costs');
+
+            // Pay machines operation costs
+            $this->call('game:pay-machines-operation-costs');
 
             // Generate new sales
             $this->call('game:generate-new-sales'); 

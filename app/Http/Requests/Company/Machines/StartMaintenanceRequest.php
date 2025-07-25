@@ -4,8 +4,7 @@ namespace App\Http\Requests\Company\Machines;
 
 use App\Models\Employee;
 use Illuminate\Foundation\Http\FormRequest;
-use App\Services\ProductionService;
-use App\Services\MaintenanceService;
+use App\Services\ValidationService;
 
 class StartMaintenanceRequest extends FormRequest
 {
@@ -34,7 +33,7 @@ class StartMaintenanceRequest extends FormRequest
             $company = $this->company;
             $companyMachine = $this->route('companyMachine');
 
-            $errors = MaintenanceService::validateMaintenance($companyMachine);
+            $errors = ValidationService::validateMaintenance($companyMachine);
 
             if($errors) {
                 foreach($errors as $key => $error) {

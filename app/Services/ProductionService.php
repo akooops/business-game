@@ -17,6 +17,7 @@ class ProductionService
 
         $companyMachine = CompanyMachine::create([
             'speed' => $speed,
+            'quality_factor' => $machine->quality_factor,
             'carbon_footprint' => $machine->carbon_footprint,
             'operations_cost' => $machine->operations_cost,
             'reliability_decay_days' => $machine->reliability_decay_days,
@@ -31,30 +32,6 @@ class ProductionService
 
         FinanceService::payMachineSetupCost($company, $machine);
         NotificationService::createMachineSetupNotification($company, $machine);
-    }
-
-    public static function validateAssignEmployee($companyMachine, $employee){
-        $errors = [];
-
-        $machine = $companyMachine->machine;
-
-        if($machine->employee){
-            $errors['employee'] = 'This machine already has an employee.';
-        }
-
-        if($employee->companyMachine){
-            $errors['employee'] = 'This employee is already assigned to another machine. Consider unassigning this employee first.';
-        }
-
-        if($employee->status != Employee::STATUS_ACTIVE){
-            $errors['employee'] = 'This employee is not active.';
-        }
-
-        if($machine->employeeProfile->id != $employee->employeeProfile->id){
-            $errors['employee'] = 'This machine does not need this employee profile.';
-        }
-
-        return $errors;
     }
 
     public static function assignEmployee($companyMachine, $employee){
@@ -179,9 +156,13 @@ class ProductionService
 
     public static function payMachineOperationCost($company){
         $machines = $company->machines;
+        $totalCost = 0;
 
         foreach($machines as $machine){
-            FinanceService::payMachineOperationCost($company, $machine);
+            $totalCost += $machine->operations_cost;
         }
+
+        FinanceService::payMachineOperationCost($company, $totalCost);
+        NotificationService::createMachineOperationCostsPaidNotification($company, $totalCost);
     }
 }

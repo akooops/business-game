@@ -207,11 +207,25 @@ class NotificationService
         ]);
     }
 
+    public static function createMachineOperationCostsPaidNotification($company, $totalCost){
+
+        return Notification::create([
+            'type' => Notification::TYPE_MACHINE_OPERATION_COSTS_PAID,
+            'title' => 'Machine Operation Costs Paid',
+            'message' => "Machine operation costs paid for DZD {$totalCost}.",
+            'url' => route('company.machines.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
+    // ------------------------------------------------------------
+    // Maintenance
+    // ------------------------------------------------------------
     public static function createMachineBrokenNotification($company, $companyMachine){
         return Notification::create([
             'type' => Notification::TYPE_MACHINE_BROKEN,
             'title' => 'Machine Broken',
-            'message' => "Machine {$companyMachine->machine->name} broken.",
+            'message' => "Machine {$companyMachine->machine->name} broken. Any production orders for this machine will be cancelled and materials will be lost.",
             'url' => route('company.machines.index'),
             'user_id' => $company->user_id,
         ]);
