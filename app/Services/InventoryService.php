@@ -176,13 +176,12 @@ class InventoryService
     //-------------------------------------
     // Production
     //-------------------------------------
-    public static function productionStarted($productionOrder){
+    public static function productionStarted($productionOrder, $material, $requiredQuantity){
         $company = $productionOrder->companyMachine->company;
-        $product = $productionOrder->product;
-        $quantity = $productionOrder->quantity;
+        $quantity = $requiredQuantity;
 
         $companyInventory = $company->inventoryMovements()->where([
-            'product_id' => $product->id,
+            'product_id' => $material->id,
             'movement_type' => InventoryMovement::MOVEMENT_TYPE_IN,
         ])->get();
 
@@ -199,12 +198,13 @@ class InventoryService
             $remainingQuantity -= $quantityToSubtract;
         }
 
-        $companyProduct = $company->companyProducts()->where('product_id', $product->id)->first();
+        $companyProduct = $company->companyProducts()->where('product_id', $material->id)->first();
+
         $companyProduct->update(['available_stock' => $companyProduct->available_stock - $quantity]);
 
         $inventoryMovement = InventoryMovement::create([
             'company_id' => $company->id,
-            'product_id' => $product->id,
+            'product_id' => $material->id,
             'movement_type' => InventoryMovement::MOVEMENT_TYPE_OUT,
             'original_quantity' => $quantity,
             'current_quantity' => $quantity,

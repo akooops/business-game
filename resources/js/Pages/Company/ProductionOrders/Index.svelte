@@ -340,7 +340,7 @@
                                             </div>
 
                                             <!-- Production Progress -->
-                                            {#if productionOrder.is_producing}
+                                            {#if productionOrder.is_producing && productionOrder.status != 'cancelled'}
                                                 <div class="kt-card bg-accent/50">
                                                     <div class="kt-card-header px-5">
                                                         <h3 class="kt-card-title">

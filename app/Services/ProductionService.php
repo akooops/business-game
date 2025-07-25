@@ -64,6 +64,11 @@ class ProductionService
 
         $timeToComplete = $quantity / $realSpeed;
 
+        if($timeToComplete < 1){
+            $timeToComplete = 1;
+        }
+
+        
         $productionOrder = ProductionOrder::create([
             'quantity' => $quantity,
             'time_to_complete' => $timeToComplete,
@@ -76,10 +81,12 @@ class ProductionService
             'product_id' => $product->id,
         ]);
 
+        /*
         $companyMachine->update([
             'status' => CompanyMachine::STATUS_ACTIVE,
         ]);
-
+        */
+        
         $productRecipes = $product->recipes;
 
         foreach($productRecipes as $recipe){
