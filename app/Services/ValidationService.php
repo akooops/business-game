@@ -243,4 +243,47 @@ class ValidationService
         
         return $errors;
     }
+
+    //-------------------------------------
+    // Production Orders
+    //-------------------------------------
+    public static function validateProductionOrder($companyMachine, $product, $quantity){
+        $errors = [];
+
+        //product is reseached
+        if(!$product->is_researched) {
+            $errors['product_researched'] = 'This product is not researched yet.';
+        }
+
+        //machine can produce this product
+        $checkMachineCanProduceProduct = $companyMachine->machine->outputs()->where('product_id', $product->id)->exists();
+        if(!$checkMachineCanProduceProduct){
+            $errors['product'] = 'This machine does not produce this product.';
+        }
+
+        //Machine should be inactive
+        if($companyMachine->status != CompanyMachine::STATUS_INACTIVE){
+            $errors['machine'] = 'This machine is not active.';
+        }
+
+        //Machine should have an employee
+        if(!$companyMachine->employee){
+            $errors['employee'] = 'This machine does not have an employee.';
+        }
+
+        //Check if company has enough materials to produce the product
+        $productRecipes = $product->recipes;
+
+        foreach($productRecipes as $recipe){
+            $material = $recipe->material;
+            $requiredQuantity = $recipe->quantity * $quantity;
+
+            $hasSufficientStock = InventoryService::haveSufficientStock($companyMachine->company, $material, $requiredQuantity);
+            if(!$hasSufficientStock){
+                $errors['material'] = 'This company does not have enough stock of ' . $material->name . ' to produce this product.';
+            }
+        }
+
+        return $errors;
+    }   
 }

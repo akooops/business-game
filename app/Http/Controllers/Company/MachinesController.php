@@ -25,7 +25,7 @@ class MachinesController extends Controller
     public function index(Request $request)
     {
         $company = $request->company;   
-        $machines = $company->companyMachines()->with(['machine', 'machine.outputs', 'machine.outputs.product', 'machine.employeeProfile', 'employee'])->latest();
+        $machines = $company->companyMachines()->with(['machine', 'machine.outputs', 'machine.outputs.product', 'machine.employeeProfile', 'employee', 'ongoingProductionOrder', 'ongoingProductionOrder.product'])->latest();
 
 
         if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {

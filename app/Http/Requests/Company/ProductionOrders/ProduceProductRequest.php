@@ -3,7 +3,7 @@
 namespace App\Http\Requests\Company\ProductionOrders;
 
 use App\Models\Product;
-use App\Services\ProductionService;
+use App\Services\ValidationService;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ProduceProductRequest extends FormRequest
@@ -37,13 +37,7 @@ class ProduceProductRequest extends FormRequest
             $quantity = $this->quantity;
 
             $product = Product::find($this->product_id);
-
-            if(!$product){
-                $validator->errors()->add('product_id', 'Product not found.');
-                return;
-            }
-
-            $errors = ProductionService::validateProductionOrder($companyMachine, $product, $quantity);
+            $errors = ValidationService::validateProductionOrder($companyMachine, $product, $quantity);
 
             if($errors) {
                 foreach($errors as $key => $error) {

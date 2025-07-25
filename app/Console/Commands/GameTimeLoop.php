@@ -63,6 +63,9 @@ class GameTimeLoop extends Command
         // Process machines reliability
         $this->call('game:process-machines-reliability');
 
+        // Process maintenances
+        $this->call('game:process-maintenances');
+
         // Every start of the month
         if($newTime->day == 1 ){
             // Pay employees salaries

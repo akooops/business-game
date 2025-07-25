@@ -48,45 +48,11 @@ class ProductionService
         ]);
     }
 
-    public static function validateProductionOrder($companyMachine, $product, $quantity){
-        $errors = [];
-
-        //product is reseached
-        if(!$product->is_researched) {
-            $errors['product_researched'] = 'This product is not researched yet.';
-        }
-
-        if(!$companyMachine->machine->products->contains($product)){
-            $errors['product'] = 'This machine does not produce this product.';
-        }
-
-        if($companyMachine->status != CompanyMachine::STATUS_INACTIVE){
-            $errors['machine'] = 'This machine is not active.';
-        }
-
-        if(!$companyMachine->employee){
-            $errors['employee'] = 'This machine does not have an employee.';
-        }
-
-        $productRecipes = $product->recipes;
-
-        foreach($productRecipes as $recipe){
-            $material = $recipe->material;
-            $requiredQuantity = $recipe->quantity * $quantity;
-
-            if(!InventoryService::haveSufficientStock($companyMachine->company, $material, $requiredQuantity)){
-                $errors['material'] = 'This company does not have enough stock of ' . $material->name . ' to produce this product.';
-            }
-        }
-
-        return $errors;
-    }
-
     public static function startProduction($companyMachine, $product, $quantity){
         $machine = $companyMachine->machine;
 
-        $realSpeed = CalculationsService::calculatePertValue($machine->min_speed, $machine->avg_speed, $machine->max_speed);
-        $realSpeed = $realSpeed * $companyMachine->employee->efficiency_factor;
+        $realSpeed = $companyMachine->speed;
+        $realSpeed = $realSpeed * $companyMachine->employee_efficiency_factor;
 
         if($realSpeed < $machine->min_speed){
             $realSpeed = $machine->min_speed;
@@ -96,22 +62,18 @@ class ProductionService
             $realSpeed = $machine->max_speed;
         }
 
-        $expectedSpeed = $machine->avg_speed;
-
-        $estimatedProductionTime = $quantity / $expectedSpeed;
-        $realProductionTime = $quantity / $realSpeed;
-
-        $estimatedCompletedAt = SettingsService::getCurrentTimestamp()->addDays($estimatedProductionTime);
-        $realCompletedAt = SettingsService::getCurrentTimestamp()->addDays($realProductionTime);
+        $timeToComplete = $quantity / $realSpeed;
 
         $productionOrder = ProductionOrder::create([
-            'company_machine_id' => $companyMachine->id,
-            'product_id' => $product->id,
             'quantity' => $quantity,
+            'time_to_complete' => $timeToComplete,
+            'quality_factor' => $companyMachine->quality_factor,
+            'employee_efficiency_factor' => $companyMachine->employee->efficiency_factor,
+            'carbon_footprint' => $companyMachine->carbon_footprint,
             'status' => ProductionOrder::STATUS_IN_PROGRESS,
             'started_at' => SettingsService::getCurrentTimestamp(),
-            'estimated_completed_at' => $estimatedCompletedAt,
-            'real_completed_at' => $realCompletedAt,
+            'company_machine_id' => $companyMachine->id,
+            'product_id' => $product->id,
         ]);
 
         $companyMachine->update([
@@ -127,31 +89,41 @@ class ProductionService
             InventoryService::productionStarted($productionOrder, $material, $requiredQuantity);
         }
 
+        $carbonFootprint = $companyMachine->carbon_footprint * $quantity;
+        PollutionService::releaseCarbonFootprint($companyMachine->company, $carbonFootprint);
+
         NotificationService::createMachineProductionStartedNotification($companyMachine->company, $companyMachine->machine, $product, $quantity);
     }
 
-    public static function completeProduction($productionOrder){
-        $productionOrder->update([
-            'status' => ProductionOrder::STATUS_COMPLETED,
-            'completed_at' => SettingsService::getCurrentTimestamp(),
-        ]);
+    public static function completeProduction($company){
+        //Get all company machines
+        $companyMachines = CompanyMachine::where('company_id', $company->id)->get();
 
-        $companyMachine = $productionOrder->companyMachine;
+        foreach($companyMachines as $companyMachine){
+            //Get all production orders for the company machine
+            $productionOrders = $companyMachine->productionOrders()->where('status', ProductionOrder::STATUS_IN_PROGRESS)->get();
 
-        $companyMachine->update([
-            'status' => CompanyMachine::STATUS_INACTIVE,
-        ]);
+            foreach($productionOrders as $productionOrder){
+                $currentTimestamp = SettingsService::getCurrentTimestamp();
+                $completedAt = $productionOrder->started_at->copy()->addDays($productionOrder->time_to_complete);
 
-        $machine = $companyMachine->machine;
-
-        $company = $companyMachine->company;
-
-        $company->update([
-            'carbon_footprint' => $company->carbon_footprint + $productionOrder->quantity * $machine->carbon_footprint,
-        ]);
-
-        InventoryService::productionCompleted($productionOrder, $productionOrder->quantity * $machine->quality_factor);
-        NotificationService::createMachineProductionCompletedNotification($companyMachine->company, $companyMachine->machine, $productionOrder->product, $productionOrder->quantity, $machine->quality_factor);
+                //Check if production order is completed
+                if($completedAt <= $currentTimestamp){                    
+                    //Update production order status to completed
+                    $productionOrder->update([
+                        'status' => ProductionOrder::STATUS_COMPLETED,
+                        'completed_at' => SettingsService::getCurrentTimestamp(),
+                    ]);
+                    
+                    $companyMachine->update([
+                        'status' => CompanyMachine::STATUS_INACTIVE,
+                    ]);
+            
+                    InventoryService::productionCompleted($productionOrder, $productionOrder->quantity * $productionOrder->quality_factor);
+                    NotificationService::createMachineProductionCompletedNotification($companyMachine->company, $companyMachine->machine, $productionOrder->product, $productionOrder->quantity, $companyMachine->quality_factor);
+                }
+            }
+        }
     }
 
     public static function payMachineOperationCost($company){

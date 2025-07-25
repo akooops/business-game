@@ -51,7 +51,7 @@
     <!-- End of Navbar -->
 
     <!-- Wrapper -->
-    <div class="container-fixed w-full flex px-0">
+    <div class="container-fixed w-full flex px-0" style="padding-bottom: 36px;">
         <!-- Main -->
           <main class="grow" role="content">
               <Breadcrumbs {breadcrumbs} {pageTitle} />

@@ -146,8 +146,15 @@
         machineToProduce = machine;
         selectedProductId = '';
         productionQuantity = 1;
+
         // Get available products from the machine
-        availableProducts = machine.machine?.products?.filter(product => product.is_researched) || [];
+        availableProducts = [];
+        for(let output of machine.machine?.outputs){
+            if(output.product.is_researched){
+                availableProducts = [...availableProducts, output.product];
+            }
+        }
+
         showProductionModal = true;
         const toggleButton = document.querySelector('[data-kt-modal-toggle="#production_modal"]');
         if (toggleButton) toggleButton.click();
@@ -167,14 +174,10 @@
         maintenanceMachine = machine;
         maintenanceType = type;
         showMaintenanceModal = true;
-        // Use avg cost/time for both types (can be customized if needed)
-        maintenanceCost = machine.machine?.avg_maintenance_cost || 0;
-        maintenanceTime = machine.machine?.avg_maintenance_time_days || 1;
-        if (type === 'corrective') {
-            // If you want to use different fields for corrective, set here
-            // maintenanceCost = machine.machine?.max_maintenance_cost || maintenanceCost;
-            // maintenanceTime = machine.machine?.max_maintenance_time_days || maintenanceTime;
-        }
+
+        maintenanceCost = machine.maintenance_cost || 0;
+        maintenanceTime = machine.maintenance_time_days || 1;
+
         const toggleButton = document.querySelector('[data-kt-modal-toggle="#maintenance_modal"]');
         if (toggleButton) toggleButton.click();
     }
@@ -479,6 +482,36 @@
                                                 {/if}
                                             </div>
 
+                                            {#if companyMachine.ongoing_production_order}
+                                                <div class="mt-4 pt-3 border-t border-border">
+                                                    <h3 class="text-sm font-semibold text-mono mb-4">Ongoing Production</h3>
+                                                    <div class="flex items-center gap-3">
+                                                            <div class="flex-shrink-0 relative">
+                                                                {#if companyMachine.ongoing_production_order.product.image_url}
+                                                                    <img 
+                                                                        src={companyMachine.ongoing_production_order.product.image_url} 
+                                                                        alt={companyMachine.ongoing_production_order.product.name}
+                                                                        class="w-12 h-12 rounded-lg object-cover"
+                                                                    />
+                                                                {:else}
+                                                                    <div class="w-12 h-12 rounded-lg bg-accent/50 flex items-center justify-center">
+                                                                        <i class="ki-filled ki-abstract-26 text-lg text-muted-foreground"></i>
+                                                                    </div>
+                                                                {/if}
+                                                            </div>
+                                                            <div class="flex-1 min-w-0">
+                                                                <h4 class="text-sm font-semibold text-mono mb-2 truncate">{companyMachine.ongoing_production_order.product.name}</h4>
+                                                                <p class="text-xs text-muted-foreground mb-2">x{companyMachine.ongoing_production_order.quantity}</p>
+                                                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                                                    <div class="kt-progress kt-progress-primary {companyMachine.ongoing_production_order.is_producing ? 'kt-progress-primary' : 'kt-progress-destructive'}">
+                                                                        <div class="kt-progress-indicator" style="width: {companyMachine.ongoing_production_order.producing_progress}%"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                    </div>
+                                                </div>
+                                            {/if}
+                                            
                                             <!-- Employee Assignment Section -->
                                             <div class="mt-4 pt-3 border-t border-border">
                                                 <h3 class="text-sm font-semibold text-mono mb-4">Employee Assignment</h3>
@@ -995,8 +1028,8 @@
                                 type="number" 
                                 class="kt-input w-full" 
                                 bind:value={productionQuantity}
-                                min="1"
-                                step="1"
+                                min="0.001"
+                                step="0.001"
                                 placeholder="Enter quantity"
                             />
                         </div>
@@ -1010,15 +1043,19 @@
                                 <div class="kt-card-content px-5 py-4 space-y-2">
                                     <div class="flex justify-between items-center">
                                         <span class="text-sm font-normal text-secondary-foreground">Speed:</span>
-                                        <span class="text-sm font-medium text-mono">{machineToProduce.machine?.avg_speed} units/day</span>
+                                        <span class="text-sm font-medium text-mono">{machineToProduce.machine?.min_speed} - {machineToProduce.machine?.max_speed} units/day</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm font-normal text-secondary-foreground">Employee Efficiency Factor:</span>
+                                        <span class="text-sm font-medium text-mono">x{machineToProduce.employee?.efficiency_factor}</span>
                                     </div>
                                     <div class="flex justify-between items-center">
                                         <span class="text-sm font-normal text-secondary-foreground">Quality Factor:</span>
-                                        <span class="text-sm font-medium text-mono">{machineToProduce.machine?.quality_factor}%</span>
+                                        <span class="text-sm font-medium text-mono">{machineToProduce.machine?.quality_factor * 100}% (Expect as output: {productionQuantity * machineToProduce.machine?.quality_factor} units)</span>
                                     </div>
                                     <div class="flex justify-between items-center">
                                         <span class="text-sm font-normal text-secondary-foreground">Carbon Footprint:</span>
-                                        <span class="text-sm font-medium text-mono">{machineToProduce.machine?.carbon_footprint} kg CO2/unit</span>
+                                        <span class="text-sm font-medium text-mono">{machineToProduce.machine?.carbon_footprint * productionQuantity} kg CO2</span>
                                     </div>
                                 </div>
                             </div>

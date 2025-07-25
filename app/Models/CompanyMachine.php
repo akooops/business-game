@@ -40,4 +40,14 @@ class CompanyMachine extends Model
     {
         return $this->belongsTo(Employee::class);
     }
+
+    public function productionOrders()
+    {
+        return $this->hasMany(ProductionOrder::class);
+    }
+
+    public function ongoingProductionOrder()
+    {
+        return $this->hasOne(ProductionOrder::class)->where('status', ProductionOrder::STATUS_IN_PROGRESS);
+    }
 }

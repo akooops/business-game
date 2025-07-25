@@ -142,6 +142,7 @@ class MaintenanceService
                     // Update company machine status and reliability
                     $companyMachine->update([
                         'status' => CompanyMachine::STATUS_INACTIVE,
+                        'last_maintenance_at' => $currentTimestamp,
                         'current_reliability' => min(1, $companyMachine->current_reliability + $companyMachine->current_reliability * (rand(75, 100) / 100)),
                     ]);
 
