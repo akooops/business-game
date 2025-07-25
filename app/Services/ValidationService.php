@@ -175,4 +175,21 @@ class ValidationService
 
         return $errors;
     }
+
+    //-------------------------------------
+    // Machines
+    //-------------------------------------
+    public static function validateMachineSetup($company, $machine){
+        $errors = [];
+
+        $setupCost = $machine->cost_to_acquire;
+
+        $hasSufficientFunds = FinanceService::haveSufficientFunds($company, $setupCost);
+
+        if(!$hasSufficientFunds){
+            $errors['funds'] = 'This company does not have enough funds to setup this machine.';
+        }
+
+        return $errors;
+    }   
 }

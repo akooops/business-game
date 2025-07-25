@@ -20,7 +20,6 @@ class CompanyMachine extends Model
         'last_broken_at' => 'datetime',
     ];
 
-    const STATUS_SETUP = 'setup';
     const STATUS_ACTIVE = 'active';
     const STATUS_INACTIVE = 'inactive';
     const STATUS_BROKEN = 'broken';

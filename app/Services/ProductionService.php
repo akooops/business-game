@@ -11,28 +11,26 @@ class ProductionService
 {
     public static function setupMachine($company, $machine)
     {
+        $speed = CalculationsService::calcaulteRandomBetweenMinMax($machine->min_speed, $machine->max_speed);
+        $maintenance_cost = CalculationsService::calcaulteRandomBetweenMinMax($machine->min_maintenance_cost, $machine->max_maintenance_cost);
+        $maintenance_time_days = CalculationsService::calcaulteRandomBetweenMinMax($machine->min_maintenance_time_days, $machine->max_maintenance_time_days);
+
         $companyMachine = CompanyMachine::create([
-            'company_id' => $company->id,
-            'machine_id' => $machine->id,
+            'speed' => $speed,
+            'carbon_footprint' => $machine->carbon_footprint,
+            'operations_cost' => $machine->operations_cost,
+            'reliability_decay_days' => $machine->reliability_decay_days,
+            'maintenance_cost' => $maintenance_cost,
+            'maintenance_time_days' => $maintenance_time_days,
             'current_reliability' => 1,
             'status' => CompanyMachine::STATUS_INACTIVE,
             'setup_at' => SettingsService::getCurrentTimestamp(),
+            'company_id' => $company->id,
+            'machine_id' => $machine->id,
         ]);
 
         FinanceService::payMachineSetupCost($company, $machine);
         NotificationService::createMachineSetupNotification($company, $machine);
-    }
-
-    public static function validateSetup($company, $machine){
-        $errors = [];
-
-        $setupCost = $machine->cost_to_acquire;
-
-        if(!FinanceService::haveSufficientFunds($company, $setupCost)){
-            $errors['funds'] = 'This company does not have enough funds to setup this machine.';
-        }
-
-        return $errors;
     }
 
     public static function validateAssignEmployee($companyMachine, $employee){

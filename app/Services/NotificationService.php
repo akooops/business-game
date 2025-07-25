@@ -171,7 +171,7 @@ class NotificationService
         return Notification::create([
             'type' => Notification::TYPE_MACHINE_SETUP,
             'title' => 'Machine Setup',
-            'message' => "Machine {$machine->name} setup.",
+            'message' => "Machine {$machine->name} setup successfully.",
             'url' => route('company.machines.index'),
             'user_id' => $company->user_id,
         ]);

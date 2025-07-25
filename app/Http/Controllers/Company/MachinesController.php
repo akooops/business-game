@@ -176,34 +176,11 @@ class MachinesController extends Controller
 
     public function setupPage(Request $request)
     {
-        $perPage = IndexService::limitPerPage($request->query('perPage', 10));
-        $page = IndexService::checkPageIfNull($request->query('page', 1));
-        $search = IndexService::checkIfSearchEmpty($request->query('search'));
-
-        $machines = Machine::with(['products', 'employeeProfile'])->latest();
-
-        // Apply search filter
-        if ($search) {
-            $machines->where(function($query) use ($search) {
-                $query->where('id', $search)
-                      ->orWhere('name', 'like', '%' . $search . '%')
-                      ->orWhere('model', 'like', '%' . $search . '%')
-                      ->orWhere('manufacturer', 'like', '%' . $search . '%')
-                      ->orWhereHas('employeeProfile', function($q) use ($search) {
-                          $q->where('name', 'like', '%' . $search . '%');
-                      })
-                      ->orWhereHas('outputs.product', function($q) use ($search) {
-                        $q->where('name', 'like', '%' . $search . '%');
-                    });
-            });
-        }
-
-        $machines = $machines->paginate($perPage, ['*'], 'page', $page);
+        $machines = Machine::with(['outputs', 'outputs.product', 'employeeProfile'])->latest();
 
         if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
             return response()->json([
-                'machines' => $machines->items(),
-                'pagination' => IndexService::handlePagination($machines)
+                'machines' => $machines->get(),
             ]);
         }
 

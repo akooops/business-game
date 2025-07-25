@@ -1,8 +1,6 @@
 <script>
     import CompanyLayout from '../../Layouts/CompanyLayout.svelte';
-    import Pagination from '../../Components/Pagination.svelte';
-    import Select2 from '../../Components/Forms/Select2.svelte';
-    import { onMount, tick } from 'svelte';
+    import { onMount, onDestroy, tick } from 'svelte';
     import { page } from '@inertiajs/svelte'
 
     // Define breadcrumbs for this page
@@ -23,34 +21,8 @@
 
     // Reactive variables
     let machines = [];
-    let pagination = {};
     let loading = true;
-    let search = '';
-    let perPage = 10;
-    let currentPage = 1;
-    let searchTimeout;
-    let showFilters = false;
-
-    // Filter variables
-    let manufacturerFilter = '';
-    let priceMin = '';
-    let priceMax = '';
-    let operationCostMin = '';
-    let operationCostMax = '';
-    let speedMin = '';
-    let speedMax = '';
-    let qualityMin = '';
-    let qualityMax = '';
-    let carbonFootprintMin = '';
-    let carbonFootprintMax = '';
-    let reliabilityDecayDaysMin = '';
-    let reliabilityDecayDaysMax = '';
-    let productFilter = '';
-    let employeeProfileFilter = '';
-
-    // Select2 component references
-    let productSelectComponent;
-    let employeeProfileSelectComponent;
+    let fetchInterval = null;
 
     // Drawer state
     let selectedMachine = null;
@@ -62,62 +34,10 @@
 
     // Fetch machines data
     async function fetchMachines() {
-        loading = true;
+        if (machines.length == 0) loading = true;
+        
         try {
-            const params = new URLSearchParams({
-                page: currentPage,
-                perPage: perPage,
-                search: search
-            });
-
-            // Add filter parameters
-            if (manufacturerFilter) {
-                params.append('manufacturer', manufacturerFilter);
-            }
-            if (priceMin) {
-                params.append('price_min', priceMin);
-            }
-            if (priceMax) {
-                params.append('price_max', priceMax);
-            }
-            if (operationCostMin) {
-                params.append('operations_cost_min', operationCostMin);
-            }
-            if (operationCostMax) {
-                params.append('operations_cost_max', operationCostMax);
-            }
-            if (speedMin) {
-                params.append('min_speed', speedMin);
-            }
-            if (speedMax) {
-                params.append('max_speed', speedMax);
-            }
-            if (qualityMin) {
-                params.append('quality_factor_min', qualityMin);
-            }
-            if (qualityMax) {
-                params.append('quality_factor_max', qualityMax);
-            }
-            if (carbonFootprintMin) {
-                params.append('carbon_footprint_min', carbonFootprintMin);
-            }
-            if (carbonFootprintMax) {
-                params.append('carbon_footprint_max', carbonFootprintMax);
-            }
-            if (reliabilityDecayDaysMin) {
-                params.append('reliability_decay_days_min', reliabilityDecayDaysMin);
-            }
-            if (reliabilityDecayDaysMax) {
-                params.append('reliability_decay_days_max', reliabilityDecayDaysMax);
-            }
-            if (productFilter) {
-                params.append('product_id', productFilter);
-            }
-            if (employeeProfileFilter) {
-                params.append('employee_profile_id', employeeProfileFilter);
-            }
-            
-            const response = await fetch(route('company.machines.setup-page') + '?' + params.toString(), {
+            const response = await fetch(route('company.machines.setup-page'), {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
@@ -125,7 +45,6 @@
             
             const data = await response.json();
             machines = data.machines;
-            pagination = data.pagination;
             
             // Wait for DOM to update, then initialize menus
             await tick();
@@ -137,106 +56,6 @@
         } finally {
             loading = false;
         }
-    }
-
-    // Handle search with debouncing
-    function handleSearch() {
-        // Clear existing timeout
-        if (searchTimeout) {
-            clearTimeout(searchTimeout);
-        }
-        
-        // Set new timeout for 500ms
-        searchTimeout = setTimeout(() => {
-            currentPage = 1;
-            fetchMachines();
-        }, 500);
-    }
-
-    // Handle search input change
-    function handleSearchInput(event) {
-        search = event.target.value;
-        handleSearch();
-    }
-
-    // Handle filter changes
-    function handleFilterChange() {
-        currentPage = 1;
-        fetchMachines();
-    }
-
-    // Handle pagination
-    function goToPage(page) {
-        if (page && page !== currentPage) {
-            currentPage = page;
-            fetchMachines();
-        }
-    }
-
-    // Handle per page change
-    function handlePerPageChange(newPerPage) {
-        perPage = newPerPage;
-        currentPage = 1;
-        fetchMachines();
-    }
-
-    // Handle product selection
-    function handleProductSelect(event) {
-        productFilter = event.detail.value;
-        handleFilterChange();
-    }
-
-    // Handle product clear
-    function handleProductClear() {
-        productFilter = '';
-        handleFilterChange();
-    }
-
-    // Handle employee profile selection
-    function handleEmployeeProfileSelect(event) {
-        employeeProfileFilter = event.detail.value;
-        handleFilterChange();
-    }
-
-    // Handle employee profile clear
-    function handleEmployeeProfileClear() {
-        employeeProfileFilter = '';
-        handleFilterChange();
-    }
-
-    // Clear all filters
-    function clearAllFilters() {
-        manufacturerFilter = '';
-        priceMin = '';
-        priceMax = '';
-        operationCostMin = '';
-        operationCostMax = '';
-        speedMin = '';
-        speedMax = '';
-        qualityMin = '';
-        qualityMax = '';
-        carbonFootprintMin = '';
-        carbonFootprintMax = '';
-        reliabilityDecayDaysMin = '';
-        reliabilityDecayDaysMax = '';
-        productFilter = '';
-        employeeProfileFilter = '';
-        currentPage = 1;
-        
-        // Clear the Select2 components
-        if (productSelectComponent) {
-            productSelectComponent.clear();
-        }
-        if (employeeProfileSelectComponent) {
-            employeeProfileSelectComponent.clear();
-        }
-        
-        fetchMachines();
-    }
-
-    // Toggle filters visibility
-    function toggleFilters() {
-        showFilters = !showFilters;
     }
 
     // Open machine drawer
@@ -263,15 +82,13 @@
         
         // Calculate setup data
         const setupCost = machine.cost_to_acquire;
-        const totalEmployeeCost = machine.employee_profiles ? machine.employee_profiles.reduce((total, profile) => {
-            return total + (profile.avg_salary_month * profile.pivot.required_count);
-        }, 0) : 0;
+        const totalEmployeeCost = machine.employee_profile ? machine.employee_profile.salary_month : 0;
 
         const totalSetupCost = setupCost + totalEmployeeCost;
 
         setupData = {
             machine: machine,
-            employeeProfiles: machine.employee_profiles || [],
+            employeeProfile: machine.employee_profile || null,
             setupCost: setupCost,
             employeeCost: totalEmployeeCost,
             totalSetupCost: totalSetupCost,
@@ -314,10 +131,6 @@
                 },
                 body: JSON.stringify({
                     machine_id: setupData.machine.id,
-                    employee_profiles: setupData.employeeProfiles.map(profile => ({
-                        id: profile.id,
-                        required_count: profile.pivot.required_count
-                    }))
                 })
             });
 
@@ -333,10 +146,6 @@
                 // Reset form
                 selectedMachine = null;
                 setupData = null;
-                
-                if (productSelectComponent) {
-                    productSelectComponent.clear();
-                }
             } else {
                 const errorData = await response.json();
                 showToast(errorData.message || 'Error setting up machine. Please try again.', 'error');
@@ -347,20 +156,13 @@
         }
     }
 
-    // Show toast notification
-    function showToast(message, type = 'success') {
-        if (window.KTToast) {
-            KTToast.show({
-                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                message: message,
-                variant: type === 'success' ? 'success' : 'destructive',
-                position: 'bottom-right',
-            });
-        }
-    }
-
     onMount(() => {
         fetchMachines();
+        fetchInterval = setInterval(fetchMachines, 60000);
+    });
+
+    onDestroy(() => {
+        clearInterval(fetchInterval);
     });
 
     // Flash message handling
@@ -377,7 +179,7 @@
 
 <CompanyLayout {breadcrumbs} {pageTitle}>
     <!-- Container -->
-    <div class="kt-container-fluid">
+    <div class="kt-container-fixed">
         <div class="grid gap-5 lg:gap-7.5">
             <!-- Machines Header -->
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -397,334 +199,12 @@
 
             <!-- Machines Grid -->
             <div class="kt-card">
-                <div class="kt-card-header">
-                    <div class="kt-card-toolbar">
-                        <div class="flex items-center gap-4">
-                            <div class="kt-input max-w-64 w-64">
-                                <i class="ki-filled ki-magnifier"></i>
-                                <input 
-                                    type="text" 
-                                    class="kt-input" 
-                                    placeholder="Search machines..." 
-                                    bind:value={search}
-                                    on:input={handleSearchInput}
-                                />
-                            </div>
-                            
-                            <!-- Filter Toggle Button -->
-                            <button 
-                                class="kt-btn kt-btn-outline"
-                                on:click={toggleFilters}
-                            >
-                                <i class="ki-filled ki-filter text-sm"></i>
-                                {showFilters ? 'Hide Filters' : 'Show Filters'}
-                            </button>
-                            
-                            <!-- Clear Filters Button -->
-                            {#if manufacturerFilter || priceMin || priceMax || operationCostMin || operationCostMax || speedMin || speedMax || qualityMin || qualityMax || carbonFootprintMin || carbonFootprintMax || reliabilityDecayDaysMin || reliabilityDecayDaysMax || productFilter || employeeProfileFilter}
-                                <button 
-                                    class="kt-btn kt-btn-ghost kt-btn-sm"
-                                    on:click={clearAllFilters}
-                                >
-                                    <i class="ki-filled ki-cross text-sm"></i>
-                                    Clear All
-                                </button>
-                            {/if}
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Advanced Filters Section -->
-                {#if showFilters}
-                    <div class="kt-card-body border-t border-gray-200 p-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                            <!-- Manufacturer Filter -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Manufacturer</h4>
-                                <input 
-                                    type="text" 
-                                    class="kt-input w-full" 
-                                    placeholder="Enter manufacturer" 
-                                    bind:value={manufacturerFilter}
-                                    on:input={handleFilterChange}
-                                />
-                            </div>
-
-                            <!-- Price Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Acquisition Cost (DZD)</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min Price" 
-                                        bind:value={priceMin}
-                                        on:input={handleFilterChange}
-                                        step="1000"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max Price" 
-                                        bind:value={priceMax}
-                                        on:input={handleFilterChange}
-                                        step="1000"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Carbon Footprint Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Carbon Footprint (kg CO2/unit)</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min Carbon Footprint" 
-                                        bind:value={carbonFootprintMin}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max Carbon Footprint" 
-                                        bind:value={carbonFootprintMax}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Energy Consumption Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Operation Cost (DZD/day)</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min Operation Cost" 
-                                        bind:value={operationCostMin}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max Operation Cost" 
-                                        bind:value={operationCostMax}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Quality Factor Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Quality Factor</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min Quality" 
-                                        bind:value={qualityMin}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max Quality" 
-                                        bind:value={qualityMax}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Speed Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Average Speed (units/day)</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min Speed" 
-                                        bind:value={speedMin}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max Speed" 
-                                        bind:value={speedMax}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Reliability Decay Days Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Reliability Decay Days</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min Reliability Decay Days" 
-                                        bind:value={reliabilityDecayDaysMin}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max Reliability Decay Days" 
-                                        bind:value={reliabilityDecayDaysMax}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Product Output Filter -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Product Output</h4>
-                                <Select2
-                                    bind:this={productSelectComponent}
-                                    id="product-filter"
-                                    placeholder="Search products..."
-                                    allowClear={true}
-                                    on:select={handleProductSelect}
-                                    on:clear={handleProductClear}
-                                    ajax={{
-                                        url: route('company.products.index'),
-                                        dataType: 'json',
-                                        delay: 300,
-                                        data: function(params) {
-                                            return {
-                                                search: params.term,
-                                                perPage: 10
-                                            };
-                                        },
-                                        processResults: function(data) {
-                                            return {
-                                                results: data.products.map(product => ({
-                                                    id: product.product.id,
-                                                    text: `${product.product.name}`,
-                                                    name: product.product.name,
-                                                    type: product.product.type,
-                                                    type_name: product.product.type_name,
-                                                    image_url: product.product.image_url
-                                                }))
-                                            };
-                                        },
-                                        cache: true
-                                    }}
-                                    templateResult={function(data) {
-                                        if (data.loading) return data.text;
-                                        
-                                        const $elem = globalThis.$('<div class="flex items-center gap-3">' +
-                                            '<div class="flex items-center justify-center size-8 shrink-0 rounded bg-accent/50">' +
-                                            (data.image_url ? '<img src="' + data.image_url + '" alt="" class="size-6 object-cover rounded">' : '<i class="ki-filled ki-abstract-26 text-xs text-muted-foreground"></i>') +
-                                            '</div>' +
-                                            '<div class="flex flex-col">' +
-                                            '<span class="font-medium text-sm">' + data.name + '</span>' +
-                                            '<span class="kt-badge kt-badge-outline kt-badge-primary kt-badge-xs w-fit">' + data.type_name + '</span>' +
-                                            '</div>' +
-                                            '</div>');
-                                        return $elem;
-                                    }}
-                                    templateSelection={function(data) {
-                                        if (!data.id) return data.text;
-                                        return data.name;
-                                    }}
-                                />
-                            </div>
-
-                            <!-- Employee Profile Filter -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Employee Profile</h4>
-                                <Select2
-                                    bind:this={employeeProfileSelectComponent}
-                                    id="employee-profile-filter"
-                                    placeholder="Search employee profiles..."
-                                    allowClear={true}
-                                    on:select={handleEmployeeProfileSelect}
-                                    on:clear={handleEmployeeProfileClear}
-                                    ajax={{
-                                        url: route('company.employee-profiles.index'),
-                                        dataType: 'json',
-                                        delay: 300,
-                                        data: function(params) {
-                                            return {
-                                                search: params.term,
-                                                perPage: 10
-                                            };
-                                        },
-                                        processResults: function(data) {
-                                            return {
-                                                results: data.employeeProfiles.map(profile => ({
-                                                    id: profile.id,
-                                                    text: `${profile.name}`,
-                                                    name: profile.name,
-                                                    description: profile.description,
-                                                    recruitment_difficulty: profile.recruitment_difficulty,
-                                                    avg_salary: profile.avg_salary_month
-                                                }))
-                                            };
-                                        },
-                                        cache: true
-                                    }}
-                                    templateResult={function(data) {
-                                        if (data.loading) return data.text;
-                                        
-                                        const $elem = globalThis.$('<div class="flex items-center gap-3">' +
-                                            '<div class="flex items-center justify-center size-8 shrink-0 rounded bg-accent/50">' +
-                                            '<i class="ki-filled ki-profile-user text-xs text-muted-foreground"></i>' +
-                                            '</div>' +
-                                            '<div class="flex flex-col">' +
-                                            '<span class="font-medium text-sm">' + data.name + '</span>' +
-                                            '<span class="text-xs text-muted-foreground">' + (data.description || '').substring(0, 30) + (data.description && data.description.length > 30 ? '...' : '') + '</span>' +
-                                            '</div>' +
-                                            '</div>');
-                                        return $elem;
-                                    }}
-                                    templateSelection={function(data) {
-                                        if (!data.id) return data.text;
-                                        return data.name;
-                                    }}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                {/if}
-
                 <div class="kt-card-content p-0">
                     {#if loading}
                         <!-- Loading skeleton -->
                         <div class="p-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-                                {#each Array(perPage) as _, i}
+                                {#each Array(10) as _, i}
                                     <div class="kt-card animate-pulse">
                                         <div class="kt-card-body p-4">
                                             <!-- Machine Image Skeleton -->
@@ -768,7 +248,7 @@
                                 </div>
                                 <h3 class="text-lg font-semibold text-mono mb-2">No machines found</h3>
                                 <p class="text-sm text-secondary-foreground mb-4">
-                                    {search ? 'No machines match your search criteria.' : 'No machines available for setup.'}
+                                    No machines available for setup.
                                 </p>
                             </div>
                         </div>
@@ -777,25 +257,19 @@
                         <div class="p-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
                                 {#each machines as machine}
-                                    <div class="kt-card kt-card-hover">
+                                    <div class="kt-card kt-card-hover cursor-pointer" on:click={() => openMachineDrawer(machine)}>
                                         <div class="kt-card-body p-4">
                                             <!-- Machine Image -->
-                                            <div class="flex items-center justify-center mb-4 cursor-pointer" on:click={() => openMachineDrawer(machine)}>
-                                                {#if machine.image_url}
-                                                    <img 
-                                                        src={machine.image_url} 
-                                                        alt={machine.name}
-                                                        class="h-[180px] w-full object-cover rounded-sm"
-                                                    />
-                                                {:else}
-                                                    <div class="h-[180px] w-full bg-accent/50 flex items-center justify-center rounded-sm">
-                                                        <i class="ki-filled ki-setting-3 text-4xl text-muted-foreground"></i>
-                                                    </div>
-                                                {/if}
+                                            <div class="size-20 mb-4">
+                                                <img 
+                                                    class="rounded-lg w-full h-full object-cover bg-gray-100" 
+                                                    src={machine.image_url}
+                                                    alt={machine.name}
+                                                />
                                             </div>
 
                                             <!-- Machine Info -->
-                                            <div class="mb-4 cursor-pointer" on:click={() => openMachineDrawer(machine)}>
+                                            <div class="mb-4 cursor-pointer">
                                                 <h3 class="text-lg font-semibold text-mono mb-1">
                                                     {machine.name}
                                                 </h3>
@@ -808,11 +282,11 @@
                                             <div class="text-xs text-muted-foreground space-y-1 cursor-pointer" on:click={() => openMachineDrawer(machine)}>
                                                 <div class="flex justify-between">
                                                     <span>Speed:</span>
-                                                    <span class="font-medium">{machine.avg_speed} units/day</span>
+                                                    <span class="font-medium">{machine.min_speed} - {machine.max_speed} units/day</span>
                                                 </div>
                                                 <div class="flex justify-between">
                                                     <span>Quality Factor:</span>
-                                                    <span class="font-medium">{machine.quality_factor}%</span>
+                                                    <span class="font-medium">{machine.quality_factor * 100}%</span>
                                                 </div>
                                                 <div class="flex justify-between">
                                                     <span>Operation Cost:</span>
@@ -828,20 +302,38 @@
                                                 </div>
                                             </div>
 
-                                            <!-- Action Buttons -->
-                                            <div class="flex items-center justify-between mt-4 pt-3 border-t border-border">
-                                                <button 
-                                                    class="kt-btn kt-btn-sm kt-btn-outline kt-btn-primary"
-                                                    on:click={() => openMachineDrawer(machine)}
-                                                >
-                                                    <i class="ki-filled ki-eye text-sm"></i>
-                                                    View Details
-                                                </button>
-                                                <button 
-                                                    class="kt-btn kt-btn-sm kt-btn-primary"
-                                                    on:click={() => openSetupModal(machine)}
-                                                >
-                                                    <i class="ki-filled ki-setting-3 text-sm"></i>
+                                            <div class="mt-4 pt-3 border-t border-border">
+                                                <h3 class="text-sm font-semibold text-mono mb-4">Output Products</h3>
+
+                                                <div class="flex flex-wrap gap-4">  
+                                                    {#each machine.outputs as output}
+                                                        {#if output.product.is_researched}
+                                                        <!-- Product Image -->
+                                                        <div class="size-10 mb-4">
+                                                            <img 
+                                                                class="rounded-lg w-full h-full object-cover bg-gray-100" 
+                                                                src={output.product.image_url}
+                                                                alt={output.product.name}
+                                                                />
+                                                            </div>
+                                                        {:else} 
+                                                            <div class="flex items-center size-10">
+                                                                <div class="flex-shrink-0 relative" style="width: 100%; height: 100%;">
+                                                                    <div class="rounded-lg bg-muted animate-pulse" style="width: 100%; height: 100%;"></div>
+                                                                    <div class="absolute inset-0 flex items-center justify-center" style="top: 50%; left: 50%; bottom: 50%; right: 50%;">
+                                                                        <i class="ki-filled ki-lock text-muted-foreground text-sm"></i>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        {/if}
+                                                    {/each}
+                                                </div>
+                                            </div>
+
+
+                                            <div class="flex items-center justify-between">
+                                                <button class="kt-btn kt-btn-primary w-full mt-4" on:click|stopPropagation={() => openSetupModal(machine)}>
+                                                    <i class="fa-solid fa-gear text-base"></i>
                                                     Setup Machine
                                                 </button>
                                             </div>
@@ -850,18 +342,6 @@
                                 {/each}
                             </div>
                         </div>
-
-                        <!-- Pagination -->
-                        {#if pagination && pagination.total > 0}
-                            <div class="border-t border-gray-200">
-                                <Pagination 
-                                    {pagination} 
-                                    {perPage}
-                                    onPageChange={goToPage} 
-                                    onPerPageChange={handlePerPageChange}
-                                />
-                            </div>
-                        {/if}
                     {/if}
                 </div>
             </div>
@@ -936,11 +416,11 @@
                     <div class="space-y-2">
                         <div class="flex justify-between">
                             <span class="text-xs text-muted-foreground">Speed:</span>
-                            <span class="text-xs font-medium">{selectedMachine.avg_speed} units/day</span>
+                            <span class="text-xs font-medium">{selectedMachine.min_speed} - {selectedMachine.max_speed} units/day</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-xs text-muted-foreground">Quality Factor:</span>
-                            <span class="text-xs font-medium">{selectedMachine.quality_factor}%</span>
+                            <span class="text-xs font-medium">{selectedMachine.quality_factor * 100}%</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-xs text-muted-foreground">Operation Cost:</span>
@@ -963,41 +443,32 @@
                         </div>
                         <div class="flex justify-between">
                             <span class="text-xs text-muted-foreground">Reliability Decay:</span>
-                            <span class="text-xs font-medium">{selectedMachine.reliability_decay_days}%/day</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-xs text-muted-foreground">Maintenance Interval:</span>
-                            <span class="text-xs font-medium">{selectedMachine.maintenance_interval_days} days</span>
+                            <span class="text-xs font-medium">{selectedMachine.reliability_decay_days * 100}%/day</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Employee Requirements Section -->
-                {#if selectedMachine.employee_profiles && selectedMachine.employee_profiles.length > 0}
+                {#if selectedMachine.employee_profile}
                     <div class="border-t border-border pt-4">
                         <h3 class="text-sm font-semibold text-mono mb-3">Employee Requirements</h3>
                         <div class="space-y-3">
-                            {#each selectedMachine.employee_profiles as profile}
                                 <div class="kt-card">
                                     <div class="kt-card-body p-3">
                                         <div class="flex items-center gap-3">
                                             <div class="flex-1 min-w-0">
                                                 <h4 class="text-sm font-semibold text-mono mb-1 truncate">
-                                                    {profile.name}
+                                                    {selectedMachine.employee_profile.name}
                                                 </h4>
-                                                <p class="text-xs text-muted-foreground mb-1">
-                                                    Required: {profile.pivot.required_count} employees
-                                                </p>
-                                                {#if profile.description}
+                                                {#if selectedMachine.employee_profile.description}
                                                     <p class="text-xs text-muted-foreground">
-                                                        {profile.description}
+                                                        {selectedMachine.employee_profile.description}
                                                     </p>
                                                 {/if}
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            {/each}
                         </div>
                     </div>
                 {:else}
@@ -1015,20 +486,20 @@
                 {/if}
 
                 <!-- Output Products Section -->
-                {#if selectedMachine.products && selectedMachine.products.length > 0}
+                {#if selectedMachine.outputs && selectedMachine.outputs.length > 0}
                     <div class="border-t border-border pt-4">
                         <h3 class="text-sm font-semibold text-mono mb-3">Output Products</h3>
                         <div class="space-y-3">
-                            {#each selectedMachine.products as product}
-                                {#if product.is_researched}
+                            {#each selectedMachine.outputs as output}
+                                {#if output.product.is_researched}
                                     <div class="kt-card">
                                         <div class="kt-card-body p-3">
                                             <div class="flex items-center gap-3">
                                                 <div class="flex-shrink-0 relative">
-                                                    {#if product.image_url}
+                                                    {#if output.product.image_url}
                                                         <img 
-                                                            src={product.image_url} 
-                                                            alt={product.name}
+                                                            src={output.product.image_url} 
+                                                            alt={output.product.name}
                                                             class="w-12 h-12 rounded-lg object-cover"
                                                         />
                                                     {:else}
@@ -1038,8 +509,8 @@
                                                     {/if}
                                                 </div>
                                                 <div class="flex-1 min-w-0">
-                                                    <h4 class="text-sm font-semibold text-mono mb-1 truncate">{product.name}</h4>
-                                                    <p class="text-xs text-muted-foreground mb-1">{product.type_name}</p>
+                                                    <h4 class="text-sm font-semibold text-mono mb-1 truncate">{output.product.name}</h4>
+                                                    <p class="text-xs text-muted-foreground mb-1">{output.product.type_name}</p>
                                                     <span class="text-xs text-green-500 font-medium">Researched</span>
                                                 </div>
                                             </div>
@@ -1155,11 +626,11 @@
                                     </div>
                                     <div class="flex justify-between">
                                         <span class="text-sm text-muted-foreground">Speed:</span>
-                                        <span class="font-medium">{setupData.machine.avg_speed} units/day</span>
+                                        <span class="font-medium">{setupData.machine.min_speed} - {setupData.machine.max_speed} units/day</span>
                                     </div>
                                     <div class="flex justify-between">
                                         <span class="text-sm text-muted-foreground">Quality Factor:</span>
-                                        <span class="font-medium">{setupData.machine.quality_factor}%</span>
+                                        <span class="font-medium">{setupData.machine.quality_factor * 100}%</span>
                                     </div>
                                 </div>
                             </div>
