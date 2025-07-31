@@ -81,11 +81,9 @@ class ProductionService
             'product_id' => $product->id,
         ]);
 
-        /*
         $companyMachine->update([
             'status' => CompanyMachine::STATUS_ACTIVE,
         ]);
-        */
         
         $productRecipes = $product->recipes;
 

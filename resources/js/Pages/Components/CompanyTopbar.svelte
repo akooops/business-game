@@ -2,6 +2,7 @@
     import { page } from '@inertiajs/svelte'
     import Timer from './Timer.svelte';
     import Notifications from './Notifications.svelte';
+    import CompanyOverview from './CompanyOverview.svelte';
 
     function handleLogout() {
         // Create a form element to submit the logout request
@@ -50,6 +51,10 @@
                 <!-- Timer -->
                 <Timer />
                 <!-- End of Timer -->
+
+              <!-- Company Transactions -->
+              <CompanyOverview />
+              <!-- End of Company Transactions -->
 
               <!-- Notifications -->
               <Notifications />

@@ -12,10 +12,15 @@ class UtilitiesController extends Controller
      */
     public function index(Request $request)
     {
+        $company = auth()->user()->company;
+
         return response()->json([
             'status' => 'success',
             'timestamp' => SettingsService::getCurrentTimestamp()->format('Y-m-d H:i'),
             'currentGameWeek' => SettingsService::getCurrentGameWeek(),
+            'funds' => ($company) ? $company->funds : 0,
+            'researchLevel' => ($company) ? $company->research_level : 0,
+            'carbonFootprint' => ($company) ? $company->carbon_footprint : 0,
         ]);
     }
 } 

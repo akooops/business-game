@@ -32,17 +32,11 @@ use App\Http\Controllers\Admin\CompaniesController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
 /*
 |--------------------------------------------------------------------------
 | Admin Authentication Routes
 |--------------------------------------------------------------------------
 */
-
-
 
 Route::middleware(['handle.inertia'])->group(function () {
     Route::get('auth/login', [AuthController::class, 'showLoginForm'])->middleware('guest')->name('auth.login');
@@ -161,6 +155,11 @@ Route::prefix('admin')->middleware(['auth', 'check.admin', 'handle.inertia'])->g
     Route::get('wilayas/{wilaya}/edit', [WilayasController::class, 'edit'])->name('admin.wilayas.edit');
     Route::patch('wilayas/{wilaya}', [WilayasController::class, 'update'])->name('admin.wilayas.update');
     Route::delete('wilayas/{wilaya}', [WilayasController::class, 'destroy'])->name('admin.wilayas.destroy');
+});
+
+// redirect to admin dashboard
+Route::get('/', function () {
+    return redirect()->route('auth.login');
 });
 
 include 'company.php';

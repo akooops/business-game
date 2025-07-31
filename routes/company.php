@@ -15,6 +15,7 @@ use App\Http\Controllers\Company\EmployeeProfilesController;
 use App\Http\Controllers\Company\EmployeesController;
 use App\Http\Controllers\Company\MachinesController;
 use App\Http\Controllers\Company\ProductionOrdersController;
+use App\Http\Controllers\Company\TransactionsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,10 +27,6 @@ use App\Http\Controllers\Company\ProductionOrdersController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-
-Route::get('/', function () {
-    return view('welcome');
-});
 
 Route::prefix('company')->middleware(['auth', 'check.company', 'handle.inertia'])->group(function () {
     // Dashboard
@@ -87,6 +84,9 @@ Route::prefix('company')->middleware(['auth', 'check.company', 'handle.inertia']
     // Technologies
     Route::get('/technologies', [TechnologiesController::class, 'index'])->name('company.technologies.index');
     Route::post('/technologies/{technology}/research', [TechnologiesController::class, 'research'])->name('company.technologies.research');
+
+    // Transactions
+    Route::get('/transactions', [TransactionsController::class, 'index'])->name('company.transactions.index');
 
     // Wilayas
     Route::get('/wilayas', [WilayasController::class, 'index'])->name('company.wilayas.index');
