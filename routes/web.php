@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\TechnologiesController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\SuppliersController;
 use App\Http\Controllers\Admin\CompaniesController;
+use App\Http\Controllers\Admin\BanksController;
 
 /*
 |--------------------------------------------------------------------------
@@ -58,6 +59,15 @@ Route::middleware(['auth', 'handle.inertia'])->group(function () {
 
 Route::prefix('admin')->middleware(['auth', 'check.admin', 'handle.inertia'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('admin.dashboard.index');
+
+    // Banks
+    Route::get('banks', [BanksController::class, 'index'])->name('admin.banks.index');
+    Route::get('banks/create', [BanksController::class, 'create'])->name('admin.banks.create');
+    Route::post('banks', [BanksController::class, 'store'])->name('admin.banks.store');
+    Route::get('banks/{bank}', [BanksController::class, 'show'])->name('admin.banks.show');
+    Route::get('banks/{bank}/edit', [BanksController::class, 'edit'])->name('admin.banks.edit');
+    Route::patch('banks/{bank}', [BanksController::class, 'update'])->name('admin.banks.update');
+    Route::delete('banks/{bank}', [BanksController::class, 'destroy'])->name('admin.banks.destroy');
 
     // Companies
     Route::get('companies', [CompaniesController::class, 'index'])->name('admin.companies.index');

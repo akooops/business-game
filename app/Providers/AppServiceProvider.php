@@ -38,6 +38,9 @@ class AppServiceProvider extends ServiceProvider
             'supplier' => 'App\\Models\\Supplier',
             'purchase' => 'App\\Models\\Purchase',
             'inventory_movement' => 'App\\Models\\InventoryMovement',
+            'transaction' => 'App\\Models\\Transaction',
+            'bank' => 'App\\Models\\Bank',
+            'loan' => 'App\\Models\\Loan',
             // Add more models as needed
         ]);
     }
