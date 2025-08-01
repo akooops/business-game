@@ -218,6 +218,16 @@ class NotificationService
         ]);
     }
 
+    public static function createMachineSoldNotification($company, $companyMachine, $soldPrice){
+        return Notification::create([
+            'type' => Notification::TYPE_MACHINE_SOLD,
+            'title' => 'Machine Sold',
+            'message' => "Machine {$companyMachine->machine->name} sold for DZD " . $soldPrice,
+            'url' => route('company.machines.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
     // ------------------------------------------------------------
     // Maintenance
     // ------------------------------------------------------------
@@ -225,7 +235,7 @@ class NotificationService
         return Notification::create([
             'type' => Notification::TYPE_MACHINE_BROKEN,
             'title' => 'Machine Broken',
-            'message' => "Machine {$companyMachine->machine->name} broken. Any production orders for this machine will be cancelled and materials will be lost.",
+            'message' => "Machine {$companyMachine->machine->name} broken. Any production orders for this machine will be cancelled and materials will be lost. The value of the machine is now DZD {$companyMachine->current_value}.",
             'url' => route('company.machines.index'),
             'user_id' => $company->user_id,
         ]);

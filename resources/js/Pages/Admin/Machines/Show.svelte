@@ -116,6 +116,16 @@
                             </p>
                         </div>
 
+                        <!-- Loss on Sale -->
+
+                        <!-- Loss on Sale -->
+                        <div class="flex flex-col gap-2">
+                            <h4 class="text-sm font-semibold text-mono">Loss on Sale</h4>
+                            <p class="text-sm text-secondary-foreground">
+                                {machine.loss_on_sale_days * 100}% / day of acquisition cost
+                            </p>
+                        </div>
+
                         <!-- Created At -->
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Created At</h4>
@@ -146,7 +156,7 @@
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">OperationS Cost</h4>
                             <p class="text-sm text-secondary-foreground">
-                                {machine.operations_cost} DZD/day
+                                {machine.operations_cost} DZD/week
                                 <span class="text-xs text-muted-foreground ml-2">
                                     (Daily operational expenses)
                                 </span>

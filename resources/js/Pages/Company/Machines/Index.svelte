@@ -56,6 +56,11 @@
     let maintenanceCost = 0;
     let maintenanceTime = 0;
 
+    // Sell modal state
+    let showSellModal = false;
+    let selling = false;
+    let machineToSell = null;
+
     function getMachineStatusBadgeClass(status) {
         switch(status) {
             case 'active':
@@ -192,6 +197,20 @@
         maintenanceTime = 0;
     }
 
+    function openSellModal(machine) {
+        machineToSell = machine;
+        showSellModal = true;
+        const toggleButton = document.querySelector('[data-kt-modal-toggle="#sell_modal"]');
+        if (toggleButton) toggleButton.click();
+    }
+
+    function closeSellModal() {
+        const dismissButton = document.querySelector('[data-kt-modal-dismiss="#sell_modal"]');
+        if (dismissButton) dismissButton.click();
+        showSellModal = false;
+        machineToSell = null;
+    }
+
     async function startMaintenance() {
         if (!maintenanceMachine) return;
         maintenanceLoading = true;
@@ -219,6 +238,35 @@
             showToast('Network error. Please check your connection and try again.', 'error');
         } finally {
             maintenanceLoading = false;
+        }
+    }
+
+    async function sellMachine() {
+        if (!machineToSell) return;
+        selling = true;
+        try {
+            const response = await fetch(route('company.machines.sell', machineToSell.id), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                showToast(data.message || 'Machine sold successfully!', 'success');
+                closeSellModal();
+                fetchMachines();
+            } else {
+                const errorData = await response.json();
+                showToast(errorData.message || 'Error selling machine. Please try again.', 'error');
+            }
+        } catch (error) {
+            console.error('Error selling machine:', error);
+            showToast('Network error. Please check your connection and try again.', 'error');
+        } finally {
+            selling = false;
         }
     }
 
@@ -572,6 +620,15 @@
                                                                 Start Predictive Maintenance
                                                             </button>
                                                         {/if}
+                                                        {#if companyMachine.status !== 'sold'}
+                                                            <button 
+                                                                class="kt-btn kt-btn-outline kt-btn-warning w-full"
+                                                                on:click|stopPropagation={() => openSellModal(companyMachine)}
+                                                            >
+                                                                <i class="fa-solid fa-coins text-base"></i>
+                                                                Sell Machine
+                                                            </button>
+                                                        {/if}
                                                     </div>
                                                 {:else if companyMachine.status === 'broken'}
                                                     <div class="flex flex-col gap-2">
@@ -589,6 +646,15 @@
                                                             <i class="fa-solid fa-user-minus text-base"></i>
                                                             Unassign Employee
                                                         </button>
+                                                        {#if companyMachine.status !== 'sold'}
+                                                            <button 
+                                                                class="kt-btn kt-btn-outline kt-btn-warning w-full"
+                                                                on:click|stopPropagation={() => openSellModal(companyMachine)}
+                                                            >
+                                                                <i class="fa-solid fa-coins text-base"></i>
+                                                                Sell Machine
+                                                            </button>
+                                                        {/if}
                                                     </div>
                                                 {:else if companyMachine.status === 'inactive'}
                                                     <div class="flex flex-col gap-2">
@@ -613,15 +679,35 @@
                                                             <i class="fa-solid fa-user-minus text-base"></i>
                                                             Unassign Employee
                                                         </button>
+                                                        {#if companyMachine.status !== 'sold'}
+                                                            <button 
+                                                                class="kt-btn kt-btn-outline kt-btn-warning w-full"
+                                                                on:click|stopPropagation={() => openSellModal(companyMachine)}
+                                                            >
+                                                                <i class="fa-solid fa-coins text-base"></i>
+                                                                Sell Machine
+                                                            </button>
+                                                        {/if}
                                                     </div>
                                                 {:else}
-                                                    <button 
-                                                        class="kt-btn kt-btn-outline kt-btn-secondary w-full"
-                                                        on:click|stopPropagation={() => openUnassignModal(companyMachine)}
-                                                    >
-                                                        <i class="fa-solid fa-user-minus text-base"></i>
-                                                        Unassign Employee
-                                                    </button>
+                                                    <div class="flex flex-col gap-2">
+                                                        <button 
+                                                            class="kt-btn kt-btn-outline kt-btn-secondary w-full"
+                                                            on:click|stopPropagation={() => openUnassignModal(companyMachine)}
+                                                        >
+                                                            <i class="fa-solid fa-user-minus text-base"></i>
+                                                            Unassign Employee
+                                                        </button>
+                                                        {#if companyMachine.status !== 'sold'}
+                                                            <button 
+                                                                class="kt-btn kt-btn-outline kt-btn-warning w-full"
+                                                                on:click|stopPropagation={() => openSellModal(companyMachine)}
+                                                            >
+                                                                <i class="fa-solid fa-coins text-base"></i>
+                                                                Sell Machine
+                                                            </button>
+                                                        {/if}
+                                                    </div>
                                                 {/if}
                                             </div>
                                         </div>
@@ -648,6 +734,9 @@
 
     <!-- Hidden button to trigger maintenance modal -->
     <button style="display:none" data-kt-modal-toggle="#maintenance_modal"></button>
+
+    <!-- Hidden button to trigger sell modal -->
+    <button style="display:none" data-kt-modal-toggle="#sell_modal"></button>
 
     <!-- Machine Details Drawer -->
     <div class="hidden kt-drawer kt-drawer-end card flex-col max-w-[90%] w-[450px] top-5 bottom-5 end-5 rounded-xl border border-border" data-kt-drawer="true" data-kt-drawer-container="body" id="machine_drawer">
@@ -1178,6 +1267,144 @@
                         disabled={maintenanceLoading}
                     >
                         {maintenanceLoading ? 'Starting...' : 'Start Maintenance'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sell Machine Modal -->
+    <div class="kt-modal" data-kt-modal="true" id="sell_modal">
+        <div class="kt-modal-content max-w-[600px] top-[5%]">
+            <div class="kt-modal-header">
+                <h3 class="kt-modal-title">Sell Machine</h3>
+                <button
+                    type="button"
+                    class="kt-modal-close"
+                    aria-label="Close modal"
+                    data-kt-modal-dismiss="#sell_modal"
+                    on:click={closeSellModal}
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-x"
+                        aria-hidden="true"
+                    >
+                        <path d="M18 6 6 18"></path>
+                        <path d="m6 6 12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="kt-modal-body">
+                {#if machineToSell}
+                    <div class="space-y-4">
+                        <!-- Machine Info -->
+                        <div class="flex items-center gap-4">
+                            <div class="flex-shrink-0">
+                                {#if machineToSell.machine?.image_url}
+                                    <img 
+                                        src={machineToSell.machine.image_url} 
+                                        alt={machineToSell.machine.name}
+                                        class="w-16 h-16 rounded-lg object-cover"
+                                    />
+                                {:else}
+                                    <div class="w-16 h-16 rounded-lg bg-accent/50 flex items-center justify-center">
+                                        <i class="ki-filled ki-setting-3 text-xl text-muted-foreground"></i>
+                                    </div>
+                                {/if}
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-mono mb-1">{machineToSell.machine?.name}</h4>
+                                <p class="text-sm text-muted-foreground">{machineToSell.machine?.model} - {machineToSell.machine?.manufacturer}</p>
+                                <span class={getMachineStatusBadgeClass(machineToSell.status)}>
+                                    {machineToSell.status}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Estimated Price -->
+                        <div class="kt-card bg-accent/50">
+                            <div class="kt-card-header px-5">
+                                <h3 class="kt-card-title">Sale Details</h3>
+                            </div>
+                            <div class="kt-card-content px-5 py-4 space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm font-normal text-secondary-foreground">Estimated Sale Price:</span>
+                                    <span class="text-lg font-semibold text-mono">DZD {machineToSell.current_value?.toLocaleString() || 'N/A'}</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm font-normal text-secondary-foreground">Original Cost:</span>
+                                    <span class="text-sm font-medium text-mono">DZD {machineToSell.acquisition_cost?.toLocaleString() || machineToSell.machine?.cost_to_acquire?.toLocaleString() || 'N/A'}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Price Variation Warning -->
+                        <div class="kt-alert kt-alert-warning kt-alert-ghost">
+                            <div class="flex items-start gap-3">
+                                <i class="ki-filled ki-information-2 text-base text-warning-foreground mt-0.5"></i>
+                                <div class="flex-1">
+                                    <h5 class="text-sm font-semibold text-warning-foreground mb-1">Price Variation Notice</h5>
+                                    <p class="text-xs text-warning-foreground">
+                                        The final sale price may vary based on market conditions. 
+                                        Machines in 'broken' or 'maintenance' status may sell for up to 30% less than the estimated price.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Consequences Warning -->
+                        <div class="kt-alert kt-alert-destructive">
+                            <div class="flex items-start gap-3">
+                                <i class="ki-filled ki-warning-2 text-base text-destructive-foreground mt-0.5"></i>
+                                <div class="flex-1">
+                                    <h5 class="text-sm font-semibold text-destructive-foreground mb-1">Important Notice</h5>
+                                    <div class="text-xs text-destructive-foreground space-y-1">
+                                        {#if machineToSell.ongoing_production_order}
+                                            <p>• Any ongoing production order will be cancelled and lost</p>
+                                        {/if}
+                                        {#if machineToSell.status === 'maintenance'}
+                                            <p>• Any ongoing maintenance will be cancelled</p>
+                                        {/if}
+                                        {#if machineToSell.employee}
+                                            <p>• The assigned employee ({machineToSell.employee.name}) will become inactive</p>
+                                        {/if}
+                                        <p>• This action cannot be undone</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-sm text-muted-foreground">
+                            Are you sure you want to sell this machine?
+                        </div>
+                    </div>
+                {/if}
+            </div>
+            <div class="kt-modal-footer">
+                <div></div>
+                <div class="flex gap-4">
+                    <button
+                        class="kt-btn kt-btn-secondary"
+                        data-kt-modal-dismiss="#sell_modal"
+                        on:click={closeSellModal}
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        class="kt-btn kt-btn-warning"
+                        on:click={sellMachine}
+                        disabled={selling}
+                    >
+                        {selling ? 'Selling...' : 'Sell Machine'}
                     </button>
                 </div>
             </div>

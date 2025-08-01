@@ -23,6 +23,7 @@ return new class extends Migration
                 'employee_recruitment',
                 'employee_salary',
                 'machine_setup',
+                'machine_sold',
                 'machine_operations',
                 'maintenance',
                 'marketing',

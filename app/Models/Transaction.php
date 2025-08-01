@@ -25,6 +25,7 @@ class Transaction extends Model
     const TYPE_EMPLOYEE_RECRUITMENT = 'employee_recruitment';
     const TYPE_EMPLOYEE_SALARY = 'employee_salary';
     const TYPE_MACHINE_SETUP = 'machine_setup';
+    const TYPE_MACHINE_SOLD = 'machine_sold';
     const TYPE_MACHINE_OPERATIONS = 'machine_operations';
     const TYPE_MAINTENANCE = 'maintenance';
     const TYPE_MARKETING = 'marketing';

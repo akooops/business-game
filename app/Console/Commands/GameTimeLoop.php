@@ -63,6 +63,9 @@ class GameTimeLoop extends Command
         // Process machines reliability
         $this->call('game:process-machines-reliability');
 
+        // Process machines value
+        $this->call('game:process-machines-value');
+
         // Process maintenances
         $this->call('game:process-maintenances');
 

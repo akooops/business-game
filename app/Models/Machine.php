@@ -23,6 +23,7 @@ class Machine extends Model
         'min_speed' => 'decimal:3',
         'max_speed' => 'decimal:3',
         'reliability_decay_days' => 'decimal:3',
+        'loss_on_sale_days' => 'decimal:3',
         'min_maintenance_cost' => 'decimal:3',
         'max_maintenance_cost' => 'decimal:3',
     ];

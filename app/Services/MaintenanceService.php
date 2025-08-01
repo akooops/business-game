@@ -51,6 +51,8 @@ class MaintenanceService
             // If reliability is less than 0.4, set break threshold to 10%
             else if($reliability < 0.4){
                 $breakThreshold = 10; // 10% chance
+            } else {
+                $breakThreshold = 5; // 5% chance
             }
 
             // If break chance is less than or equal to break threshold, machine breaks
@@ -74,6 +76,14 @@ class MaintenanceService
                         'status' => ProductionOrder::STATUS_CANCELLED,
                     ]);
                 }
+
+                // Calculate value loss
+                $valueLoss = $companyMachine->current_value * $companyMachine->loss_on_sale_days;
+                $companyMachine->current_value -= $valueLoss;
+
+                $companyMachine->update([
+                    'current_value' => $companyMachine->current_value,
+                ]);
                 
                 // Create machine broken notification
                 NotificationService::createMachineBrokenNotification($companyMachine->company, $companyMachine);

@@ -203,12 +203,16 @@ class ValidationService
             $errors['employee'] = 'Employee not found.';
         }
 
-        if($machine->employee){
+        if($companyMachine->employee){
             $errors['employee'] = 'This machine already has an employee.';
         }
 
         if($employee->companyMachine){
             $errors['employee'] = 'This employee is already assigned to another machine. Consider unassigning this employee first.';
+        }
+
+        if($companyMachine->status != CompanyMachine::STATUS_INACTIVE){
+            $errors['machine'] = 'This machine is not inactive, it cannot be assigned to an employee.';
         }
 
         if($employee->status != Employee::STATUS_ACTIVE){
@@ -293,6 +297,16 @@ class ValidationService
 
         if($productionOrder->status != ProductionOrder::STATUS_IN_PROGRESS){
             $errors['status'] = 'This production order is not in progress.';
+        }
+
+        return $errors;
+    }
+
+    public static function validateMachineSell($companyMachine){
+        $errors = [];
+
+        if($companyMachine->status == CompanyMachine::STATUS_SOLD){
+            $errors['machine'] = 'This machine is already sold.';
         }
 
         return $errors;

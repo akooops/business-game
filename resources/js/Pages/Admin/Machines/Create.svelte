@@ -25,6 +25,7 @@
         model: '',
         manufacturer: '',
         cost_to_acquire: '',
+        loss_on_sale_days: '',
         operations_cost: '',
         carbon_footprint: '',
         quality_factor: '',
@@ -255,6 +256,27 @@
                                     <p class="text-sm text-destructive">{errors.cost_to_acquire}</p>
                                 {/if}
                             </div>
+
+                            <!-- Loss on Sale -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-medium text-mono" for="loss_on_sale_days">
+                                    Loss on Sale (%) <span class="text-destructive">*</span>
+                                </label>
+                                <input 
+                                    id="loss_on_sale_days"
+                                    type="number" 
+                                    bind:value={formData.loss_on_sale_days}
+                                    class="kt-input {errors.loss_on_sale_days ? 'kt-input-error' : ''}"
+                                    placeholder="Enter loss on sale (%) / day of cost to acquire"
+                                    min="0"
+                                    max="1"
+                                    step="0.001"
+                                    required
+                                />
+                                {#if errors.loss_on_sale_days}
+                                    <p class="text-sm text-destructive">{errors.loss_on_sale_days}</p>
+                                {/if}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -346,7 +368,7 @@
                             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                 <div class="flex flex-col gap-2">
                                     <label class="text-sm font-medium text-mono" for="operations_cost">
-                                        Operations Cost (DZD/day) <span class="text-destructive">*</span>
+                                        Operations Cost (DZD/week) <span class="text-destructive">*</span>
                                     </label>
                                     <input 
                                         id="operations_cost"

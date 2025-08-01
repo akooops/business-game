@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Company;
 use App\Http\Requests\Company\Machines\SetupMachineRequest;
 use App\Http\Requests\Company\Machines\AssignEmployeeRequest;
 use App\Http\Requests\Company\Machines\StartMaintenanceRequest;
+use App\Http\Requests\Company\Machines\SellMachineRequest;
 use App\Services\FileService;
 use App\Services\IndexService;
 use App\Services\ProductionService;
@@ -91,6 +92,17 @@ class MachinesController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Maintenance started successfully!'
+        ]);
+    }
+
+    public function sell(SellMachineRequest $request, CompanyMachine $companyMachine)
+    {
+        $company = $request->company;
+        ProductionService::sellMachine($companyMachine);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Machine sold successfully!'
         ]);
     }
 } 

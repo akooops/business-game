@@ -148,6 +148,8 @@ class HrService
                 $resignationThreshold = 25; // 25% chance
             } else if($mood < 0.4){
                 $resignationThreshold = 10; // 10% chance
+            } else {
+                $resignationThreshold = 5; // 5% chance
             }
 
             if($resignationChance <= $resignationThreshold){

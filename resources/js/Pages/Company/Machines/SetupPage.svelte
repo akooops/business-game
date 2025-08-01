@@ -300,6 +300,10 @@
                                                     <span>Cost to Acquire:</span>
                                                     <span class="font-medium">DZD {machine.cost_to_acquire}</span>
                                                 </div>
+                                                <div class="flex justify-between">
+                                                    <span>Value Loss Rate:</span>
+                                                    <span class="font-medium">{machine.loss_on_sale_days * 100}%/day</span>
+                                                </div>
                                             </div>
 
                                             <div class="mt-4 pt-3 border-t border-border">
@@ -444,6 +448,10 @@
                         <div class="flex justify-between">
                             <span class="text-xs text-muted-foreground">Reliability Decay:</span>
                             <span class="text-xs font-medium">{selectedMachine.reliability_decay_days * 100}%/day</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-xs text-muted-foreground">Value Loss Rate:</span>
+                            <span class="text-xs font-medium">{selectedMachine.loss_on_sale_days * 100}%/day</span>
                         </div>
                     </div>
                 </div>
@@ -631,6 +639,10 @@
                                     <div class="flex justify-between">
                                         <span class="text-sm text-muted-foreground">Quality Factor:</span>
                                         <span class="font-medium">{setupData.machine.quality_factor * 100}%</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-muted-foreground">Value Loss Rate:</span>
+                                        <span class="font-medium">{setupData.machine.loss_on_sale_days * 100}%/day of acquisition cost</span>
                                     </div>
                                 </div>
                             </div>

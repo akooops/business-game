@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Employee;
 use App\Models\Machine;
 use App\Models\CompanyMachine;
+use App\Models\Maintenance;
 use App\Models\ProductionOrder;
 
 class ProductionService
@@ -21,6 +22,9 @@ class ProductionService
             'carbon_footprint' => $machine->carbon_footprint,
             'operations_cost' => $machine->operations_cost,
             'reliability_decay_days' => $machine->reliability_decay_days,
+            'loss_on_sale_days' => $machine->loss_on_sale_days,
+            'acquisition_cost' => $machine->cost_to_acquire,
+            'current_value' => $machine->cost_to_acquire,
             'maintenance_cost' => $maintenance_cost,
             'maintenance_time_days' => $maintenance_time_days,
             'current_reliability' => 1,
@@ -152,5 +156,75 @@ class ProductionService
 
         FinanceService::payMachineOperationCost($company, $totalCost);
         NotificationService::createMachineOperationCostsPaidNotification($company, $totalCost);
+    }
+
+    public static function calculateMachinesValue($company){
+        $companyMachines = CompanyMachine::where('company_id', $company->id)->get();
+
+        foreach($companyMachines as $companyMachine){
+            $currentValue = $companyMachine->current_value;
+            $lossOnSaleDays = $companyMachine->loss_on_sale_days;
+            $currentTimestamp = SettingsService::getCurrentTimestamp();
+            $setupAt = $companyMachine->setup_at;
+
+            $timeSinceSetup = $currentTimestamp->diffInDays($setupAt);
+
+            if($timeSinceSetup > 0){
+                $valueLoss = $currentValue * $lossOnSaleDays * $timeSinceSetup;
+                $currentValue -= $valueLoss;
+
+                $companyMachine->update([
+                    'current_value' => $currentValue,
+                ]);
+            }
+        }
+    }
+
+    public static function sellMachine($companyMachine){
+        $brokenFactor = 0;  
+
+        if($companyMachine->status == CompanyMachine::STATUS_BROKEN){
+            $brokenFactor = rand(1, 30) / 100;
+        } else if($companyMachine->status == CompanyMachine::STATUS_MAINTENANCE){
+            $brokenFactor = rand(1, 5) / 100;
+        }
+
+        $companyMachine->update([
+            'status' => CompanyMachine::STATUS_SOLD,
+        ]);
+
+        // Cancel all production orders for the company machine
+        $productionOrders = ProductionOrder::where([
+            'company_machine_id' => $companyMachine->id,
+            'status' => ProductionOrder::STATUS_IN_PROGRESS,
+        ])->get();
+
+        // Cancel each production order
+        foreach($productionOrders as $productionOrder){ 
+            $productionOrder->update([
+                'status' => ProductionOrder::STATUS_CANCELLED,
+            ]);
+        }
+
+        // Unassign employee
+        self::unassignEmployee($companyMachine);
+
+        // Cancel all maintenances for the company machine
+        $maintenances = Maintenance::where([
+            'company_machine_id' => $companyMachine->id, 
+            'status' => Maintenance::STATUS_IN_PROGRESS,
+        ])->get();
+
+        foreach($maintenances as $maintenance){
+            $maintenance->update([
+                'status' => Maintenance::STATUS_CANCELLED,
+            ]);
+        }
+
+        $soldPrice = $companyMachine->current_value * (1 - $brokenFactor);
+
+        // Receive machine sale
+        FinanceService::receiveMachineSale($companyMachine->company, $soldPrice);
+        NotificationService::createMachineSoldNotification($companyMachine->company, $companyMachine, $soldPrice);
     }
 }

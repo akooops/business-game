@@ -21,9 +21,7 @@ class FinanceService
         Transaction::create([
             'company_id' => $company->id,
             'amount' => $technology->research_cost,
-            'type' => 'technology',
-            'reference_id' => $technology->id,
-            'reference_type' => 'technology',
+            'type' => Transaction::TYPE_TECHNOLOGY,
         ]);
 
         return $funds;  
@@ -40,9 +38,7 @@ class FinanceService
         Transaction::create([
             'company_id' => $company->id,
             'amount' => $purchase->total_cost,
-            'type' => 'purchase',
-            'reference_id' => $purchase->id,
-            'reference_type' => 'purchase',
+            'type' => Transaction::TYPE_PURCHASE,
         ]);
 
 
@@ -60,7 +56,7 @@ class FinanceService
         Transaction::create([
             'company_id' => $company->id,
             'amount' => $totalCost,
-            'type' => 'inventory',
+            'type' => Transaction::TYPE_INVENTORY,
         ]);
 
         return $funds;
@@ -77,9 +73,7 @@ class FinanceService
         Transaction::create([
             'company_id' => $company->id,
             'amount' => $sale->shipping_cost * $sale->quantity,
-            'type' => 'sale_shipping',
-            'reference_id' => $sale->id,
-            'reference_type' => 'sale',
+            'type' => Transaction::TYPE_SALE_SHIPPING,
         ]);
 
 
@@ -94,9 +88,7 @@ class FinanceService
         Transaction::create([
             'company_id' => $company->id,
             'amount' => $sale->sale_price * $sale->quantity,
-            'type' => 'sale_payment',
-            'reference_id' => $sale->id,
-            'reference_type' => 'sale',
+            'type' => Transaction::TYPE_SALE_PAYMENT,
         ]);
 
         return $funds;
@@ -113,9 +105,7 @@ class FinanceService
         Transaction::create([
             'company_id' => $company->id,
             'amount' => $employee->recruitment_cost,
-            'type' => 'employee_recruitment',
-            'reference_id' => $employee->id,
-            'reference_type' => 'employee',
+            'type' => Transaction::TYPE_EMPLOYEE_RECRUITMENT,
         ]);
 
         return $funds;
@@ -130,7 +120,7 @@ class FinanceService
         Transaction::create([
             'company_id' => $company->id,
             'amount' => $totalSalaries,
-            'type' => 'employee_salary',
+            'type' => Transaction::TYPE_EMPLOYEE_SALARY,
         ]);
 
         return $funds;
@@ -147,9 +137,7 @@ class FinanceService
         Transaction::create([
             'company_id' => $company->id,
             'amount' => $machine->cost_to_acquire,
-            'type' => 'machine_setup',
-            'reference_id' => $machine->id,
-            'reference_type' => 'machine',
+            'type' => Transaction::TYPE_MACHINE_SETUP,
         ]);
 
         return $funds;
@@ -163,9 +151,7 @@ class FinanceService
         Transaction::create([
             'company_id' => $company->id,
             'amount' => $machine->operations_cost,
-            'type' => 'machine_operations',
-            'reference_id' => $machine->id,
-            'reference_type' => 'machine',
+            'type' => Transaction::TYPE_MACHINE_OPERATIONS,
         ]);
 
         return $funds;
@@ -182,9 +168,7 @@ class FinanceService
         Transaction::create([
             'company_id' => $company->id,
             'amount' => $maintenance->maintenances_cost,
-            'type' => 'maintenance',
-            'reference_id' => $maintenance->id,
-            'reference_type' => 'maintenance',
+            'type' => Transaction::TYPE_MAINTENANCE,
         ]);
 
         return $funds;
@@ -201,9 +185,7 @@ class FinanceService
         Transaction::create([
             'company_id' => $company->id,
             'amount' => $loanAmount,
-            'type' => 'loan_received',
-            'reference_id' => $loanId,
-            'reference_type' => 'loan',
+            'type' => Transaction::TYPE_LOAN_RECEIVED,
         ]);
 
         return $funds;
@@ -217,9 +199,25 @@ class FinanceService
         Transaction::create([
             'company_id' => $company->id,
             'amount' => $paymentAmount,
-            'type' => 'loan_payment',
-            'reference_id' => $loanId,
-            'reference_type' => 'loan',
+            'type' => Transaction::TYPE_LOAN_PAYMENT,
+        ]);
+
+        return $funds;
+    }
+
+    //-------------------------------------
+    // Machines
+    //-------------------------------------
+    public static function receiveMachineSale($company, $soldPrice){
+        $funds = $company->funds;
+        $funds += $soldPrice;
+        
+        $company->update(['funds' => $funds]);
+
+        Transaction::create([
+            'company_id' => $company->id,
+            'amount' => $soldPrice,
+            'type' => Transaction::TYPE_MACHINE_SOLD,
         ]);
 
         return $funds;

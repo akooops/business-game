@@ -53,10 +53,11 @@ Route::prefix('company')->middleware(['auth', 'check.company', 'handle.inertia']
     Route::get('/machines', [MachinesController::class, 'index'])->name('company.machines.index');
     Route::get('/machines/setup-page', [MachinesController::class, 'setupPage'])->name('company.machines.setup-page');
     Route::post('/machines/{machine}/setup', [MachinesController::class, 'setup'])->name('company.machines.setup');
+    Route::post('/machines/{companyMachine}/sell', [MachinesController::class, 'sell'])->name('company.machines.sell');
     Route::post('/machines/{companyMachine}/assign-employee', [MachinesController::class, 'assignEmployee'])->name('company.machines.assign-employee');
     Route::post('/machines/{companyMachine}/unassign-employee', [MachinesController::class, 'unassignEmployee'])->name('company.machines.unassign-employee');
     Route::post('/machines/{companyMachine}/start-maintenance', [MachinesController::class, 'startMaintenance'])->name('company.machines.start-maintenance');
-
+    
     // Product Demand
     Route::get('/product-demand', [ProductDemandController::class, 'index'])->name('company.product-demand.index');
 

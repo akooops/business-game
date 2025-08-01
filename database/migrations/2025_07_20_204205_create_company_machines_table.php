@@ -23,7 +23,7 @@ return new class extends Migration
             $table->integer('maintenance_time_days')->default(0);
 
             $table->decimal('current_reliability', 15, 3)->default(0);
-            $table->enum('status', ['active', 'inactive', 'maintenance', 'broken'])->default('inactive');
+            $table->enum('status', ['active', 'inactive', 'maintenance', 'broken', 'sold'])->default('inactive');
 
             // Timestamps
             $table->timestamp('setup_at')->nullable();            

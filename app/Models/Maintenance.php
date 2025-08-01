@@ -20,6 +20,7 @@ class Maintenance extends Model
     // Statuses
     const STATUS_IN_PROGRESS = 'in_progress';
     const STATUS_COMPLETED = 'completed';
+    const STATUS_CANCELLED = 'cancelled';
 
     // Types
     const TYPE_CORRECTIVE = 'corrective';

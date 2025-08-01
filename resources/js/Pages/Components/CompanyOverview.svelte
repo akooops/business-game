@@ -112,6 +112,7 @@
             'employee_recruitment': 'Employee Recruitment',
             'employee_salary': 'Employee Salary',
             'machine_setup': 'Machine Setup',
+            'machine_sold': 'Machine Sold',
             'machine_operations': 'Machine Operations',
             'maintenance': 'Maintenance',
             'marketing': 'Marketing',
@@ -123,7 +124,7 @@
 
     // Check if transaction type is income (positive)
     function isIncomeTransaction(type) {
-        return ['sale_payment', 'loan_received'].includes(type);
+        return ['sale_payment', 'loan_received', 'machine_sold'].includes(type);
     }
 
     // Format time ago

@@ -15,6 +15,9 @@ class CompanyMachine extends Model
 
     protected $casts = [
         'current_reliability' => 'decimal:3',
+        'loss_on_sale_days' => 'decimal:3',
+        'acquisition_cost' => 'decimal:3',
+        'current_value' => 'decimal:3',
         'setup_at' => 'datetime',
         'last_maintenance_at' => 'datetime',
         'last_broken_at' => 'datetime',
@@ -24,6 +27,7 @@ class CompanyMachine extends Model
     const STATUS_INACTIVE = 'inactive';
     const STATUS_BROKEN = 'broken';
     const STATUS_MAINTENANCE = 'maintenance';
+    const STATUS_SOLD = 'sold';
 
     // Relations
     public function machine()

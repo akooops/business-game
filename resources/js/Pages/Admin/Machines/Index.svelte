@@ -317,7 +317,7 @@
                                                     </div>
                                                     <div class="flex items-center gap-1">
                                                         <span class="text-xs text-muted-foreground">Operations Cost:</span>
-                                                        <span class="text-xs font-medium">{machine.operations_cost} DZD/day</span>
+                                                        <span class="text-xs font-medium">{machine.operations_cost} DZD/week</span>
                                                     </div>
                                                     <div class="flex items-center gap-1">
                                                         <span class="text-xs text-muted-foreground">Carbon Footprint:</span>
@@ -329,6 +329,10 @@
                                                 <div class="flex items-center gap-1">
                                                     <span class="text-xs text-muted-foreground">Cost to Acquire:</span>
                                                     <span class="text-xs font-medium">{machine.cost_to_acquire} DZD</span>
+                                                </div>
+                                                <div class="flex items-center gap-1">
+                                                    <span class="text-xs text-muted-foreground">Loss on Sale:</span>
+                                                    <span class="text-xs font-medium">{machine.loss_on_sale_days * 100}% / day</span>
                                                 </div>
                                             </td>
                                             <td class="text-center">
