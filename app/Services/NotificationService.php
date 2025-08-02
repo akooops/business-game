@@ -412,11 +412,11 @@ class NotificationService
         ]);
     }
 
-    public static function createLoanBorrowedInsufficientFundsNotification($company, $loan){
+    public static function createLoanBorrowedInsufficientFundsNotification($company, $loan, $reason){
         return Notification::create([
             'type' => Notification::TYPE_LOAN_BORROWED_INSUFFICIENT_FUNDS,
             'title' => 'Loan Borrowed Insufficient Funds',
-            'message' => "Montly loan payments failed because of insufficient funds. A new loan has been borrowed to cover the monthly payments from {$loan->bank->name} for DZD {$loan->monthly_payment} for {$loan->duration_months} months.",
+            'message' => "Insufficient funds to pay ". $reason." payments. A new loan has been borrowed to cover the monthly payments from {$loan->bank->name} for DZD {$loan->monthly_payment} for {$loan->duration_months} months.",
             'url' => route('company.loans.index'),
             'user_id' => $company->user_id,
         ]);

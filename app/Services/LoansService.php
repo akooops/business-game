@@ -7,7 +7,7 @@ use App\Models\Loan;
 
 class LoansService
 {
-    public static function borrowMoney($company, $bank, $amount, $insufficientFunds = false){
+    public static function borrowMoney($company, $bank, $amount, $reason = null){
         $totalAmount = $amount * (1 + $bank->loan_interest_rate);
         $monthlyPayment = $totalAmount / $bank->loan_duration_months;
 
@@ -28,10 +28,10 @@ class LoansService
 
         FinanceService::receiveLoan($company, $amount, $loan->id);
 
-        if(!$insufficientFunds){
-            NotificationService::createLoanBorrowedNotification($company, $loan);
+        if($reason){
+            NotificationService::createLoanBorrowedInsufficientFundsNotification($company, $loan, $reason);
         }else{
-            NotificationService::createLoanBorrowedInsufficientFundsNotification($company, $loan);
+            NotificationService::createLoanBorrowedNotification($company, $loan);
         }
     }
 
@@ -51,7 +51,7 @@ class LoansService
 
             if($company->funds < $loan->monthly_payment){
                 $randomBank = Bank::inRandomOrder()->first();
-                self::borrowMoney($company, $randomBank, $loan->monthly_payment, true);
+                self::borrowMoney($company, $randomBank, $loan->monthly_payment, "existing monthly loan payments");
             }
 
             FinanceService::payLoan($company, $loan->monthly_payment);

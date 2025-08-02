@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Bank;
 use App\Models\Transaction;
 
 class FinanceService
@@ -49,6 +50,12 @@ class FinanceService
     // Inventory
     //-------------------------------------
     public static function payInventoryCosts($company, $product, $totalCost){
+        if($totalCost > $company->funds){
+            $randomBank = Bank::inRandomOrder()->first();
+
+            LoansService::borrowMoney($company, $randomBank, $totalCost, "inventory costs");
+        }
+
         $funds = $company->funds;
         $funds -= $totalCost;
         $company->update(['funds' => $funds]);
@@ -112,10 +119,15 @@ class FinanceService
     }
 
     public static function payEmployeesSalary($company, $totalSalaries){
+        if($totalSalaries > $company->funds){
+            $randomBank = Bank::inRandomOrder()->first();
+
+            LoansService::borrowMoney($company, $randomBank, $totalSalaries, "employee salaries");
+        }
+
         $funds = $company->funds;
         $funds -= $totalSalaries;
         $company->update(['funds' => $funds]);
-
 
         Transaction::create([
             'company_id' => $company->id,
@@ -144,6 +156,12 @@ class FinanceService
     }
 
     public static function payMachineOperationCost($company, $machine){
+        if($machine->operations_cost > $company->funds){
+            $randomBank = Bank::inRandomOrder()->first();
+
+            LoansService::borrowMoney($company, $randomBank, $machine->operations_cost, "machine operation costs");
+        }
+
         $funds = $company->funds;
         $funds -= $machine->operations_cost;
         $company->update(['funds' => $funds]);
