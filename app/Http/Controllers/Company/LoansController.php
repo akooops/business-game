@@ -18,11 +18,12 @@ class LoansController extends Controller
      */
     public function index(Request $request)
     {
-        $banks = Bank::latest();       
+        $company = $request->company;
+        $loans = $company->loans()->with('bank')->latest();       
 
         if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
             return response()->json([
-                'banks' => $banks->get(),
+                'loans' => $loans->get(),
             ]);
         }
 

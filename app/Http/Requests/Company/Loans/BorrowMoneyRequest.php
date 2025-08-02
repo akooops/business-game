@@ -25,7 +25,7 @@ class BorrowMoneyRequest extends FormRequest
     {
         return [
             'bank_id' => 'required|exists:banks,id',
-            'amount' => 'required|numeric|min:1000',
+            'amount' => 'required|numeric|min:0.001',
         ];
     }
 

@@ -19,7 +19,7 @@ class Loan extends Model
         'total_amount' => 'decimal:3',
         'monthly_payment' => 'decimal:3',
         'remaining_amount' => 'decimal:3',
-        'is_paid' => 'boolean',
+        'paid_at' => 'datetime',
     ];
 
     // Relations
