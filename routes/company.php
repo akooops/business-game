@@ -16,6 +16,8 @@ use App\Http\Controllers\Company\EmployeesController;
 use App\Http\Controllers\Company\MachinesController;
 use App\Http\Controllers\Company\ProductionOrdersController;
 use App\Http\Controllers\Company\TransactionsController;
+use App\Http\Controllers\Company\BanksController;
+use App\Http\Controllers\Company\LoansController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,6 +33,14 @@ use App\Http\Controllers\Company\TransactionsController;
 Route::prefix('company')->middleware(['auth', 'check.company', 'handle.inertia'])->group(function () {
     // Dashboard
     Route::get('/', [DashboardController::class, 'index'])->name('company.dashboard.index');
+
+    // Banks
+    Route::get('/banks', [BanksController::class, 'index'])->name('company.banks.index');
+
+    // Loans
+    Route::get('/loans', [LoansController::class, 'index'])->name('company.loans.index');
+    Route::post('/loans', [LoansController::class, 'store'])->name('company.loans.store');
+    Route::post('/loans/{loan}/pay', [LoansController::class, 'pay'])->name('company.loans.pay');
 
     // Countries
     Route::get('/countries', [CountriesController::class, 'index'])->name('company.countries.index');

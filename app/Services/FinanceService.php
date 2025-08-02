@@ -177,7 +177,7 @@ class FinanceService
     //-------------------------------------
     // Loans
     //-------------------------------------
-    public static function receiveLoan($company, $loanAmount, $loanId = null){
+    public static function receiveLoan($company, $loanAmount){
         $funds = $company->funds;
         $funds += $loanAmount;
         $company->update(['funds' => $funds]);
@@ -191,7 +191,7 @@ class FinanceService
         return $funds;
     }
 
-    public static function payLoan($company, $paymentAmount, $loanId = null){
+    public static function payLoan($company, $paymentAmount){
         $funds = $company->funds;
         $funds -= $paymentAmount;
         $company->update(['funds' => $funds]);

@@ -73,6 +73,9 @@ class GameTimeLoop extends Command
         if($newTime->day == 1 ){
             // Pay employees salaries
             $this->call('game:pay-employees-salaries');
+
+            // Pay monthly loans
+            $this->call('game:pay-monthly-loans');
         }
 
         // Every week

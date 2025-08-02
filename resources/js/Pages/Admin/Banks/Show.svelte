@@ -114,7 +114,7 @@
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Interest Rate</h4>
                             <p class="text-sm text-secondary-foreground font-bold">
-                                {bank.loan_interest_rate}%
+                                {bank.loan_interest_rate * 100}%
                                 <span class="text-xs text-muted-foreground ml-2 font-normal">
                                     (From total borrowed amount)
                                 </span>

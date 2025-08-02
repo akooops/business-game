@@ -399,6 +399,39 @@ class NotificationService
         ]);
     }
 
+    // ------------------------------------------------------------
+    // Loans
+    // ------------------------------------------------------------
+    public static function createLoanBorrowedNotification($company, $loan){
+        return Notification::create([
+            'type' => Notification::TYPE_LOAN_BORROWED,
+            'title' => 'Loan Borrowed', 
+            'message' => "Loan borrowed from {$loan->bank->name} for DZD {$loan->amount} for {$loan->duration_months} months.",
+            'url' => route('company.loans.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
+    public static function createLoanBorrowedInsufficientFundsNotification($company, $loan){
+        return Notification::create([
+            'type' => Notification::TYPE_LOAN_BORROWED_INSUFFICIENT_FUNDS,
+            'title' => 'Loan Borrowed Insufficient Funds',
+            'message' => "Montly loan payments failed because of insufficient funds. A new loan has been borrowed to cover the monthly payments from {$loan->bank->name} for DZD {$loan->monthly_payment} for {$loan->duration_months} months.",
+            'url' => route('company.loans.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
+    public static function createLoanPaidNotification($company, $loan){
+        return Notification::create([
+            'type' => Notification::TYPE_LOAN_PAID,
+            'title' => 'Loan Paid',
+            'message' => "Loan paid to {$loan->bank->name} for DZD {$loan->monthly_payment}.",
+            'url' => route('company.loans.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
     public static function getUnreadCount()
     {
         return Notification::where('user_id', auth()->user()->id)->whereNull('read_at')->count();

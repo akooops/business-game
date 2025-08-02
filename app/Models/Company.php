@@ -79,5 +79,10 @@ class Company extends Model
             ->withTimestamps();
     }
 
+    public function loans()
+    {
+        return $this->hasMany(Loan::class);
+    }
+
     // Accessors
 }

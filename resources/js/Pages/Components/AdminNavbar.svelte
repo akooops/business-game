@@ -227,6 +227,36 @@
             <div class="kt-menu-item" data-kt-menu-item-offset="0,0|lg:-20px, 0" data-kt-menu-item-offset-rtl="0,0|lg:20px, 0" data-kt-menu-item-overflow="true" data-kt-menu-item-placement="bottom-start" data-kt-menu-item-placement-rtl="bottom-end" data-kt-menu-item-toggle="dropdown" data-kt-menu-item-trigger="click|lg:hover">
                 <div class="kt-menu-link lg:py-3.5 border-b border-b-transparent kt-menu-item-active:border-b-mono text-foreground kt-menu-item-hover:text-mono kt-menu-item-active:text-mono kt-menu-item-here:border-b-mono kt-menu-item-here:text-mono">
                     <span class="kt-menu-title font-medium text-foreground text-sm">
+                        Banks
+                    </span>
+                    <span class="kt-menu-arrow flex lg:hidden">
+                    <span class="flex kt-menu-item-show:hidden">
+                    <i class="ki-filled ki-plus text-xs text-secondary-foreground">
+                    </i>
+                    </span>
+                    <span class="hidden kt-menu-item-show:inline-flex">
+                    <i class="ki-filled ki-minus text-xs text-secondary-foreground">
+                    </i>
+                    </span>
+                    </span>
+                </div>
+                <div class="kt-menu-dropdown kt-menu-default py-2.5 w-full max-w-[220px]">
+                    <div class="kt-menu-item">
+                        <a class="kt-menu-link" href={route('admin.banks.index')} tabindex="0">
+                        <span class="kt-menu-icon">
+                            <i class="fa-solid fa-bank text-sm"></i>
+                        </span>
+                        <span class="kt-menu-title grow-0">
+                            Banks
+                        </span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-menu-item" data-kt-menu-item-offset="0,0|lg:-20px, 0" data-kt-menu-item-offset-rtl="0,0|lg:20px, 0" data-kt-menu-item-overflow="true" data-kt-menu-item-placement="bottom-start" data-kt-menu-item-placement-rtl="bottom-end" data-kt-menu-item-toggle="dropdown" data-kt-menu-item-trigger="click|lg:hover">
+                <div class="kt-menu-link lg:py-3.5 border-b border-b-transparent kt-menu-item-active:border-b-mono text-foreground kt-menu-item-hover:text-mono kt-menu-item-active:text-mono kt-menu-item-here:border-b-mono kt-menu-item-here:text-mono">
+                    <span class="kt-menu-title font-medium text-foreground text-sm">
                         Settings
                     </span>
                     <span class="kt-menu-arrow flex lg:hidden">

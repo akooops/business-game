@@ -311,4 +311,37 @@ class ValidationService
 
         return $errors;
     }
+
+    //-------------------------------------
+    // Loans
+    //-------------------------------------
+    public static function validateBorrowMoney($bank, $amount){
+        $errors = [];
+
+        if(!$bank){
+            $errors['bank'] = 'Bank not found.';
+        }
+
+        if($amount > $bank->loan_max_amount){
+            $errors['amount'] = 'This bank can not lend you more than his maximum loan amount.';
+        }
+
+        return $errors;
+    }   
+
+    public static function validatePayLoan($loan){
+        $errors = [];
+
+        if($loan->is_paid){
+            $errors['loan'] = 'This loan is already paid.';
+        }
+
+        $hasSufficientFunds = FinanceService::haveSufficientFunds($loan->company, $loan->remaining_amount);
+        
+        if(!$hasSufficientFunds){
+            $errors['funds'] = 'This company does not have enough funds to pay this loan. You need to borrow more money.';
+        }
+
+        return $errors;
+    }
 }

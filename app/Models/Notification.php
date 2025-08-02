@@ -76,6 +76,11 @@ class Notification extends Model
     const TYPE_MACHINE_MAINTENANCE_STARTED = 'machine_maintenance_started';
     const TYPE_MACHINE_MAINTENANCE_COMPLETED = 'machine_maintenance_completed';
 
+    // Loans
+    const TYPE_LOAN_BORROWED = 'loan_borrowed';
+    const TYPE_LOAN_BORROWED_INSUFFICIENT_FUNDS = 'loan_borrowed_insufficient_funds';
+    const TYPE_LOAN_PAID = 'loan_paid';
+
     // Icons for different notification types
     const ICONS = [
         self::TYPE_TECHNOLOGY_RESEARCH_STARTED => 'fa-solid fa-rocket',
@@ -111,6 +116,9 @@ class Notification extends Model
         self::TYPE_MACHINE_OPERATION_COSTS_PAID => 'fa-solid fa-coins',
         self::TYPE_MACHINE_MAINTENANCE_COMPLETED => 'fa-solid fa-hammer',
         self::TYPE_MACHINE_SOLD => 'fa-solid fa-coins',
+        self::TYPE_LOAN_BORROWED => 'fa-solid fa-coins',
+        self::TYPE_LOAN_BORROWED_INSUFFICIENT_FUNDS => 'fa-solid fa-coins',
+        self::TYPE_LOAN_PAID => 'fa-solid fa-coins',
     ];
 
     // Methods

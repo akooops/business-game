@@ -310,7 +310,7 @@
                                             </td>
                                             <td>
                                                 <span class="text-sm font-medium text-secondary-foreground">
-                                                    {bank.loan_interest_rate}%
+                                                    {bank.loan_interest_rate * 100}%
                                                 </span>
                                             </td>
                                             <td>

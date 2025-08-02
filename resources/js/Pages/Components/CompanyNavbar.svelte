@@ -143,6 +143,38 @@
                     </div>
                 </div>
             </div>
+
+            <div class="kt-menu-item" data-kt-menu-item-toggle="dropdown" data-kt-menu-item-trigger="click|lg:hover">
+                <div class="kt-menu-link lg:py-3.5 border-b border-b-transparent kt-menu-item-active:border-b-mono text-foreground kt-menu-item-hover:text-mono kt-menu-item-active:text-mono kt-menu-item-here:border-b-mono kt-menu-item-here:text-mono">
+                    <span class="kt-menu-title font-medium text-foreground text-sm">Finance</span>
+                </div>
+                <div class="kt-menu-dropdown kt-menu-default py-2.5 w-full max-w-[220px]">
+                    <div class="kt-menu-item">
+                        <a class="kt-menu-link" href={route('company.banks.index')} tabindex="0">
+                            <span class="kt-menu-icon">
+                                <i class="fa-solid fa-building-columns text-sm"></i>
+                            </span>
+                            <span class="kt-menu-title grow-0">Banks</span>
+                        </a>
+                    </div>
+                    <div class="kt-menu-item">
+                        <a class="kt-menu-link" href={route('company.loans.index')} tabindex="0">
+                            <span class="kt-menu-icon">
+                                <i class="fa-solid fa-money-bill-transfer text-sm"></i>
+                            </span>
+                            <span class="kt-menu-title grow-0">Loans</span>
+                        </a>
+                    </div>
+                    <div class="kt-menu-item">
+                        <a class="kt-menu-link" href={route('company.transactions.index')} tabindex="0">
+                            <span class="kt-menu-icon">
+                                <i class="fa-solid fa-money-bill-transfer text-sm"></i>
+                            </span>
+                            <span class="kt-menu-title grow-0">Transactions</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
         <!-- End of Mega Menu -->
     </div>
