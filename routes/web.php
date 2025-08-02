@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\SuppliersController;
 use App\Http\Controllers\Admin\CompaniesController;
 use App\Http\Controllers\Admin\BanksController;
+use App\Http\Controllers\Admin\EventsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -95,6 +96,10 @@ Route::prefix('admin')->middleware(['auth', 'check.admin', 'handle.inertia'])->g
     Route::get('employee-profiles/{employeeProfile}/edit', [EmployeeProfilesController::class, 'edit'])->name('admin.employee-profiles.edit');
     Route::patch('employee-profiles/{employeeProfile}', [EmployeeProfilesController::class, 'update'])->name('admin.employee-profiles.update');
     Route::delete('employee-profiles/{employeeProfile}', [EmployeeProfilesController::class, 'destroy'])->name('admin.employee-profiles.destroy');
+
+    //Events    
+    Route::get('events', [EventsController::class, 'index'])->name('admin.events.index');
+    Route::post('events', [EventsController::class, 'run'])->name('admin.events.run');
 
     // Machines 
     Route::get('machines', [MachinesController::class, 'index'])->name('admin.machines.index');
