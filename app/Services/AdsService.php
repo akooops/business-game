@@ -29,7 +29,7 @@ class AdsService
         return $adMarketImpactPercentage;
     }
 
-    public static function processAdPackageCompletion($company){
+    public static function ProcessAdPackagesCompletion($company){
         $ads = $company->ads()->where('status', Ad::STATUS_ACTIVE)->get();
 
         foreach($ads as $ad){

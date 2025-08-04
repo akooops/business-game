@@ -69,6 +69,9 @@ class GameTimeLoop extends Command
         // Process maintenances
         $this->call('game:process-maintenances');
 
+        // Process ad packages completion
+        $this->call('game:process-ad-packages-completion');
+
         // Every start of the month
         if($newTime->day == 1 ){
             // Pay employees salaries
