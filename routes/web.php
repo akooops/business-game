@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\SuppliersController;
 use App\Http\Controllers\Admin\CompaniesController;
 use App\Http\Controllers\Admin\BanksController;
 use App\Http\Controllers\Admin\EventsController;
+use App\Http\Controllers\Admin\AdvertisersController;
 
 /*
 |--------------------------------------------------------------------------
@@ -60,6 +61,15 @@ Route::middleware(['auth', 'handle.inertia'])->group(function () {
 
 Route::prefix('admin')->middleware(['auth', 'check.admin', 'handle.inertia'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('admin.dashboard.index');
+
+    // Advertisers
+    Route::get('advertisers', [AdvertisersController::class, 'index'])->name('admin.advertisers.index');
+    Route::get('advertisers/create', [AdvertisersController::class, 'create'])->name('admin.advertisers.create');
+    Route::post('advertisers', [AdvertisersController::class, 'store'])->name('admin.advertisers.store');
+    Route::get('advertisers/{advertiser}', [AdvertisersController::class, 'show'])->name('admin.advertisers.show');
+    Route::get('advertisers/{advertiser}/edit', [AdvertisersController::class, 'edit'])->name('admin.advertisers.edit');
+    Route::patch('advertisers/{advertiser}', [AdvertisersController::class, 'update'])->name('admin.advertisers.update');
+    Route::delete('advertisers/{advertiser}', [AdvertisersController::class, 'destroy'])->name('admin.advertisers.destroy');
 
     // Banks
     Route::get('banks', [BanksController::class, 'index'])->name('admin.banks.index');

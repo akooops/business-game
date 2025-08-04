@@ -41,6 +41,8 @@ class AppServiceProvider extends ServiceProvider
             'transaction' => 'App\\Models\\Transaction',
             'bank' => 'App\\Models\\Bank',
             'loan' => 'App\\Models\\Loan',
+            'advertiser' => 'App\\Models\\Advertiser',
+            'ad' => 'App\\Models\\Ad',
             // Add more models as needed
         ]);
     }

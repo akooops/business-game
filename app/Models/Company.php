@@ -85,5 +85,10 @@ class Company extends Model
         return $this->hasMany(Loan::class);
     }
 
+    public function ads()
+    {
+        return $this->hasMany(Ad::class);
+    }
+
     // Accessors
 }
