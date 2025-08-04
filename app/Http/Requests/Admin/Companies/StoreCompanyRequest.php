@@ -31,6 +31,7 @@ class StoreCompanyRequest extends FormRequest
             'password' => 'required|string|min:6|max:255',
 
             'funds' => 'required|numeric|min:0',
+            'unpaid_loans' => 'required|numeric|min:0',
             'carbon_footprint' => 'required|numeric|min:0',
             'research_level' => 'required|integer|min:0',
 

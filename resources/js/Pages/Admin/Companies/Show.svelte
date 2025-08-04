@@ -115,6 +115,11 @@
                         </div>
                         
                         <div class="flex flex-col gap-2">
+                            <h4 class="text-sm font-semibold text-mono">Unpaid Loans</h4>
+                            <p class="text-sm text-secondary-foreground">{company.unpaid_loans} DZD</p>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Carbon Footprint</h4>
                             <p class="text-sm text-secondary-foreground">{company.carbon_footprint} kg CO2</p>
                         </div>

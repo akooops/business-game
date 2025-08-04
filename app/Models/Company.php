@@ -14,6 +14,7 @@ class Company extends Model
     protected $casts = [
         'funds' => 'decimal:3',
         'carbon_footprint' => 'decimal:3',
+        'unpaid_loans' => 'decimal:3',
     ];
 
     // Relations

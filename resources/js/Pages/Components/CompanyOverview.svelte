@@ -14,6 +14,7 @@
     // Company stats
     let companyStats = {
         funds: 0,
+        unpaidLoans: 0,
         researchLevel: 0,
         carbonFootprint: 0
     };
@@ -29,6 +30,7 @@
             const data = await response.json();
             companyStats = {
                 funds: data.funds,
+                unpaidLoans: data.unpaidLoans,
                 researchLevel: data.researchLevel,
                 carbonFootprint: data.carbonFootprint
             };
@@ -165,7 +167,7 @@
 
 <!-- Transactions Drawer -->
 <div 
-    class="hidden kt-drawer kt-drawer-end card flex-col max-w-[90%] w-[450px] top-5 bottom-5 end-5 rounded-xl border border-border" 
+    class="hidden kt-drawer kt-drawer-end card flex-col max-w-[90%] w-[600px] top-5 bottom-5 end-5 rounded-xl border border-border" 
     data-kt-drawer="true" 
     data-kt-drawer-container="body" 
     id="transactions_drawer"
@@ -179,10 +181,14 @@
     
     <!-- Company Stats -->
     <div class="px-5 py-4 border-b border-b-border">
-        <div class="grid grid-cols-3 text-center">
+        <div class="grid grid-cols-4 text-center">
             <div class="flex flex-col">
                 <span class="text-xs text-muted-foreground mb-1">Funds (DZD)</span>
                 <span class="text-lg font-bold text-success">{companyStats.funds}</span>
+            </div>
+            <div class="flex flex-col">
+                <span class="text-xs text-muted-foreground mb-1">Unpaid Loans (DZD)</span>
+                <span class="text-lg font-bold text-destructive">{companyStats.unpaidLoans}</span>
             </div>
             <div class="flex flex-col">
                 <span class="text-xs text-muted-foreground mb-1">Research (Level)</span>

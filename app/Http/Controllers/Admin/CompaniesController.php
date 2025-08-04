@@ -81,6 +81,7 @@ class CompaniesController extends Controller
         $company = Company::create([
             'user_id' => $user->id,
             'funds' => $request->funds,
+            'unpaid_loans' => $request->unpaid_loans,
             'carbon_footprint' => $request->carbon_footprint,
             'research_level' => $request->research_level,
         ]);
@@ -165,6 +166,7 @@ class CompaniesController extends Controller
 
         $company->update([
             'funds' => $request->funds,
+            'unpaid_loans' => $request->unpaid_loans,
             'carbon_footprint' => $request->carbon_footprint,
             'research_level' => $request->research_level,
         ]);

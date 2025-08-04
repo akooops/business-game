@@ -198,7 +198,9 @@ class FinanceService
     public static function receiveLoan($company, $loanAmount, $loanId = null){
         $funds = $company->funds;
         $funds += $loanAmount;
-        $company->update(['funds' => $funds]);
+        $unpaidLoans = $company->unpaid_loans;
+        $unpaidLoans += $loanAmount;
+        $company->update(['funds' => $funds, 'unpaid_loans' => $unpaidLoans]);
 
         Transaction::create([
             'company_id' => $company->id,
@@ -212,7 +214,9 @@ class FinanceService
     public static function payLoan($company, $paymentAmount){
         $funds = $company->funds;
         $funds -= $paymentAmount;
-        $company->update(['funds' => $funds]);
+        $unpaidLoans = $company->unpaid_loans;
+        $unpaidLoans -= $paymentAmount;
+        $company->update(['funds' => $funds, 'unpaid_loans' => $unpaidLoans]);
 
         Transaction::create([
             'company_id' => $company->id,

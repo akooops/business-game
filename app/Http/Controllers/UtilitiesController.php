@@ -19,6 +19,7 @@ class UtilitiesController extends Controller
             'timestamp' => SettingsService::getCurrentTimestamp()->format('Y-m-d H:i'),
             'currentGameWeek' => SettingsService::getCurrentGameWeek(),
             'funds' => ($company) ? $company->funds : 0,
+            'unpaidLoans' => ($company) ? $company->unpaid_loans : 0,
             'researchLevel' => ($company) ? $company->research_level : 0,
             'carbonFootprint' => ($company) ? $company->carbon_footprint : 0,
         ]);

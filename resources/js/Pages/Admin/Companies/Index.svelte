@@ -310,6 +310,10 @@
                                                         <span class="text-xs font-medium">{company.funds} DZD</span>
                                                     </div>
                                                     <div class="flex items-center gap-1">
+                                                        <span class="text-xs text-muted-foreground">Unpaid Loans:</span>
+                                                        <span class="text-xs font-medium">{company.unpaid_loans} DZD</span>
+                                                    </div>
+                                                    <div class="flex items-center gap-1">
                                                         <span class="text-xs text-muted-foreground">Carbon Footprint:</span>
                                                         <span class="text-xs font-medium">{company.carbon_footprint} kg CO2</span>
                                                     </div>
