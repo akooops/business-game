@@ -244,4 +244,21 @@ class FinanceService
 
         return $funds;
     }
+
+    //-------------------------------------
+    // Advertisers
+    //-------------------------------------
+    public static function payAdPackage($company, $ad){
+        $funds = $company->funds;
+        $funds -= $ad->price;
+        $company->update(['funds' => $funds]);
+
+        Transaction::create([
+            'company_id' => $company->id,
+            'amount' => $ad->price,
+            'type' => Transaction::TYPE_MARKETING,
+        ]);
+
+        return $funds;
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Ad;
 use App\Models\Employee;
 use App\Models\CompanyMachine;
 use App\Models\Sale;
@@ -340,6 +341,21 @@ class ValidationService
         
         if(!$hasSufficientFunds){
             $errors['funds'] = 'This company does not have enough funds to pay this loan. You need to borrow more money.';
+        }
+
+        return $errors;
+    }
+
+    //-------------------------------------
+    // Advertisers
+    //-------------------------------------
+    public static function validateAdPackagePurchase($company, $advertiser){
+        $errors = [];
+
+        $hasSufficientFunds = FinanceService::haveSufficientFunds($company, $advertiser->real_price);
+        
+        if(!$hasSufficientFunds){
+            $errors['funds'] = 'This company does not have enough funds to purchase this ad package.';
         }
 
         return $errors;

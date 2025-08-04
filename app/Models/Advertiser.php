@@ -46,7 +46,7 @@ class Advertiser extends Model
     {
         parent::boot();
 
-        static::saving(function ($model) {
+        static::creating(function ($model) {
             $model->real_price = CalculationsService::calcaulteRandomBetweenMinMax($model->min_price, $model->max_price);
         });
     }

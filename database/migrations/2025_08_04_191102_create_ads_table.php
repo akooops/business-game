@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('duration_days')->default(0);
             $table->decimal('market_impact_percentage', 15, 3)->default(0);
 
-            $table->enum('status', ['active', 'completed', 'cancelled'])->default('active');
+            $table->enum('status', ['active', 'completed'])->default('active');
 
             $table->timestamp('started_at')->nullable();
             $table->timestamp('completed_at')->nullable();

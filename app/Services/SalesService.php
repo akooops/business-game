@@ -49,9 +49,12 @@ class SalesService
             // Calculate the price difference between the market price and the company product sale price
             $priceDifference = $productDemand->market_price - $companyProduct->sale_price;
 
-            // Later we should add marketing efforts to the demand formula
-            // Calculate the demand for the week based on the price difference and the elasticity coefficient
-            $demandForWeek = $productDemand->real_demand - $product->elasticity_coefficient * $productDemand->real_demand * ($priceDifference / $productDemand->market_price);
+            // Get the ad market impact percentage
+            $adMarketImpactPercentage = AdsService::getAdMarketImpactPercentage($company, $product);
+
+            // Calculate the demand for the week based on the price difference and the elasticity coefficient with marketing boost
+            $baseDemand = $productDemand->real_demand * (1 + $adMarketImpactPercentage);
+            $demandForWeek = $baseDemand - $product->elasticity_coefficient * $baseDemand * ($priceDifference / $productDemand->market_price);
 
             if($demandForWeek > $productDemand->max_demand){
                 $demandForWeek = $productDemand->max_demand;

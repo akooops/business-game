@@ -20,7 +20,6 @@ class Ad extends Model
 
     const STATUS_ACTIVE = 'active';
     const STATUS_COMPLETED = 'completed';
-    const STATUS_CANCELLED = 'cancelled';
 
     // Relations
     public function company()

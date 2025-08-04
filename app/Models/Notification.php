@@ -81,6 +81,10 @@ class Notification extends Model
     const TYPE_LOAN_BORROWED_INSUFFICIENT_FUNDS = 'loan_borrowed_insufficient_funds';
     const TYPE_LOAN_PAID = 'loan_paid';
 
+    // Advertisers
+    const TYPE_AD_PACKAGE_CREATED = 'ad_package_created';
+    const TYPE_AD_PACKAGE_COMPLETED = 'ad_package_completed';
+
     // Icons for different notification types
     const ICONS = [
         self::TYPE_TECHNOLOGY_RESEARCH_STARTED => 'fa-solid fa-rocket',
@@ -119,6 +123,8 @@ class Notification extends Model
         self::TYPE_LOAN_BORROWED => 'fa-solid fa-coins',
         self::TYPE_LOAN_BORROWED_INSUFFICIENT_FUNDS => 'fa-solid fa-coins',
         self::TYPE_LOAN_PAID => 'fa-solid fa-coins',
+        self::TYPE_AD_PACKAGE_CREATED => 'fa-solid fa-ad',
+        self::TYPE_AD_PACKAGE_COMPLETED => 'fa-solid fa-ad',
     ];
 
     // Methods

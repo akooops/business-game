@@ -432,6 +432,29 @@ class NotificationService
         ]);
     }
 
+    // ------------------------------------------------------------
+    // Advertisers
+    // ------------------------------------------------------------
+    public static function createAdPackageCreatedNotification($company, $ad){   
+        return Notification::create([
+            'type' => Notification::TYPE_AD_PACKAGE_CREATED,
+            'title' => 'Ad Package Created',
+            'message' => "Ad package created for {$ad->product->name} by {$ad->advertiser->name} for DZD {$ad->price}.",
+            'url' => route('company.ads.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
+    public static function createAdPackageCompletedNotification($company, $ad){
+        return Notification::create([
+            'type' => Notification::TYPE_AD_PACKAGE_COMPLETED,
+            'title' => 'Ad Package Completed',
+            'message' => "Ad package completed for {$ad->product->name} by {$ad->advertiser->name}.",
+            'url' => route('company.ads.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
     public static function getUnreadCount()
     {
         return Notification::where('user_id', auth()->user()->id)->whereNull('read_at')->count();
