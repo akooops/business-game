@@ -1,7 +1,7 @@
 services:
   - type: web
     name: business-game-web
-    env: nixpacks
+    env: php
     region: oregon
     buildCommand: |
       composer install --no-dev --prefer-dist --optimize-autoloader
@@ -47,7 +47,7 @@ services:
 
   - type: cron
     name: business-game-scheduler
-    env: nixpacks
+    env: php
     schedule: "*/1 * * * *"
     buildCommand: composer install --no-dev --prefer-dist --optimize-autoloader
     startCommand: php artisan schedule:run
