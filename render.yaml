@@ -40,7 +40,7 @@ services:
         sync: false
       - key: APP_KEY
         sync: false
-    postDeployCommand: |
+    preDeployCommand: |
       php artisan storage:link || true
       php artisan migrate --force --seed
       php artisan optimize
