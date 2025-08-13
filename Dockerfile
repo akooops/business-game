@@ -12,9 +12,9 @@ FROM php:8.2-apache
 
 # System deps
 RUN apt-get update && apt-get install -y \
-        git unzip libzip-dev libpng-dev libjpeg-dev libfreetype6-dev libonig-dev \
+        git unzip libzip-dev libpng-dev libjpeg-dev libfreetype6-dev libonig-dev libpq-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql zip \
+    && docker-php-ext-install gd pdo pdo_mysql pdo_pgsql zip \
     && rm -rf /var/lib/apt/lists/*
 
 # Enable Apache mods
@@ -30,7 +30,6 @@ COPY . .
 
 # Copy built assets from node stage
 COPY --from=node_builder /app/public /var/www/html/public
-COPY --from=node_builder /app/. /var/www/html/.
 
 # Laravel install
 RUN composer install --no-dev --prefer-dist --optimize-autoloader \
