@@ -1,6 +1,7 @@
 services:
   - type: web
     name: business-game-web
+    runtime: docker
     dockerfilePath: ./Dockerfile
     region: oregon
     autoDeploy: true
@@ -42,9 +43,10 @@ services:
 
   - type: cron
     name: business-game-scheduler
+    runtime: docker
     dockerfilePath: ./Dockerfile
     schedule: "*/1 * * * *"
-    startCommand: php artisan schedule:run
+    dockerCommand: php artisan schedule:run
     envVars:
       - key: APP_ENV
         value: production
