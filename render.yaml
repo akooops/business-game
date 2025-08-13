@@ -1,19 +1,12 @@
 services:
   - type: web
     name: business-game-web
-    env: php
+    dockerfilePath: ./Dockerfile
     region: oregon
-    buildCommand: |
-      composer install --no-dev --prefer-dist --optimize-autoloader
-      npm ci
-      npm run build
-      php artisan config:cache
-      php artisan view:cache
-    startCommand: php -S 0.0.0.0:$PORT -t public public/index.php
     autoDeploy: true
     disk:
       name: storage
-      mountPath: /opt/render/project/src/storage
+      mountPath: /var/www/html/storage
       sizeGB: 1
     envVars:
       - key: APP_NAME
@@ -43,13 +36,14 @@ services:
     preDeployCommand: |
       php artisan storage:link || true
       php artisan migrate --force --seed
+      php artisan config:cache
+      php artisan view:cache
       php artisan optimize
 
   - type: cron
     name: business-game-scheduler
-    env: php
+    dockerfilePath: ./Dockerfile
     schedule: "*/1 * * * *"
-    buildCommand: composer install --no-dev --prefer-dist --optimize-autoloader
     startCommand: php artisan schedule:run
     envVars:
       - key: APP_ENV
