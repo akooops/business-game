@@ -32,9 +32,7 @@ use App\Http\Controllers\Admin\CompaniesController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::redirect('/', '/auth/login');
 
 /*
 |--------------------------------------------------------------------------
