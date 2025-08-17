@@ -42,6 +42,10 @@ RUN sed -ri -e 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-avail
 
 EXPOSE 80
 
-CMD ["apache2-foreground"]
+# Entrypoint will adjust Apache to bind to $PORT, run migrations, optionally seed, then start Apache
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+CMD ["/entrypoint.sh"]
 
 
