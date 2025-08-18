@@ -1,0 +1,66 @@
+services:
+  - type: web
+    name: business-game-web
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    region: oregon
+    autoDeploy: true
+    disk:
+      name: storage
+      mountPath: /var/www/html/storage
+      sizeGB: 1
+    envVars:
+      - key: APP_NAME
+        value: BusinessGame
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_URL
+        value: https://YOUR_RENDER_URL
+      - key: LOG_LEVEL
+        value: warning
+      - key: PHP_VERSION
+        value: 8.2
+      - key: NODE_VERSION
+        value: 20
+      - key: FILESYSTEM_DISK
+        value: public
+      - key: SESSION_DRIVER
+        value: file
+      - key: CACHE_DRIVER
+        value: file
+      - key: DATABASE_URL
+        sync: false
+      - key: APP_KEY
+        sync: false
+    preDeployCommand: |
+      php artisan storage:link || true
+      php artisan migrate --force --seed
+      php artisan config:cache
+      php artisan view:cache
+      php artisan optimize
+
+  - type: cron
+    name: business-game-scheduler
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    schedule: "*/1 * * * *"
+    dockerCommand: php artisan schedule:run
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_URL
+        value: https://YOUR_RENDER_URL
+      - key: FILESYSTEM_DISK
+        value: public
+      - key: SESSION_DRIVER
+        value: file
+      - key: CACHE_DRIVER
+        value: file
+      - key: DATABASE_URL
+        sync: false
+      - key: APP_KEY
+        sync: false
