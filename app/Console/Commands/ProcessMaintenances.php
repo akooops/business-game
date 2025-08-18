@@ -2,17 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Models\CompanyTechnology;
-use App\Models\Technology;
 use App\Models\Company;
-use App\Models\Purchase;
 use Illuminate\Console\Command;
 use App\Services\SettingsService;
-use App\Services\TechnolgiesResearchService;
-use App\Services\ProcurementService;
-use App\Services\NotificationService;
-use App\Models\ProductionOrder;
-use App\Services\ProductionService;
 use App\Models\Maintenance;
 use App\Services\MaintenanceService;
 
@@ -44,24 +36,7 @@ class ProcessMaintenances extends Command
         foreach($companies as $company){
             $this->info('Processing company: ' . $company->name);
 
-            $companyMachines = $company->companyMachines;
-
-            foreach($companyMachines as $companyMachine){
-                $companyMaintenances = Maintenance::where([
-                    'company_machine_id' => $companyMachine->id, 
-                    'status' => Maintenance::STATUS_IN_PROGRESS
-                ])->get();
-
-                foreach($companyMaintenances as $companyMaintenance){
-                    $currentTimestamp = SettingsService::getCurrentTimestamp();
-                    
-                    // Process actual deliveries
-                    if($companyMaintenance->completed_at && $companyMaintenance->completed_at <= $currentTimestamp){
-                        MaintenanceService::completeMaintenance($companyMaintenance);
-                        $this->info('Maintenance completed: ' . $companyMachine->machine->name);
-                    }
-                }
-            }
+            MaintenanceService::completeMaintenance($company);
         }
         
         $this->info('Maintenances processing completed successfully!');

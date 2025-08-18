@@ -11,36 +11,51 @@ use App\Models\Maintenance;
 class MaintenanceService
 {
     public static function processMachinesReliability($company){
+        // Get all company machines that are active or inactive
         $companyMachines = CompanyMachine::where('company_id', $company->id)
             ->whereIn('status', [CompanyMachine::STATUS_ACTIVE, CompanyMachine::STATUS_INACTIVE])->get();
 
+        // Process each company machine
         foreach($companyMachines as $companyMachine){
             $machine = $companyMachine->machine;
             $reliability = $companyMachine->current_reliability;
 
+            // Calculate reliability decay
             $reliability_decay_days = $machine->reliability_decay_days;
 
             $reliability -= $reliability_decay_days;
 
+            // If reliability is less than 0, set it to 0
             if($reliability < 0){
                 $reliability = 0;
             }
 
-            $breakChance = 0;
-
+            // Calculate break chance
             $breakChance = rand(1, 100); 
 
+            // Calculate break threshold
             $breakThreshold = 0;
+
+            // If reliability is less than 0.1, set break threshold to 75%
             if($reliability < 0.1){
                 $breakThreshold = 75; // 75% chance
-            } else if($reliability < 0.2){
+            } 
+            // If reliability is less than 0.2, set break threshold to 50%
+            else if($reliability < 0.2){
                 $breakThreshold = 50; // 50% chance
-            } else if($reliability < 0.3){
+            } 
+            // If reliability is less than 0.3, set break threshold to 25%
+            else if($reliability < 0.3){
                 $breakThreshold = 25; // 25% chance
-            } else if($reliability < 0.4){
+            } 
+            // If reliability is less than 0.4, set break threshold to 10%
+            else if($reliability < 0.4){
                 $breakThreshold = 10; // 10% chance
+            } else {
+                $breakThreshold = 5; // 5% chance
             }
 
+            // If break chance is less than or equal to break threshold, machine breaks
             if($breakChance <= $breakThreshold){
                 // Machine breaks
                 $companyMachine->update([
@@ -49,22 +64,33 @@ class MaintenanceService
                     'current_reliability' => $reliability
                 ]);
 
+                // Cancel all production orders for the company machine
                 $productionOrders = ProductionOrder::where([
                     'company_machine_id' => $companyMachine->id,
                     'status' => ProductionOrder::STATUS_IN_PROGRESS,
                 ])->get();
 
+                // Cancel each production order
                 foreach($productionOrders as $productionOrder){ 
                     $productionOrder->update([
                         'status' => ProductionOrder::STATUS_CANCELLED,
                     ]);
                 }
+
+                // Calculate value loss
+                $valueLoss = $companyMachine->current_value * $companyMachine->loss_on_sale_days;
+                $companyMachine->current_value -= $valueLoss;
+
+                $companyMachine->update([
+                    'current_value' => $companyMachine->current_value,
+                ]);
                 
                 // Create machine broken notification
                 NotificationService::createMachineBrokenNotification($companyMachine->company, $companyMachine);
                 continue; // Skip reliability update since machine broke
             }
 
+            // If reliability is less than 0.5, create machine reliability decreased notification
             if($reliability < 0.5){
                 NotificationService::createMachineReliabilityDecreasedNotification($companyMachine->company, $companyMachine);
             }
@@ -75,25 +101,6 @@ class MaintenanceService
         }
     }
 
-    public static function validateMaintenance($companyMachine){
-        $errors = [];
-
-        if($companyMachine->status == CompanyMachine::STATUS_ACTIVE){
-            $errors['machine'] = 'This machine is active, it cannot be maintained.';
-        }
-
-        if($companyMachine->status == CompanyMachine::STATUS_MAINTENANCE){
-            $errors['machine'] = 'This machine is already being maintained.';
-        }
-
-        // Check if company has sufficient funds
-        if (!FinanceService::haveSufficientFunds($companyMachine->company, $companyMachine->machine->avg_maintenance_cost)) {
-            $errors['funds'] = 'You do not have enough funds to maintain this machine. Required: DZD ' . $companyMachine->machine->avg_maintenance_cost . ', Available: DZD ' . $companyMachine->company->funds;
-        }
-
-        return $errors;
-    }
-
     public static function startMaintenance($companyMachine){
         $type = Maintenance::TYPE_PREDICTIVE;
 
@@ -102,16 +109,13 @@ class MaintenanceService
         }
 
         // Calculate real delivery date
-        $maintenanceTimeDays = CalculationsService::calculatePertValue($companyMachine->machine->min_maintenance_time_days, $companyMachine->machine->avg_maintenance_time_days, $companyMachine->machine->max_maintenance_time_days);
-        $realCompletedAt = SettingsService::getCurrentTimestamp()->copy()->addDays($maintenanceTimeDays);
-
         $maintenance = Maintenance::create([
-            'company_machine_id' => $companyMachine->id,
             'type' => $type,
             'status' => Maintenance::STATUS_IN_PROGRESS,
             'started_at' => SettingsService::getCurrentTimestamp(),
-            'maintenances_cost' => $companyMachine->machine->avg_maintenance_cost,
-            'completed_at' => $realCompletedAt,
+            'maintenances_cost' => $companyMachine->maintenance_cost,
+            'maintenance_time_days' => $companyMachine->maintenance_time_days,
+            'company_machine_id' => $companyMachine->id,
         ]);
 
         $companyMachine->update([
@@ -122,19 +126,40 @@ class MaintenanceService
         NotificationService::createMachineMaintenanceStartedNotification($companyMachine->company, $companyMachine);
     }
 
-    public static function completeMaintenance($maintenance){
-        $maintenance->update([
-            //'status' => Maintenance::STATUS_COMPLETED,
-            'completed_at' => SettingsService::getCurrentTimestamp(),
-        ]);
+    public static function completeMaintenance($company){
+        // Get all company machines that are in maintenance
+        $companyMachines = $company->companyMachines;
 
-        $companyMachine = $maintenance->companyMachine;
+        foreach($companyMachines as $companyMachine){
+            // Get all maintenances for the company machine that are in progress
+            $companyMaintenances = Maintenance::where([
+                'company_machine_id' => $companyMachine->id, 
+                'status' => Maintenance::STATUS_IN_PROGRESS
+            ])->get();
 
-        $companyMachine->update([
-            'status' => CompanyMachine::STATUS_INACTIVE,
-            'current_reliability' => min(1, $companyMachine->current_reliability + $companyMachine->current_reliability * (rand(75, 100) / 100)),
-        ]);
+            foreach($companyMaintenances as $companyMaintenance){
+                // Check if maintenance is completed
+                $currentTimestamp = SettingsService::getCurrentTimestamp();
+                $completedAt = $companyMaintenance->started_at->copy()->addDays($companyMaintenance->maintenance_time_days);
 
-        NotificationService::createMachineMaintenanceCompletedNotification($companyMachine->company, $companyMachine);
+                // If maintenance is completed, update the maintenance and company machine
+                if($completedAt <= $currentTimestamp){
+                    $companyMaintenance->update([
+                        'status' => Maintenance::STATUS_COMPLETED,
+                        'completed_at' => $currentTimestamp,
+                    ]);
+
+                    // Update company machine status and reliability
+                    $companyMachine->update([
+                        'status' => CompanyMachine::STATUS_INACTIVE,
+                        'last_maintenance_at' => $currentTimestamp,
+                        'current_reliability' => min(1, $companyMachine->current_reliability + $companyMachine->current_reliability * (rand(75, 100) / 100)),
+                    ]);
+
+                    // Create machine maintenance completed notification
+                    NotificationService::createMachineMaintenanceCompletedNotification($companyMachine->company, $companyMachine);
+                }
+            }
+        }
     }
 }

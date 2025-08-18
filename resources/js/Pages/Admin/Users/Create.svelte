@@ -3,9 +3,6 @@
     import { onMount, tick } from 'svelte';
     import { router } from '@inertiajs/svelte';
 
-    // Props from the server
-    export let roles;
-
     // Define breadcrumbs for this user
     const breadcrumbs = [
         {
@@ -30,7 +27,6 @@
         email: '',
         password: '',
         file: null,
-        roles: []
     };
 
     // Form errors
@@ -55,15 +51,6 @@
         }
     }
 
-    // Handle role toggle
-    function toggleRole(roleId) {
-        if (form.roles.includes(roleId)) {
-            form.roles = form.roles.filter(id => id !== roleId);
-        } else {
-            form.roles = [...form.roles, roleId];
-        }
-    }
-
     // Handle form submission
     function handleSubmit() {
         loading = true;
@@ -75,12 +62,7 @@
             if (form[key] !== null && form[key] !== '') {
                 if (key === 'file' && form.file) {
                     formData.append(key, form.file);
-                } else if (key === 'roles' && form.roles.length > 0) {
-                    // Add each role ID to the roles array
-                    form.roles.forEach(roleId => {
-                        formData.append('roles[]', roleId);
-                    });
-                } else if (key !== 'file' && key !== 'roles') {
+                } else if (key !== 'file') {
                     formData.append(key, form[key]);
                 }
             }
@@ -303,45 +285,6 @@
                                     <p class="text-sm text-destructive">{errors.file}</p>
                                 {/if}
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Roles Card -->
-                <div class="kt-card">
-                    <div class="kt-card-header">
-                        <h4 class="kt-card-title">User Roles</h4>
-                    </div>
-                    <div class="kt-card-content">
-                        <div class="grid gap-4">
-                            {#if roles && roles.length > 0}
-                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    {#each roles as role}
-                                        <div class="flex items-center gap-3 p-3 border rounded-lg">
-                                            <input 
-                                                class="kt-switch" 
-                                                type="checkbox" 
-                                                id="role_{role.id}" 
-                                                checked={form.roles.includes(role.id)}
-                                                on:change={() => toggleRole(role.id)}
-                                            />
-                                            <label class="kt-label flex-1 cursor-pointer" for="role_{role.id}">
-                                                <div class="font-medium">{role.name}</div>
-                                                {#if role.description}
-                                                    <div class="text-sm text-secondary-foreground">{role.description}</div>
-                                                {/if}
-                                            </label>
-                                        </div>
-                                    {/each}
-                                </div>
-                            {:else}
-                                <div class="text-center py-8">
-                                    <p class="text-secondary-foreground">No roles available</p>
-                                </div>
-                            {/if}
-                            {#if errors.roles}
-                                <p class="text-sm text-destructive">{errors.roles}</p>
-                            {/if}
                         </div>
                     </div>
                 </div>

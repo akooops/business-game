@@ -9,25 +9,65 @@ use App\Models\Technology;
 class TechnolgiesResearchService
 {
     public static function researchTechnology($company, $technology){
-        // Pay funds
-        $funds = FinanceService::payTechnologyResearch($company, $technology);
-
         // Get current timestamp
         $startedAt = SettingsService::getCurrentTimestamp();
-        $estimatedCompletedAt = $startedAt->copy()->addDays($technology->research_time_days);
 
         $companyTechnology = CompanyTechnology::create([
             'research_cost' => $technology->research_cost,
             'research_time_days' => $technology->research_time_days,
+            'started_at' => $startedAt,
             'company_id' => $company->id,
             'technology_id' => $technology->id,
-            'started_at' => $startedAt,
-            'estimated_completed_at' => $estimatedCompletedAt,
         ]);
+
+        FinanceService::payTechnologyResearch($company, $technology);
+        NotificationService::createTechnologyResearchStartedNotification($company, $technology, $companyTechnology);
+    }
+
+    public static function processCompletedResearch($company){
+        $companyTechnologies = $company->companyTechnologies()->where('completed_at', null)->get();
+
+        foreach($companyTechnologies as $companyTechnology){
+            // Check if technology research is completed
+            $currentTimestamp = SettingsService::getCurrentTimestamp();
+            $completedAt = $companyTechnology->started_at->copy()->addDays($companyTechnology->research_time_days);
+
+            if($completedAt <= $currentTimestamp){
+                // Update company technology as completed
+                $companyTechnology->update([
+                    'completed_at' => $currentTimestamp,
+                ]);
+
+                // Unlock products for company
+                self::unlockProductsForCompany($company, $companyTechnology->technology);
+                NotificationService::createTechnologyResearchCompletedNotification($company, $companyTechnology->technology, $companyTechnology);
+            }
+        }
+    }
+
+    private static function unlockProductsForCompany($company, $technology){
+        $products = $technology->products;
+    
+        foreach($products as $product){
+            // Check if product already exists
+            $companyProduct = $company->companyProducts()->where('product_id', $product->id)->first();
+
+            if($companyProduct){
+                continue;
+            }
+
+            // Create product for company
+            CompanyProduct::create([
+                'company_id' => $company->id,
+                'product_id' => $product->id,
+                'available_stock' => 0,
+                'sale_price' => SalesService::getCurrentGameweekProductMarketPrice($product),
+            ]);
+        }
 
         // Check if company has unlocked all technologies at current level
         $currentLevel = $company->research_level;
-        
+
         // Get all technologies at current level
         $technologiesAtCurrentLevel = Technology::where('level', $currentLevel)->pluck('id');
         
@@ -47,68 +87,5 @@ class TechnolgiesResearchService
                 'research_level' => $currentLevel + 1
             ]);
         }
-
-        NotificationService::createTechnologyResearchStartedNotification($companyTechnology);
-
-        return $companyTechnology;  
-    }
-
-    public static function completedResearch($companyTechnology){
-        $companyTechnology->update([
-            'completed_at' => SettingsService::getCurrentTimestamp(),
-        ]);
-
-        // Create products for company
-        $products = $companyTechnology->technology->products;
-        
-        foreach($products as $product){
-            // Check if product already exists
-            $companyProduct = $companyTechnology->company->companyProducts()->where('product_id', $product->id)->first();
-            if($companyProduct){
-                continue;
-            }
-
-            CompanyProduct::create([
-                'company_id' => $companyTechnology->company_id,
-                'product_id' => $product->id,
-                'total_stock' => 0,
-                'in_sale_stock' => 0,
-                'sale_price' => SalesService::getCurrentGameweekProductMarketPrice($product),
-            ]);
-        }
-
-        NotificationService::createTechnologyResearchCompletedNotification($companyTechnology);
-    }
-
-    public static function validateTechnologyResearch($company, $technology){
-        $errors = [];
-        
-        // Check if company has sufficient funds
-        if (!FinanceService::haveSufficientFunds($company, $technology->research_cost)) {
-            $errors['funds'] = 'You do not have enough funds to research this technology. Required: DZD ' . $technology->research_cost . ', Available: DZD ' . $company->funds;
-        }
-        
-        // Check if technology exists
-        if (!$technology) {
-            $errors['technology_id'] = 'The selected technology does not exist.';
-            return $errors;
-        }
-
-        // Check if company is already researching this technology
-        $alreadyResearching = $company->companyTechnologies()
-            ->where('technology_id', $technology->id)
-            ->exists();
-        
-        if ($alreadyResearching) {
-            $errors['technology_id'] = 'You are already researching this technology.';
-            return $errors;
-        }
-
-        // Check research level
-        if ($technology->level > $company->research_level + 1) {
-            $errors['technology_id'] = 'You can only research technologies up to level ' . ($company->research_level + 1) . '.';
-        }
-
-        return $errors;
     }
 }

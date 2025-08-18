@@ -1,10 +1,9 @@
 <script>
     // --- Config & Constants ---
     import CompanyLayout from '../../Layouts/CompanyLayout.svelte';
-    import Pagination from '../../Components/Pagination.svelte';
-    import { onMount, tick } from 'svelte';
-    import { page } from '@inertiajs/svelte';
+    import { onMount, onDestroy, tick } from 'svelte';
     import Select2 from '../../Components/Forms/Select2.svelte';
+    import { page } from '@inertiajs/svelte';
 
     // Breadcrumbs and page title
     const breadcrumbs = [
@@ -21,38 +20,11 @@
     ];
     const pageTitle = 'My Machines';
 
-    // --- Reactive Variables ---
     let machines = [];
-    let pagination = {};
     let loading = true;
-    let search = '';
-    let perPage = 10;
-    let currentPage = 1;
-    let searchTimeout;
-    let showFilters = false;
+    let fetchInterval = null;
 
-    // Filter variables
-    let manufacturerFilter = '';
-    let priceMin = '';
-    let priceMax = '';
-    let operationCostMin = '';
-    let operationCostMax = '';
-    let speedMin = '';
-    let speedMax = '';
-    let qualityMin = '';
-    let qualityMax = '';
-    let carbonFootprintMin = '';
-    let carbonFootprintMax = '';
-    let reliabilityMin = '';
-    let reliabilityMax = '';
-    let statusFilter = '';
-    let productFilter = '';
-    let employeeProfileFilter = '';
-
-    // --- Component References ---
-    let productSelectComponent;
-    let employeeProfileSelectComponent;
-    let employeeSelectComponent;
+    let employeeSelectComponent = null;
 
     // --- Modal/Drawer State ---
     let selectedMachine = null;
@@ -62,35 +34,33 @@
     let loadingAssign = false;
     let assignEmployeeData = null;
     let selectedEmployeeId = '';
-// Unassign modal state
-let showUnassignModal = false;
-let unassigning = false;
-let machineToUnassign = null;
 
-// Production modal state
-let showProductionModal = false;
-let startingProduction = false;
-let machineToProduce = null;
-let selectedProductId = '';
-let productionQuantity = 1;
-let availableProducts = [];
+    // Unassign modal state
+    let showUnassignModal = false;
+    let unassigning = false;
+    let machineToUnassign = null;
 
-// Maintenance modal state
-let showMaintenanceModal = false;
-let maintenanceType = '';
-let maintenanceLoading = false;
-let maintenanceMachine = null;
-let maintenanceCost = 0;
-let maintenanceTime = 0;
+    // Production modal state
+    let showProductionModal = false;
+    let startingProduction = false;
+    let machineToProduce = null;
+    let selectedProductId = '';
+    let productionQuantity = 1;
+    let availableProducts = [];
 
-    // --- Machine Status Mapping ---
-    const machineStatuses = {
-        'active': 'Active',
-        'inactive': 'Inactive',
-        'setup': 'Setup',
-        'maintenance': 'Maintenance',
-        'broken': 'Broken'
-    };
+    // Maintenance modal state
+    let showMaintenanceModal = false;
+    let maintenanceType = '';
+    let maintenanceLoading = false;
+    let maintenanceMachine = null;
+    let maintenanceCost = 0;
+    let maintenanceTime = 0;
+
+    // Sell modal state
+    let showSellModal = false;
+    let selling = false;
+    let machineToSell = null;
+
     function getMachineStatusBadgeClass(status) {
         switch(status) {
             case 'active':
@@ -108,38 +78,16 @@ let maintenanceTime = 0;
 
     // --- Fetch Functions ---
     async function fetchMachines() {
-        loading = true;
-        try {
-            const params = new URLSearchParams({
-                page: currentPage,
-                perPage: perPage,
-                search: search
-            });
-            if (manufacturerFilter) params.append('manufacturer', manufacturerFilter);
-            if (priceMin) params.append('price_min', priceMin);
-            if (priceMax) params.append('price_max', priceMax);
-            if (operationCostMin) params.append('operation_cost_min', operationCostMin);
-            if (operationCostMax) params.append('operation_cost_max', operationCostMax);
-            if (speedMin) params.append('min_speed', speedMin);
-            if (speedMax) params.append('max_speed', speedMax);
-            if (qualityMin) params.append('quality_factor_min', qualityMin);
-            if (qualityMax) params.append('quality_factor_max', qualityMax);
-            if (carbonFootprintMin) params.append('carbon_footprint_min', carbonFootprintMin);
-            if (carbonFootprintMax) params.append('carbon_footprint_max', carbonFootprintMax);
-            if (reliabilityMin) params.append('reliability_min', reliabilityMin);
-            if (reliabilityMax) params.append('reliability_max', reliabilityMax);
-            if (statusFilter) params.append('status', statusFilter);
-            if (productFilter) params.append('product_id', productFilter);
-            if (employeeProfileFilter) params.append('employee_profile_id', employeeProfileFilter);
+        if(machines.length == 0) loading = true;
 
-            const response = await fetch(route('company.machines.index') + '?' + params.toString(), {
+        try {
+            const response = await fetch(route('company.machines.index'), {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             });
             const data = await response.json();
             machines = data.machines;
-            pagination = data.pagination;
             await tick();
             if (window.KTMenu) {
                 window.KTMenu.init();
@@ -149,77 +97,6 @@ let maintenanceTime = 0;
         } finally {
             loading = false;
         }
-    }
-
-    // --- Search/Filter Handlers ---
-    function handleSearch() {
-        if (searchTimeout) clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            currentPage = 1;
-            fetchMachines();
-        }, 500);
-    }
-    function handleSearchInput(event) {
-        search = event.target.value;
-        handleSearch();
-    }
-    function handleFilterChange() {
-        currentPage = 1;
-        fetchMachines();
-    }
-    function handleProductSelect(event) {
-        productFilter = event.detail.value;
-        handleFilterChange();
-    }
-    function handleProductClear() {
-        productFilter = '';
-        handleFilterChange();
-    }
-    function handleEmployeeProfileSelect(event) {
-        employeeProfileFilter = event.detail.value;
-        handleFilterChange();
-    }
-    function handleEmployeeProfileClear() {
-        employeeProfileFilter = '';
-        handleFilterChange();
-    }
-    function clearAllFilters() {
-        manufacturerFilter = '';
-        priceMin = '';
-        priceMax = '';
-        operationCostMin = '';
-        operationCostMax = '';
-        speedMin = '';
-        speedMax = '';
-        qualityMin = '';
-        qualityMax = '';
-        carbonFootprintMin = '';
-        carbonFootprintMax = '';
-        reliabilityMin = '';
-        reliabilityMax = '';
-        statusFilter = '';
-        productFilter = '';
-        employeeProfileFilter = '';
-        currentPage = 1;
-        if (productSelectComponent) productSelectComponent.clear();
-        if (employeeProfileSelectComponent) employeeProfileSelectComponent.clear();
-        fetchMachines();
-    }
-    function toggleFilters() {
-        showFilters = !showFilters;
-    }
-
-    // --- Pagination Handlers ---
-    function goToPage(page) {
-        if (page && page !== currentPage) {
-            currentPage = page;
-            fetchMachines();
-        }
-    }
-    function handlePerPageChange(newPerPage) {
-        perPage = newPerPage;
-        currentPage = 1;
-        fetchMachines();
     }
 
     // --- Modal/Drawer Handlers ---
@@ -274,8 +151,15 @@ let maintenanceTime = 0;
         machineToProduce = machine;
         selectedProductId = '';
         productionQuantity = 1;
+
         // Get available products from the machine
-        availableProducts = machine.machine?.products?.filter(product => product.is_researched) || [];
+        availableProducts = [];
+        for(let output of machine.machine?.outputs){
+            if(output.product.is_researched){
+                availableProducts = [...availableProducts, output.product];
+            }
+        }
+
         showProductionModal = true;
         const toggleButton = document.querySelector('[data-kt-modal-toggle="#production_modal"]');
         if (toggleButton) toggleButton.click();
@@ -295,14 +179,10 @@ let maintenanceTime = 0;
         maintenanceMachine = machine;
         maintenanceType = type;
         showMaintenanceModal = true;
-        // Use avg cost/time for both types (can be customized if needed)
-        maintenanceCost = machine.machine?.avg_maintenance_cost || 0;
-        maintenanceTime = machine.machine?.avg_maintenance_time_days || 1;
-        if (type === 'corrective') {
-            // If you want to use different fields for corrective, set here
-            // maintenanceCost = machine.machine?.max_maintenance_cost || maintenanceCost;
-            // maintenanceTime = machine.machine?.max_maintenance_time_days || maintenanceTime;
-        }
+
+        maintenanceCost = machine.maintenance_cost || 0;
+        maintenanceTime = machine.maintenance_time_days || 1;
+
         const toggleButton = document.querySelector('[data-kt-modal-toggle="#maintenance_modal"]');
         if (toggleButton) toggleButton.click();
     }
@@ -315,6 +195,20 @@ let maintenanceTime = 0;
         maintenanceType = '';
         maintenanceCost = 0;
         maintenanceTime = 0;
+    }
+
+    function openSellModal(machine) {
+        machineToSell = machine;
+        showSellModal = true;
+        const toggleButton = document.querySelector('[data-kt-modal-toggle="#sell_modal"]');
+        if (toggleButton) toggleButton.click();
+    }
+
+    function closeSellModal() {
+        const dismissButton = document.querySelector('[data-kt-modal-dismiss="#sell_modal"]');
+        if (dismissButton) dismissButton.click();
+        showSellModal = false;
+        machineToSell = null;
     }
 
     async function startMaintenance() {
@@ -344,6 +238,35 @@ let maintenanceTime = 0;
             showToast('Network error. Please check your connection and try again.', 'error');
         } finally {
             maintenanceLoading = false;
+        }
+    }
+
+    async function sellMachine() {
+        if (!machineToSell) return;
+        selling = true;
+        try {
+            const response = await fetch(route('company.machines.sell', machineToSell.id), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                showToast(data.message || 'Machine sold successfully!', 'success');
+                closeSellModal();
+                fetchMachines();
+            } else {
+                const errorData = await response.json();
+                showToast(errorData.message || 'Error selling machine. Please try again.', 'error');
+            }
+        } catch (error) {
+            console.error('Error selling machine:', error);
+            showToast('Network error. Please check your connection and try again.', 'error');
+        } finally {
+            selling = false;
         }
     }
 
@@ -440,25 +363,19 @@ let maintenanceTime = 0;
         }
     }
 
-    function showToast(message, type = 'success') {
-        if (window.KTToast) {
-            KTToast.show({
-                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                message: message,
-                variant: type === 'success' ? 'success' : 'destructive',
-                position: 'bottom-right',
-            });
-        }
-    }
-    function formatTimestamp(timestamp) {
-        if (!timestamp) return 'N/A';
-        return new Date(timestamp).toLocaleString();
-    }
 
     // --- Svelte Lifecycle ---
     onMount(() => {
         fetchMachines();
+        fetchInterval = setInterval(fetchMachines, 60000);
     });
+
+    onDestroy(() => {
+        if (fetchInterval) {
+            clearInterval(fetchInterval);
+        }
+    });
+
     export let success;
     $: if (success) {
         showToast(success, 'success');
@@ -470,7 +387,7 @@ let maintenanceTime = 0;
 </svelte:head>
 
 <CompanyLayout {breadcrumbs} {pageTitle}>
-    <div class="kt-container-fluid">
+    <div class="kt-container-fixed">
         <div class="grid gap-5 lg:gap-7.5">
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div class="flex flex-col gap-1">
@@ -487,150 +404,11 @@ let maintenanceTime = 0;
                 </div>
             </div>
             <div class="kt-card">
-                <div class="kt-card-header">
-                    <div class="kt-card-toolbar">
-                        <div class="flex items-center gap-4">
-                            <div class="kt-input max-w-64 w-64">
-                                <i class="ki-filled ki-magnifier"></i>
-                                <input 
-                                    type="text" 
-                                    class="kt-input" 
-                                    placeholder="Search machines..." 
-                                    bind:value={search}
-                                    on:input={handleSearchInput}
-                                />
-                            </div>
-                            <button 
-                                class="kt-btn kt-btn-outline"
-                                on:click={toggleFilters}
-                            >
-                                <i class="ki-filled ki-filter text-sm"></i>
-                                {showFilters ? 'Hide Filters' : 'Show Filters'}
-                            </button>
-                            {#if manufacturerFilter || priceMin || priceMax || operationCostMin || operationCostMax || speedMin || speedMax || qualityMin || qualityMax || carbonFootprintMin || carbonFootprintMax || reliabilityMin || reliabilityMax || statusFilter || productFilter || employeeProfileFilter}
-                                <button 
-                                    class="kt-btn kt-btn-ghost kt-btn-sm"
-                                    on:click={clearAllFilters}
-                                >
-                                    <i class="ki-filled ki-cross text-sm"></i>
-                                    Clear All
-                                </button>
-                            {/if}
-                        </div>
-                    </div>
-                </div>
-                {#if showFilters}
-                    <div class="kt-card-body border-t border-gray-200 p-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                            <!-- Manufacturer Filter -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Manufacturer</h4>
-                                <input 
-                                    type="text" 
-                                    class="kt-input w-full" 
-                                    placeholder="Enter manufacturer" 
-                                    bind:value={manufacturerFilter}
-                                    on:input={handleFilterChange}
-                                />
-                            </div>
-                            <!-- Price Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Acquisition Cost (DZD)</h4>
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min Price" 
-                                        bind:value={priceMin}
-                                        on:input={handleFilterChange}
-                                        step="1000"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max Price" 
-                                        bind:value={priceMax}
-                                        on:input={handleFilterChange}
-                                        step="1000"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-                            <!-- Carbon Footprint Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Carbon Footprint (kg CO2/unit)</h4>
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min Carbon Footprint" 
-                                        bind:value={carbonFootprintMin}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max Carbon Footprint" 
-                                        bind:value={carbonFootprintMax}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-                            <!-- Reliability Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Reliability (%)</h4>
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min Reliability" 
-                                        bind:value={reliabilityMin}
-                                        on:input={handleFilterChange}
-                                        step="0.01"
-                                        min="0"
-                                        max="100"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max Reliability" 
-                                        bind:value={reliabilityMax}
-                                        on:input={handleFilterChange}
-                                        step="0.01"
-                                        min="0"
-                                        max="100"
-                                    />
-                                </div>
-                            </div>
-                            <!-- Status Filter -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Status</h4>
-                                <select 
-                                    class="kt-select w-full" 
-                                    bind:value={statusFilter}
-                                    on:change={handleFilterChange}
-                                >
-                                    <option value="">All Statuses</option>
-                                    <option value="active">Active</option>
-                                    <option value="inactive">Inactive</option>
-                                    <option value="setup">Setup</option>
-                                    <option value="maintenance">Maintenance</option>
-                                    <option value="broken">Broken</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                {/if}
                 <div class="kt-card-content p-0">
                     {#if loading}
                         <div class="p-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-                                {#each Array(perPage) as _, i}
+                                {#each Array(10) as _, i}
                                     <div class="kt-card animate-pulse">
                                         <div class="kt-card-body p-4">
                                             <div class="flex items-center justify-center mb-4">
@@ -668,7 +446,7 @@ let maintenanceTime = 0;
                                 </div>
                                 <h3 class="text-lg font-semibold text-mono mb-2">No machines found</h3>
                                 <p class="text-sm text-secondary-foreground mb-4">
-                                    {search ? 'No machines match your search criteria.' : 'You have not acquired any machines yet.'}
+                                    You have not acquired any machines yet.
                                 </p>
                                 <a href="{route('company.machines.setup-page')}" class="kt-btn kt-btn-primary">
                                     <i class="ki-filled ki-plus text-base"></i>
@@ -680,22 +458,25 @@ let maintenanceTime = 0;
                         <div class="p-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
                                 {#each machines as companyMachine}
-                                    <div class="kt-card kt-card-hover">
+                                    <div class="kt-card kt-card-hover cursor-pointer" on:click={() => openMachineDrawer(companyMachine)}>
                                         <div class="kt-card-body p-4">
-                                            <div class="flex items-center justify-center mb-4 cursor-pointer" on:click={() => openMachineDrawer(companyMachine)}>
+                                            <!-- Machine Image -->
+                                            <div class="size-20 mb-4">
                                                 {#if companyMachine.machine?.image_url}
                                                     <img 
-                                                        src={companyMachine.machine.image_url} 
+                                                        class="rounded-lg w-full h-full object-cover bg-gray-100" 
+                                                        src={companyMachine.machine.image_url}
                                                         alt={companyMachine.machine.name}
-                                                        class="h-[180px] w-full object-cover rounded-sm"
                                                     />
                                                 {:else}
-                                                    <div class="h-[180px] w-full bg-accent/50 flex items-center justify-center rounded-sm">
-                                                        <i class="ki-filled ki-setting-3 text-4xl text-muted-foreground"></i>
+                                                    <div class="rounded-lg w-full h-full bg-accent/50 flex items-center justify-center">
+                                                        <i class="ki-filled ki-setting-3 text-2xl text-muted-foreground"></i>
                                                     </div>
                                                 {/if}
                                             </div>
-                                            <div class="mb-4 cursor-pointer" on:click={() => openMachineDrawer(companyMachine)}>
+
+                                            <!-- Machine Info -->
+                                            <div class="mb-4 cursor-pointer">
                                                 <h3 class="text-lg font-semibold text-mono mb-1">
                                                     {companyMachine.machine?.name}
                                                 </h3>
@@ -703,28 +484,39 @@ let maintenanceTime = 0;
                                                     {companyMachine.machine?.model} - {companyMachine.machine?.manufacturer}
                                                 </p>
                                             </div>
-                                            <div class="flex items-center gap-2 mb-2">
-                                                <span class={getMachineStatusBadgeClass(companyMachine.status)}>
-                                                    {machineStatuses[companyMachine.status] || companyMachine.status}
-                                                </span>
-                                            </div>
-                                            <div class="flex items-center gap-2 mb-2">
-                                                <span class="text-xs text-muted-foreground">Reliability:</span>
+
+                                            <!-- Status and Reliability -->
+                                            <div class="mb-3">
+                                                <div class="flex items-center justify-between mb-2">
+                                                    <span class="text-xs font-medium text-muted-foreground">Status</span>
+                                                    <span class={getMachineStatusBadgeClass(companyMachine.status)}>
+                                                        {companyMachine.status}
+                                                    </span>
+                                                </div>
                                                 <div class="w-full bg-gray-200 rounded-full h-2">
-                                                    <div class="kt-progress {companyMachine.current_reliability > 0.7 ? 'kt-progress-primary' : companyMachine.current_reliability > 0.4 ? 'kt-progress-warning' : 'kt-progress-destructive'}">
-                                                        <div class="kt-progress-indicator" style="width: {(companyMachine.current_reliability * 100).toFixed(0)}%"></div>
+                                                    <div class="kt-progress kt-progress-primary {companyMachine.current_reliability > 0.7 ? 'kt-progress-primary' : companyMachine.current_reliability > 0.4 ? 'kt-progress-warning' : 'kt-progress-destructive'}">
+                                                        <div class="kt-progress-indicator" style="width: {companyMachine.current_reliability * 100}%"></div>
                                                     </div>
                                                 </div>
-                                                <span class="text-xs text-muted-foreground">{(companyMachine.current_reliability * 100).toFixed(0)}%</span>
                                             </div>
+
+                                            <!-- Performance Details -->
                                             <div class="text-xs text-muted-foreground space-y-1 cursor-pointer" on:click={() => openMachineDrawer(companyMachine)}>
                                                 <div class="flex justify-between">
+                                                    <span>Speed:</span>
+                                                    <span class="font-medium">{companyMachine.machine?.min_speed} - {companyMachine.machine?.max_speed} units/day</span>
+                                                </div>
+                                                <div class="flex justify-between">
+                                                    <span>Quality Factor:</span>
+                                                    <span class="font-medium">{companyMachine.quality_factor * 100}%</span>
+                                                </div>
+                                                <div class="flex justify-between">
                                                     <span>Operation Cost:</span>
-                                                    <span class="font-medium">DZD {companyMachine.machine?.operation_cost}/day</span>
+                                                    <span class="font-medium">DZD {companyMachine.operations_cost}/day</span>
                                                 </div>
                                                 <div class="flex justify-between">
                                                     <span>Carbon Footprint:</span>
-                                                    <span class="font-medium">{companyMachine.machine?.carbon_footprint} kg CO2/unit</span>
+                                                    <span class="font-medium">{companyMachine.carbon_footprint} kg CO2/unit</span>
                                                 </div>
                                                 <div class="flex justify-between">
                                                     <span>Cost to Acquire:</span>
@@ -738,54 +530,184 @@ let maintenanceTime = 0;
                                                 {/if}
                                             </div>
 
-                                            <!-- Action Buttons -->
-                                            <div class="flex items-center justify-between mt-4 pt-3 border-t border-border">
-                                                <button 
-                                                    class="kt-btn kt-btn-sm kt-btn-outline kt-btn-primary"
-                                                    on:click={() => openMachineDrawer(companyMachine)}
-                                                >
-                                                    <i class="ki-filled ki-eye text-sm"></i>
-                                                    View Details
-                                                </button>
-                                                {#if companyMachine.employee === null}
-                                                    <button 
-                                                        class="kt-btn kt-btn-sm kt-btn-primary"
-                                                        on:click={() => openAssignModal(companyMachine)}
-                                                    >
-                                                        <i class="ki-filled ki-setting-3 text-sm"></i>
-                                                        Assign Employee
-                                                    </button>
-                                                {:else if companyMachine.status === 'inactive'}
-                                                    <button 
-                                                        class="kt-btn kt-btn-sm kt-btn-info"
-                                                        on:click={() => openMaintenanceModal(companyMachine, 'predictive')}
-                                                    >
-                                                        <i class="ki-filled ki-wrench text-sm"></i>
-                                                        Start Predictive Maintenance
-                                                    </button>
-                                                    <button 
-                                                        class="kt-btn kt-btn-sm kt-btn-primary"
-                                                        on:click={() => openProductionModal(companyMachine)}
-                                                    >
-                                                        <i class="ki-filled ki-play text-sm"></i>
-                                                        Start Production
-                                                    </button>
-                                                {:else if companyMachine.status === 'broken'}
-                                                    <button 
-                                                        class="kt-btn kt-btn-sm kt-btn-destructive"
-                                                        on:click={() => openMaintenanceModal(companyMachine, 'corrective')}
-                                                    >
-                                                        <i class="ki-filled ki-wrench text-sm"></i>
-                                                        Start Corrective Maintenance
-                                                    </button>
+                                            {#if companyMachine.ongoing_production_order}
+                                                <div class="mt-4 pt-3 border-t border-border">
+                                                    <h3 class="text-sm font-semibold text-mono mb-4">Ongoing Production</h3>
+                                                    <div class="flex items-center gap-3">
+                                                            <div class="flex-shrink-0 relative">
+                                                                {#if companyMachine.ongoing_production_order.product.image_url}
+                                                                    <img 
+                                                                        src={companyMachine.ongoing_production_order.product.image_url} 
+                                                                        alt={companyMachine.ongoing_production_order.product.name}
+                                                                        class="w-12 h-12 rounded-lg object-cover"
+                                                                    />
+                                                                {:else}
+                                                                    <div class="w-12 h-12 rounded-lg bg-accent/50 flex items-center justify-center">
+                                                                        <i class="ki-filled ki-abstract-26 text-lg text-muted-foreground"></i>
+                                                                    </div>
+                                                                {/if}
+                                                            </div>
+                                                            <div class="flex-1 min-w-0">
+                                                                <h4 class="text-sm font-semibold text-mono mb-2 truncate">{companyMachine.ongoing_production_order.product.name}</h4>
+                                                                <p class="text-xs text-muted-foreground mb-2">x{companyMachine.ongoing_production_order.quantity}</p>
+                                                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                                                    <div class="kt-progress kt-progress-primary">
+                                                                        <div class="kt-progress-indicator" style="width: {companyMachine.ongoing_production_order.producing_progress}%"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                    </div>
+                                                </div>
+                                            {/if}
+                                            
+                                            <!-- Employee Assignment Section -->
+                                            <div class="mt-4 pt-3 border-t border-border">
+                                                <h3 class="text-sm font-semibold text-mono mb-4">Employee Assignment</h3>
+                                                {#if companyMachine.employee}
+                                                    <div class="kt-card">
+                                                        <div class="kt-card-body p-3">
+                                                            <div class="flex items-center gap-3">
+                                                                <div class="flex-1 min-w-0">
+                                                                    <h4 class="text-sm font-semibold text-mono mb-1 truncate">
+                                                                        {companyMachine.employee.name}
+                                                                    </h4>
+                                                                    {#if companyMachine.employee.employee_profile}
+                                                                        <p class="text-xs text-muted-foreground">
+                                                                            {companyMachine.employee.employee_profile.name}
+                                                                        </p>
+                                                                    {/if}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 {:else}
-                                                    <button 
-                                                        class="kt-btn kt-btn-sm kt-btn-destructive"
-                                                        on:click={() => openUnassignModal(companyMachine)}
-                                                    >
-                                                        <i class="ki-filled ki-cross text-sm"></i>
-                                                        Unassign Employee
-                                                    </button>
+                                                    <div class="kt-card">
+                                                        <div class="kt-card-body p-4">
+                                                            <div class="flex flex-col items-center justify-center text-center">
+                                                                <i class="ki-filled ki-profile-user text-2xl text-muted-foreground mb-2"></i>
+                                                                <p class="text-xs text-muted-foreground">No employee assigned</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {/if}
+                                            </div>
+
+                                            <!-- Action Buttons -->
+                                            <div class="mt-4 pt-3 border-t border-border">
+                                                {#if companyMachine.employee === null}
+                                                    <div class="flex flex-col gap-2">
+                                                        <button 
+                                                            class="kt-btn kt-btn-primary w-full"
+                                                            on:click|stopPropagation={() => openAssignModal(companyMachine)}
+                                                        >
+                                                            <i class="fa-solid fa-user-plus text-base"></i>
+                                                            Assign Employee
+                                                        </button>
+                                                        {#if companyMachine.status === 'broken'}
+                                                            <button 
+                                                                class="kt-btn kt-btn-destructive w-full"
+                                                                on:click|stopPropagation={() => openMaintenanceModal(companyMachine, 'corrective')}
+                                                            >
+                                                                <i class="fa-solid fa-wrench text-base"></i>
+                                                                Start Corrective Maintenance
+                                                            </button>
+                                                        {:else if companyMachine.status === 'inactive'}
+                                                            <button 
+                                                                class="kt-btn kt-btn-outline kt-btn-info w-full"
+                                                                on:click|stopPropagation={() => openMaintenanceModal(companyMachine, 'predictive')}
+                                                            >
+                                                                <i class="fa-solid fa-wrench text-base"></i>
+                                                                Start Predictive Maintenance
+                                                            </button>
+                                                        {/if}
+                                                        {#if companyMachine.status !== 'sold'}
+                                                            <button 
+                                                                class="kt-btn kt-btn-outline kt-btn-warning w-full"
+                                                                on:click|stopPropagation={() => openSellModal(companyMachine)}
+                                                            >
+                                                                <i class="fa-solid fa-coins text-base"></i>
+                                                                Sell Machine
+                                                            </button>
+                                                        {/if}
+                                                    </div>
+                                                {:else if companyMachine.status === 'broken'}
+                                                    <div class="flex flex-col gap-2">
+                                                        <button 
+                                                            class="kt-btn kt-btn-destructive w-full"
+                                                            on:click|stopPropagation={() => openMaintenanceModal(companyMachine, 'corrective')}
+                                                        >
+                                                            <i class="fa-solid fa-wrench text-base"></i>
+                                                            Start Corrective Maintenance
+                                                        </button>
+                                                        <button 
+                                                            class="kt-btn kt-btn-outline kt-btn-secondary w-full"
+                                                            on:click|stopPropagation={() => openUnassignModal(companyMachine)}
+                                                        >
+                                                            <i class="fa-solid fa-user-minus text-base"></i>
+                                                            Unassign Employee
+                                                        </button>
+                                                        {#if companyMachine.status !== 'sold'}
+                                                            <button 
+                                                                class="kt-btn kt-btn-outline kt-btn-warning w-full"
+                                                                on:click|stopPropagation={() => openSellModal(companyMachine)}
+                                                            >
+                                                                <i class="fa-solid fa-coins text-base"></i>
+                                                                Sell Machine
+                                                            </button>
+                                                        {/if}
+                                                    </div>
+                                                {:else if companyMachine.status === 'inactive'}
+                                                    <div class="flex flex-col gap-2">
+                                                        <button 
+                                                            class="kt-btn kt-btn-primary w-full"
+                                                            on:click|stopPropagation={() => openProductionModal(companyMachine)}
+                                                        >
+                                                            <i class="fa-solid fa-play text-base"></i>
+                                                            Start Production
+                                                        </button>
+                                                        <button 
+                                                            class="kt-btn kt-btn-outline kt-btn-info w-full"
+                                                            on:click|stopPropagation={() => openMaintenanceModal(companyMachine, 'predictive')}
+                                                        >
+                                                            <i class="fa-solid fa-wrench text-base"></i>
+                                                            Start Predictive Maintenance
+                                                        </button>
+                                                        <button 
+                                                            class="kt-btn kt-btn-outline kt-btn-secondary w-full"
+                                                            on:click|stopPropagation={() => openUnassignModal(companyMachine)}
+                                                        >
+                                                            <i class="fa-solid fa-user-minus text-base"></i>
+                                                            Unassign Employee
+                                                        </button>
+                                                        {#if companyMachine.status !== 'sold'}
+                                                            <button 
+                                                                class="kt-btn kt-btn-outline kt-btn-warning w-full"
+                                                                on:click|stopPropagation={() => openSellModal(companyMachine)}
+                                                            >
+                                                                <i class="fa-solid fa-coins text-base"></i>
+                                                                Sell Machine
+                                                            </button>
+                                                        {/if}
+                                                    </div>
+                                                {:else}
+                                                    <div class="flex flex-col gap-2">
+                                                        <button 
+                                                            class="kt-btn kt-btn-outline kt-btn-secondary w-full"
+                                                            on:click|stopPropagation={() => openUnassignModal(companyMachine)}
+                                                        >
+                                                            <i class="fa-solid fa-user-minus text-base"></i>
+                                                            Unassign Employee
+                                                        </button>
+                                                        {#if companyMachine.status !== 'sold'}
+                                                            <button 
+                                                                class="kt-btn kt-btn-outline kt-btn-warning w-full"
+                                                                on:click|stopPropagation={() => openSellModal(companyMachine)}
+                                                            >
+                                                                <i class="fa-solid fa-coins text-base"></i>
+                                                                Sell Machine
+                                                            </button>
+                                                        {/if}
+                                                    </div>
                                                 {/if}
                                             </div>
                                         </div>
@@ -793,16 +715,6 @@ let maintenanceTime = 0;
                                 {/each}
                             </div>
                         </div>
-                        {#if pagination && pagination.total > 0}
-                            <div class="border-t border-gray-200">
-                                <Pagination 
-                                    {pagination} 
-                                    {perPage}
-                                    onPageChange={goToPage} 
-                                    onPerPageChange={handlePerPageChange}
-                                />
-                            </div>
-                        {/if}
                     {/if}
                 </div>
             </div>
@@ -822,6 +734,9 @@ let maintenanceTime = 0;
 
     <!-- Hidden button to trigger maintenance modal -->
     <button style="display:none" data-kt-modal-toggle="#maintenance_modal"></button>
+
+    <!-- Hidden button to trigger sell modal -->
+    <button style="display:none" data-kt-modal-toggle="#sell_modal"></button>
 
     <!-- Machine Details Drawer -->
     <div class="hidden kt-drawer kt-drawer-end card flex-col max-w-[90%] w-[450px] top-5 bottom-5 end-5 rounded-xl border border-border" data-kt-drawer="true" data-kt-drawer-container="body" id="machine_drawer">
@@ -852,18 +767,23 @@ let maintenanceTime = 0;
                 </span>
                 <div class="flex items-center gap-2 mb-2">
                     <span class={getMachineStatusBadgeClass(selectedMachine.status)}>
-                        {machineStatuses[selectedMachine.status] || selectedMachine.status}
+                        {selectedMachine.status}
                     </span>
                 </div>
-                <div class="flex items-center gap-2 mb-2">
-                    <span class="text-xs text-muted-foreground">Reliability:</span>
-                    <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="kt-progress {selectedMachine.current_reliability > 0.7 ? 'kt-progress-primary' : selectedMachine.current_reliability > 0.4 ? 'kt-progress-warning' : 'kt-progress-destructive'}">
-                            <div class="kt-progress-indicator" style="width: {(selectedMachine.current_reliability * 100).toFixed(0)}%"></div>
+
+                <h3 class="text-sm font-semibold text-mono mb-3">Reliability</h3>
+                <div class="space-y-2">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-medium">{(selectedMachine.current_reliability * 100).toFixed(0)}%</span>
+
+                        <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                            <div class="kt-progress kt-progress-primary {selectedMachine.current_reliability > 0.7 ? 'kt-progress-primary' : selectedMachine.current_reliability > 0.4 ? 'kt-progress-warning' : 'kt-progress-destructive'}">
+                                <div class="kt-progress-indicator" style="width: {(selectedMachine.current_reliability * 100)}%"></div>
+                            </div>
                         </div>
                     </div>
-                    <span class="text-xs text-muted-foreground">{(selectedMachine.current_reliability * 100).toFixed(0)}%</span>
                 </div>
+
                 <div class="flex flex-col gap-2.5">
                     <div class="flex items-center gap-2.5">
                         <span class="text-xs font-normal text-foreground min-w-14 xl:min-w-24 shrink-0">
@@ -906,14 +826,18 @@ let maintenanceTime = 0;
                             <span class="text-xs text-muted-foreground">Setup At:</span>
                             <span class="text-xs font-medium">{formatTimestamp(selectedMachine.setup_at)}</span>
                         </div>
+                        {#if selectedMachine.last_maintenance_at}
                         <div class="flex justify-between">
                             <span class="text-xs text-muted-foreground">Last Maintenance:</span>
                             <span class="text-xs font-medium">{formatTimestamp(selectedMachine.last_maintenance_at)}</span>
                         </div>
+                        {/if}
+                        {#if selectedMachine.last_broken_at}
                         <div class="flex justify-between">
                             <span class="text-xs text-muted-foreground">Last Broken:</span>
                             <span class="text-xs font-medium">{formatTimestamp(selectedMachine.last_broken_at)}</span>
                         </div>
+                        {/if}
                     </div>
                 </div>
                 <!-- Performance Section -->
@@ -921,38 +845,24 @@ let maintenanceTime = 0;
                     <h3 class="text-sm font-semibold text-mono mb-3">Performance</h3>
                     <div class="space-y-2">
                         <div class="flex justify-between">
-                            <span class="text-xs text-muted-foreground">Operation Cost:</span>
-                            <span class="text-xs font-medium">DZD {selectedMachine.machine?.operation_cost}/day</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-xs text-muted-foreground">Carbon Footprint:</span>
-                            <span class="text-xs font-medium">{selectedMachine.machine?.carbon_footprint} kg CO2/unit</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-xs text-muted-foreground">Cost to Acquire:</span>
-                            <span class="text-xs font-medium">DZD {selectedMachine.machine?.cost_to_acquire}</span>
+                            <span class="text-xs text-muted-foreground">Speed:</span>
+                            <span class="text-xs font-medium">{selectedMachine.machine?.min_speed} - {selectedMachine.machine?.max_speed} units/day</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-xs text-muted-foreground">Quality Factor:</span>
-                            <span class="text-xs font-medium">{selectedMachine.machine?.quality_factor}</span>
-                        </div>
-                    </div>
-                </div>
-                <!-- Speed Section -->
-                <div class="border-t border-border pt-4">
-                    <h3 class="text-sm font-semibold text-mono mb-3">Speed</h3>
-                    <div class="space-y-2">
-                        <div class="flex justify-between">
-                            <span class="text-xs text-muted-foreground">Min Speed:</span>
-                            <span class="text-xs font-medium">{selectedMachine.machine?.min_speed} units/day</span>
+                            <span class="text-xs font-medium">{selectedMachine.machine?.quality_factor * 100}%</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-xs text-muted-foreground">Average Speed:</span>
-                            <span class="text-xs font-medium">{selectedMachine.machine?.avg_speed} units/day</span>
+                            <span class="text-xs text-muted-foreground">Operation Cost:</span>
+                            <span class="text-xs font-medium">DZD {selectedMachine.operations_cost}/day</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-xs text-muted-foreground">Max Speed:</span>
-                            <span class="text-xs font-medium">{selectedMachine.machine?.max_speed} units/day</span>
+                            <span class="text-xs text-muted-foreground">Carbon Footprint:</span>
+                            <span class="text-xs font-medium">{selectedMachine.carbon_footprint} kg CO2/unit</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-xs text-muted-foreground">Acquisition Cost:</span>
+                            <span class="text-xs font-medium">DZD {selectedMachine.machine?.cost_to_acquire}</span>
                         </div>
                     </div>
                 </div>
@@ -961,12 +871,8 @@ let maintenanceTime = 0;
                     <h3 class="text-sm font-semibold text-mono mb-3">Maintenance</h3>
                     <div class="space-y-2">
                         <div class="flex justify-between">
-                            <span class="text-xs text-muted-foreground">Maintenance Interval:</span>
-                            <span class="text-xs font-medium">{selectedMachine.machine?.maintenance_interval_days} days</span>
-                        </div>
-                        <div class="flex justify-between">
                             <span class="text-xs text-muted-foreground">Reliability Decay:</span>
-                            <span class="text-xs font-medium">{selectedMachine.machine?.reliability_decay_days}%/day</span>
+                            <span class="text-xs font-medium">{selectedMachine.machine?.reliability_decay_days * 100}%/day</span>
                         </div>
                     </div>
                 </div>
@@ -1211,8 +1117,8 @@ let maintenanceTime = 0;
                                 type="number" 
                                 class="kt-input w-full" 
                                 bind:value={productionQuantity}
-                                min="1"
-                                step="1"
+                                min="0.001"
+                                step="0.001"
                                 placeholder="Enter quantity"
                             />
                         </div>
@@ -1226,15 +1132,19 @@ let maintenanceTime = 0;
                                 <div class="kt-card-content px-5 py-4 space-y-2">
                                     <div class="flex justify-between items-center">
                                         <span class="text-sm font-normal text-secondary-foreground">Speed:</span>
-                                        <span class="text-sm font-medium text-mono">{machineToProduce.machine?.avg_speed} units/day</span>
+                                        <span class="text-sm font-medium text-mono">{machineToProduce.machine?.min_speed} - {machineToProduce.machine?.max_speed} units/day</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm font-normal text-secondary-foreground">Employee Efficiency Factor:</span>
+                                        <span class="text-sm font-medium text-mono">x{machineToProduce.employee?.efficiency_factor}</span>
                                     </div>
                                     <div class="flex justify-between items-center">
                                         <span class="text-sm font-normal text-secondary-foreground">Quality Factor:</span>
-                                        <span class="text-sm font-medium text-mono">{machineToProduce.machine?.quality_factor}%</span>
+                                        <span class="text-sm font-medium text-mono">{machineToProduce.machine?.quality_factor * 100}% (Expect as output: {productionQuantity * machineToProduce.machine?.quality_factor} units)</span>
                                     </div>
                                     <div class="flex justify-between items-center">
                                         <span class="text-sm font-normal text-secondary-foreground">Carbon Footprint:</span>
-                                        <span class="text-sm font-medium text-mono">{machineToProduce.machine?.carbon_footprint} kg CO2/unit</span>
+                                        <span class="text-sm font-medium text-mono">{machineToProduce.machine?.carbon_footprint * productionQuantity} kg CO2</span>
                                     </div>
                                 </div>
                             </div>
@@ -1357,6 +1267,144 @@ let maintenanceTime = 0;
                         disabled={maintenanceLoading}
                     >
                         {maintenanceLoading ? 'Starting...' : 'Start Maintenance'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sell Machine Modal -->
+    <div class="kt-modal" data-kt-modal="true" id="sell_modal">
+        <div class="kt-modal-content max-w-[600px] top-[5%]">
+            <div class="kt-modal-header">
+                <h3 class="kt-modal-title">Sell Machine</h3>
+                <button
+                    type="button"
+                    class="kt-modal-close"
+                    aria-label="Close modal"
+                    data-kt-modal-dismiss="#sell_modal"
+                    on:click={closeSellModal}
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-x"
+                        aria-hidden="true"
+                    >
+                        <path d="M18 6 6 18"></path>
+                        <path d="m6 6 12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="kt-modal-body">
+                {#if machineToSell}
+                    <div class="space-y-4">
+                        <!-- Machine Info -->
+                        <div class="flex items-center gap-4">
+                            <div class="flex-shrink-0">
+                                {#if machineToSell.machine?.image_url}
+                                    <img 
+                                        src={machineToSell.machine.image_url} 
+                                        alt={machineToSell.machine.name}
+                                        class="w-16 h-16 rounded-lg object-cover"
+                                    />
+                                {:else}
+                                    <div class="w-16 h-16 rounded-lg bg-accent/50 flex items-center justify-center">
+                                        <i class="ki-filled ki-setting-3 text-xl text-muted-foreground"></i>
+                                    </div>
+                                {/if}
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-mono mb-1">{machineToSell.machine?.name}</h4>
+                                <p class="text-sm text-muted-foreground">{machineToSell.machine?.model} - {machineToSell.machine?.manufacturer}</p>
+                                <span class={getMachineStatusBadgeClass(machineToSell.status)}>
+                                    {machineToSell.status}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Estimated Price -->
+                        <div class="kt-card bg-accent/50">
+                            <div class="kt-card-header px-5">
+                                <h3 class="kt-card-title">Sale Details</h3>
+                            </div>
+                            <div class="kt-card-content px-5 py-4 space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm font-normal text-secondary-foreground">Estimated Sale Price:</span>
+                                    <span class="text-lg font-semibold text-mono">DZD {machineToSell.current_value?.toLocaleString() || 'N/A'}</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm font-normal text-secondary-foreground">Original Cost:</span>
+                                    <span class="text-sm font-medium text-mono">DZD {machineToSell.acquisition_cost?.toLocaleString() || machineToSell.machine?.cost_to_acquire?.toLocaleString() || 'N/A'}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Price Variation Warning -->
+                        <div class="kt-alert kt-alert-warning kt-alert-ghost">
+                            <div class="flex items-start gap-3">
+                                <i class="ki-filled ki-information-2 text-base text-warning-foreground mt-0.5"></i>
+                                <div class="flex-1">
+                                    <h5 class="text-sm font-semibold text-warning-foreground mb-1">Price Variation Notice</h5>
+                                    <p class="text-xs text-warning-foreground">
+                                        The final sale price may vary based on market conditions. 
+                                        Machines in 'broken' or 'maintenance' status may sell for up to 30% less than the estimated price.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Consequences Warning -->
+                        <div class="kt-alert kt-alert-destructive">
+                            <div class="flex items-start gap-3">
+                                <i class="ki-filled ki-warning-2 text-base text-destructive-foreground mt-0.5"></i>
+                                <div class="flex-1">
+                                    <h5 class="text-sm font-semibold text-destructive-foreground mb-1">Important Notice</h5>
+                                    <div class="text-xs text-destructive-foreground space-y-1">
+                                        {#if machineToSell.ongoing_production_order}
+                                            <p>• Any ongoing production order will be cancelled and lost</p>
+                                        {/if}
+                                        {#if machineToSell.status === 'maintenance'}
+                                            <p>• Any ongoing maintenance will be cancelled</p>
+                                        {/if}
+                                        {#if machineToSell.employee}
+                                            <p>• The assigned employee ({machineToSell.employee.name}) will become inactive</p>
+                                        {/if}
+                                        <p>• This action cannot be undone</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-sm text-muted-foreground">
+                            Are you sure you want to sell this machine?
+                        </div>
+                    </div>
+                {/if}
+            </div>
+            <div class="kt-modal-footer">
+                <div></div>
+                <div class="flex gap-4">
+                    <button
+                        class="kt-btn kt-btn-secondary"
+                        data-kt-modal-dismiss="#sell_modal"
+                        on:click={closeSellModal}
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        class="kt-btn kt-btn-warning"
+                        on:click={sellMachine}
+                        disabled={selling}
+                    >
+                        {selling ? 'Selling...' : 'Sell Machine'}
                     </button>
                 </div>
             </div>

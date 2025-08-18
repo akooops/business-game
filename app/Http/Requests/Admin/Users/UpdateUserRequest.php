@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Admin\Users;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class UpdateUserRequest extends FormRequest
 {
@@ -32,9 +31,6 @@ class UpdateUserRequest extends FormRequest
             'password' => 'nullable|string|min:6|max:255',
 
             'file' => 'nullable|file|mimes:jpg,jpeg,png',
-
-            'roles' => 'required|array',
-            'roles.*' => 'exists:roles,id'
         ];
     }
 }

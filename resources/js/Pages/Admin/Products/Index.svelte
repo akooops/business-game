@@ -29,29 +29,9 @@
     let perPage = 10;
     let currentPage = 1;
     let searchTimeout;
-    let showFilters = false;
-
-    // Filter variables
-    let typeFilter = '';
-    let hasExpirationFilter = '';
-    let elasticityMin = '';
-    let elasticityMax = '';
-    let storageCostMin = '';
-    let storageCostMax = '';
-    let shelfLifeMin = '';
-    let shelfLifeMax = '';
-    let needTechnologyFilter = '';
-    let technologyIdFilter = '';
 
     // Select2 component reference
     let technologySelectComponent;
-
-    // Product types mapping
-    const productTypes = {
-        'raw_material': 'Raw Material',
-        'component': 'Component',
-        'finished_product': 'Finished Product'
-    };
 
     // Product type badge colors
     function getProductTypeBadgeClass(type) {
@@ -67,11 +47,6 @@
         }
     }
 
-    // Handle technology selection
-    function handleTechnologySelect(event) {
-        technologyIdFilter = event.detail.value;
-        handleFilterChange();
-    }
 
     // Fetch products data
     async function fetchProducts() {
@@ -82,39 +57,7 @@
                 perPage: perPage,
                 search: search
             });
-            
-            // Add filter parameters
-            if (typeFilter) {
-                params.append('type', typeFilter);
-            }
-            if (hasExpirationFilter) {
-                params.append('has_expiration', hasExpirationFilter);
-            }
-            if (elasticityMin) {
-                params.append('elasticity_min', elasticityMin);
-            }
-            if (elasticityMax) {
-                params.append('elasticity_max', elasticityMax);
-            }
-            if (storageCostMin) {
-                params.append('storage_cost_min', storageCostMin);
-            }
-            if (storageCostMax) {
-                params.append('storage_cost_max', storageCostMax);
-            }
-            if (shelfLifeMin) {
-                params.append('shelf_life_min', shelfLifeMin);
-            }
-            if (shelfLifeMax) {
-                params.append('shelf_life_max', shelfLifeMax);
-            }
-            if (needTechnologyFilter) {
-                params.append('need_technology', needTechnologyFilter);
-            }
-            if (technologyIdFilter) {
-                params.append('technology_id', technologyIdFilter);
-            }
-            
+
             const response = await fetch(route('admin.products.index') + '?' + params.toString(), {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
@@ -172,36 +115,6 @@
         fetchProducts();
     }
 
-    // Handle filter changes
-    function handleFilterChange() {
-        currentPage = 1;
-        fetchProducts();
-    }
-
-    // Clear all filters
-    function clearAllFilters() {
-        typeFilter = '';
-        hasExpirationFilter = '';
-        elasticityMin = '';
-        elasticityMax = '';
-        storageCostMin = '';
-        storageCostMax = '';
-        shelfLifeMin = '';
-        shelfLifeMax = '';
-        needTechnologyFilter = '';
-        technologyIdFilter = '';
-        if (technologySelectComponent) {
-            technologySelectComponent.clear();
-        }
-        currentPage = 1;
-        fetchProducts();
-    }
-
-    // Toggle filters visibility
-    function toggleFilters() {
-        showFilters = !showFilters;
-    }
-
     // Delete product
     async function deleteProduct(productId) {
         if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
@@ -222,13 +135,7 @@
             });
 
             if (response.ok) {
-                // Show success toast
-                KTToast.show({
-                    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                    message: "Product deleted successfully!",
-                    variant: "success",
-                    position: "bottom-right",
-                });
+                showToast("Product deleted successfully!", 'success');
 
                 // Refresh the products list
                 fetchProducts();
@@ -236,22 +143,12 @@
                 const errorData = await response.json().catch(() => ({}));
                 const errorMessage = errorData.message || 'Error deleting product. Please try again.';
                 
-                KTToast.show({
-                    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                    message: errorMessage,
-                    variant: "destructive",
-                    position: "bottom-right",
-                });
+                showToast(errorMessage, 'destructive');
             }
         } catch (error) {
             console.error('Error deleting product:', error);
             
-            KTToast.show({
-                    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                    message: "Network error. Please check your connection and try again.",
-                    variant: "destructive",
-                    position: "bottom-right",
-            });
+            showToast("Network error. Please check your connection and try again.", 'destructive');
         }
     }
 
@@ -263,12 +160,7 @@
     export let success;
 
     $: if (success) {
-        KTToast.show({
-            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-            message: success,
-            variant: "success",
-            position: "bottom-right",
-        });
+        showToast(success, 'success');  
     }
 </script>
 
@@ -289,16 +181,12 @@
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
-                    {#if hasPermission('admin.products.store')}
                     <a href="{route('admin.products.create')}" class="kt-btn kt-btn-primary">
                         <i class="ki-filled ki-plus text-base"></i>
                         Add New Product
                     </a>
-                    {/if}
                 </div>                      
             </div>
-
-
 
             <!-- Products Table -->
             <div class="kt-card">
@@ -315,239 +203,36 @@
                                     on:input={handleSearchInput}
                                 />
                             </div>
-                            
-                            <!-- Filter Toggle Button -->
-                            <button 
-                                class="kt-btn kt-btn-outline"
-                                on:click={toggleFilters}
-                            >
-                                <i class="ki-filled ki-filter text-sm"></i>
-                                {showFilters ? 'Hide Filters' : 'Show Filters'}
-                            </button>
-                            
-                            <!-- Clear Filters Button -->
-                            {#if typeFilter || hasExpirationFilter || elasticityMin || elasticityMax || shelfLifeMin || shelfLifeMax || needTechnologyFilter || technologyIdFilter}
-                                <button 
-                                    class="kt-btn kt-btn-ghost kt-btn-sm"
-                                    on:click={clearAllFilters}
-                                >
-                                    <i class="ki-filled ki-cross text-sm"></i>
-                                    Clear All
-                                </button>
-                            {/if}
                         </div>
                     </div>
                 </div>
-                
-                <!-- Advanced Filters Section -->
-                {#if showFilters}
-                    <div class="kt-card-body border-t border-gray-200 p-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                            <!-- Product Properties -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Product Properties</h4>                                    
-                                <!-- Product type -->
-                                <select 
-                                    class="kt-select w-full" 
-                                    bind:value={typeFilter}
-                                    on:change={handleFilterChange}
-                                >
-                                    <option value="">All Products</option>
-                                    <option value="raw_material">Raw Materials</option>
-                                    <option value="component">Components</option>
-                                    <option value="finished_product">Finished Products</option>
-                                </select>
-                            </div>
-
-                            <!-- Has expiration -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Has expiration</h4>                                    
-                                <!-- Has expiration -->
-                                <select 
-                                    class="kt-select w-full" 
-                                    bind:value={hasExpirationFilter}
-                                    on:change={handleFilterChange}
-                                >
-                                    <option value="">All Products</option>
-                                    <option value="1">Yes</option>
-                                    <option value="0">No</option>
-                                </select>
-                            </div>                     
-                            
-                            <!-- Shelf Life Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Shelf Life (Days)</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min Days" 
-                                        bind:value={shelfLifeMin}
-                                        on:input={handleFilterChange}
-                                        min="1"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max Days" 
-                                        bind:value={shelfLifeMax}
-                                        on:input={handleFilterChange}
-                                        min="1"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Elasticity Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Elasticity Coefficient</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min" 
-                                        bind:value={elasticityMin}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max" 
-                                        bind:value={elasticityMax}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Storage Cost Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Storage Cost</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min" 
-                                        bind:value={storageCostMin}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max" 
-                                        bind:value={storageCostMax}
-                                        on:input={handleFilterChange}
-                                        step="0.1"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Need Technology -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Need Technology</h4>
-                                <select 
-                                    class="kt-select w-full" 
-                                    bind:value={needTechnologyFilter}
-                                    on:change={handleFilterChange}
-                                >
-                                    <option value="">All Products</option>
-                                    <option value="1">Yes</option>
-                                    <option value="0">No</option>
-                                </select>
-                            </div>
-
-                                                         <!-- Technology -->
-                             <div class="space-y-2">
-                                 <h4 class="text-sm font-medium text-gray-700">Technology</h4>
-                                 <Select2
-                                     bind:this={technologySelectComponent}
-                                     id="technology-filter"
-                                     placeholder="All Technologies"
-                                     allowClear={true}
-                                     on:select={handleTechnologySelect}
-                                     on:clear={() => {
-                                         technologyIdFilter = '';
-                                         handleFilterChange();
-                                     }}
-                                     ajax={{
-                                         url: route('admin.technologies.index'),
-                                         dataType: 'json',
-                                         delay: 300,
-                                         data: function(params) {
-                                             return {
-                                                 search: params.term,
-                                                 perPage: 10
-                                             };
-                                         },
-                                         processResults: function(data) {
-                                             return {
-                                                 results: data.technologies.map(technology => ({
-                                                     id: technology.id,
-                                                     text: technology.name,
-                                                     name: technology.name,
-                                                     level: technology.level
-                                                 }))
-                                             };
-                                         },
-                                         cache: true
-                                     }}
-                                     templateResult={function(data) {
-                                         if (data.loading) return data.text;
-                                         
-                                         const $elem = globalThis.$('<div class="flex items-center gap-2">' +
-                                             '<i class="ki-filled ki-technology-1 text-sm text-muted-foreground"></i>' +
-                                             '<span class="font-medium text-sm">' + data.name + '</span>' +
-                                             '<span class="text-xs text-muted-foreground">(Level ' + data.level + ')</span>' +
-                                             '</div>');
-                                         return $elem;
-                                     }}
-                                     templateSelection={function(data) {
-                                         if (!data.id) return data.text;
-                                         return data.name;
-                                     }}
-                                 />
-                             </div>
-                        </div>
-                    </div>
-                {/if}
                 
                 <div class="kt-card-content p-0">
                     <div class="kt-scrollable-x-auto">
                         <table class="kt-table kt-table-border table-fixed">
                             <thead>
                                 <tr>
-                                    <th class="w-[50px]">
-                                        <input class="kt-checkbox kt-checkbox-sm" type="checkbox"/>
-                                    </th>
-                                    <th class="w-[80px]">
+                                    <th style="width: 75px;">
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">ID</span>
                                         </span>
                                     </th>
-                                    <th class="min-w-[200px]">
+                                    <th>
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">Product</span>
                                         </span>
                                     </th>
-                                    <th class="min-w-[150px]">
+                                    <th>
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">Type</span>
                                         </span>
                                     </th>
-                                    <th class="min-w-[150px]">
+                                    <th>
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">Technology</span>
                                         </span>
                                     </th>
-                                    <th class="w-[80px]">
+                                    <th style="width: 70px;">
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">Actions</span>
                                         </span>
@@ -559,9 +244,6 @@
                                     <!-- Loading skeleton rows -->
                                     {#each Array(perPage) as _, i}
                                         <tr>
-                                            <td class="p-4">
-                                                <div class="kt-skeleton w-4 h-4 rounded"></div>
-                                            </td>
                                             <td class="p-4">
                                                 <div class="kt-skeleton w-8 h-4 rounded"></div>
                                             </td>
@@ -597,12 +279,11 @@
                                                 <p class="text-sm text-secondary-foreground mb-4">
                                                     {search ? 'No products match your search criteria.' : 'Get started by creating your first product.'}
                                                 </p>
-                                                {#if hasPermission('admin.products.store')}
+
                                                 <a href="{route('admin.products.create')}" class="kt-btn kt-btn-primary">
                                                     <i class="ki-filled ki-plus text-base"></i>
                                                     Create First Product
                                                 </a>
-                                                {/if}
                                             </div>
                                         </td>
                                     </tr>
@@ -610,9 +291,6 @@
                                     <!-- Actual data rows -->
                                     {#each products as product}
                                         <tr class="hover:bg-muted/50">
-                                            <td>
-                                                <input class="kt-checkbox kt-checkbox-sm" type="checkbox" value={product.id}/>
-                                            </td>
                                             <td>
                                                 <span class="text-sm font-medium text-mono">#{product.id}</span>
                                             </td>
@@ -632,43 +310,42 @@
                                                         {/if}
                                                     </div>
                                                     <div class="flex flex-col gap-1">
-                                                        <span class="text-sm font-medium text-mono hover:text-primary">
+                                                        <span class="text-sm font-medium text-mono">
                                                             {product.name}
                                                         </span>
+
+                                                        {#if product.description}
+                                                            <span class="text-xs text-muted-foreground">
+                                                                {product.description}
+                                                            </span>
+                                                        {/if}
                                                     </div>
                                                 </div>
                                             </td>
 
                                             <td>
                                                 <span class={getProductTypeBadgeClass(product.type)}>
-                                                    {productTypes[product.type] || product.type}
+                                                    {product.type_name}
                                                 </span>
                                             </td>
                                             <td>
-                                                {#if product.need_technology}
-                                                    {#if product.technology}
-                                                        <div class="flex items-center gap-2">
-                                                            <div class="flex items-center justify-center size-8 shrink-0 rounded bg-accent/50">
-                                                                {#if product.technology.image_url}
-                                                                    <img src={product.technology.image_url} alt="" class="size-6 object-cover rounded" />
-                                                                {:else}
-                                                                    <i class="ki-filled ki-technology-1 text-sm text-muted-foreground"></i>
-                                                                {/if}
-                                                            </div>
-                                                            <div class="flex flex-col">
-                                                                <span class="text-xs font-medium text-mono">{product.technology.name}</span>
-                                                                <span class="text-xs text-muted-foreground">Level {product.technology.level}</span>
-                                                            </div>
+                                                {#if product.technology}
+                                                    <div class="flex items-center gap-2">
+                                                        <div class="flex items-center justify-center size-8 shrink-0 rounded bg-accent/50">
+                                                            {#if product.technology.image_url}
+                                                                <img src={product.technology.image_url} alt="" class="size-6 object-cover rounded" />
+                                                            {:else}
+                                                                <i class="ki-filled ki-technology-1 text-sm text-muted-foreground"></i>
+                                                            {/if}
                                                         </div>
-                                                    {:else}
-                                                        <span class="kt-badge kt-badge-outline kt-badge-danger kt-badge-sm">
-                                                            <i class="ki-filled ki-technology-1 text-xs mr-1"></i>
-                                                            Required
-                                                        </span>
-                                                    {/if}
+                                                        <div class="flex flex-col">
+                                                            <span class="text-xs font-medium text-mono">{product.technology.name}</span>
+                                                            <span class="text-xs text-muted-foreground">Level {product.technology.level}</span>
+                                                        </div>
+                                                    </div>
                                                 {:else}
                                                     <span class="text-xs text-muted-foreground">
-                                                        No technology
+                                                        No research required
                                                     </span>
                                                 {/if}
                                             </td>
@@ -679,7 +356,6 @@
                                                             <i class="ki-filled ki-dots-vertical text-lg"></i>
                                                         </button>
                                                         <div class="kt-menu-dropdown kt-menu-default w-full max-w-[175px]" data-kt-menu-dismiss="true">
-                                                            {#if hasPermission('admin.product-demand.index')}
                                                             <div class="kt-menu-item">
                                                                 <a class="kt-menu-link" href={route('admin.product-demand.index', { product_id: product.id, product_name: product.name })}>
                                                                     <span class="kt-menu-icon">
@@ -690,9 +366,7 @@
                                                             </div>
 
                                                             <div class="kt-menu-separator"></div>
-                                                            {/if}
 
-                                                            {#if hasPermission('admin.product-recipes.index')}
                                                             <div class="kt-menu-item">
                                                                 <a class="kt-menu-link" href={route('admin.product-recipes.index', { product_id: product.id, product_name: product.name })}>
                                                                     <span class="kt-menu-icon">
@@ -703,9 +377,7 @@
                                                             </div>
 
                                                             <div class="kt-menu-separator"></div>
-                                                            {/if}
                                                                 
-                                                            {#if hasPermission('admin.products.show')}
                                                             <div class="kt-menu-item">
                                                                 <a class="kt-menu-link" href={route('admin.products.show', { product: product.id })}>
                                                                     <span class="kt-menu-icon">
@@ -714,8 +386,7 @@
                                                                     <span class="kt-menu-title">View</span>
                                                                 </a>
                                                             </div>
-                                                            {/if}
-                                                            {#if hasPermission('admin.products.update')}
+
                                                             <div class="kt-menu-item">
                                                                 <a class="kt-menu-link" href={route('admin.products.edit', { product: product.id })}>
                                                                     <span class="kt-menu-icon">
@@ -724,18 +395,17 @@
                                                                     <span class="kt-menu-title">Edit</span>
                                                                 </a>
                                                             </div>
-                                                            {/if}
-                                                            {#if hasPermission('admin.products.destroy')}
-                                                                <div class="kt-menu-separator"></div>
-                                                                <div class="kt-menu-item">
-                                                                    <button class="kt-menu-link" on:click={() => deleteProduct(product.id)}>
-                                                                        <span class="kt-menu-icon">
-                                                                            <i class="ki-filled ki-trash"></i>
-                                                                        </span>
-                                                                        <span class="kt-menu-title">Delete</span>
-                                                                    </button>
-                                                                </div>
-                                                            {/if}
+
+                                                            <div class="kt-menu-separator"></div>
+                                                            
+                                                            <div class="kt-menu-item">
+                                                                <button class="kt-menu-link" on:click={() => deleteProduct(product.id)}>
+                                                                    <span class="kt-menu-icon">
+                                                                        <i class="ki-filled ki-trash"></i>
+                                                                    </span>
+                                                                    <span class="kt-menu-title">Delete</span>
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>

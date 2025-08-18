@@ -26,8 +26,7 @@
     let form = {
         name: country.name || '',
         customs_duties_rate: country.customs_duties_rate || 0.25,
-        allows_imports: country.allows_imports || true,
-        file: null
+        allows_imports: country.allows_imports,
     };
 
     // Form errors
@@ -35,28 +34,6 @@
 
     // Loading state
     let loading = false;
-
-    // File preview
-    let filePreview = null;
-    let existingFlagUrl = country.flag_url;
-
-    // Handle file input change
-    function handleFileChange(event) {
-        const file = event.target.files[0];
-        if (file && file.type.startsWith('image/')) {
-            form.file = file;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                filePreview = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-    }
-
-    // Handle imports toggle
-    function handleImportsToggle() {
-        form.allows_imports = !form.allows_imports;
-    }
 
     // Handle form submission
     function handleSubmit() {
@@ -68,11 +45,9 @@
         // Add form fields
         Object.keys(form).forEach(key => {
             if (form[key] !== null && form[key] !== '') {
-                if (key === 'file' && form.file) {
-                    formData.append(key, form.file);
-                } else if (key === 'allows_imports') {
+                if (key === 'allows_imports') {
                     formData.append(key, form[key] ? '1' : '0');
-                } else if (key !== 'file') {
+                } else {
                     formData.append(key, form[key]);
                 }
             }
@@ -185,7 +160,7 @@
                                     id="customs_duties_rate"
                                     type="number"
                                     class="kt-input {errors.customs_duties_rate ? 'kt-input-error' : ''}"
-                                    placeholder="0.25"
+                                    placeholder="Enter customs duties rate"
                                     step="0.001"
                                     min="0"
                                     max="1"
@@ -195,57 +170,9 @@
                                     <p class="text-sm text-destructive">{errors.customs_duties_rate}</p>
                                 {/if}
                                 <p class="text-sm text-secondary-foreground">
-                                    Current: {(form.customs_duties_rate * 100).toFixed(1)}%
+                                    Current: {(form.customs_duties_rate * 100)}%
                                 </p>
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Flag Upload Card -->
-                <div class="kt-card">
-                    <div class="kt-card-header">
-                        <h4 class="kt-card-title">Country Flag</h4>
-                    </div>
-                    <div class="kt-card-content">
-                        <div class="grid gap-4">
-                            <!-- Current Flag -->
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono">Current Flag</label>
-                                <div class="w-24 h-16 border rounded-lg overflow-hidden">
-                                    <img src={existingFlagUrl} alt="Current Flag" class="w-full h-full object-cover" />
-                                </div>
-                            </div>
-
-                            <!-- File Upload -->
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="file">
-                                    Update Flag Image
-                                </label>
-                                <input
-                                    id="file"
-                                    type="file"
-                                    class="kt-input {errors.file ? 'kt-input-error' : ''}"
-                                    accept="image/jpeg,image/jpg,image/png"
-                                    on:change={handleFileChange}
-                                />
-                                {#if errors.file}
-                                    <p class="text-sm text-destructive">{errors.file}</p>
-                                {/if}
-                                <p class="text-sm text-secondary-foreground">
-                                    Upload a new flag image (JPEG, JPG, PNG, max 2MB). Leave empty to keep current flag.
-                                </p>
-                            </div>
-
-                            <!-- File Preview -->
-                            {#if filePreview}
-                                <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono">New Flag Preview</label>
-                                    <div class="w-24 h-16 border rounded-lg overflow-hidden">
-                                        <img src={filePreview} alt="Flag Preview" class="w-full h-full object-cover" />
-                                    </div>
-                                </div>
-                            {/if}
                         </div>
                     </div>
                 </div>

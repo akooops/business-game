@@ -56,12 +56,10 @@
                         <i class="ki-filled ki-arrow-left text-base"></i>
                         Back to Products
                     </a>
-                    {#if hasPermission('admin.products.update')}
                     <a href="{route('admin.products.edit', { product: product.id })}" class="kt-btn kt-btn-primary">
                         <i class="ki-filled ki-pencil text-base"></i>
                         Edit Product
                     </a>
-                    {/if}
                 </div>
             </div>
 
@@ -108,12 +106,6 @@
                             </div>
                         </div>
 
-                        <!-- Measurement Unit -->
-                        <div class="flex flex-col gap-2">
-                            <h4 class="text-sm font-semibold text-mono">Measurement Unit</h4>
-                            <p class="text-sm text-secondary-foreground">{product?.measurement_unit}</p>
-                        </div>
-
                         <!-- Created At -->
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Created At</h4>
@@ -157,7 +149,7 @@
                             <p class="text-sm text-secondary-foreground">
                                 {product?.storage_cost}
                                 <span class="text-xs text-muted-foreground ml-2">
-                                    (Storage cost per day per unit)
+                                    (Storage cost per day per unit DZD)
                                 </span>
                             </p>
                         </div>
@@ -190,70 +182,45 @@
                         </div>
                         {/if}
 
-                        <!-- Technology Requirement -->
-                        <div class="flex flex-col gap-2">
-                            <h4 class="text-sm font-semibold text-mono">Technology Requirement</h4>
-                            <div class="flex items-center gap-2">
-                                {#if product?.need_technology}
-                                    <span class="kt-badge kt-badge-warning kt-badge-sm">Required</span>
-                                    <span class="text-sm text-secondary-foreground">
-                                        This product requires a technology to be produced
-                                    </span>
-                                {:else}
-                                    <span class="kt-badge kt-badge-outline kt-badge-sm">Not Required</span>
-                                    <span class="text-sm text-secondary-foreground">
-                                        No technology required for production
-                                    </span>
-                                {/if}
-                            </div>
-                        </div>
-
                         <!-- Assigned Technology -->
-                        {#if product?.need_technology}
+                        {#if product?.technology}
                             <div class="flex flex-col gap-2">
                                 <h4 class="text-sm font-semibold text-mono">Assigned Technology</h4>
-                                {#if product?.technology}
-                                    <div class="kt-card border">
-                                        <div class="kt-card-content p-3">
-                                            <div class="flex items-center gap-3">
-                                                <div class="flex items-center justify-center size-12 shrink-0 rounded bg-accent/50">
-                                                    {#if product.technology.image_url}
-                                                        <img src={product.technology.image_url} alt="" class="size-10 object-cover rounded" />
-                                                    {:else}
-                                                        <i class="ki-filled ki-technology-1 text-xl text-muted-foreground"></i>
-                                                    {/if}
-                                                </div>
-                                                <div class="flex flex-col gap-1">
-                                                    <span class="text-sm font-medium text-mono">{product.technology.name}</span>
-                                                    <div class="flex items-center gap-3 text-xs text-muted-foreground">
-                                                        <span class="kt-badge kt-badge-light-primary kt-badge-sm">Level {product.technology.level}</span>
-                                                        <span>Cost: {product.technology.research_cost}</span>
-                                                        <span>Time: {product.technology.research_time_days} days</span>
-                                                    </div>
-                                                    {#if product.technology.description}
-                                                        <p class="text-xs text-muted-foreground mt-1">{product.technology.description}</p>
-                                                    {/if}
+                                <div class="kt-card border">
+                                    <div class="kt-card-content p-3">
+                                        <div class="flex items-center gap-3">
+                                            <div class="flex items-center justify-center size-12 shrink-0 rounded bg-accent/50">
+                                                {#if product.technology.image_url}
+                                                    <img src={product.technology.image_url} alt="" class="size-10 object-cover rounded" />
+                                                {:else}
+                                                    <i class="ki-filled ki-technology-1 text-xl text-muted-foreground"></i>
+                                                {/if}
+                                            </div>
+                                            <div class="flex flex-col gap-1">
+                                                <span class="text-sm font-medium text-mono">{product.technology.name}</span>
+                                                <div class="flex items-center gap-3 text-xs text-muted-foreground">
+                                                    <span class="kt-badge text-white kt-badge-light-primary kt-badge-sm">Level {product.technology.level}</span>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                {:else}
-                                    <div class="kt-card border border-dashed border-warning/50 bg-warning/5">
-                                        <div class="kt-card-content p-3">
-                                            <div class="flex items-center gap-3">
-                                                <div class="flex items-center justify-center size-10 shrink-0 rounded bg-warning/20">
-                                                    <i class="ki-filled ki-warning-2 text-lg text-warning"></i>
-                                                </div>
-                                                <div class="flex flex-col">
-                                                    <span class="text-sm font-medium text-mono text-warning">No Technology Assigned</span>
-                                                    <span class="text-xs text-muted-foreground">
-                                                        This product requires a technology but none is currently assigned
-                                                    </span>
-                                                </div>
-                                            </div>
+                                </div>
+                            </div>
+                        {:else}
+                            <div class="kt-card border border-dashed border-warning/50 bg-warning/5">
+                                <div class="kt-card-content p-3">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex items-center justify-center size-10 shrink-0 rounded bg-warning/20">
+                                            <i class="fa-solid fa-robot text-warning"></i>
+                                        </div>
+                                        <div class="flex flex-col">
+                                            <span class="text-sm font-medium text-mono text-warning">No Technology Assigned</span>
+                                            <span class="text-xs text-muted-foreground">
+                                                This product does not require a technology
+                                            </span>
                                         </div>
                                     </div>
-                                {/if}
+                                </div>
                             </div>
                         {/if}
                     </div>

@@ -121,35 +121,20 @@
 
             if (response.ok) {
                 // Show success toast
-                KTToast.show({
-                    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                    message: "User deleted successfully!",
-                    variant: "success",
-                    position: "bottom-right",
-                });
+                showToast("User deleted successfully!", 'success');
 
                 // Refresh the users list
                 fetchUsers();
             } else {
                 const errorData = await response.json().catch(() => ({}));
                 const errorMessage = errorData.message || 'Error deleting user. Please try again.';
-                
-                KTToast.show({
-                    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                    message: errorMessage,
-                    variant: "destructive",
-                    position: "bottom-right",
-                });
+
+                showToast(errorMessage, 'destructive');
             }
         } catch (error) {
             console.error('Error deleting user:', error);
-            
-            KTToast.show({
-                    icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                    message: "Network error. Please check your connection and try again.",
-                    variant: "destructive",
-                    position: "bottom-right",
-            });
+
+            showToast("Network error. Please check your connection and try again.", 'destructive');
         }
     }
 
@@ -161,12 +146,7 @@
     export let success;
 
     $: if (success) {
-        KTToast.show({
-            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-            message: success,
-            variant: "success",
-            position: "bottom-right",
-        });
+        showToast(success, 'success');   
     }
 </script>
 
@@ -187,12 +167,10 @@
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
-                    {#if hasPermission('admin.users.store')}
                     <a href="{route('admin.users.create')}" class="kt-btn kt-btn-primary">
                         <i class="ki-filled ki-plus text-base"></i>
                         Add New User
                     </a>
-                    {/if}
                 </div>                      
             </div>
 
@@ -215,28 +193,25 @@
                 
                 <div class="kt-card-content p-0">
                     <div class="kt-scrollable-x-auto">
-                        <table class="kt-table kt-table-border table-fixed">
+                        <table class="kt-table kt-table-border">
                             <thead>
                                 <tr>
-                                    <th class="w-[50px]">
-                                        <input class="kt-checkbox kt-checkbox-sm" type="checkbox"/>
-                                    </th>
-                                    <th class="w-[80px]">
+                                    <th style="width: 75px;">
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">ID</span>
                                         </span>
                                     </th>
-                                    <th class="min-w-[200px]">
+                                    <th>
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">User</span>
                                         </span>
                                     </th>
-                                    <th class="min-w-[150px]">
+                                    <th>
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">Name</span>
                                         </span>
                                     </th>
-                                    <th class="w-[80px]">
+                                    <th style="width: 70px;">
                                         <span class="kt-table-col">
                                             <span class="kt-table-col-label">Actions</span>
                                         </span>
@@ -248,9 +223,6 @@
                                     <!-- Loading skeleton rows -->
                                     {#each Array(perPage) as _, i}
                                         <tr>
-                                            <td class="p-4">
-                                                <div class="kt-skeleton w-4 h-4 rounded"></div>
-                                            </td>
                                             <td class="p-4">
                                                 <div class="kt-skeleton w-8 h-4 rounded"></div>
                                             </td>
@@ -283,12 +255,10 @@
                                                 <p class="text-sm text-secondary-foreground mb-4">
                                                     {search ? 'No users match your search criteria.' : 'Get started by creating your first user.'}
                                                 </p>
-                                                {#if hasPermission('admin.users.store')}
                                                 <a href="{route('admin.users.create')}" class="kt-btn kt-btn-primary">
                                                     <i class="ki-filled ki-plus text-base"></i>
                                                     Create First User
                                                 </a>
-                                                {/if}
                                             </div>
                                         </td>
                                     </tr>
@@ -296,9 +266,6 @@
                                     <!-- Actual data rows -->
                                     {#each users as user}
                                         <tr class="hover:bg-muted/50">
-                                            <td>
-                                                <input class="kt-checkbox kt-checkbox-sm" type="checkbox" value={user.id}/>
-                                            </td>
                                             <td>
                                                 <span class="text-sm font-medium text-mono">#{user.id}</span>
                                             </td>
@@ -334,7 +301,6 @@
                                                             <i class="ki-filled ki-dots-vertical text-lg"></i>
                                                         </button>
                                                         <div class="kt-menu-dropdown kt-menu-default w-full max-w-[175px]" data-kt-menu-dismiss="true">
-                                                            {#if hasPermission('admin.users.show')}
                                                             <div class="kt-menu-item">
                                                                 <a class="kt-menu-link" href={route('admin.users.show', { user: user.id })}>
                                                                     <span class="kt-menu-icon">
@@ -343,8 +309,6 @@
                                                                     <span class="kt-menu-title">View</span>
                                                                 </a>
                                                             </div>
-                                                            {/if}
-                                                            {#if hasPermission('admin.users.update')}
                                                             <div class="kt-menu-item">
                                                                 <a class="kt-menu-link" href={route('admin.users.edit', { user: user.id })}>
                                                                     <span class="kt-menu-icon">
@@ -353,18 +317,17 @@
                                                                     <span class="kt-menu-title">Edit</span>
                                                                 </a>
                                                             </div>
-                                                            {/if}
-                                                            {#if !user.is_default && hasPermission('admin.users.destroy')}
-                                                                <div class="kt-menu-separator"></div>
-                                                                <div class="kt-menu-item">
-                                                                    <button class="kt-menu-link" on:click={() => deleteUser(user.id)}>
-                                                                        <span class="kt-menu-icon">
-                                                                            <i class="ki-filled ki-trash"></i>
-                                                                        </span>
-                                                                        <span class="kt-menu-title">Remove</span>
-                                                                    </button>
-                                                                </div>
-                                                            {/if}
+
+                                                            <div class="kt-menu-separator"></div>
+                                                            
+                                                            <div class="kt-menu-item">
+                                                                <button class="kt-menu-link" on:click={() => deleteUser(user.id)}>
+                                                                    <span class="kt-menu-icon">
+                                                                        <i class="ki-filled ki-trash"></i>
+                                                                    </span>
+                                                                    <span class="kt-menu-title">Delete</span>
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>

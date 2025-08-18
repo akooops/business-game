@@ -36,8 +36,7 @@
         storage_cost: 0,
         shelf_life_days: '',
         has_expiration: false,
-        measurement_unit: '',
-        need_technology: false,
+        needs_technology: false,
         technology_id: null,
         file: null
     };
@@ -80,8 +79,8 @@
 
     // Handle need technology toggle
     function handleNeedTechnologyToggle() {
-        form.need_technology = !form.need_technology;
-        if (!form.need_technology) {
+        form.needs_technology = !form.needs_technology;
+        if (!form.needs_technology) {
             form.technology_id = null;
             selectedTechnology = null;
             if (technologySelectComponent) {
@@ -107,7 +106,7 @@
             if (form[key] !== null && form[key] !== '') {
                 if (key === 'file' && form.file) {
                     formData.append(key, form.file);
-                } else if (key === 'has_expiration' || key === 'need_technology') {
+                } else if (key === 'has_expiration' || key === 'needs_technology') {
                     formData.append(key, form[key] ? '1' : '0');
                 } else if (key !== 'file') {
                     formData.append(key, form[key]);
@@ -217,23 +216,6 @@
                                     <p class="text-sm text-destructive">{errors.type}</p>
                                 {/if}
                             </div>
-
-                            <!-- Measurement Unit -->
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="measurement_unit">
-                                    Measurement Unit <span class="text-destructive">*</span>
-                                </label>
-                                <input
-                                    id="measurement_unit"
-                                    type="text"
-                                    class="kt-input {errors.measurement_unit ? 'kt-input-error' : ''}"
-                                    placeholder="e.g., kg, liter, piece, ton"
-                                    bind:value={form.measurement_unit}
-                                />
-                                {#if errors.measurement_unit}
-                                    <p class="text-sm text-destructive">{errors.measurement_unit}</p>
-                                {/if}
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -257,7 +239,7 @@
                                     min="-1"
                                     max="1"
                                     class="kt-input {errors.elasticity_coefficient ? 'kt-input-error' : ''}"
-                                    placeholder="1.0"
+                                    placeholder="Enter elasticity coefficient"
                                     bind:value={form.elasticity_coefficient}
                                 />
                                 <p class="text-xs text-secondary-foreground">
@@ -279,7 +261,7 @@
                                     step="0.001"
                                     min="0"
                                     class="kt-input {errors.storage_cost ? 'kt-input-error' : ''}"
-                                    placeholder="1.0"
+                                    placeholder="Enter storage cost DZD"
                                     bind:value={form.storage_cost}
                                 />
                                 <p class="text-xs text-secondary-foreground">
@@ -322,7 +304,7 @@
                                         type="number"
                                         min="1"
                                         class="kt-input {errors.shelf_life_days ? 'kt-input-error' : ''}"
-                                        placeholder="30"
+                                        placeholder="Enter shelf life days"
                                         bind:value={form.shelf_life_days}
                                     />
                                     {#if errors.shelf_life_days}
@@ -340,20 +322,20 @@
                                     <input 
                                         class="kt-switch" 
                                         type="checkbox" 
-                                        id="need_technology" 
-                                        bind:checked={form.need_technology}
+                                        id="needs_technology" 
+                                        bind:checked={form.needs_technology}
                                     />
-                                    <label class="kt-label cursor-pointer" for="need_technology">
+                                    <label class="kt-label cursor-pointer" for="needs_technology">
                                         This product needs a technology to be produced
                                     </label>
                                 </div>
-                                {#if errors.need_technology}
-                                    <p class="text-sm text-destructive">{errors.need_technology}</p>
+                                {#if errors.needs_technology}
+                                    <p class="text-sm text-destructive">{errors.needs_technology}</p>
                                 {/if}
                             </div>
 
                             <!-- Technology Selection (conditional) -->
-                             {#if form.need_technology}
+                             {#if form.needs_technology}
                                  <div class="flex flex-col gap-2">
                                      <label class="text-sm font-medium text-mono" for="technology_id">
                                          Technology <span class="text-destructive">*</span>
@@ -380,8 +362,6 @@
                                                          text: technology.name,
                                                          name: technology.name,
                                                          level: technology.level,
-                                                         research_cost: technology.research_cost,
-                                                         research_time_days: technology.research_time_days,
                                                          image_url: technology.image_url
                                                      }))
                                                  };
@@ -397,7 +377,7 @@
                                                  '</div>' +
                                                  '<div class="flex flex-col">' +
                                                  '<span class="font-medium text-sm">' + data.name + '</span>' +
-                                                 '<span class="text-xs text-muted-foreground">Level: ' + data.level + ' | Cost: ' + data.research_cost + ' | Time: ' + data.research_time_days + ' days</span>' +
+                                                 '<span class="text-xs text-muted-foreground">Level: ' + data.level + '</span>' +
                                                  '</div>' +
                                                  '</div>');
                                              return $elem;

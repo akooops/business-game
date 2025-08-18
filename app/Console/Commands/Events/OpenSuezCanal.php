@@ -48,14 +48,18 @@ class OpenSuezCanal extends Command
             $supplier = Supplier::where('country_id', $country->id)->first();
 
             if($supplier){
+                $minShippingCost = $supplier->min_shipping_cost / $rate;
+                $maxShippingCost = $supplier->max_shipping_cost / $rate;
+                $minShippingTimeDays = $supplier->min_shipping_time_days / $rate;
+                $maxShippingTimeDays = $supplier->max_shipping_time_days / $rate;
+
                 $supplier->update([
-                    'min_shipping_cost' => $supplier->min_shipping_cost / $rate,
-                    'max_shipping_cost' => $supplier->max_shipping_cost / $rate,
-                    'avg_shipping_cost' => $supplier->avg_shipping_cost / $rate,
-                    'real_shipping_cost' => CalculationsService::calculatePertValue($supplier->min_shipping_cost, $supplier->avg_shipping_cost, $supplier->max_shipping_cost),
-                    'min_shipping_time_days' => $supplier->min_shipping_time_days / $rate,
-                    'max_shipping_time_days' => $supplier->max_shipping_time_days / $rate,
-                    'avg_shipping_time_days' => $supplier->avg_shipping_time_days / $rate,
+                    'min_shipping_cost' => $minShippingCost,
+                    'max_shipping_cost' => $maxShippingCost,
+                    'real_shipping_cost' => CalculationsService::calcaulteRandomBetweenMinMax($minShippingCost, $maxShippingCost),
+                    'min_shipping_time_days' => $minShippingTimeDays,
+                    'max_shipping_time_days' => $maxShippingTimeDays,
+                    'real_shipping_time_days' => CalculationsService::calcaulteRandomBetweenMinMax($minShippingTimeDays, $maxShippingTimeDays),
                 ]);
 
                 $this->info('Country ' . $country->name . ' affected successfully');

@@ -7,7 +7,7 @@
     let previousUnreadCount = 0;
     let loading = false;
     let search = '';
-    let perPage = 10;
+    let perPage = 20;
     let currentPage = 1;
     let searchTimeout;
     let drawerOpen = false;
@@ -85,18 +85,6 @@
         }
     }
 
-    // Show toast notification
-    function showToast(message, type = 'info') {
-        if (window.KTToast) {
-            KTToast.show({
-                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                message: message,
-                variant: type,
-                position: 'bottom-right',
-            });
-        }
-    }
-
     // Handle search with debouncing
     function handleSearch() {
         // Clear existing timeout
@@ -124,14 +112,7 @@
             fetchNotifications();
         }
     }
-
-    // Handle per page change
-    function handlePerPageChange(newPerPage) {
-        perPage = newPerPage;
-        currentPage = 1;
-            fetchNotifications();
-    }
-
+    
     // Mark notification as read
     async function markAsRead(notificationId) {
         try {
@@ -204,6 +185,7 @@
     function toggleDrawer() {
         drawerOpen = !drawerOpen;
         if (drawerOpen) {
+            markAllAsRead();
             fetchNotifications();
         }
     }
@@ -218,21 +200,6 @@
         if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
         if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
         return `${Math.floor(diffInSeconds / 86400)}d ago`;
-    }
-
-    // Get notification type label
-    function getNotificationTypeLabel(type) {
-        const labels = {
-            'finance_funds_changed': 'Funds Changed',
-            'technology_research_started': 'Technology Research Started',
-            'technology_research_completed': 'Technology Research Completed',
-        };
-        return labels[type] || type;
-    }
-
-    // Get status badge class
-    function getStatusBadgeClass(isRead) {
-        return isRead ? 'kt-badge-secondary' : 'kt-badge-success';
     }
 
     onMount(() => {
@@ -253,15 +220,15 @@
 
 <!-- Notifications -->
 <button 
-    class="kt-btn kt-btn-ghost kt-btn-icon size-8 hover:bg-background hover:[&_i]:text-primary relative" 
+    class="kt-btn kt-btn-primary kt-btn-icon size-9 rounded-full relative" 
     data-kt-drawer-toggle="#notifications_drawer"
     on:click={toggleDrawer}
->
-    <i class="ki-filled ki-notification-status text-lg"></i>
-    
+>    
+    <i class="fa-regular fa-bell text-lg"></i>
+
     <!-- Unread count badge -->
     {#if unreadCount > 0}
-        <span class="absolute -top-1 -right-1 bg-danger kt-badge kt-badge-destructive text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+        <span class="absolute -top-1 -right-1 bg-danger kt-badge kt-badge-destructive text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
             {unreadCount > 99 ? '99+' : unreadCount}
         </span>
     {/if}
@@ -281,15 +248,7 @@
         </button>
     </div>
     
-    <div class="kt-tabs kt-tabs-line justify-between px-5 mb-2" data-kt-tabs="true" id="notifications_tabs">
-        <div class="flex items-center gap-5">
-            <button class="kt-tab-toggle py-3 active" data-kt-tab-toggle="#notifications_tab_all">
-                All
-            </button>
-        </div>
-    </div>
-    
-    <div class="grow flex flex-col kt-scrollable-y-auto" id="notifications_tab_all" data-kt-scrollable="true" data-kt-scrollable-dependencies="#header" data-kt-scrollable-max-height="auto" data-kt-scrollable-offset="150px">
+    <div class="grow flex flex-col mt-4 kt-scrollable-y-auto" data-kt-scrollable="true" data-kt-scrollable-dependencies="#header" data-kt-scrollable-max-height="auto" data-kt-scrollable-offset="0px">
         <!-- Search Bar -->
         <div class="px-5 pb-3">
             <div class="kt-input max-w-full">
@@ -319,7 +278,7 @@
             {:else}
                 <div class="grow flex flex-col gap-5 pt-3 pb-4 divider-y divider-border">
                     {#each notifications as notification, index}
-                        <div class="flex grow gap-2.5 px-5 transition-all duration-300 {notification.read_at ? 'opacity-75' : ''}">
+                        <div class="flex grow gap-2.5 px-5 transition-all duration-300">
                             <div class="kt-avatar size-8">
                                 <div class="kt-avatar-image">
                                     <i class="{notification.icon} text-lg text-primary"></i>
@@ -333,7 +292,7 @@
                             <div class="flex flex-col gap-1 flex-1">
                                 <div class="text-sm font-medium mb-px">
                                     <button 
-                                        class="hover:text-primary text-mono font-semibold text-left {notification.read_at ? 'text-muted-foreground' : ''}"
+                                        class="hover:text-primary text-mono font-semibold text-left"
                                         style="cursor: pointer;"
                                         on:click={() => handleNotificationClick(notification)}
                                     >
@@ -346,11 +305,6 @@
                                 <div class="flex items-center justify-between">
                                     <span class="flex items-center text-xs font-medium text-muted-foreground">
                                         {formatTimeAgo(notification.created_at)}
-                                        <span class="rounded-full size-1 bg-mono/30 mx-1.5"></span>
-                                        {getNotificationTypeLabel(notification.type)}
-                                    </span>
-                                    <span class="kt-badge {getStatusBadgeClass(notification.read_at)} text-xs transition-all duration-300 transform {notification.read_at ? 'scale-95' : 'scale-100'}">
-                                        {notification.read_at ? 'Read' : 'New'}
                                     </span>
                                 </div>
                             </div>
@@ -396,20 +350,7 @@
     {#if notifications.length > 0}
     <div class="flex items-center justify-between" id="notifications_footer">
         <div class="border-b border-b-border"></div>
-        <div class="grid grid-cols-2 p-5 gap-2.5" id="notifications_all_footer">
-            <button 
-                class="kt-btn kt-btn-outline justify-center transition-all duration-200 {markingAllAsRead ? 'opacity-75 cursor-not-allowed' : ''}" 
-                on:click={markAllAsRead}
-                disabled={markingAllAsRead}
-            >
-                {#if markingAllAsRead}
-                    <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
-                    Marking...
-                {:else}
-                    <i class="ki-filled ki-check text-base mr-2"></i>
-                    Mark all as read
-                {/if}
-            </button>
+        <div class="grid p-5 gap-2.5" id="notifications_all_footer">
             <a class="kt-btn kt-btn-primary justify-center" href={route('notifications.index')}>
                 View all
             </a>

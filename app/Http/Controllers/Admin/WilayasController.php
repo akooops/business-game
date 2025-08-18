@@ -23,38 +23,14 @@ class WilayasController extends Controller
         $page = IndexService::checkPageIfNull($request->query('page', 1));
         $search = IndexService::checkIfSearchEmpty($request->query('search'));
 
-        // Filter parameters
-        $minShippingCost = IndexService::checkIfNumber($request->query('min_shipping_cost'));
-        $maxShippingCost = IndexService::checkIfNumber($request->query('max_shipping_cost'));
-        $minShippingTimeDays = IndexService::checkIfNumber($request->query('min_shipping_time_days'));
-        $maxShippingTimeDays = IndexService::checkIfNumber($request->query('max_shipping_time_days'));
-
         $wilayas = Wilaya::latest();
 
-        // Apply min shipping cost range filters
-        if ($minShippingCost) {
-            $wilayas->where('avg_shipping_cost', '>=', $minShippingCost);
-        }
-
-        if ($maxShippingCost) {
-            $wilayas->where('avg_shipping_cost', '<=', $maxShippingCost);
-        }
-
-        // Apply min shipping time range filters
-        if ($minShippingTimeDays) {
-            $wilayas->where('avg_shipping_time_days', '>=', $minShippingTimeDays);
-        }
-
-        if ($maxShippingTimeDays) {
-            $wilayas->where('avg_shipping_time_days', '<=', $maxShippingTimeDays);
-        }
 
         // Apply search filter
         if ($search) {
             $wilayas->where(function($query) use ($search) {
                 $query->where('id', $search)
-                      ->orWhere('name', 'like', '%' . $search . '%')
-                      ->orWhere('code', 'like', '%' . $search . '%');
+                      ->orWhere('name', 'like', '%' . $search . '%');
             });
         }
 
@@ -88,10 +64,7 @@ class WilayasController extends Controller
      */
     public function store(StoreWilayaRequest $request)
     {
-        $validated = $request->validated();
-
-        // Create the wilaya
-        $wilaya = Wilaya::create($validated);
+        $wilaya = Wilaya::create($request->validated());
 
         return inertia('Admin/Wilayas/Index', [
             'success' => 'Wilaya created successfully!'
@@ -129,10 +102,7 @@ class WilayasController extends Controller
      */
     public function update(Wilaya $wilaya, UpdateWilayaRequest $request)
     {
-        $validated = $request->validated();
-
-        // Update the wilaya
-        $wilaya->update($validated);
+        $wilaya->update($request->validated());
 
         return inertia('Admin/Wilayas/Index', [
             'success' => 'Wilaya updated successfully!'

@@ -18,8 +18,6 @@ class Sale extends Model
         'shipping_cost' => 'decimal:3',
         'initiated_at' => 'datetime',
         'confirmed_at' => 'datetime',
-        'estimated_delivered_at' => 'datetime',
-        'real_delivered_at' => 'datetime',
         'delivered_at' => 'datetime',
     ];
 
@@ -56,10 +54,5 @@ class Sale extends Model
     public function getTotalShippingCostAttribute()
     {
         return round($this->quantity * $this->shipping_cost, 3) ?? 0;
-    }
-
-    public function getIsConfirmedAttribute()
-    {
-        return $this->confirmed_at && !$this->cancelled_at;
     }
 }

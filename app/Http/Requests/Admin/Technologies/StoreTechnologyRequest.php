@@ -30,18 +30,4 @@ class StoreTechnologyRequest extends FormRequest
             'research_time_days' => 'required|integer|min:0',
         ];
     }
-
-    /**
-     * Get custom attributes for validator errors.
-     *
-     * @return array
-     */
-    public function attributes(): array
-    {
-        return [
-            'level' => 'level',
-            'research_cost' => 'research cost',
-            'research_time_days' => 'research time (days)',
-        ];
-    }
 } 

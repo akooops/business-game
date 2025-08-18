@@ -25,15 +25,15 @@ class StoreMachineRequest extends FormRequest
             'model' => 'required|string|max:255',
             'manufacturer' => 'required|string|max:255',
             'cost_to_acquire' => 'required|numeric|min:0',
+            'loss_on_sale_days' => 'required|numeric|min:0',
             
             // Performance metrics
-            'operation_cost' => 'required|numeric|min:0',
+            'operations_cost' => 'required|numeric|min:0',
             'carbon_footprint' => 'required|numeric|min:0',
             'quality_factor' => 'required|numeric|min:0|max:1',
             
             // Speed ranges
             'min_speed' => 'required|numeric|min:0',
-            'avg_speed' => 'required|numeric|min:0|gte:min_speed|lte:max_speed',
             'max_speed' => 'required|numeric|min:0|gte:min_speed',
             
             // Reliability
@@ -41,10 +41,8 @@ class StoreMachineRequest extends FormRequest
 
             // Maintenance
             'min_maintenance_cost' => 'required|numeric|min:0',
-            'avg_maintenance_cost' => 'required|numeric|min:0|gte:min_maintenance_cost|lte:max_maintenance_cost',
             'max_maintenance_cost' => 'required|numeric|min:0|gte:min_maintenance_cost',
             'min_maintenance_time_days' => 'required|integer|min:0',
-            'avg_maintenance_time_days' => 'required|integer|min:0|gte:min_maintenance_time_days|lte:max_maintenance_time_days',
             'max_maintenance_time_days' => 'required|integer|min:0|gte:min_maintenance_time_days',
             
             // Relationships
@@ -56,42 +54,6 @@ class StoreMachineRequest extends FormRequest
             
             // Image file
             'file' => 'required|file|mimes:jpg,jpeg,png',
-        ];
-    }
-
-    /**
-     * Get custom attributes for validator errors.
-     */
-    public function attributes(): array
-    {
-        return [
-            'name' => 'machine name',
-            'model' => 'machine model',
-            'manufacturer' => 'manufacturer',
-            'cost_to_acquire' => 'acquisition cost',
-            'operation_cost' => 'operation cost',
-            'carbon_footprint' => 'carbon footprint',
-            'quality_factor' => 'quality factor',
-            'min_speed' => 'minimum speed',
-            'avg_speed' => 'average speed',
-            'max_speed' => 'maximum speed',
-            'reliability_decay_days' => 'reliability decay',
-            'outputs.*.product_id' => 'product',
-            'file' => 'machine image',
-        ];
-    }
-
-    /**
-     * Get custom error messages for validator errors.
-     */
-    public function messages(): array
-    {
-        return [
-            'name.unique' => 'A machine with this name already exists.',
-            'reliability_decay_days.max' => 'Reliability decay must be between 0 and 1.',
-            'employee_profile_id.exists' => 'Selected employee profile does not exist.',
-            'outputs.*.product_id.required' => 'Product is required for each output.',
-            'outputs.*.product_id.exists' => 'Selected product does not exist.',
         ];
     }
 } 

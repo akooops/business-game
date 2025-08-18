@@ -14,6 +14,7 @@ class Employee extends Model
 
     protected $casts = [
         'salary_month' => 'decimal:3',
+        'recruitment_cost' => 'decimal:3',
         'current_mood' => 'decimal:3',
         'mood_decay_rate_days' => 'decimal:3',
         'efficiency_factor' => 'decimal:3',

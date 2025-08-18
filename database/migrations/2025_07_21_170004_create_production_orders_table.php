@@ -15,11 +15,14 @@ return new class extends Migration
             $table->id();
 
             $table->decimal('quantity', 10, 3);
-            $table->enum('status', ['pending', 'in_progress', 'completed', 'cancelled'])->default('pending');
+            $table->integer('time_to_complete');
+            $table->decimal('quality_factor', 10, 3);
+            $table->decimal('employee_efficiency_factor', 10, 3);
+            $table->decimal('carbon_footprint', 10, 3);
+
+            $table->enum('status', ['in_progress', 'completed', 'cancelled'])->default('in_progress');
 
             $table->timestamp('started_at')->nullable();
-            $table->timestamp('estimated_completed_at')->nullable();
-            $table->timestamp('real_completed_at')->nullable();
             $table->timestamp('completed_at')->nullable();
 
             $table->foreignId('company_machine_id')->constrained('company_machines');

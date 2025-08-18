@@ -44,26 +44,32 @@ class RaiseOilPrice extends Command
 
         foreach($suppliers as $supplier){
             if($supplier){
+                $minShippingCost = $supplier->min_shipping_cost * (1 + $rate);
+                $maxShippingCost = $supplier->max_shipping_cost * (1 + $rate);
+
                 $supplier->update([
-                    'min_shipping_cost' => $supplier->min_shipping_cost * (1 + $rate),
-                    'max_shipping_cost' => $supplier->max_shipping_cost * (1 + $rate),
-                    'avg_shipping_cost' => $supplier->avg_shipping_cost * (1 + $rate),
-                    'real_shipping_cost' => CalculationsService::calculatePertValue($supplier->min_shipping_cost, $supplier->avg_shipping_cost, $supplier->max_shipping_cost),
+                    'min_shipping_cost' => $minShippingCost,
+                    'max_shipping_cost' => $maxShippingCost,
+                    'real_shipping_cost' => CalculationsService::calcaulteRandomBetweenMinMax($minShippingCost, $maxShippingCost),
                 ]);
 
-                $this->info('Supplier ' . $supplier->name . ' raised successfully');
+                $this->info('Supplier ' . $supplier->name . ' raised successfully with min shipping cost ' . $minShippingCost . ' and max shipping cost ' . $maxShippingCost);
             }
         }
 
         $wilayas = Wilaya::get();
 
         foreach($wilayas as $wilaya){
+            $minShippingCost = $wilaya->min_shipping_cost * (1 + $rate);
+            $maxShippingCost = $wilaya->max_shipping_cost * (1 + $rate);
+
             $wilaya->update([
-                'min_shipping_cost' => $wilaya->min_shipping_cost * (1 + $rate),
-                'max_shipping_cost' => $wilaya->max_shipping_cost * (1 + $rate),
-                'avg_shipping_cost' => $wilaya->avg_shipping_cost * (1 + $rate),
-                'real_shipping_cost' => CalculationsService::calculatePertValue($wilaya->min_shipping_cost, $wilaya->avg_shipping_cost, $wilaya->max_shipping_cost),
+                'min_shipping_cost' => $minShippingCost,
+                'max_shipping_cost' => $maxShippingCost,
+                'real_shipping_cost' => CalculationsService::calcaulteRandomBetweenMinMax($wilaya->min_shipping_cost, $wilaya->max_shipping_cost),
             ]);
+
+            $this->info('Wilaya ' . $wilaya->name . ' raised successfully with min shipping cost ' . $minShippingCost . ' and max shipping cost ' . $maxShippingCost);
         }
 
         NotificationService::createOilPriceRaisedNotification($rate);

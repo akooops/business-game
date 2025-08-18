@@ -1,7 +1,7 @@
 <script>
     import CompanyLayout from '../../Layouts/CompanyLayout.svelte';
     import Pagination from '../../Components/Pagination.svelte';
-    import { onMount, tick } from 'svelte';
+    import { onMount, onDestroy, tick } from 'svelte';
     import { page } from '@inertiajs/svelte'
     import Select2 from '../../Components/Forms/Select2.svelte';
 
@@ -9,6 +9,11 @@
     const breadcrumbs = [
         {
             title: 'Employees',
+            url: route('company.employees.index'),
+            active: false
+        },
+        {
+            title: 'Index',
             url: route('company.employees.index'),
             active: true
         }
@@ -18,13 +23,8 @@
 
     // Reactive variables
     let employees = [];
-    let pagination = {};
     let loading = true;
-    let search = '';
-    let perPage = 10;
-    let currentPage = 1;
-    let searchTimeout;
-    let showFilters = false;
+    let fetchInterval = null;
 
     // Drawer state
     let selectedEmployee = null;
@@ -52,13 +52,6 @@
     // Select2 component references
     let employeeProfileSelectComponent;
 
-    // Employee status mapping
-    const employeeStatuses = {
-        'active': 'Active',
-        'applied': 'Applied',
-        'fired': 'Fired',
-        'resigned': 'Resigned'
-    };
 
     // Employee status badge colors
     function getEmployeeStatusBadgeClass(status) {
@@ -76,49 +69,12 @@
         }
     }
 
-    // Handle employee profile selection
-    function handleEmployeeProfileSelect(event) {
-        employeeProfileFilter = event.detail.value;
-        handleFilterChange();
-    }
-
     // Fetch employees data
     async function fetchEmployees() {
-        loading = true;
+        if(employees.length == 0) loading = true;
+
         try {
-            const params = new URLSearchParams({
-                page: currentPage,
-                perPage: perPage,
-                search: search
-            });
-            
-            // Add filter parameters
-            if (employeeProfileFilter) {
-                params.append('employee_profile_id', employeeProfileFilter);
-            }
-            if (statusFilter) {
-                params.append('status', statusFilter);
-            }
-            if (currentMoodMin) {
-                params.append('current_mood_min', currentMoodMin);
-            }
-            if (currentMoodMax) {
-                params.append('current_mood_max', currentMoodMax);
-            }
-            if (efficiencyFactorMin) {
-                params.append('efficiency_factor_min', efficiencyFactorMin);
-            }
-            if (efficiencyFactorMax) {
-                params.append('efficiency_factor_max', efficiencyFactorMax);
-            }
-            if (moodDecayRateMin) {
-                params.append('mood_decay_rate_days_min', moodDecayRateMin);
-            }
-            if (moodDecayRateMax) {
-                params.append('mood_decay_rate_days_max', moodDecayRateMax);
-            }
-            
-            const response = await fetch(route('company.employees.index') + '?' + params.toString(), {
+            const response = await fetch(route('company.employees.index'), {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
@@ -126,7 +82,6 @@
             
             const data = await response.json();
             employees = data.employees;
-            pagination = data.pagination;
             
             // Wait for DOM to update, then initialize menus
             await tick();
@@ -138,69 +93,6 @@
         } finally {
             loading = false;
         }
-    }
-
-    // Handle search with debouncing
-    function handleSearch() {
-        // Clear existing timeout
-        if (searchTimeout) {
-            clearTimeout(searchTimeout);
-        }
-        
-        // Set new timeout for 500ms
-        searchTimeout = setTimeout(() => {
-            currentPage = 1;
-            fetchEmployees();
-        }, 500);
-    }
-
-    // Handle search input change
-    function handleSearchInput(event) {
-        search = event.target.value;
-        handleSearch();
-    }
-
-    // Handle pagination
-    function goToPage(page) {
-        if (page && page !== currentPage) {
-            currentPage = page;
-            fetchEmployees();
-        }
-    }
-
-    // Handle per page change
-    function handlePerPageChange(newPerPage) {
-        perPage = newPerPage;
-        currentPage = 1;
-        fetchEmployees();
-    }
-
-    // Handle filter changes
-    function handleFilterChange() {
-        currentPage = 1;
-        fetchEmployees();
-    }
-
-    // Clear all filters
-    function clearAllFilters() {
-        employeeProfileFilter = '';
-        statusFilter = '';
-        currentMoodMin = '';
-        currentMoodMax = '';
-        efficiencyFactorMin = '';
-        efficiencyFactorMax = '';
-        moodDecayRateMin = '';
-        moodDecayRateMax = '';
-        if (employeeProfileSelectComponent) {
-            employeeProfileSelectComponent.clear();
-        }
-        currentPage = 1;
-        fetchEmployees();
-    }
-
-    // Toggle filters visibility
-    function toggleFilters() {
-        showFilters = !showFilters;
     }
 
     // Open employee drawer
@@ -302,18 +194,6 @@
         }
     }
 
-    // Show toast notification
-    function showToast(message, type = 'success') {
-        if (window.KTToast) {
-            KTToast.show({
-                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                message: message,
-                variant: type === 'success' ? 'success' : 'destructive',
-                position: 'bottom-right',
-            });
-        }
-    }
-
     // Open fire modal
     function openFireModal(employee) {
         if (!employee) {
@@ -391,6 +271,13 @@
 
     onMount(() => {
         fetchEmployees();
+        fetchInterval = setInterval(fetchEmployees, 60000);
+    });
+
+    onDestroy(() => {
+        if (fetchInterval) {
+            clearInterval(fetchInterval);
+        }
     });
 
     // Flash message handling
@@ -430,439 +317,151 @@
                 </div>                      
             </div>
 
-            <!-- Employees Table -->
+            <!-- Employees Grid -->
             <div class="kt-card">
-                <div class="kt-card-header">
-                    <div class="kt-card-toolbar">
-                        <div class="flex items-center gap-4">
-                            <div class="kt-input max-w-64 w-64">
-                                <i class="ki-filled ki-magnifier"></i>
-                                <input 
-                                    type="text" 
-                                    class="kt-input" 
-                                    placeholder="Search employees..." 
-                                    bind:value={search}
-                                    on:input={handleSearchInput}
-                                />
-                            </div>
-                            
-                            <!-- Filter Toggle Button -->
-                            <button 
-                                class="kt-btn kt-btn-outline"
-                                on:click={toggleFilters}
-                            >
-                                <i class="ki-filled ki-filter text-sm"></i>
-                                {showFilters ? 'Hide Filters' : 'Show Filters'}
-                            </button>
-                            
-                            <!-- Clear Filters Button -->
-                            {#if employeeProfileFilter || statusFilter || currentMoodMin || currentMoodMax || efficiencyFactorMin || efficiencyFactorMax || moodDecayRateMin || moodDecayRateMax}
-                                <button 
-                                    class="kt-btn kt-btn-ghost kt-btn-sm"
-                                    on:click={clearAllFilters}
-                                >
-                                    <i class="ki-filled ki-cross text-sm"></i>
-                                    Clear All
-                                </button>
-                            {/if}
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Advanced Filters Section -->
-                {#if showFilters}
-                    <div class="kt-card-body border-t border-gray-200 p-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                            <!-- Employee Properties -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Employee Properties</h4>                                    
-                                <!-- Employee profile -->
-                                <Select2
-                                    bind:this={employeeProfileSelectComponent}
-                                    id="employee-profile-filter"
-                                    placeholder="All Profiles"
-                                    allowClear={true}
-                                    on:select={handleEmployeeProfileSelect}
-                                    on:clear={() => {
-                                        employeeProfileFilter = '';
-                                        handleFilterChange();
-                                    }}
-                                    ajax={{
-                                        url: route('company.employee-profiles.index'),
-                                        dataType: 'json',
-                                        delay: 300,
-                                        data: function(params) {
-                                            return {
-                                                search: params.term,
-                                                perPage: 10
-                                            };
-                                        },
-                                        processResults: function(data) {
-                                            return {
-                                                results: data.employeeProfiles.map(profile => ({
-                                                    id: profile.id,
-                                                    text: profile.name,
-                                                    name: profile.name,
-                                                    description: profile.description
-                                                }))
-                                            };
-                                        },
-                                        cache: true
-                                    }}
-                                    templateResult={function(data) {
-                                        if (data.loading) return data.text;
-                                        
-                                        const $elem = globalThis.$('<div class="flex items-center gap-2">' +
-                                            '<i class="ki-filled ki-user text-sm text-muted-foreground"></i>' +
-                                            '<span class="font-medium text-sm">' + data.name + '</span>' +
-                                            '</div>');
-                                        return $elem;
-                                    }}
-                                    templateSelection={function(data) {
-                                        if (!data.id) return data.text;
-                                        return data.name;
-                                    }}
-                                />
-                            </div>
-
-                            <!-- Status -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Status</h4>                                    
-                                <select 
-                                    class="kt-select w-full" 
-                                    bind:value={statusFilter}
-                                    on:change={handleFilterChange}
-                                >
-                                    <option value="">All Statuses</option>
-                                    <option value="active">Active</option>
-                                    <option value="applied">Applied</option>
-                                    <option value="fired">Fired</option>
-                                    <option value="resigned">Resigned</option>
-                                </select>
-                            </div>
-
-                            <!-- Current Mood Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Current Mood (%)</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min %" 
-                                        bind:value={currentMoodMin}
-                                        on:input={handleFilterChange}
-                                        step="0.01"
-                                        min="0"
-                                        max="100"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max %" 
-                                        bind:value={currentMoodMax}
-                                        on:input={handleFilterChange}
-                                        step="0.01"
-                                        min="0"
-                                        max="100"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Efficiency Factor Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Efficiency Factor</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min" 
-                                        bind:value={efficiencyFactorMin}
-                                        on:input={handleFilterChange}
-                                        step="0.01"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max" 
-                                        bind:value={efficiencyFactorMax}
-                                        on:input={handleFilterChange}
-                                        step="0.01"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Mood Decay Rate Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Mood Decay Rate (%/day)</h4>
-                                
-                                <div class="flex gap-2">
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Min %" 
-                                        bind:value={moodDecayRateMin}
-                                        on:input={handleFilterChange}
-                                        step="0.001"
-                                        min="0"
-                                    />
-                                    <input 
-                                        type="number" 
-                                        class="kt-input flex-1" 
-                                        placeholder="Max %" 
-                                        bind:value={moodDecayRateMax}
-                                        on:input={handleFilterChange}
-                                        step="0.001"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {/if}
-                
                 <div class="kt-card-content p-0">
-                    <div class="kt-scrollable-x-auto">
-                        <table class="kt-table kt-table-border table-fixed">
-                            <thead>
-                                <tr>
-                                    <th class="w-[50px]">
-                                        <input class="kt-checkbox kt-checkbox-sm" type="checkbox"/>
-                                    </th>
-                                    <th class="w-[80px]">
-                                        <span class="kt-table-col">
-                                            <span class="kt-table-col-label">ID</span>
-                                        </span>
-                                    </th>
-                                    <th class="min-w-[200px]">
-                                        <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Employee</span>
-                                        </span>
-                                    </th>
-                                    <th class="min-w-[150px]">
-                                        <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Profile</span>
-                                        </span>
-                                    </th>
-                                    <th class="min-w-[120px]">
-                                        <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Status</span>
-                                        </span>
-                                    </th>
-                                    <th class="min-w-[120px]">
-                                        <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Salary</span>
-                                        </span>
-                                    </th>
-                                    <th class="min-w-[120px]">
-                                        <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Mood</span>
-                                        </span>
-                                    </th>
-                                    <th class="min-w-[120px]">
-                                        <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Efficiency</span>
-                                        </span>
-                                    </th>
-                                    <th class="min-w-[120px]">
-                                        <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Mood Decay</span>
-                                        </span>
-                                    </th>
-                                    <th class="min-w-[120px]">
-                                        <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Machine</span>
-                                        </span>
-                                    </th>
-                                    <th class="w-[80px]">
-                                        <span class="kt-table-col">
-                                            <span class="kt-table-col-label">Actions</span>
-                                        </span>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {#if loading}
-                                    <!-- Loading skeleton rows -->
-                                    {#each Array(perPage) as _, i}
-                                        <tr>
-                                            <td class="p-4">
-                                                <div class="kt-skeleton w-4 h-4 rounded"></div>
-                                            </td>
-                                            <td class="p-4">
-                                                <div class="kt-skeleton w-8 h-4 rounded"></div>
-                                            </td>
-                                            <td class="p-4">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="kt-skeleton w-10 h-10 rounded-lg"></div>
-                                                    <div class="flex flex-col gap-1">
-                                                        <div class="kt-skeleton w-24 h-4 rounded"></div>
-                                                        <div class="kt-skeleton w-16 h-3 rounded"></div>
+                    {#if loading}
+                        <!-- Loading skeleton -->
+                        <div class="p-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
+                                {#each Array(10) as _, i}
+                                    <div class="kt-card animate-pulse">
+                                        <div class="kt-card-content flex flex-col items-center lg:pt-10">
+                                            <div class="mb-3">
+                                                <div class="size-20 relative">
+                                                    <div class="kt-skeleton w-20 h-20 rounded-full"></div>
+                                                    <div class="kt-skeleton w-2.5 h-2.5 rounded-full ring-2 ring-background absolute bottom-0.5 start-16 transform -translate-y-1/2"></div>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center justify-center gap-1.5 mb-3">
+                                                <div class="kt-skeleton h-5 w-24"></div>
+                                            </div>
+                                            <div class="kt-skeleton h-3 w-32 mb-4"></div>
+                                            <div class="flex items-center gap-2.5">
+                                                <div class="kt-skeleton w-6 h-6 rounded"></div>
+                                                <div class="kt-skeleton w-6 h-6 rounded"></div>
+                                                <div class="kt-skeleton w-6 h-6 rounded"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {/each}
+                            </div>
+                        </div>
+                    {:else if employees.length === 0}
+                        <!-- Empty state -->
+                        <div class="p-10">
+                            <div class="flex flex-col items-center justify-center text-center">
+                                <div class="mb-4">
+                                    <i class="ki-filled ki-user text-4xl text-muted-foreground"></i>
+                                </div>
+                                <h3 class="text-lg font-semibold text-mono mb-2">No employees found</h3>
+                                <p class="text-sm text-secondary-foreground mb-4">
+                                    Get started by recruiting your first employee.
+                                </p>
+                                <a href="{route('company.employees.recruit-page')}" class="kt-btn kt-btn-primary">
+                                    <i class="ki-filled ki-plus text-base"></i>
+                                    Recruit First Employee
+                                </a>
+                            </div>
+                        </div>
+                    {:else}
+                        <!-- Employees Grid -->
+                        <div class="p-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
+                                {#each employees as employee}
+                                    <div class="kt-card kt-card-hover cursor-pointer" on:click={() => openEmployeeDrawer(employee)}>
+                                        <div class="kt-card-content flex flex-col items-center lg:pt-10">
+                                            <div class="mb-3">
+                                                <div class="size-20 relative">
+                                                    <div class="w-20 h-20 rounded-full bg-accent/50 flex items-center justify-center">
+                                                        <i class="ki-filled ki-user text-2xl text-muted-foreground"></i>
                                                     </div>
+                                                    <div class="w-2.5 h-2.5 rounded-full ring-2 ring-background absolute bottom-0.5 start-16 transform -translate-y-1/2 {employee.status === 'active' ? 'bg-green-500' : employee.status === 'applied' ? 'bg-yellow-500' : employee.status === 'fired' ? 'bg-red-500' : 'bg-gray-500'}"></div>
                                                 </div>
-                                            </td>
-                                            <td class="p-4">
-                                                <div class="kt-skeleton w-20 h-4 rounded"></div>
-                                            </td>
-                                            <td class="p-4">
-                                                <div class="kt-skeleton w-16 h-6 rounded"></div>
-                                            </td>
-                                            <td class="p-4">
-                                                <div class="kt-skeleton w-16 h-4 rounded"></div>
-                                            </td>
-                                            <td class="p-4">
-                                                <div class="kt-skeleton w-12 h-4 rounded"></div>
-                                            </td>
-                                            <td class="p-4">
-                                                <div class="kt-skeleton w-16 h-6 rounded"></div>
-                                            </td>
-                                            <td class="p-4">
-                                                <div class="kt-skeleton w-12 h-4 rounded"></div>
-                                            </td>
-                                            <td class="p-4">
-                                                <div class="kt-skeleton w-12 h-4 rounded"></div>
-                                            </td>
-                                            <td class="p-4">
-                                                <div class="kt-skeleton w-8 h-8 rounded"></div>
-                                            </td>
-                                        </tr>
-                                    {/each}
-                                {:else if employees.length === 0}
-                                    <!-- Empty state -->
-                                    <tr>
-                                        <td colspan="10" class="p-10">
-                                            <div class="flex flex-col items-center justify-center text-center">
-                                                <div class="mb-4">
-                                                    <i class="ki-filled ki-user text-4xl text-muted-foreground"></i>
-                                                </div>
-                                                <h3 class="text-lg font-semibold text-mono mb-2">No employees found</h3>
-                                                <p class="text-sm text-secondary-foreground mb-4">
-                                                    {search ? 'No employees match your search criteria.' : 'Get started by recruiting your first employee.'}
-                                                </p>
-                                                <a href="{route('company.employees.recruit-page')}" class="kt-btn kt-btn-primary">
-                                                    <i class="ki-filled ki-plus text-base"></i>
-                                                    Recruit First Employee
+                                            </div>
+                                            <div class="flex items-center justify-center gap-1.5 mb-3">
+                                                <a class="hover:text-primary text-center text-base leading-5 font-medium text-mono" href="#">
+                                                    {employee.name} 
                                                 </a>
                                             </div>
-                                        </td>
-                                    </tr>
-                                {:else}
-                                    <!-- Actual data rows -->
-                                    {#each employees as employee}
-                                        <tr class="hover:bg-muted/50">
-                                            <td>
-                                                <input class="kt-checkbox kt-checkbox-sm" type="checkbox" value={employee.id}/>
-                                            </td>
-                                            <td>
-                                                <span class="text-sm font-medium text-mono">#{employee.id}</span>
-                                            </td>
-                                            <td>
-                                                <span class="text-sm font-medium text-mono hover:text-primary">
-                                                    {employee.name}
+
+                                            <div class="flex items-center gap-2.5 mb-2">
+                                                <span class="kt-badge kt-badge-outline kt-badge-sm">
+                                                    {employee.employee_profile?.name || 'Unknown'}
                                                 </span>
-                                            </td>
-                                            <td>
-                                                <span class="text-sm text-muted-foreground">{employee.employee_profile?.name || 'Unknown'}</span>
-                                            </td>
-                                            <td>
+
                                                 <span class={getEmployeeStatusBadgeClass(employee.status)}>
-                                                    {employeeStatuses[employee.status] || employee.status}
+                                                    {employee.status}
                                                 </span>
-                                            </td>
-                                            <td>
-                                                <span class="text-sm font-medium text-mono">DZD {employee.salary_month}</span>
-                                            </td>
-                                            <td>
-                                                <div class="flex items-center gap-2">
-                                                    <!-- Progress Bar -->
-                                                    <div class="w-full bg-gray-200 rounded-full h-2">
-                                                        <div class="kt-progress {employee.current_mood > 0.7 ? 'kt-progress-primary' : employee.current_mood > 0.4 ? 'kt-progress-warning' : 'kt-progress-destructive'}">
-                                                            <div class="kt-progress-indicator" style="width: {(employee.current_mood * 100)}%"></div>
-                                                        </div>
-                                                    </div>
+                                            </div>
 
-                                                    <span class="text-xs text-muted-foreground">{(employee.current_mood * 100).toFixed(0)}%</span>
+                                            <div class="flex flex-col gap-1 text-xs text-secondary-foreground">
+                                                <div class="flex justify-center gap-1">
+                                                    <i class="fa-solid fa-dollar-sign text-green-500"></i>
+                                                    <span>DZD {employee.salary_month}</span>
                                                 </div>
-                                            </td>
-                                            <td>
-                                                <span class="kt-badge kt-badge-{employee.efficiency_factor > 1 ? 'success' : 'warning'} kt-badge-sm">
-                                                    {employee.efficiency_factor}x
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span class="text-sm text-muted-foreground">{(employee.mood_decay_rate_days * 100).toFixed(2)}%/day</span>
-                                            </td>
-                                            <td>
-                                                <span class="text-sm text-muted-foreground">{employee.company_machine?.machine?.name || 'None'}</span>
-                                            </td>
-                                            <td class="text-center">
-                                                <div class="kt-menu flex-inline" data-kt-menu="true">
-                                                    <div class="kt-menu-item" data-kt-menu-item-offset="0, 10px" data-kt-menu-item-placement="bottom-end" data-kt-menu-item-placement-rtl="bottom-start" data-kt-menu-item-toggle="dropdown" data-kt-menu-item-trigger="click">
-                                                        <button class="kt-menu-toggle kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost">
-                                                            <i class="ki-filled ki-dots-vertical text-lg"></i>
-                                                        </button>
-                                                        <div class="kt-menu-dropdown kt-menu-default w-full max-w-[175px]" data-kt-menu-dismiss="true">
-                                                            <div class="kt-menu-item">
-                                                                <button class="kt-menu-link" on:click={() => openEmployeeDrawer(employee)}>
-                                                                    <span class="kt-menu-icon">
-                                                                        <i class="ki-filled ki-eye"></i>
-                                                                    </span>
-                                                                    <span class="kt-menu-title">View Details</span>
-                                                                </button>
-                                                            </div>
-                                                            
-                                                            {#if employee.status === 'active'}
-                                                                <div class="kt-menu-separator"></div>
-                                                                <div class="kt-menu-item">
-                                                                    <button class="kt-menu-link" on:click={() => openPromoteModal(employee)}>
-                                                                        <span class="kt-menu-icon">
-                                                                            <i class="ki-filled ki-arrow-up"></i>
-                                                                        </span>
-                                                                        <span class="kt-menu-title">Promote</span>
-                                                                    </button>
-                                                                </div>
-                                                                <div class="kt-menu-separator"></div>
-                                                                <div class="kt-menu-item">
-                                                                    <button class="kt-menu-link" on:click={() => openFireModal(employee)}>
-                                                                        <span class="kt-menu-icon">
-                                                                            <i class="ki-filled ki-trash"></i>
-                                                                        </span>
-                                                                        <span class="kt-menu-title">Fire Employee</span>
-                                                                    </button>
-                                                                </div>
-                                                            {:else if employee.status === 'applied'}
-                                                                <div class="kt-menu-separator"></div>
-                                                                <div class="kt-menu-item">
-                                                                    <a class="kt-menu-link" href={route('company.employees.recruit-page')}>
-                                                                        <span class="kt-menu-icon">
-                                                                            <i class="ki-filled ki-check"></i>
-                                                                        </span>
-                                                                        <span class="kt-menu-title">Recruit</span>
-                                                                    </a>
-                                                                </div>
-                                                            {/if}
-                                                        </div>
-                                                    </div>
+                                                <div class="flex justify-center gap-1">
+                                                    <i class="fa-solid fa-chart-line text-primary"></i>
+                                                    <span>{employee.efficiency_factor}x Efficiency</span>
                                                 </div>
-                                            </td>
-                                        </tr>
-                                    {/each}
-                                {/if}
-                            </tbody>
-                        </table>
-                    </div>
+                                                <div class="flex justify-center gap-1">
+                                                    <i class="fa-solid fa-heart text-destructive"></i>
+                                                    <span>{(employee.current_mood * 100).toFixed(0)}% Mood</span>
+                                                </div>
+                                            </div>
 
-                    <!-- Pagination -->
-                    {#if pagination && pagination.total > 0}
-                        <Pagination 
-                            {pagination} 
-                            {perPage}
-                            onPageChange={goToPage} 
-                            onPerPageChange={handlePerPageChange}
-                        />
+                                            <!-- Mood Progress Bar -->
+                                            <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                                                <div class="kt-progress kt-progress-primary {employee.current_mood > 0.7 ? 'kt-progress-primary' : employee.current_mood > 0.4 ? 'kt-progress-warning' : 'kt-progress-destructive'}">
+                                                    <div class="kt-progress-indicator" style="width: {(employee.current_mood * 100)}%"></div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Machine Assignment -->
+                                            {#if employee.company_machine}
+                                                <div class="flex items-center gap-1 text-xs text-secondary-foreground mt-2">
+                                                    <i class="ki-filled ki-gear text-blue-500"></i>
+                                                    <span>{employee.company_machine.machine.name}</span>
+                                                </div>
+                                            {:else}
+                                                <div class="flex items-center gap-1 text-xs text-secondary-foreground mt-2">
+                                                    <i class="ki-filled ki-cross text-gray-500"></i>
+                                                    <span>No Machine</span>
+                                                </div>
+                                            {/if}
+
+                                            <!-- Action Buttons -->
+                                            <div class="flex items-center gap-2 mt-4">
+                                                {#if employee.status === 'active'}
+                                                    <button 
+                                                        class="kt-btn kt-btn-sm kt-btn-primary"
+                                                        on:click|stopPropagation={() => openPromoteModal(employee)}
+                                                    >
+                                                        <i class="ki-filled ki-arrow-up text-sm"></i>
+                                                        Promote
+                                                    </button>
+                                                    <button 
+                                                        class="kt-btn kt-btn-sm kt-btn-destructive"
+                                                        on:click|stopPropagation={() => openFireModal(employee)}
+                                                    >
+                                                        <i class="ki-filled ki-trash text-sm"></i>
+                                                        Fire
+                                                    </button>
+                                                {:else if employee.status === 'applied'}
+                                                    <a 
+                                                        class="kt-btn kt-btn-sm kt-btn-success"
+                                                        href={route('company.employees.recruit-page')}
+                                                    >
+                                                        <i class="ki-filled ki-check text-sm"></i>
+                                                        Recruit
+                                                    </a>
+                                                {/if}
+                                            </div>
+                                        </div>
+                                    </div>      
+                                {/each}
+                            </div>
+                        </div>
                     {/if}
                 </div>
             </div>
@@ -892,7 +491,7 @@
                 <!-- Employee Status -->
                 <div class="flex items-center gap-2">
                     <span class={getEmployeeStatusBadgeClass(selectedEmployee.status)}>
-                        {employeeStatuses[selectedEmployee.status] || selectedEmployee.status}
+                        {selectedEmployee.status}
                     </span>
                 </div>
 
@@ -945,19 +544,14 @@
                     <h3 class="text-sm font-semibold text-mono mb-3">Current Mood</h3>
                     <div class="space-y-2">
                         <div class="flex items-center gap-2">
-                            <div class="w-full bg-gray-200 rounded-full h-3">
-                                <div 
-                                    class="h-3 rounded-full {selectedEmployee.current_mood > 0.7 ? 'bg-green-500' : selectedEmployee.current_mood > 0.4 ? 'bg-yellow-500' : 'bg-red-500'}"
-                                    style="width: {(selectedEmployee.current_mood * 100)}%"
-                                ></div>
-                            </div>
                             <span class="text-xs font-medium">{(selectedEmployee.current_mood * 100).toFixed(0)}%</span>
+
+                            <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                                <div class="kt-progress kt-progress-primary {selectedEmployee.current_mood > 0.7 ? 'kt-progress-primary' : selectedEmployee.current_mood > 0.4 ? 'kt-progress-warning' : 'kt-progress-destructive'}">
+                                    <div class="kt-progress-indicator" style="width: {(selectedEmployee.current_mood * 100)}%"></div>
+                                </div>
+                            </div>
                         </div>
-                        <p class="text-xs text-muted-foreground">
-                            {selectedEmployee.current_mood > 0.7 ? 'High morale - Employee is very satisfied' : 
-                              selectedEmployee.current_mood > 0.4 ? 'Moderate morale - Employee is somewhat satisfied' : 
-                              'Low morale - Employee is dissatisfied and may resign'}
-                        </p>
                     </div>
                 </div>
 

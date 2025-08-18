@@ -3,7 +3,7 @@
 namespace App\Http\Requests\Company\Machines;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Services\ProductionService;
+use App\Services\ValidationService;
 
 class SetupMachineRequest extends FormRequest
 {
@@ -33,12 +33,7 @@ class SetupMachineRequest extends FormRequest
             $machine = request()->route('machine');
             $company = $this->company;
 
-            if (!$machine) {
-                $validator->errors()->add('machine', 'The selected machine does not exist.');
-                return;
-            }
-
-            $errors = ProductionService::validateSetup($company, $machine);
+            $errors = ValidationService::validateMachineSetup($company, $machine);
 
             if($errors) {
                 foreach($errors as $key => $error) {

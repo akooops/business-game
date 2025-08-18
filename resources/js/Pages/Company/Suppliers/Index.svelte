@@ -1,8 +1,6 @@
 <script>
     import CompanyLayout from '../../Layouts/CompanyLayout.svelte';
-    import Pagination from '../../Components/Pagination.svelte';
-    import Select2 from '../../Components/Forms/Select2.svelte';
-    import { onMount, tick } from 'svelte';
+    import { onMount, onDestroy, tick } from 'svelte';
     import { page } from '@inertiajs/svelte'
 
     // Define breadcrumbs for this page
@@ -23,43 +21,27 @@
 
     // Reactive variables
     let suppliers = [];
-    let pagination = {};
     let loading = true;
-    let search = '';
-    let perPage = 10;
-    let currentPage = 1;
-    let searchTimeout;
-    let showFilters = false;
-
-    // Filter variables
-    let isInternationalFilter = '';
-    let countryIdFilter = '';
-    let wilayaIdFilter = '';
-
-    // Select2 component references
-    let countrySelectComponent;
-    let wilayaSelectComponent;
+    let fetchInterval = null;
 
     // Drawer state
     let selectedSupplier = null;
     let showSupplierDrawer = false;
 
+    // Purchase modal state
+    let showPurchaseModal = false;
+    let purchaseSupplier = null;
+    let selectedProductId = '';
+    let quantity = 1;
+    let purchaseData = null;
+
     // Fetch suppliers data
     async function fetchSuppliers() {
-        loading = true;
+        if(suppliers.length == 0) loading = true;
+        
         try {
-            const params = new URLSearchParams({
-                page: currentPage,
-                perPage: perPage,
-                search: search
-            });
 
-            // Add filters to params
-            if (isInternationalFilter !== '') params.append('is_international', isInternationalFilter);
-            if (countryIdFilter) params.append('country_id', countryIdFilter);
-            if (wilayaIdFilter) params.append('wilaya_id', wilayaIdFilter);
-            
-            const response = await fetch(route('company.suppliers.index') + '?' + params.toString(), {
+            const response = await fetch(route('company.suppliers.index'), {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
@@ -67,7 +49,6 @@
             
             const data = await response.json();
             suppliers = data.suppliers;
-            pagination = data.pagination;
             
             // Wait for DOM to update, then initialize menus
             await tick();
@@ -79,79 +60,6 @@
         } finally {
             loading = false;
         }
-    }
-
-    // Handle search with debouncing
-    function handleSearch() {
-        // Clear existing timeout
-        if (searchTimeout) {
-            clearTimeout(searchTimeout);
-        }
-        
-        // Set new timeout for 500ms
-        searchTimeout = setTimeout(() => {
-            currentPage = 1;
-            fetchSuppliers();
-        }, 500);
-    }
-
-    // Handle search input change
-    function handleSearchInput(event) {
-        search = event.target.value;
-        handleSearch();
-    }
-
-    // Handle filter changes
-    function handleFilterChange() {
-        currentPage = 1;
-        fetchSuppliers();
-    }
-
-    // Handle pagination
-    function goToPage(page) {
-        if (page && page !== currentPage) {
-            currentPage = page;
-            fetchSuppliers();
-        }
-    }
-
-    // Handle per page change
-    function handlePerPageChange(newPerPage) {
-        perPage = newPerPage;
-        currentPage = 1;
-        fetchSuppliers();
-    }
-
-    // Clear all filters
-    function clearAllFilters() {
-        isInternationalFilter = '';
-        countryIdFilter = '';
-        wilayaIdFilter = '';
-        if (countrySelectComponent) {
-            countrySelectComponent.clear();
-        }
-        if (wilayaSelectComponent) {
-            wilayaSelectComponent.clear();
-        }
-        currentPage = 1;
-        fetchSuppliers();
-    }
-
-    // Toggle filters visibility
-    function toggleFilters() {
-        showFilters = !showFilters;
-    }
-
-    // Handle country selection
-    function handleCountrySelect(event) {
-        countryIdFilter = event.detail.value;
-        handleFilterChange();
-    }
-
-    // Handle wilaya selection
-    function handleWilayaSelect(event) {
-        wilayaIdFilter = event.detail.value;
-        handleFilterChange();
     }
 
     // Open supplier drawer
@@ -172,26 +80,136 @@
         selectedSupplier = null;
     }
 
-    // Format timestamp
-    function formatTimestamp(timestamp) {
-        if (!timestamp) return 'N/A';
-        return new Date(timestamp).toLocaleString();
+    // Open purchase modal
+    function openPurchaseModal(supplier, event) {
+        event.stopPropagation(); // Prevent opening the drawer
+        purchaseSupplier = supplier;
+        selectedProductId = '';
+        quantity = 1;
+        purchaseData = null;
+        showPurchaseModal = true;
+        
+        // Show modal
+        const toggleButton = document.querySelector('[data-kt-modal-toggle="#purchase_modal"]');
+        if (toggleButton) {
+            toggleButton.click();
+        }
     }
 
+    // Close purchase modal
+    function closePurchaseModal() {
+        // Simulate button click to use KT framework logic
+        const dismissButton = document.querySelector('[data-kt-modal-dismiss="#purchase_modal"]');
+        if (dismissButton) {
+            dismissButton.click();
+        }
+        
+        showPurchaseModal = false;
+        purchaseSupplier = null;
+        selectedProductId = '';
+        quantity = 1;
+        purchaseData = null;
+    }
+
+    // Calculate purchase data
+    function calculatePurchaseData() {
+        if (!purchaseSupplier || !selectedProductId) return;
+
+        const supplierProduct = purchaseSupplier.supplier_products.find(sp => sp.product.id == selectedProductId);
+        if (!supplierProduct) return;
+
+        const subtotal = supplierProduct.real_sale_price * quantity;
+        const shippingCost = purchaseSupplier.real_shipping_cost * quantity;
+        let customsDuties = 0;
+        
+        // Calculate customs duties for international suppliers
+        if (purchaseSupplier.is_international && purchaseSupplier.country && purchaseSupplier.country.allows_imports) {
+            customsDuties = (subtotal + shippingCost) * purchaseSupplier.country.customs_duties_rate;
+        }
+        
+        const totalCost = subtotal + shippingCost + customsDuties;
+        const carbonFootprint = purchaseSupplier.carbon_footprint * quantity;
+
+        purchaseData = {
+            product: supplierProduct.product,
+            supplier: purchaseSupplier,
+            supplierProduct: supplierProduct,
+            quantity: quantity,
+            subtotal: subtotal,
+            shippingCost: shippingCost,
+            customsDuties: customsDuties,
+            totalCost: totalCost,
+            carbonFootprint: carbonFootprint,
+            shippingTime: purchaseSupplier.real_shipping_time_days || 0
+        };
+    }
+
+    // Handle product selection
+    function handleProductSelect() {
+        calculatePurchaseData();
+    }
+
+    // Handle quantity change
+    function handleQuantityChange() {
+        calculatePurchaseData();
+    }
+
+    // Make purchase
+    async function makePurchase() {
+        if (!purchaseData) return;
+
+        try {
+            const response = await fetch(route('company.purchases.store'), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    supplier_id: purchaseSupplier.id,
+                    product_id: selectedProductId,
+                    quantity: quantity
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                
+                // Show success toast
+                showToast(data.message || 'Purchase completed successfully!', 'success');
+                
+                // Close modal
+                closePurchaseModal();
+                
+                // Refresh suppliers data
+                fetchSuppliers();
+            } else {
+                const errorData = await response.json();
+                showToast(errorData.message || 'Error making purchase. Please try again.', 'error');
+            }
+        } catch (error) {
+            console.error('Error making purchase:', error);
+            showToast('Network error. Please check your connection and try again.', 'error');
+        }
+    }
+    
     onMount(() => {
         fetchSuppliers();
+        fetchInterval = setInterval(fetchSuppliers, 60000);
+    });
+
+    onDestroy(() => {
+        if (fetchInterval) {
+            clearInterval(fetchInterval);
+        }
     });
 
     // Flash message handling
     export let success;
 
     $: if (success) {
-        KTToast.show({
-            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-            message: success,
-            variant: "success",
-            position: "bottom-right",
-        });
+        showToast(success, 'success');
     }
 </script>
 
@@ -201,7 +219,7 @@
 
 <CompanyLayout {breadcrumbs} {pageTitle}>
     <!-- Container -->
-    <div class="kt-container-fluid">
+    <div class="kt-container-fixed">
         <div class="grid gap-5 lg:gap-7.5">
             <!-- Suppliers Header -->
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -215,172 +233,12 @@
 
             <!-- Suppliers Grid -->
             <div class="kt-card">
-                <div class="kt-card-header">
-                    <div class="kt-card-toolbar">
-                        <div class="kt-input max-w-64 w-64">
-                            <i class="ki-filled ki-magnifier"></i>
-                            <input 
-                                type="text" 
-                                class="kt-input" 
-                                placeholder="Search suppliers..." 
-                                bind:value={search}
-                                on:input={handleSearchInput}
-                            />
-                        </div>
-                        
-                        <!-- Filters Toggle -->
-                        <div class="flex items-center gap-3 ml-auto">
-                            <!-- Filter Toggle Button -->
-                            <button 
-                                class="kt-btn kt-btn-outline"
-                                on:click={toggleFilters}
-                            >
-                                <i class="ki-filled ki-filter text-sm"></i>
-                                {showFilters ? 'Hide Filters' : 'Show Filters'}
-                            </button>
-                            
-                            <!-- Clear Filters Button -->
-                            {#if isInternationalFilter || countryIdFilter || wilayaIdFilter}
-                                <button 
-                                    class="kt-btn kt-btn-ghost kt-btn-sm"
-                                    on:click={clearAllFilters}
-                                >
-                                    <i class="ki-filled ki-cross text-sm"></i>
-                                    Clear All
-                                </button>
-                            {/if}
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Advanced Filters Section -->
-                {#if showFilters}
-                    <div class="kt-card-body border-t border-gray-200 p-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <!-- Supplier Properties -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Supplier Properties</h4>
-                                <!-- Supplier Type -->
-                                <select 
-                                    class="kt-select w-full" 
-                                    bind:value={isInternationalFilter}
-                                    on:change={handleFilterChange}
-                                >
-                                    <option value="">All Types</option>
-                                    <option value="true">International</option>
-                                    <option value="false">Local</option>
-                                </select>
-                            </div>
-
-                            <!-- Country -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Country</h4>
-                                <Select2
-                                    bind:this={countrySelectComponent}
-                                    id="country-filter"
-                                    placeholder="All Countries"
-                                    allowClear={true}
-                                    on:select={handleCountrySelect}
-                                    on:clear={() => {
-                                        countryIdFilter = '';
-                                        handleFilterChange();
-                                    }}
-                                    ajax={{
-                                        url: route('company.countries.index'),
-                                        dataType: 'json',
-                                        delay: 300,
-                                        data: function(params) {
-                                            return {
-                                                search: params.term,
-                                                perPage: 10
-                                            };
-                                        },
-                                        processResults: function(data) {
-                                            return {
-                                                results: data.countries.map(country => ({
-                                                    id: country.id,
-                                                    text: country.name,
-                                                    name: country.name,
-                                                }))
-                                            };
-                                        },
-                                        cache: true
-                                    }}
-                                    templateResult={function(data) {
-                                        if (data.loading) return data.text;
-                                        
-                                        const $elem = globalThis.$('<div class="flex items-center gap-2">' +
-                                            '<i class="ki-filled ki-globe text-sm text-muted-foreground"></i>' +
-                                            '<span class="font-medium text-sm">' + data.name + '</span>' +
-                                            '</div>');
-                                        return $elem;
-                                    }}
-                                    templateSelection={function(data) {
-                                        if (!data.id) return data.text;
-                                        return data.name;
-                                    }}
-                                />
-                            </div>
-
-                            <!-- Wilaya -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Wilaya</h4>
-                                <Select2
-                                    bind:this={wilayaSelectComponent}
-                                    id="wilaya-filter"
-                                    placeholder="All Wilayas"
-                                    allowClear={true}
-                                    on:select={handleWilayaSelect}
-                                    on:clear={() => {
-                                        wilayaIdFilter = '';
-                                        handleFilterChange();
-                                    }}
-                                    ajax={{
-                                        url: route('company.wilayas.index'),
-                                        dataType: 'json',
-                                        delay: 300,
-                                        data: function(params) {
-                                            return {
-                                                search: params.term,
-                                                perPage: 10
-                                            };
-                                        },
-                                        processResults: function(data) {
-                                            return {
-                                                results: data.wilayas.map(wilaya => ({
-                                                    id: wilaya.id,
-                                                    text: wilaya.name,
-                                                    name: wilaya.name,
-                                                }))
-                                            };
-                                        },
-                                        cache: true
-                                    }}
-                                    templateResult={function(data) {
-                                        if (data.loading) return data.text;
-                                        
-                                        const $elem = globalThis.$('<div class="flex items-center gap-2">' +
-                                            '<i class="ki-filled ki-map-pin text-sm text-muted-foreground"></i>' +
-                                            '<span class="font-medium text-sm">' + data.name + '</span>' +
-                                            '</div>');
-                                        return $elem;
-                                    }}
-                                    templateSelection={function(data) {
-                                        if (!data.id) return data.text;
-                                        return data.name;
-                                    }}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                {/if}
-
                 <div class="kt-card-content p-0">
                     {#if loading}
                         <!-- Loading skeleton -->
                         <div class="p-6">
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
-                                {#each Array(perPage) as _, i}
+                                {#each Array(10) as _, i}
                                     <div class="kt-card animate-pulse">
                                         <div class="kt-card-content flex flex-col items-center lg:pt-10">
                                             <div class="mb-3">
@@ -412,7 +270,7 @@
                                 </div>
                                 <h3 class="text-lg font-semibold text-mono mb-2">No suppliers found</h3>
                                 <p class="text-sm text-secondary-foreground mb-4">
-                                    {search ? 'No suppliers match your search criteria.' : 'No suppliers available in the market.'}
+                                    No suppliers available in the market.
                                 </p>
                             </div>
                         </div>
@@ -439,11 +297,10 @@
                                                 </div>
                                             </div>
                                             <div class="flex items-center justify-center gap-1.5 mb-3">
-                                                <a class="hover:text-primary text-base leading-5 font-medium text-mono" href="#">
+                                                <a class="hover:text-primary text-center text-base leading-5 font-medium text-mono" href="#">
                                                     {supplier.name}
                                                 </a>
                                             </div>
-
 
                                             <div class="flex items-center gap-2.5">
                                                 <span class="kt-badge kt-badge-{supplier.is_international ? 'warning' : 'info'} kt-badge-sm">
@@ -457,12 +314,12 @@
                                                 <span class="text-secondary-foreground text-sm">
                                                     
                                                     <i class="ki-filled ki-map"></i>
-                                                    {supplier.country ? supplier.country.name : supplier.wilaya ? supplier.wilaya.name : 'Unknown Location'}
+                                                    {supplier.location_name}
                                                 </span>
                                             </div>
 
                                             <span class="text-secondary-foreground text-sm mb-4">
-                                                {supplier.products.length} products
+                                                {supplier.supplier_products.length} products
                                             </span>
 
                                             {#if supplier.country}
@@ -482,23 +339,24 @@
                                                     </div>
                                                 </div>
                                             {/if}
+
+                                            {#if supplier.country == null || (supplier.country && supplier.country.allows_imports)}
+                                            <!-- Make Purchase Button -->
+                                            <div class="mt-4">
+                                                <button 
+                                                    class="kt-btn kt-btn-sm kt-btn-primary"
+                                                    on:click={(e) => openPurchaseModal(supplier, e)}
+                                                >
+                                                    <i class="ki-filled ki-handcart text-sm"></i>
+                                                    Make Purchase
+                                                </button>
+                                            </div>
+                                            {/if}
                                         </div>
                                     </div>      
                                 {/each}
                             </div>
                         </div>
-
-                        <!-- Pagination -->
-                        {#if pagination && pagination.total > 0}
-                            <div class="border-t border-gray-200">
-                                <Pagination 
-                                    {pagination} 
-                                    {perPage}
-                                    onPageChange={goToPage} 
-                                    onPerPageChange={handlePerPageChange}
-                                />
-                            </div>
-                        {/if}
                     {/if}
                 </div>
             </div>
@@ -508,6 +366,9 @@
 
     <!-- Hidden button to trigger drawer -->
     <button style="display:none" data-kt-drawer-toggle="#supplier_drawer"></button>
+
+    <!-- Hidden button to trigger modal -->
+    <button style="display:none" data-kt-modal-toggle="#purchase_modal"></button>
 
     <!-- Supplier Details Drawer -->
     <div class="hidden kt-drawer kt-drawer-end card flex-col max-w-[90%] w-[450px] top-5 bottom-5 end-5 rounded-xl border border-border" data-kt-drawer="true" data-kt-drawer-container="body" id="supplier_drawer">
@@ -558,7 +419,7 @@
                         </span>
                         <div>
                             <span class="text-xs font-medium text-foreground">
-                                {selectedSupplier.country ? selectedSupplier.country.name : selectedSupplier.wilaya ? selectedSupplier.wilaya.name : 'Unknown'}
+                                {selectedSupplier.location_name}
                             </span>
                         </div>
                     </div>
@@ -594,23 +455,56 @@
                             </div>
                         </div>
                     {/if}
+
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-xs font-normal text-foreground min-w-14 xl:min-w-24 shrink-0">
+                            Current Shipping Cost
+                        </span>
+                        <div>
+                            <span class="text-xs font-medium text-foreground">
+                                DZD {selectedSupplier.real_shipping_cost} / unit
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-xs font-normal text-foreground min-w-14 xl:min-w-24 shrink-0">
+                            Current Shipping Time
+                        </span>
+                        <div>
+                            <span class="text-xs font-medium text-foreground">
+                                {selectedSupplier.real_shipping_time_days} days
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-xs font-normal text-foreground min-w-14 xl:min-w-24 shrink-0">
+                            Carbon Footprint
+                        </span>
+                        <div>
+                            <span class="text-xs font-medium text-foreground">
+                                {selectedSupplier.carbon_footprint} kg CO2e / unit
+                            </span>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Products Section -->
-                {#if selectedSupplier.products && selectedSupplier.products.length > 0}
+                {#if selectedSupplier.supplier_products && selectedSupplier.supplier_products.length > 0}
                     <div class="border-t border-border pt-4">
                         <h3 class="text-sm font-semibold text-mono mb-3">Available Products</h3>
                         <div class="space-y-3">
-                            {#each selectedSupplier.products as product}
-                                {#if product.is_researched}
+                            {#each selectedSupplier.supplier_products as supplierProduct}
+                                {#if supplierProduct.product.is_researched}
                                     <div class="kt-card">
                                         <div class="kt-card-body p-3">
                                             <div class="flex items-center gap-3">
                                                 <div class="flex-shrink-0 relative">
-                                                    {#if product.image_url}
+                                                    {#if supplierProduct.product.image_url}
                                                         <img 
-                                                            src={product.image_url} 
-                                                            alt={product.name}
+                                                            src={supplierProduct.product.image_url} 
+                                                            alt={supplierProduct.product.name}
                                                             class="w-12 h-12 rounded-lg object-cover"
                                                         />
                                                     {:else}
@@ -620,9 +514,9 @@
                                                     {/if}
                                                 </div>
                                                 <div class="flex-1 min-w-0">
-                                                    <h4 class="text-sm font-semibold text-mono mb-1 truncate">{product.name}</h4>
-                                                    <p class="text-xs text-muted-foreground mb-1">{product.type_name}</p>
-                                                    <span class="text-xs text-green-500 font-medium">Researched</span>
+                                                    <h4 class="text-sm font-semibold text-mono mb-1 truncate">{supplierProduct.product.name}</h4>
+                                                    <p class="text-xs text-muted-foreground mb-1">{supplierProduct.product.type_name}</p>
+                                                    <span class="text-xs text-green-500 font-medium">{supplierProduct.real_sale_price} DZD/unit</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -666,6 +560,205 @@
                     </div>
                 {/if}
             {/if}
+        </div>
+    </div>
+
+    <!-- Purchase Modal -->
+    <div class="kt-modal" data-kt-modal="true" id="purchase_modal">
+        <div class="kt-modal-content max-w-[600px] top-[5%]">
+            <div class="kt-modal-header">
+                <h3 class="kt-modal-title">Make Purchase</h3>
+                <button
+                    type="button"
+                    class="kt-modal-close"
+                    aria-label="Close modal"
+                    data-kt-modal-dismiss="#purchase_modal"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="lucide lucide-x"
+                        aria-hidden="true"
+                    >
+                        <path d="M18 6 6 18"></path>
+                        <path d="m6 6 12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="kt-modal-body">
+                {#if purchaseSupplier}
+                    <div class="space-y-4">
+                        <!-- Supplier Info -->
+                        <div class="flex items-center gap-4">
+                            <div class="flex-shrink-0">
+                                {#if purchaseSupplier.image_url}
+                                    <img 
+                                        src={purchaseSupplier.image_url} 
+                                        alt={purchaseSupplier.name}
+                                        class="w-16 h-16 rounded-lg object-cover"
+                                    />
+                                {:else}
+                                    <div class="w-16 h-16 rounded-lg bg-accent/50 flex items-center justify-center">
+                                        <i class="ki-filled ki-shop text-xl text-muted-foreground"></i>
+                                    </div>
+                                {/if}
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-mono mb-1">{purchaseSupplier.name}</h4>
+                                <p class="text-sm text-muted-foreground mb-1">{purchaseSupplier.location_name}</p>
+                                <span class="kt-badge kt-badge-{purchaseSupplier.is_international ? 'warning' : 'info'} kt-badge-sm">
+                                    {purchaseSupplier.is_international ? 'International' : 'Local'}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Product Selection -->
+                        <div class="kt-card">
+                            <div class="kt-card-body p-4">
+                                <h5 class="font-medium text-mono mb-3">Select Product</h5>
+                                <div class="space-y-3">
+                                    <label class="block text-sm font-medium text-mono mb-2">Product</label>
+                                    <select 
+                                        class="kt-input w-full" 
+                                        bind:value={selectedProductId}
+                                        on:change={handleProductSelect}
+                                    >
+                                        <option value="">Choose a product...</option>
+                                        {#each purchaseSupplier.supplier_products as supplierProduct}
+                                            {#if supplierProduct.product.is_researched}
+                                                <option value={supplierProduct.product.id}>
+                                                    {supplierProduct.product.name} ({supplierProduct.product.type_name}) - {supplierProduct.real_sale_price} DZD/unit
+                                                </option>
+                                            {/if}
+                                        {/each}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quantity Input -->
+                        <div class="kt-card">
+                            <div class="kt-card-body p-4">
+                                <h5 class="font-medium text-mono mb-3">Purchase Quantity</h5>
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-medium text-mono mb-2">Quantity</label>
+                                    <input 
+                                        type="number" 
+                                        class="kt-input w-full" 
+                                        bind:value={quantity}
+                                        min="0.001"
+                                        step="0.001"
+                                        on:input={handleQuantityChange}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Purchase Summary -->
+                        {#if purchaseData}
+                            <div class="kt-card bg-accent/50">
+                                <div class="kt-card-header px-5">
+                                    <h3 class="kt-card-title">Purchase Summary</h3>
+                                </div>
+                                <div class="kt-card-content px-5 py-4 space-y-2">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm font-normal text-secondary-foreground">
+                                            Product
+                                        </span>
+                                        <span class="text-sm font-medium text-mono">
+                                            {purchaseData.product.name}
+                                        </span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm font-normal text-secondary-foreground">
+                                            Quantity
+                                        </span>
+                                        <span class="text-sm font-medium text-mono">
+                                            {purchaseData.quantity}
+                                        </span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm font-normal text-secondary-foreground">
+                                            Subtotal
+                                        </span>
+                                        <span class="text-sm font-medium text-mono">
+                                            DZD {purchaseData.subtotal.toFixed(3)}
+                                        </span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm font-normal text-secondary-foreground">
+                                            Shipping
+                                        </span>
+                                        <span class="text-sm font-medium text-mono">
+                                            DZD {purchaseData.shippingCost.toFixed(3)}
+                                        </span>
+                                    </div>
+                                    {#if purchaseData.customsDuties > 0}
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-sm font-normal text-secondary-foreground">
+                                                Customs Duties
+                                            </span>
+                                            <span class="text-sm font-medium text-mono">
+                                                DZD {purchaseData.customsDuties.toFixed(2)}
+                                            </span>
+                                        </div>
+                                    {/if}
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm font-normal text-secondary-foreground">
+                                            Shipping Time
+                                        </span>
+                                        <span class="text-sm font-medium text-mono">
+                                            {purchaseData.shippingTime} days
+                                        </span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm font-normal text-secondary-foreground">
+                                            Carbon Footprint
+                                        </span>
+                                        <span class="text-sm font-medium text-mono">
+                                            {purchaseData.carbonFootprint.toFixed(3)} kg CO2
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="kt-card-footer flex justify-between items-center px-5">
+                                    <span class="text-sm font-normal text-secondary-foreground">
+                                        Total
+                                    </span>
+                                    <span class="text-base font-semibold text-mono">
+                                        DZD {purchaseData.totalCost.toFixed(2)}
+                                    </span>
+                                </div>
+                            </div>
+                        {/if}
+                    </div>
+                {/if}
+            </div>
+            <div class="kt-modal-footer">
+                <div></div>
+                <div class="flex gap-4">
+                    <button
+                        class="kt-btn kt-btn-secondary"
+                        data-kt-modal-dismiss="#purchase_modal"
+                        on:click={closePurchaseModal}
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        class="kt-btn kt-btn-primary"
+                        on:click={makePurchase}
+                        disabled={!purchaseData}
+                    >
+                        Confirm Purchase
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </CompanyLayout> 

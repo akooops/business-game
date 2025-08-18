@@ -8,7 +8,6 @@ use App\Models\Company;
 use App\Models\Product;
 use App\Models\CompanyProduct;
 use Illuminate\Http\Request;
-use App\Models\Role;
 use App\Models\User;
 use App\Services\FileService;
 use App\Services\IndexService;
@@ -27,35 +26,7 @@ class CompaniesController extends Controller
         $page = IndexService::checkPageIfNull($request->query('page', 1));
         $search = IndexService::checkIfSearchEmpty($request->query('search'));
 
-        // Filter parameters
-        $fundsMin = IndexService::checkIfNumber($request->query('funds_min'));
-        $fundsMax = IndexService::checkIfNumber($request->query('funds_max'));
-        $carbonFootprintMin = IndexService::checkIfNumber($request->query('carbon_footprint_min'));
-        $carbonFootprintMax = IndexService::checkIfNumber($request->query('carbon_footprint_max'));
-        $researchLevelMin = IndexService::checkIfNumber($request->query('research_level_min'));
-        $researchLevelMax = IndexService::checkIfNumber($request->query('research_level_max'));
-
-        $companies = Company::with('user')->latest();
-
-        // Apply filters
-        if ($fundsMin) {
-            $companies->where('funds', '>=', $fundsMin);
-        }
-        if ($fundsMax) {
-            $companies->where('funds', '<=', $fundsMax);
-        }   
-        if ($carbonFootprintMin) {
-            $companies->where('carbon_footprint', '>=', $carbonFootprintMin);
-        }
-        if ($carbonFootprintMax) {
-            $companies->where('carbon_footprint', '<=', $carbonFootprintMax);
-        }
-        if ($researchLevelMin) {
-            $companies->where('research_level', '>=', $researchLevelMin);
-        }
-        if ($researchLevelMax) {
-            $companies->where('research_level', '<=', $researchLevelMax);
-        }
+        $companies = Company::with('user')->latest();       
 
         if ($search) {
             $companies->where(function($query) use ($search) {
@@ -107,19 +78,15 @@ class CompaniesController extends Controller
             'password' => $request->password,
         ]);
 
-        $role = Role::where('name', 'company')->first();
-        if($role){
-            $user->roles()->syncWithoutDetaching([$role->id]);
-        }
-
         $company = Company::create([
             'user_id' => $user->id,
             'funds' => $request->funds,
+            'unpaid_loans' => $request->unpaid_loans,
             'carbon_footprint' => $request->carbon_footprint,
             'research_level' => $request->research_level,
         ]);
 
-        $products = Product::where('need_technology',false)->get();
+        $products = Product::where('technology_id', null)->get();
 
         foreach($products as $product){
             // Check if product already exists
@@ -199,11 +166,14 @@ class CompaniesController extends Controller
 
         $company->update([
             'funds' => $request->funds,
+            'unpaid_loans' => $request->unpaid_loans,
             'carbon_footprint' => $request->carbon_footprint,
             'research_level' => $request->research_level,
         ]);
 
-        $products = Product::where('need_technology',false)->get();
+        $products = Product::where('technology_id', null)->orWhereHas('technology', function($query) use ($company) {
+            $query->where('level', '<=', $company->research_level);
+        })->get();
 
         foreach($products as $product){
             // Check if product already exists
@@ -215,8 +185,7 @@ class CompaniesController extends Controller
             CompanyProduct::create([
                 'company_id' => $company->id,
                 'product_id' => $product->id,
-                'total_stock' => 0,
-                'in_sale_stock' => 0,
+                'available_stock' => 0,
                 'sale_price' => SalesService::getCurrentGameweekProductMarketPrice($product),
             ]);
         }

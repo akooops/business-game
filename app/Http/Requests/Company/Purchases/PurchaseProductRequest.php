@@ -3,8 +3,9 @@
 namespace App\Http\Requests\Company\Purchases;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Services\ProcurementService;
 use App\Models\Supplier;
+use App\Models\Product;
+use App\Services\ValidationService;
 
 class PurchaseProductRequest extends FormRequest
 {
@@ -25,6 +26,7 @@ class PurchaseProductRequest extends FormRequest
     {
         return [
             'supplier_id' => 'required|exists:suppliers,id',
+            'product_id' => 'required|exists:products,id',
             'quantity' => 'required|numeric|min:0.001',
         ];
     }
@@ -33,17 +35,11 @@ class PurchaseProductRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             $company = $this->company;
-            $product = request()->route('product');
+            $supplier = Supplier::find(request()->input('supplier_id'));
+            $product = Product::find(request()->input('product_id'));
             $quantity = request()->input('quantity');
 
-            $supplier = Supplier::find(request()->input('supplier_id'));
-
-            if (!$product) {
-                $validator->errors()->add('supplier_id', 'The selected supplier does not exist.');
-                return;
-            }
-
-            $errors = ProcurementService::validatePurchase($company, $supplier, $product, $quantity);
+            $errors = ValidationService::validatePurchase($company, $supplier, $product, $quantity);
 
             if($errors) {
                 foreach($errors as $key => $error) {

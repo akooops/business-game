@@ -42,12 +42,10 @@
                         <i class="ki-filled ki-arrow-left text-base"></i>
                         Back to Wilayas
                     </a>
-                    {#if hasPermission('admin.wilayas.update')}
                     <a href="{route('admin.wilayas.edit', { wilaya: wilaya.id })}" class="kt-btn kt-btn-primary">
                         <i class="ki-filled ki-pencil text-base"></i>
                         Edit Wilaya
                     </a>
-                    {/if}
                 </div>
             </div>
 
@@ -90,20 +88,12 @@
                     <h4 class="kt-card-title">Shipping Costs</h4>
                 </div>
                 <div class="kt-card-content">
-                    <div class="grid gap-4 w-full lg:grid-cols-3">
+                    <div class="grid gap-4 w-full lg:grid-cols-2">
                         <!-- Minimum Shipping Cost -->
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Minimum Shipping Cost</h4>
                             <p class="text-sm text-secondary-foreground">
-                                {wilaya?.min_shipping_cost}
-                            </p>
-                        </div>
-
-                        <!-- Average Shipping Cost -->
-                        <div class="flex flex-col gap-2">
-                            <h4 class="text-sm font-semibold text-mono">Average Shipping Cost</h4>
-                            <p class="text-sm text-secondary-foreground">
-                                {wilaya?.avg_shipping_cost}
+                                {wilaya?.min_shipping_cost} DZD
                             </p>
                         </div>
 
@@ -111,7 +101,7 @@
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Maximum Shipping Cost</h4>
                             <p class="text-sm text-secondary-foreground">
-                                {wilaya?.max_shipping_cost}
+                                {wilaya?.max_shipping_cost} DZD
                             </p>
                         </div>
                     </div>
@@ -124,20 +114,12 @@
                     <h4 class="kt-card-title">Shipping Times</h4>
                 </div>
                 <div class="kt-card-content">
-                    <div class="grid gap-4 w-full lg:grid-cols-3">
+                    <div class="grid gap-4 w-full lg:grid-cols-2">
                         <!-- Minimum Shipping Time -->
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Minimum Shipping Time</h4>
                             <p class="text-sm text-secondary-foreground">
                                 {wilaya?.min_shipping_time_days} days
-                            </p>
-                        </div>
-
-                        <!-- Average Shipping Time -->
-                        <div class="flex flex-col gap-2">
-                            <h4 class="text-sm font-semibold text-mono">Average Shipping Time</h4>
-                            <p class="text-sm text-secondary-foreground">
-                                {wilaya?.avg_shipping_time_days} days
                             </p>
                         </div>
 

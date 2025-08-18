@@ -55,8 +55,8 @@
             });
             
             const data = await response.json();
-            // Use suppliers that have the selected_product data
-            availableSuppliers = data.suppliers.filter(supplier => supplier.selected_product);
+            availableSuppliers = data.suppliers;
+
         } catch (error) {
             console.error('Error fetching suppliers:', error);
         } finally {
@@ -90,15 +90,23 @@
             return;
         }
 
-        // Get the specific product data for this supplier
+        calculatePurchaseData(supplier, quantity);
+        showPurchaseModal = true;
+        
+        // Show modal
+        const toggleButton = document.querySelector('[data-kt-modal-toggle="#purchase_modal"]');
+        if (toggleButton) {
+            toggleButton.click();
+        }
+    }
+
+    function calculatePurchaseData(supplier, quantity) {
         const supplierProduct = supplier.selected_product;
         
-        // Calculate purchase data using the pivot data
-        const subtotal = supplierProduct.pivot.real_sale_price * quantity;
+        const subtotal = supplierProduct.real_sale_price * quantity;
         const shippingCost = supplier.real_shipping_cost * quantity;
         let customsDuties = 0;
         
-        // Calculate customs duties for international suppliers
         if (supplier.is_international && supplier.country && supplier.country.allows_imports) {
             customsDuties = (subtotal + shippingCost) * supplier.country.customs_duties_rate;
         }
@@ -109,23 +117,14 @@
         purchaseData = {
             product: selectedProduct,
             supplier: supplier,
-            supplierProduct: supplierProduct,
             quantity: quantity,
             subtotal: subtotal,
             shippingCost: shippingCost,
             customsDuties: customsDuties,
             totalCost: totalCost,
             carbonFootprint: carbonFootprint,
-            shippingTime: supplier.avg_shipping_time_days || 0
+            shippingTime: supplier.real_shipping_time_days || 0
         };
-
-        showPurchaseModal = true;
-        
-        // Show modal
-        const toggleButton = document.querySelector('[data-kt-modal-toggle="#purchase_modal"]');
-        if (toggleButton) {
-            toggleButton.click();
-        }
     }
 
     // Close purchase modal
@@ -154,6 +153,7 @@
                 },
                 body: JSON.stringify({
                     supplier_id: purchaseData.supplier.id,
+                    product_id: purchaseData.product.id,
                     quantity: purchaseData.quantity
                 })
             });
@@ -178,23 +178,11 @@
                 }
             } else {
                 const errorData = await response.json();
-                showToast(errorData.message || 'Error making purchase. Please try again.', 'error');
+                showToast(errorData.message || 'Error making purchase. Please try again.', 'destructive');
             }
         } catch (error) {
             console.error('Error making purchase:', error);
-            showToast('Network error. Please check your connection and try again.', 'error');
-        }
-    }
-
-    // Show toast notification
-    function showToast(message, type = 'success') {
-        if (window.KTToast) {
-            KTToast.show({
-                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                message: message,
-                variant: type === 'success' ? 'success' : 'destructive',
-                position: 'bottom-right',
-            });
+            showToast('Network error. Please check your connection and try again.', 'destructive');
         }
     }
 
@@ -216,7 +204,7 @@
 
 <CompanyLayout {breadcrumbs} {pageTitle}>
     <!-- Container -->
-    <div class="kt-container-fluid">
+    <div class="kt-container-fixed">
         <div class="grid gap-5 lg:gap-7.5">
             <!-- Purchase Header -->
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -274,20 +262,17 @@
                                                 data: function(params) {
                                                     return {
                                                         search: params.term,
-                                                        perPage: 10
+                                                        perPage: 100
                                                     };
                                                 },
                                                 processResults: function(data) {
                                                     return {
-                                                        results: data.products.map(product => ({
-                                                            id: product.product.id,
-                                                            text: product.product.name,
-                                                            name: product.product.name,
-                                                            sale_price: product.product.sale_price,
-                                                            carbon_footprint: product.product.carbon_footprint,
-                                                            image_url: product.product.image_url,
-                                                            description: product.product.description,
-                                                            type_name: product.product.type_name
+                                                        results: data.companyProducts.map(companyProduct => ({
+                                                            id: companyProduct.product.id,
+                                                            text: companyProduct.product.name,
+                                                            name: companyProduct.product.name,
+                                                            image_url: companyProduct.product.image_url,
+                                                            type_name: companyProduct.product.type_name
                                                         }))
                                                     };
                                                 },
@@ -331,7 +316,6 @@
                                         <tr>
                                             <th>Supplier</th>
                                             <th>Location</th>
-                                            <th>Type</th>
                                             <th>Price</th>
                                             <th>Shipping Cost</th>
                                             <th>Shipping Time</th>
@@ -351,9 +335,6 @@
                                                             <div class="kt-skeleton h-3 w-20"></div>
                                                         </div>
                                                     </div>
-                                                </td>
-                                                <td>
-                                                    <div class="kt-skeleton h-4 w-16"></div>
                                                 </td>
                                                 <td>
                                                     <div class="kt-skeleton h-6 w-20 rounded"></div>
@@ -387,7 +368,6 @@
                                         <tr>
                                             <th>Supplier</th>
                                             <th>Location</th>
-                                            <th>Type</th>
                                             <th>Price</th>
                                             <th>Shipping Cost</th>
                                             <th>Shipping Time</th>
@@ -419,7 +399,7 @@
                                                 </td>
                                                 <td>
                                                     <span class="text-sm">
-                                                        {supplier.country ? supplier.country.name : supplier.wilaya ? supplier.wilaya.name : 'Unknown'}
+                                                        {supplier.location_name}
                                                     </span>
                                                     {#if supplier.country}
                                                         <div class="flex items-center gap-1 text-xs text-muted-foreground">
@@ -434,28 +414,23 @@
                                                     {/if}
                                                 </td>
                                                 <td>
-                                                    <span class="kt-badge kt-badge-{supplier.is_international ? 'warning' : 'info'} kt-badge-sm">
-                                                        {supplier.is_international ? 'International' : 'Local'}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <span class="text-sm font-medium">DZD {(supplier.selected_product.pivot.real_sale_price * quantity).toFixed(3)}</span>
+                                                    <span class="text-sm font-medium">DZD {supplier.selected_product.real_sale_price}</span>
                                                 </td>
                                                 <td>
                                                     <span class="text-sm font-medium">DZD {supplier.real_shipping_cost}</span>
                                                 </td>
                                                 <td>
-                                                    <span class="text-sm">{supplier.avg_shipping_time_days || 0} days</span>
+                                                    <span class="text-sm">{supplier.real_shipping_time_days || 0} days</span>
                                                 </td>
                                                 <td>
-                                                    {#if supplier.country.allows_imports}
+                                                    {#if !supplier.country || (supplier.country && supplier.country.allows_imports)}
                                                     <button 
                                                         class="kt-btn kt-btn-sm kt-btn-primary"
                                                         on:click={() => openPurchaseModal(supplier)}
                                                     >
                                                         <i class="ki-filled ki-handcart text-sm"></i>
                                                         Purchase
-                                                    </button>
+                                                    </button>                                                
                                                     {:else}
                                                         <button 
                                                             class="kt-btn kt-btn-sm kt-btn-secondary"
@@ -555,12 +530,30 @@
                                 <div class="space-y-2">
                                     <div class="flex justify-between">
                                         <span class="text-sm text-muted-foreground">Shipping Time:</span>
-                                        <span class="font-medium">{purchaseData.supplier.avg_shipping_time_days || 0} days</span>
+                                        <span class="font-medium">{purchaseData.shippingTime} days</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="text-sm text-muted-foreground">Carbon Footprint: ({purchaseData.product.carbon_footprint} kg CO2/unit)</span>
-                                        <span class="font-medium">{(purchaseData.supplier.carbon_footprint * purchaseData.quantity).toFixed(3)} kg CO2</span>
+                                        <span class="text-sm text-muted-foreground">Carbon Footprint: ({purchaseData.supplier.carbon_footprint} kg CO2/unit)</span>
+                                        <span class="font-medium">{purchaseData.carbonFootprint.toFixed(3)} kg CO2</span>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quantity Input -->
+                        <div class="kt-card">
+                            <div class="kt-card-body p-4">
+                                <h5 class="font-medium text-mono mb-3">Purchase Quantity</h5>
+                                <div class="space-y-2">
+                                    <label class="block text-sm font-medium text-mono mb-2">Quantity</label>
+                                    <input 
+                                        type="number" 
+                                        class="kt-input w-full" 
+                                        bind:value={quantity}
+                                        min="0.001"
+                                        step="0.001"
+                                        on:input={() => calculatePurchaseData(purchaseData.supplier, quantity)}
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -578,7 +571,7 @@
                                         Subtotal
                                     </span>
                                     <span class="text-sm font-medium text-mono">
-                                        DZD {(purchaseData.supplierProduct.pivot.real_sale_price * purchaseData.quantity).toFixed(3)}
+                                        DZD {purchaseData.subtotal.toFixed(3)}
                                     </span>
                                 </div>
                                 <div class="flex justify-between items-center">
@@ -586,10 +579,10 @@
                                         Shipping
                                     </span>
                                     <span class="text-sm font-medium text-mono">
-                                        DZD {(purchaseData.supplier.real_shipping_cost * purchaseData.quantity).toFixed(3)}
+                                        DZD {purchaseData.shippingCost.toFixed(3)}
                                     </span>
                                 </div>
-                                {#if purchaseData.supplier.country && purchaseData.supplier.country.allows_imports}
+                                {#if purchaseData.customsDuties > 0}
                                     <div class="flex justify-between items-center">
                                         <span class="text-sm font-normal text-secondary-foreground">
                                             Customs Duties ({purchaseData.supplier.country.customs_duties_rate * 100}%)
@@ -610,48 +603,7 @@
                             </div>
                         </div>
 
-                        <!-- Quantity Input -->
-                        <div class="kt-card">
-                            <div class="kt-card-body p-4">
-                                <h5 class="font-medium text-mono mb-3">Purchase Quantity</h5>
-                                <div class="space-y-2">
-                                    <div class="flex items-center gap-2">
-                                        <input 
-                                            type="number" 
-                                            class="kt-input w-full" 
-                                            bind:value={quantity}
-                                            min="0.001"
-                                            step="0.001"
-                                            on:input={() => {
-                                                // Recalculate purchase data when quantity changes
-                                                if (purchaseData) {
-                                                    const subtotal = purchaseData.supplierProduct.pivot.real_sale_price * quantity;
-                                                    const shippingCost = purchaseData.supplier.avg_shipping_cost * quantity;
-                                                    let customsDuties = 0;
-                                                    
-                                                    if (purchaseData.supplier.is_international && purchaseData.supplier.country && purchaseData.supplier.country.allows_imports) {
-                                                        customsDuties = (subtotal + shippingCost) * purchaseData.supplier.country.customs_duties_rate;
-                                                    }
-                                                    
-                                                    const totalCost = subtotal + shippingCost + customsDuties;
-                                                    const carbonFootprint = purchaseData.supplier.carbon_footprint * quantity;
 
-                                                    purchaseData = {
-                                                        ...purchaseData,
-                                                        quantity: quantity,
-                                                        subtotal: subtotal,
-                                                        shippingCost: shippingCost,
-                                                        customsDuties: customsDuties,
-                                                        totalCost: totalCost,
-                                                        carbonFootprint: carbonFootprint
-                                                    };
-                                                }
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
                         <!-- Confirmation Message -->
                         <div class="text-sm text-muted-foreground">

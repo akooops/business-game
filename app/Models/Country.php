@@ -14,27 +14,14 @@ class Country extends Model
 
     protected $guarded = ['id'];
 
-    protected $appends = ['flag_url'];
-
     protected $casts = [
         'customs_duties_rate' => 'decimal:3',
         'allows_imports' => 'boolean',
     ];
 
     //Relations
-    public function flag()
-    {
-        return $this->morphOne(File::class, 'model')->where('is_main', 1);
-    }
-
     public function suppliers()
     {
         return $this->hasMany(Supplier::class);
-    }
-
-    // Methods
-    public function getFlagUrlAttribute()
-    {
-        return ($this->flag) ? $this->flag->url : URL::to('assets/images/default-country-flag.jpg');
     }
 }

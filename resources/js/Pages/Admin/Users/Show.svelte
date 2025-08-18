@@ -34,7 +34,7 @@
                 <div class="flex flex-col gap-1">
                     <h1 class="text-2xl font-bold text-mono">User Details</h1>
                     <p class="text-sm text-secondary-foreground">
-                        View user information and assigned permissions
+                        View user information
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
@@ -42,12 +42,10 @@
                         <i class="ki-filled ki-arrow-left text-base"></i>
                         Back to Users
                     </a>
-                    {#if hasPermission('admin.users.update')}
                     <a href="{route('admin.users.edit', { user: user.id })}" class="kt-btn kt-btn-primary">
                         <i class="ki-filled ki-pencil text-base"></i>
                         Edit User
                     </a>
-                    {/if}
                 </div>
             </div>
 
@@ -100,49 +98,6 @@
                             </p>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Roles Card -->
-            <div class="kt-card">
-                <div class="kt-card-header">
-                    <h4 class="kt-card-title">Assigned Roles</h4>
-                    <div class="kt-card-toolbar">
-                        <span class="kt-badge kt-badge-outline kt-badge-primary">{user.roles?.length || 0} roles</span>
-                    </div>
-                </div>
-                <div class="kt-card-content">
-                    {#if user.roles && user.roles.length > 0}
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {#each user.roles as role}
-                                <div class="flex items-center gap-3 p-3 border rounded-lg bg-green-50 border-green-200">
-                                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-                                    <div class="flex-1">
-                                        <div class="font-medium text-green-800">{role.name}</div>
-                                        {#if role.description}
-                                            <div class="text-sm text-green-600">{role.description}</div>
-                                        {/if}
-                                    </div>
-                                </div>
-                            {/each}
-                        </div>
-                    {:else}
-                        <div class="text-center py-8">
-                            <div class="mb-4">
-                                <i class="ki-filled ki-shield-cross text-4xl text-muted-foreground"></i>
-                            </div>
-                            <h3 class="text-lg font-semibold text-mono mb-2">No Roles Assigned</h3>
-                            <p class="text-sm text-secondary-foreground mb-4">
-                                This user doesn't have any permissions assigned yet.
-                            </p>
-                            {#if hasPermission('admin.users.update')}
-                            <a href="{route('admin.users.edit', { user: user.id })}" class="kt-btn kt-btn-primary">
-                                <i class="ki-filled ki-plus text-base"></i>
-                                Assign Roles
-                            </a>
-                            {/if}
-                        </div>
-                    {/if}
                 </div>
             </div>
 

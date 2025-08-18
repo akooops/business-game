@@ -2,15 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Models\CompanyTechnology;
-use App\Models\Technology;
 use App\Models\Company;
-use App\Models\Purchase;
 use Illuminate\Console\Command;
 use App\Services\SettingsService;
-use App\Services\TechnolgiesResearchService;
-use App\Services\ProcurementService;
-use App\Services\NotificationService;
 use App\Models\ProductionOrder;
 use App\Services\ProductionService;
 
@@ -42,26 +36,9 @@ class ProductionOrdersProcessing extends Command
         foreach($companies as $company){
             $this->info('Processing company: ' . $company->name);
 
-            $companyMachines = $company->companyMachines;
-
-            foreach($companyMachines as $companyMachine){
-                $companyProductionOrders = ProductionOrder::where([
-                    'company_machine_id' => $companyMachine->id, 
-                    'status' => ProductionOrder::STATUS_IN_PROGRESS
-                ])->get();
-
-                foreach($companyProductionOrders as $companyProductionOrder){
-                    $currentTimestamp = SettingsService::getCurrentTimestamp();
-                    
-                    // Process actual deliveries
-                    if($companyProductionOrder->real_completed_at && $companyProductionOrder->real_completed_at <= $currentTimestamp){
-                        ProductionService::completeProduction($companyProductionOrder);
-                        $this->info('Production order completed: ' . $companyProductionOrder->product->name);
-                    }
-                }
-            }
+            ProductionService::completeProduction($company);
         }
-        
-        $this->info('Purchases processing completed successfully!');
+
+        $this->info('Production orders processing completed successfully!');
     }
 } 

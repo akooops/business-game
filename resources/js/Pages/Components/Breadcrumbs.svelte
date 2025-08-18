@@ -5,10 +5,10 @@
 </script>
 
 <!-- Breadcrumbs -->
-<div class="pb-5">
+<div class="my-5 lg:mt-0 lg:mb-7.5">
     <!-- Container -->
-    <div class="kt-container-fixed flex items-center justify-between flex-wrap gap-3">
-        <div class="flex flex-col flex-wrap gap-1">
+    <div class="kt-container-fixed flex items-center justify-between flex-wrap gap-5">
+        <div class="flex flex-col justify-center items-start flex-wrap gap-1 lg:gap-2">
             <h1 class="font-medium text-lg text-mono">
                 {pageTitle}
             </h1>

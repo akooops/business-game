@@ -7,6 +7,9 @@ use App\Models\Product;
 
 class InventoryService
 {
+    //-------------------------------------
+    // Inventory
+    //-------------------------------------
     public static function haveSufficientStock($company, $product, $quantity){
         $companyProduct = $company->companyProducts()->where('product_id', $product->id)->first();
         
@@ -17,6 +20,9 @@ class InventoryService
         return $companyProduct->available_stock >= $quantity;
     }
 
+    //-------------------------------------
+    // Purchases
+    //-------------------------------------
     public static function purchaseDelivered($purchase){
         $company = $purchase->company;
         $product = $purchase->product;
@@ -37,6 +43,9 @@ class InventoryService
         ]);
     }
 
+    //-------------------------------------
+    // Expiration
+    //-------------------------------------
     public static function expireInventory($company){
         $products = Product::where('has_expiration', true)->get();
 
@@ -90,6 +99,9 @@ class InventoryService
         }
     }
 
+    //-------------------------------------
+    // Inventory costs
+    //-------------------------------------
     public static function payInventoryCosts($company){
         $products = Product::where('storage_cost', '>', 0)->get();
 
@@ -105,11 +117,16 @@ class InventoryService
                 continue;
             }
 
-            FinanceService::payInventoryCosts($company, $product, $leftAvailableStock);
-            NotificationService::createInventoryCostsPaidNotification($company, $product, $leftAvailableStock);
+            $totalCost = $product->storage_cost * $leftAvailableStock;
+            
+            FinanceService::payInventoryCosts($company, $product, $totalCost);
+            NotificationService::createInventoryCostsPaidNotification($company, $product, $leftAvailableStock, $totalCost);
         }
     }
 
+    //-------------------------------------
+    // Sales
+    //-------------------------------------
     public static function saleConfirmed($sale){
         $company = $sale->company;
         $product = $sale->product;
@@ -156,13 +173,15 @@ class InventoryService
         ]);
     }
 
-    public static function productionStarted($productionOrder){
+    //-------------------------------------
+    // Production
+    //-------------------------------------
+    public static function productionStarted($productionOrder, $material, $requiredQuantity){
         $company = $productionOrder->companyMachine->company;
-        $product = $productionOrder->product;
-        $quantity = $productionOrder->quantity;
+        $quantity = $requiredQuantity;
 
         $companyInventory = $company->inventoryMovements()->where([
-            'product_id' => $product->id,
+            'product_id' => $material->id,
             'movement_type' => InventoryMovement::MOVEMENT_TYPE_IN,
         ])->get();
 
@@ -179,12 +198,13 @@ class InventoryService
             $remainingQuantity -= $quantityToSubtract;
         }
 
-        $companyProduct = $company->companyProducts()->where('product_id', $product->id)->first();
+        $companyProduct = $company->companyProducts()->where('product_id', $material->id)->first();
+
         $companyProduct->update(['available_stock' => $companyProduct->available_stock - $quantity]);
 
         $inventoryMovement = InventoryMovement::create([
             'company_id' => $company->id,
-            'product_id' => $product->id,
+            'product_id' => $material->id,
             'movement_type' => InventoryMovement::MOVEMENT_TYPE_OUT,
             'original_quantity' => $quantity,
             'current_quantity' => $quantity,
@@ -194,6 +214,9 @@ class InventoryService
         ]);
     }
 
+    //-------------------------------------
+    // Production
+    //-------------------------------------
     public static function productionCompleted($productionOrder, $outputQuantity){
         $company = $productionOrder->companyMachine->company;
         $product = $productionOrder->product;

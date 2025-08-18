@@ -14,6 +14,7 @@ class Company extends Model
     protected $casts = [
         'funds' => 'decimal:3',
         'carbon_footprint' => 'decimal:3',
+        'unpaid_loans' => 'decimal:3',
     ];
 
     // Relations
@@ -77,6 +78,16 @@ class Company extends Model
         return $this->belongsToMany(Machine::class, 'company_machines', 'company_id', 'machine_id')
             ->withPivot('status', 'current_reliability', 'setup_at', 'last_maintenance_at', 'last_broken_at')
             ->withTimestamps();
+    }
+
+    public function loans()
+    {
+        return $this->hasMany(Loan::class);
+    }
+
+    public function ads()
+    {
+        return $this->hasMany(Ad::class);
     }
 
     // Accessors

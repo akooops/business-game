@@ -7,79 +7,273 @@ use App\Models\Notification;
 
 class NotificationService
 {
-    public static function createFinanceFundsChangedNotification($company, $amount)
-    {
-        return Notification::create([
-            'type' => Notification::TYPE_FINANCE_FUNDS_CHANGED,
-            'title' => 'Funds Changed',
-            'message' => "Funds changed by DZD " . $amount . ". New balance: DZD " . $company->funds,
-            'url' => route('company.dashboard.index'),
-            'user_id' => $company->user_id,
-        ]);
-    }
-
-    public static function createTechnologyResearchStartedNotification($companyTechnology)
+    // ------------------------------------------------------------
+    // Technologies
+    // ------------------------------------------------------------
+    public static function createTechnologyResearchStartedNotification($company, $technology, $companyTechnology)
     {
         return Notification::create([
             'type' => Notification::TYPE_TECHNOLOGY_RESEARCH_STARTED,
             'title' => 'Technology Research Started',
-            'message' => "Technology research started for {$companyTechnology->technology->name} at " . $companyTechnology->started_at->format('Y-m-d H:i:s'),
+            'message' => "Technology ({$technology->name}) research started at {$companyTechnology->started_at->format('Y-m-d')}",
             'url' => route('company.technologies.index'),
-            'user_id' => $companyTechnology->company->user_id,
+            'user_id' => $company->user->id,
         ]);
     }
 
-    public static function createTechnologyResearchCompletedNotification($companyTechnology)
+    public static function createTechnologyResearchCompletedNotification($company, $technology, $companyTechnology)
     {
         return Notification::create([
             'type' => Notification::TYPE_TECHNOLOGY_RESEARCH_COMPLETED,
             'title' => 'Technology Research Completed',
-            'message' => "Technology research completed for {$companyTechnology->technology->name} at " . $companyTechnology->completed_at->format('Y-m-d H:i:s') . ". You have unlocked {$companyTechnology->technology->products->count()} products!",
+            'message' => "Technology ({$technology->name}) research completed at {$companyTechnology->completed_at->format('Y-m-d')}. You have unlocked {$technology->products->count()} products!",
             'url' => route('company.technologies.index'),
-            'user_id' => $companyTechnology->company->user_id,
+            'user_id' => $company->user->id,
         ]);
     }
 
-    public static function createPurchaseOrderedNotification($purchase){
+    // ------------------------------------------------------------
+    // Purchases
+    // ------------------------------------------------------------
+    public static function createPurchaseOrderedNotification($company, $purchase, $supplier, $product, $quantity){
         return Notification::create([
             'type' => Notification::TYPE_PURCHASE_ORDERED,
             'title' => 'Purchase Ordered',
-            'message' => "Purchase ordered for {$purchase->product->name} at " . $purchase->ordered_at->format('Y-m-d H:i:s') . ". Estimated delivery date: " . $purchase->estimated_delivered_at->format('Y-m-d H:i:s') . ".",
+            'message' => "Purchase initiated for {$product->name} at " . $purchase->ordered_at->format('Y-m-d') . " from {$supplier->name} with quantity of {$quantity}.",
             'url' => route('company.purchases.index'),
-            'user_id' => $purchase->company->user_id,
+            'user_id' => $company->user->id,
         ]);
     }
 
-    public static function createPurchaseDeliveredNotification($purchase){
+    public static function createPurchaseDeliveredNotification($company, $purchase, $supplier, $product, $quantity){
         return Notification::create([
             'type' => Notification::TYPE_PURCHASE_DELIVERED,
             'title' => 'Purchase Delivered',
-            'message' => "Purchase delivered for {$purchase->product->name} at " . $purchase->delivered_at->format('Y-m-d H:i:s') . ".",
+            'message' => "Purchase delivered for {$product->name} at " . $purchase->delivered_at->format('Y-m-d') . " from {$supplier->name} with quantity of {$quantity}.",
             'url' => route('company.purchases.index'),
-            'user_id' => $purchase->company->user_id,
+            'user_id' => $company->user->id,
         ]);
     }
 
-    public static function createPurchaseCancelledNotification($purchase, $reason){
+    public static function createPurchaseCancelledNotification($company, $purchase, $supplier, $product, $quantity, $cancelledReason){
         return Notification::create([
             'type' => Notification::TYPE_PURCHASE_CANCELLED,
             'title' => 'Purchase Cancelled',
-            'message' => "Purchase cancelled for {$purchase->product->name} at " . $purchase->cancelled_at->format('Y-m-d H:i:s') . ". Reason: " . $reason . ".",
+            'message' => "Purchase cancelled for {$product->name} at " . $purchase->cancelled_at->format('Y-m-d') . " from {$supplier->name} with quantity of {$quantity}. Reason: " . $cancelledReason . ".",
             'url' => route('company.purchases.index'),
-            'user_id' => $purchase->company->user_id,
+            'user_id' => $company->user->id,
         ]);
     }
 
-    public static function createPurchaseDeliveryDelayedNotification($purchase){
+    // ------------------------------------------------------------
+    // Inventory
+    // ------------------------------------------------------------
+    public static function createInventoryExpiredNotification($company, $product, $quantity){
         return Notification::create([
-            'type' => Notification::TYPE_PURCHASE_DELIVERY_DELAYED,
-            'title' => 'Purchase Delivery Delayed',
-            'message' => "Purchase delivery delayed for {$purchase->product->name} until " . $purchase->real_delivered_at->format('Y-m-d H:i:s') . ".",
-            'url' => route('company.purchases.index'),
-            'user_id' => $purchase->company->user_id,
+            'type' => Notification::TYPE_INVENTORY_EXPIRED,
+            'title' => 'Inventory Expired',
+            'message' => "Inventory expired for {$product->name} with quantity of {$quantity}.",
+            'url' => route('company.inventory.index'),
+            'user_id' => $company->user_id,
         ]);
     }
 
+    public static function createInventoryCostsPaidNotification($company, $product, $quantity, $totalCost){
+        return Notification::create([
+            'type' => Notification::TYPE_INVENTORY_COSTS_PAID,
+            'title' => 'Inventory Costs Paid',
+            'message' => "Inventory costs paid for {$product->name} for the last week for {$quantity} units. Total cost: DZD {$totalCost}.",
+            'url' => route('company.inventory.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
+    // ------------------------------------------------------------
+    // Sales
+    // ------------------------------------------------------------
+    public static function createSaleInitiatedNotification($company, $product, $numberOfSales){
+        return Notification::create([
+            'type' => Notification::TYPE_SALE_INITIATED,
+            'title' => 'Sale Initiated',
+            'message' => "{$numberOfSales} new sales for {$product->name}.",
+            'url' => route('company.sales.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
+    public static function createSaleDeliveredNotification($company, $sale, $product, $quantity){
+        return Notification::create([
+            'type' => Notification::TYPE_SALE_DELIVERED,
+            'title' => 'Sale Delivered',
+            'message' => "Sale delivered for {$product->name} with quantity of {$quantity}.",
+            'url' => route('company.sales.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
+    public static function createSaleCancelledNotification($company, $sale, $product, $quantity){
+        return Notification::create([
+            'type' => Notification::TYPE_SALE_CANCELLED,
+            'title' => 'Sale Cancelled',
+            'message' => "Sale cancelled for {$product->name} with quantity of {$quantity} because it exceeded the time limit.",
+            'url' => route('company.sales.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
+    // ------------------------------------------------------------
+    // Employees
+    // ------------------------------------------------------------
+    public static function createEmployeeHiredNotification($company, $employeeProfile, $employee){
+        return Notification::create([
+            'type' => Notification::TYPE_EMPLOYEE_HIRED,
+            'title' => 'Employee Hired',
+            'message' => "Employee {$employeeProfile->name} hired for {$employee->salary_month}.",
+            'url' => route('company.employees.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
+    public static function createEmployeeMoodDecreasedNotification($company, $employee){
+        return Notification::create([
+            'type' => Notification::TYPE_EMPLOYEE_MOOD_DECREASED,
+            'title' => 'Employee Mood Decreased',
+            'message' => "Employee {$employee->name} mood decreased to {$employee->current_mood}. Consider promoting or firing him.",
+            'url' => route('company.employees.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
+    public static function createEmployeeResignedNotification($company, $employee){
+        return Notification::create([
+            'type' => Notification::TYPE_EMPLOYEE_RESIGNED,
+            'title' => 'Employee Resigned',
+            'message' => "Employee {$employee->name} resigned from {$employee->employeeProfile->name} with mood of {$employee->current_mood}.",
+            'url' => route('company.employees.index'),
+            'user_id' => $employee->company->user_id,
+        ]);
+    }
+
+    public static function createEmployeeSalaryPaidNotification($company, $totalSalaries){
+        return Notification::create([
+            'type' => Notification::TYPE_EMPLOYEE_SALARY_PAID,
+            'title' => 'Employee Salary Paid',
+            'message' => "Monthly employee salaries paid for DZD {$totalSalaries}.",
+            'url' => route('company.employees.index'),	
+            'user_id' => $company->user_id,
+        ]);
+    }
+
+    // ------------------------------------------------------------
+    // Machines
+    // ------------------------------------------------------------
+    public static function createMachineSetupNotification($company, $machine){
+        return Notification::create([
+            'type' => Notification::TYPE_MACHINE_SETUP,
+            'title' => 'Machine Setup',
+            'message' => "Machine {$machine->name} setup successfully.",
+            'url' => route('company.machines.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
+    public static function createMachineAssignedEmployeeNotification($company, $machine, $employee){
+        return Notification::create([
+            'type' => Notification::TYPE_MACHINE_ASSIGNED_EMPLOYEE,
+            'title' => 'Machine Assigned Employee',
+            'message' => "Machine {$machine->name} assigned to employee {$employee->name}.",
+            'url' => route('company.machines.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
+    public static function createMachineProductionStartedNotification($company, $machine, $product, $quantity){
+        return Notification::create([
+            'type' => Notification::TYPE_MACHINE_PRODUCTION_STARTED,
+            'title' => 'Machine Production Started',
+            'message' => "Machine {$machine->name} production started for {$product->name} with quantity of {$quantity}.",
+            'url' => route('company.machines.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
+    public static function createMachineProductionCompletedNotification($company, $machine, $product, $quantity, $qualityFactor){
+        return Notification::create([
+            'type' => Notification::TYPE_MACHINE_PRODUCTION_COMPLETED,
+            'title' => 'Machine Production Completed',
+            'message' => "Machine {$machine->name} production completed for {$product->name} with quantity of {$quantity} and quality factor of {$qualityFactor}.",
+            'url' => route('company.machines.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
+    public static function createMachineOperationCostsPaidNotification($company, $totalCost){
+
+        return Notification::create([
+            'type' => Notification::TYPE_MACHINE_OPERATION_COSTS_PAID,
+            'title' => 'Machine Operation Costs Paid',
+            'message' => "Machine operation costs paid for DZD {$totalCost}.",
+            'url' => route('company.machines.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
+    public static function createMachineSoldNotification($company, $companyMachine, $soldPrice){
+        return Notification::create([
+            'type' => Notification::TYPE_MACHINE_SOLD,
+            'title' => 'Machine Sold',
+            'message' => "Machine {$companyMachine->machine->name} sold for DZD " . $soldPrice,
+            'url' => route('company.machines.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
+    // ------------------------------------------------------------
+    // Maintenance
+    // ------------------------------------------------------------
+    public static function createMachineBrokenNotification($company, $companyMachine){
+        return Notification::create([
+            'type' => Notification::TYPE_MACHINE_BROKEN,
+            'title' => 'Machine Broken',
+            'message' => "Machine {$companyMachine->machine->name} broken. Any production orders for this machine will be cancelled and materials will be lost. The value of the machine is now DZD {$companyMachine->current_value}.",
+            'url' => route('company.machines.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
+    public static function createMachineReliabilityDecreasedNotification($company, $companyMachine){
+        return Notification::create([
+            'type' => Notification::TYPE_MACHINE_RELIABILITY_DECREASED,
+            'title' => 'Machine Reliability Decreased',
+            'message' => "Machine {$companyMachine->machine->name} reliability decreased to {$companyMachine->current_reliability}. Consider running a predictive maintenance.",
+            'url' => route('company.machines.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
+    public static function createMachineMaintenanceStartedNotification($company, $companyMachine){
+        return Notification::create([
+            'type' => Notification::TYPE_MACHINE_MAINTENANCE_STARTED,
+            'title' => 'Machine Maintenance Started',
+            'message' => "Machine {$companyMachine->machine->name} maintenance started.",
+            'url' => route('company.machines.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
+    public static function createMachineMaintenanceCompletedNotification($company, $companyMachine){
+        return Notification::create([
+            'type' => Notification::TYPE_MACHINE_MAINTENANCE_COMPLETED,
+            'title' => 'Machine Maintenance Completed',
+            'message' => "Machine {$companyMachine->machine->name} maintenance completed.",
+            'url' => route('company.machines.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
+    // ------------------------------------------------------------
+    // Events
+    // ------------------------------------------------------------
     public static function createCountriesImportBlockedNotification($countries){
         $companies = Company::get();
 
@@ -195,16 +389,6 @@ class NotificationService
         }
     }
 
-    public static function createInventoryExpiredNotification($company, $product, $quantity){
-        return Notification::create([
-            'type' => Notification::TYPE_INVENTORY_EXPIRED,
-            'title' => 'Inventory Expired',
-            'message' => "Inventory expired for {$product->name} with quantity of {$quantity}.",
-            'url' => route('company.inventory.index'),
-            'user_id' => $company->user_id,
-        ]);
-    }
-
     public static function createInventoryDamagedNotification($company, $rate){
         return Notification::create([
             'type' => Notification::TYPE_INVENTORY_DAMAGED,
@@ -215,172 +399,58 @@ class NotificationService
         ]);
     }
 
-    public static function createSaleInitiatedNotification($company, $product, $numberOfSales){
+    // ------------------------------------------------------------
+    // Loans
+    // ------------------------------------------------------------
+    public static function createLoanBorrowedNotification($company, $loan){
         return Notification::create([
-            'type' => Notification::TYPE_SALE_INITIATED,
-            'title' => 'Sale Initiated',
-            'message' => "{$numberOfSales} new sales for {$product->name}.",
-            'url' => route('company.sales.index'),
+            'type' => Notification::TYPE_LOAN_BORROWED,
+            'title' => 'Loan Borrowed', 
+            'message' => "Loan borrowed from {$loan->bank->name} for DZD {$loan->amount} for {$loan->duration_months} months.",
+            'url' => route('company.loans.index'),
             'user_id' => $company->user_id,
         ]);
     }
 
-    public static function createSaleDeliveredNotification($sale){
+    public static function createLoanBorrowedInsufficientFundsNotification($company, $loan, $reason){
         return Notification::create([
-            'type' => Notification::TYPE_SALE_DELIVERED,
-            'title' => 'Sale Delivered',
-            'message' => "Sale delivered for {$sale->product->name} with quantity of {$sale->quantity}.",
-            'url' => route('company.sales.index'),
-            'user_id' => $sale->company->user_id,
-        ]);
-    }
-
-    public static function createSaleCancelledNotification($sale){
-        return Notification::create([
-            'type' => Notification::TYPE_SALE_CANCELLED,
-            'title' => 'Sale Cancelled',
-            'message' => "Sale cancelled for {$sale->product->name} with quantity of {$sale->quantity}.",
-            'url' => route('company.sales.index'),
-            'user_id' => $sale->company->user_id,
-        ]);
-    }
-
-    public static function createSaleDeliveryDelayedNotification($sale){
-        return Notification::create([
-            'type' => Notification::TYPE_SALE_DELIVERY_DELAYED,
-            'title' => 'Sale Delivery Delayed',
-            'message' => "Sale delivery delayed for {$sale->product->name} until " . $sale->real_delivered_at->format('Y-m-d H:i:s') . ".",
-            'url' => route('company.sales.index'),
-            'user_id' => $sale->company->user_id,
-        ]);
-    }
-
-    public static function createInventoryCostsPaidNotification($company, $product, $quantity){
-        return Notification::create([
-            'type' => Notification::TYPE_INVENTORY_COSTS_PAID,
-            'title' => 'Inventory Costs Paid',
-            'message' => "Inventory costs paid for {$product->name} with quantity of {$quantity}.",
-            'url' => route('company.inventory.index'),
+            'type' => Notification::TYPE_LOAN_BORROWED_INSUFFICIENT_FUNDS,
+            'title' => 'Loan Borrowed Insufficient Funds',
+            'message' => "Insufficient funds to pay ". $reason." payments. A new loan has been borrowed to cover the monthly payments from {$loan->bank->name} for DZD {$loan->monthly_payment} for {$loan->duration_months} months.",
+            'url' => route('company.loans.index'),
             'user_id' => $company->user_id,
         ]);
     }
 
-    public static function createEmployeeHiredNotification($employee){
+    public static function createLoanPaidNotification($company, $loan){
         return Notification::create([
-            'type' => Notification::TYPE_EMPLOYEE_HIRED,
-            'title' => 'Employee Hired',
-            'message' => "Employee {$employee->name} hired for {$employee->employeeProfile->name} with salary of {$employee->salary_month}.",
-            'url' => route('company.employees.index'),
-            'user_id' => $employee->company->user_id,
-        ]);
-    }
-
-    public static function createEmployeeMoodDecreasedNotification($employee){
-        return Notification::create([
-            'type' => Notification::TYPE_EMPLOYEE_MOOD_DECREASED,
-            'title' => 'Employee Mood Decreased',
-            'message' => "Employee {$employee->name} mood decreased to {$employee->current_mood}. Consider promoting or firing him.",
-            'url' => route('company.employees.index'),
-            'user_id' => $employee->company->user_id,
-        ]);
-    }
-
-    public static function createEmployeeResignedNotification($employee){
-        return Notification::create([
-            'type' => Notification::TYPE_EMPLOYEE_RESIGNED,
-            'title' => 'Employee Resigned',
-            'message' => "Employee {$employee->name} resigned from {$employee->employeeProfile->name} with mood of {$employee->current_mood}.",
-            'url' => route('company.employees.index'),
-            'user_id' => $employee->company->user_id,
-        ]);
-    }
-
-    public static function createEmployeeSalaryPaidNotification($company, $totalSalaries){
-        return Notification::create([
-            'type' => Notification::TYPE_EMPLOYEE_SALARY_PAID,
-            'title' => 'Employee Salary Paid',
-            'message' => "Employee salary paid for DZD {$totalSalaries}.",
-            'url' => route('company.employees.index'),	
+            'type' => Notification::TYPE_LOAN_PAID,
+            'title' => 'Loan Paid',
+            'message' => "Loan paid to {$loan->bank->name} for DZD {$loan->monthly_payment}.",
+            'url' => route('company.loans.index'),
             'user_id' => $company->user_id,
         ]);
     }
 
-    public static function createMachineSetupNotification($company, $machine){
+    // ------------------------------------------------------------
+    // Advertisers
+    // ------------------------------------------------------------
+    public static function createAdPackageCreatedNotification($company, $ad){   
         return Notification::create([
-            'type' => Notification::TYPE_MACHINE_SETUP,
-            'title' => 'Machine Setup',
-            'message' => "Machine {$machine->name} setup.",
-            'url' => route('company.machines.index'),
+            'type' => Notification::TYPE_AD_PACKAGE_CREATED,
+            'title' => 'Ad Package Created',
+            'message' => "Ad package created for {$ad->product->name} by {$ad->advertiser->name} for DZD {$ad->price}.",
+            'url' => route('company.ads.index'),
             'user_id' => $company->user_id,
         ]);
     }
 
-    public static function createMachineAssignedEmployeeNotification($company, $machine, $employee){
+    public static function createAdPackageCompletedNotification($company, $ad){
         return Notification::create([
-            'type' => Notification::TYPE_MACHINE_ASSIGNED_EMPLOYEE,
-            'title' => 'Machine Assigned Employee',
-            'message' => "Machine {$machine->name} assigned to employee {$employee->name}.",
-            'url' => route('company.machines.index'),
-            'user_id' => $company->user_id,
-        ]);
-    }
-
-    public static function createMachineProductionStartedNotification($company, $machine, $product, $quantity){
-        return Notification::create([
-            'type' => Notification::TYPE_MACHINE_PRODUCTION_STARTED,
-            'title' => 'Machine Production Started',
-            'message' => "Machine {$machine->name} production started for {$product->name} with quantity of {$quantity}.",
-            'url' => route('company.machines.index'),
-            'user_id' => $company->user_id,
-        ]);
-    }
-
-    public static function createMachineProductionCompletedNotification($company, $machine, $product, $quantity, $qualityFactor){
-        return Notification::create([
-            'type' => Notification::TYPE_MACHINE_PRODUCTION_COMPLETED,
-            'title' => 'Machine Production Completed',
-            'message' => "Machine {$machine->name} production completed for {$product->name} with quantity of {$quantity} and quality factor of {$qualityFactor}.",
-            'url' => route('company.machines.index'),
-            'user_id' => $company->user_id,
-        ]);
-    }
-
-    public static function createMachineBrokenNotification($company, $companyMachine){
-        return Notification::create([
-            'type' => Notification::TYPE_MACHINE_BROKEN,
-            'title' => 'Machine Broken',
-            'message' => "Machine {$companyMachine->machine->name} broken.",
-            'url' => route('company.machines.index'),
-            'user_id' => $company->user_id,
-        ]);
-    }
-
-    public static function createMachineReliabilityDecreasedNotification($company, $companyMachine){
-        return Notification::create([
-            'type' => Notification::TYPE_MACHINE_RELIABILITY_DECREASED,
-            'title' => 'Machine Reliability Decreased',
-            'message' => "Machine {$companyMachine->machine->name} reliability decreased to {$companyMachine->current_reliability}. Consider running a predictive maintenance.",
-            'url' => route('company.machines.index'),
-            'user_id' => $company->user_id,
-        ]);
-    }
-
-    public static function createMachineMaintenanceStartedNotification($company, $companyMachine){
-        return Notification::create([
-            'type' => Notification::TYPE_MACHINE_MAINTENANCE_STARTED,
-            'title' => 'Machine Maintenance Started',
-            'message' => "Machine {$companyMachine->machine->name} maintenance started.",
-            'url' => route('company.machines.index'),
-            'user_id' => $company->user_id,
-        ]);
-    }
-
-    public static function createMachineMaintenanceCompletedNotification($company, $companyMachine){
-        return Notification::create([
-            'type' => Notification::TYPE_MACHINE_MAINTENANCE_COMPLETED,
-            'title' => 'Machine Maintenance Completed',
-            'message' => "Machine {$companyMachine->machine->name} maintenance completed.",
-            'url' => route('company.machines.index'),
+            'type' => Notification::TYPE_AD_PACKAGE_COMPLETED,
+            'title' => 'Ad Package Completed',
+            'message' => "Ad package completed for {$ad->product->name} by {$ad->advertiser->name}.",
+            'url' => route('company.ads.index'),
             'user_id' => $company->user_id,
         ]);
     }

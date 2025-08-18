@@ -1,9 +1,7 @@
 <script>
     import CompanyLayout from '../../Layouts/CompanyLayout.svelte';
     import Pagination from '../../Components/Pagination.svelte';
-    import Select2 from '../../Components/Forms/Select2.svelte';
-    import Flatpickr from '../../Components/Forms/Flatpickr.svelte';
-    import { onMount, tick } from 'svelte';
+    import { onMount, onDestroy, tick } from 'svelte';
     import { page } from '@inertiajs/svelte'
 
     // Define breadcrumbs for this page
@@ -26,34 +24,9 @@
     let sales = [];
     let pagination = {};
     let loading = true;
-    let search = '';
+    let fetchInterval = null;
     let perPage = 10;
     let currentPage = 1;
-    let searchTimeout;
-    let showFilters = false;
-
-    // Filter variables
-    let wilayaIdFilter = '';
-    let productIdFilter = '';
-    let statusFilter = '';
-    let minInitiatedAtFilter = '';
-    let maxInitiatedAtFilter = '';
-    let minConfirmedAtFilter = '';
-    let maxConfirmedAtFilter = '';
-    let minDeliveredAtFilter = '';
-    let maxDeliveredAtFilter = '';
-
-    // Select2 component references
-    let wilayaSelectComponent;
-    let productSelectComponent;
-
-    // Flatpickr component references
-    let minInitiatedAtFlatpickr;
-    let maxInitiatedAtFlatpickr;
-    let minConfirmedAtFlatpickr;
-    let maxConfirmedAtFlatpickr;
-    let minDeliveredAtFlatpickr;
-    let maxDeliveredAtFlatpickr;
 
     // Modal state
     let selectedSale = null;
@@ -66,25 +39,14 @@
 
     // Fetch sales data
     async function fetchSales() {
-        loading = true;
+        if(sales.length == 0) loading = true;
+        
         try {
             const params = new URLSearchParams({
                 page: currentPage,
                 perPage: perPage,
-                search: search
             });
 
-            // Add filters to params
-            if (wilayaIdFilter) params.append('wilaya_id', wilayaIdFilter);
-            if (productIdFilter) params.append('product_id', productIdFilter);
-            if (statusFilter) params.append('status', statusFilter);
-            if (minInitiatedAtFilter) params.append('min_initiated_at', minInitiatedAtFilter);
-            if (maxInitiatedAtFilter) params.append('max_initiated_at', maxInitiatedAtFilter);
-            if (minConfirmedAtFilter) params.append('min_confirmed_at', minConfirmedAtFilter);
-            if (maxConfirmedAtFilter) params.append('max_confirmed_at', maxConfirmedAtFilter);
-            if (minDeliveredAtFilter) params.append('min_delivered_at', minDeliveredAtFilter);
-            if (maxDeliveredAtFilter) params.append('max_delivered_at', maxDeliveredAtFilter);
-            
             const response = await fetch(route('company.sales.index') + '?' + params.toString(), {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
@@ -107,32 +69,6 @@
         }
     }
 
-    // Handle search with debouncing
-    function handleSearch() {
-        // Clear existing timeout
-        if (searchTimeout) {
-            clearTimeout(searchTimeout);
-        }
-        
-        // Set new timeout for 500ms
-        searchTimeout = setTimeout(() => {
-            currentPage = 1;
-            fetchSales();
-        }, 500);
-    }
-
-    // Handle search input change
-    function handleSearchInput(event) {
-        search = event.target.value;
-        handleSearch();
-    }
-
-    // Handle filter changes
-    function handleFilterChange() {
-        currentPage = 1;
-        fetchSales();
-    }
-
     // Handle pagination
     function goToPage(page) {
         if (page && page !== currentPage) {
@@ -146,85 +82,6 @@
         perPage = newPerPage;
         currentPage = 1;
         fetchSales();
-    }
-
-    // Clear all filters
-    function clearAllFilters() {
-        wilayaIdFilter = '';
-        productIdFilter = '';
-        statusFilter = '';
-        minInitiatedAtFilter = '';
-        maxInitiatedAtFilter = '';
-        minConfirmedAtFilter = '';
-        maxConfirmedAtFilter = '';
-        minDeliveredAtFilter = '';
-        maxDeliveredAtFilter = '';
-        
-        if (wilayaSelectComponent) {
-            wilayaSelectComponent.clear();
-        }
-        if (productSelectComponent) {
-            productSelectComponent.clear();
-        }
-        
-        // Clear Flatpickr components
-        if (minInitiatedAtFlatpickr) minInitiatedAtFlatpickr.clear();
-        if (maxInitiatedAtFlatpickr) maxInitiatedAtFlatpickr.clear();
-        if (minConfirmedAtFlatpickr) minConfirmedAtFlatpickr.clear();
-        if (maxConfirmedAtFlatpickr) maxConfirmedAtFlatpickr.clear();
-        if (minDeliveredAtFlatpickr) minDeliveredAtFlatpickr.clear();
-        if (maxDeliveredAtFlatpickr) maxDeliveredAtFlatpickr.clear();
-        
-        currentPage = 1;
-        fetchSales();
-    }
-
-    // Toggle filters visibility
-    function toggleFilters() {
-        showFilters = !showFilters;
-    }
-
-    // Handle wilaya selection
-    function handleWilayaSelect(event) {
-        wilayaIdFilter = event.detail.value;
-        handleFilterChange();
-    }
-
-    // Handle product selection
-    function handleProductSelect(event) {
-        productIdFilter = event.detail.value;
-        handleFilterChange();
-    }
-
-    // Handle date changes
-    function handleMinInitiatedAtChange(event) {
-        minInitiatedAtFilter = event.detail.value;
-        handleFilterChange();
-    }
-
-    function handleMaxInitiatedAtChange(event) {
-        maxInitiatedAtFilter = event.detail.value;
-        handleFilterChange();
-    }
-
-    function handleMinConfirmedAtChange(event) {
-        minConfirmedAtFilter = event.detail.value;
-        handleFilterChange();
-    }
-
-    function handleMaxConfirmedAtChange(event) {
-        maxConfirmedAtFilter = event.detail.value;
-        handleFilterChange();
-    }
-
-    function handleMinDeliveredAtChange(event) {
-        minDeliveredAtFilter = event.detail.value;
-        handleFilterChange();
-    }
-
-    function handleMaxDeliveredAtChange(event) {
-        maxDeliveredAtFilter = event.detail.value;
-        handleFilterChange();
     }
 
     // Open sale modal
@@ -308,18 +165,6 @@
         }
     }
 
-    // Show toast notification
-    function showToast(message, type = 'success') {
-        if (window.KTToast) {
-            KTToast.show({
-                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
-                message: message,
-                variant: type === 'success' ? 'success' : 'destructive',
-                position: 'bottom-right',
-            });
-        }
-    }
-
     // Get status badge class
     function getStatusBadgeClass(status) {
         switch (status) {
@@ -336,24 +181,13 @@
         }
     }
 
-    // Get status text
-    function getStatusText(status) {
-        switch (status) {
-            case 'initiated':
-                return 'Initiated';
-            case 'confirmed':
-                return 'Confirmed';
-            case 'delivered':
-                return 'Delivered';
-            case 'cancelled':
-                return 'Cancelled';
-            default:
-                return status;
-        }
-    }
-
     onMount(() => {
         fetchSales();
+        fetchInterval = setInterval(fetchSales, 60000);
+    });
+    
+    onDestroy(() => {
+        clearInterval(fetchInterval);
     });
 
     // Flash message handling
@@ -375,7 +209,7 @@
 
 <CompanyLayout {breadcrumbs} {pageTitle}>
     <!-- Container -->
-    <div class="kt-container-fluid">
+    <div class="kt-container-fixed">
         <div class="grid gap-5 lg:gap-7.5">
             <!-- Sales Header -->
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -389,255 +223,6 @@
 
             <!-- Sales Grid -->
             <div class="kt-card">
-                <div class="kt-card-header">
-                    <div class="kt-card-toolbar">
-                        <div class="kt-input max-w-64 w-64">
-                            <i class="ki-filled ki-magnifier"></i>
-                            <input 
-                                type="text" 
-                                class="kt-input" 
-                                placeholder="Search sales..." 
-                                bind:value={search}
-                                on:input={handleSearchInput}
-                            />
-                        </div>
-                        
-                        <!-- Filters Toggle -->
-                        <div class="flex items-center gap-3 ml-auto">
-                            <!-- Filter Toggle Button -->
-                            <button 
-                                class="kt-btn kt-btn-outline"
-                                on:click={toggleFilters}
-                            >
-                                <i class="ki-filled ki-filter text-sm"></i>
-                                {showFilters ? 'Hide Filters' : 'Show Filters'}
-                            </button>
-                            
-                            <!-- Clear Filters Button -->
-                            {#if wilayaIdFilter || productIdFilter || statusFilter || minInitiatedAtFilter || maxInitiatedAtFilter || minConfirmedAtFilter || maxConfirmedAtFilter || minDeliveredAtFilter || maxDeliveredAtFilter}
-                                <button 
-                                    class="kt-btn kt-btn-ghost kt-btn-sm"
-                                    on:click={clearAllFilters}
-                                >
-                                    <i class="ki-filled ki-cross text-sm"></i>
-                                    Clear All
-                                </button>
-                            {/if}
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Advanced Filters Section -->
-                {#if showFilters}
-                    <div class="kt-card-body border-t border-gray-200 p-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                            <!-- Sale Properties -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Sale Properties</h4>
-                                <!-- Status -->
-                                <select 
-                                    class="kt-select w-full" 
-                                    bind:value={statusFilter}
-                                    on:change={handleFilterChange}
-                                >
-                                    <option value="">All Statuses</option>
-                                    <option value="initiated">Initiated</option>
-                                    <option value="confirmed">Confirmed</option>
-                                    <option value="delivered">Delivered</option>
-                                    <option value="cancelled">Cancelled</option>
-                                </select>
-                            </div>
-
-                            <!-- Wilaya -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Wilaya</h4>
-                                <Select2
-                                    bind:this={wilayaSelectComponent}
-                                    id="wilaya-filter"
-                                    placeholder="All Wilayas"
-                                    allowClear={true}
-                                    on:select={handleWilayaSelect}
-                                    on:clear={() => {
-                                        wilayaIdFilter = '';
-                                        handleFilterChange();
-                                    }}
-                                    ajax={{
-                                        url: route('company.wilayas.index'),
-                                        dataType: 'json',
-                                        delay: 300,
-                                        data: function(params) {
-                                            return {
-                                                search: params.term,
-                                                perPage: 10
-                                            };
-                                        },
-                                        processResults: function(data) {
-                                            return {
-                                                results: data.wilayas.map(wilaya => ({
-                                                    id: wilaya.id,
-                                                    text: wilaya.name,
-                                                    name: wilaya.name,
-                                                }))
-                                            };
-                                        },
-                                        cache: true
-                                    }}
-                                    templateResult={function(data) {
-                                        if (data.loading) return data.text;
-                                        
-                                        const $elem = globalThis.$('<div class="flex items-center gap-2">' +
-                                            '<i class="ki-filled ki-location text-sm text-muted-foreground"></i>' +
-                                            '<span class="font-medium text-sm">' + data.name + '</span>' +
-                                            '</div>');
-                                        return $elem;
-                                    }}
-                                    templateSelection={function(data) {
-                                        if (!data.id) return data.text;
-                                        return data.name;
-                                    }}
-                                />
-                            </div>
-
-                            <!-- Product -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Product</h4>
-                                <Select2
-                                    bind:this={productSelectComponent}
-                                    id="product-filter"
-                                    placeholder="All Products"
-                                    allowClear={true}
-                                    on:select={handleProductSelect}
-                                    on:clear={() => {
-                                        productIdFilter = '';
-                                        handleFilterChange();
-                                    }}
-                                    ajax={{
-                                        url: route('company.products.index'),
-                                        dataType: 'json',
-                                        delay: 300,
-                                        data: function(params) {
-                                            return {
-                                                search: params.term,
-                                                perPage: 10
-                                            };
-                                        },
-                                        processResults: function(data) {
-                                            return {
-                                                results: data.products.map(product => ({
-                                                    id: product.product.id,
-                                                    text: product.product.name,
-                                                    name: product.product.name,
-                                                }))
-                                            };
-                                        },
-                                        cache: true
-                                    }}
-                                    templateResult={function(data) {
-                                        if (data.loading) return data.text;
-                                        
-                                        const $elem = globalThis.$('<div class="flex items-center gap-2">' +
-                                            '<i class="ki-filled ki-abstract-26 text-sm text-muted-foreground"></i>' +
-                                            '<span class="font-medium text-sm">' + data.name + '</span>' +
-                                            '</div>');
-                                        return $elem;
-                                    }}
-                                    templateSelection={function(data) {
-                                        if (!data.id) return data.text;
-                                        return data.name;
-                                    }}
-                                />
-                            </div>
-
-                            <!-- Initiated Date Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Initiated Date Range</h4>
-                                <div class="flex gap-2">
-                                    <Flatpickr
-                                        bind:this={minInitiatedAtFlatpickr}
-                                        id="min-initiated-at"
-                                        placeholder="Min Date"
-                                        config={{
-                                            enableTime: true,
-                                            dateFormat: 'Y-m-d H:i',
-                                            time_24hr: true
-                                        }}
-                                        on:change={handleMinInitiatedAtChange}
-                                    />
-                                    <Flatpickr
-                                        bind:this={maxInitiatedAtFlatpickr}
-                                        id="max-initiated-at"
-                                        placeholder="Max Date"
-                                        config={{
-                                            enableTime: true,
-                                            dateFormat: 'Y-m-d H:i',
-                                            time_24hr: true
-                                        }}
-                                        on:change={handleMaxInitiatedAtChange}
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Confirmed Date Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Confirmed Date Range</h4>
-                                <div class="flex gap-2">
-                                    <Flatpickr
-                                        bind:this={minConfirmedAtFlatpickr}
-                                        id="min-confirmed-at"
-                                        placeholder="Min Date"
-                                        config={{
-                                            enableTime: true,
-                                            dateFormat: 'Y-m-d H:i',
-                                            time_24hr: true
-                                        }}
-                                        on:change={handleMinConfirmedAtChange}
-                                    />
-                                    <Flatpickr
-                                        bind:this={maxConfirmedAtFlatpickr}
-                                        id="max-confirmed-at"
-                                        placeholder="Max Date"
-                                        config={{
-                                            enableTime: true,
-                                            dateFormat: 'Y-m-d H:i',
-                                            time_24hr: true
-                                        }}
-                                        on:change={handleMaxConfirmedAtChange}
-                                    />
-                                </div>
-                            </div>
-
-                            <!-- Delivered Date Range -->
-                            <div class="space-y-2">
-                                <h4 class="text-sm font-medium text-gray-700">Delivered Date Range</h4>
-                                <div class="flex gap-2">
-                                    <Flatpickr
-                                        bind:this={minDeliveredAtFlatpickr}
-                                        id="min-delivered-at"
-                                        placeholder="Min Date"
-                                        config={{
-                                            enableTime: true,
-                                            dateFormat: 'Y-m-d H:i',
-                                            time_24hr: true
-                                        }}
-                                        on:change={handleMinDeliveredAtChange}
-                                    />
-                                    <Flatpickr
-                                        bind:this={maxDeliveredAtFlatpickr}
-                                        id="max-delivered-at"
-                                        placeholder="Max Date"
-                                        config={{
-                                            enableTime: true,
-                                            dateFormat: 'Y-m-d H:i',
-                                            time_24hr: true
-                                        }}
-                                        on:change={handleMaxDeliveredAtChange}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {/if}
-
                 <div class="kt-card-content p-0">
                     {#if loading}
                         <!-- Loading skeleton -->
@@ -680,7 +265,7 @@
                                 </div>
                                 <h3 class="text-lg font-semibold text-mono mb-2">No sales found</h3>
                                 <p class="text-sm text-secondary-foreground mb-4">
-                                    {search ? 'No sales match your search criteria.' : 'No sales available. Sales will appear here when generated.'}
+                                    No sales available. Sales will appear here when generated.
                                 </p>
                             </div>
                         </div>
@@ -710,7 +295,7 @@
                                                     Status
                                                 </span>
                                                 <span class="kt-badge kt-badge-sm {getStatusBadgeClass(sale.status)}">
-                                                    {getStatusText(sale.status)}
+                                                    {sale.status}
                                                 </span>
                                             </div>
                                             <div class="flex flex-col gap-1.5">
@@ -728,16 +313,6 @@
                                                 </span>
                                                 <span class="text-sm font-medium text-mono">
                                                     {formatTimestamp(sale.confirmed_at)}
-                                                </span>
-                                            </div>
-                                            {/if}
-                                            {#if sale.estimated_delivered_at}
-                                            <div class="flex flex-col gap-1.5">
-                                                <span class="text-xs font-normal text-secondary-foreground">
-                                                    Estimated Delivery
-                                                </span>
-                                                <span class="text-sm font-medium text-mono">
-                                                    {formatTimestamp(sale.estimated_delivered_at)}
                                                 </span>
                                             </div>
                                             {/if}
@@ -1041,7 +616,7 @@
                         </span>
                         <div>
                             <span class="kt-badge kt-badge-sm {getStatusBadgeClass(selectedConfirmedSale.status)}">
-                                {getStatusText(selectedConfirmedSale.status)}
+                                {selectedConfirmedSale.status}
                             </span>
                         </div>
                     </div>
@@ -1113,18 +688,6 @@
                             <div>
                                 <span class="text-xs font-medium text-foreground">
                                     {formatTimestamp(selectedConfirmedSale.confirmed_at)}
-                                </span>
-                            </div>
-                        </div>
-                    {/if}
-                    {#if selectedConfirmedSale.estimated_delivered_at}
-                        <div class="flex items-center gap-2.5">
-                            <span class="text-xs font-normal text-foreground min-w-14 xl:min-w-24 shrink-0">
-                                Estimated Delivery
-                            </span>
-                            <div>
-                                <span class="text-xs font-medium text-foreground">
-                                    {formatTimestamp(selectedConfirmedSale.estimated_delivered_at)}
                                 </span>
                             </div>
                         </div>

@@ -18,14 +18,11 @@ return new class extends Migration
 
             // Salary
             $table->decimal('min_salary_month', 15, 3)->default(0);
-            $table->decimal('avg_salary_month', 15, 3)->default(0);
             $table->decimal('max_salary_month', 15, 3)->default(0);
 
             // Recruitment
             $table->decimal('min_recruitment_cost', 15, 3)->default(0);
-            $table->decimal('avg_recruitment_cost', 15, 3)->default(0);
             $table->decimal('max_recruitment_cost', 15, 3)->default(0);
-            $table->decimal('real_recruitment_cost', 15, 3)->default(0);
 
             $table->timestamps();
         });

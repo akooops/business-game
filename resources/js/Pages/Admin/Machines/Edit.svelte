@@ -33,32 +33,26 @@
         model: machine.model || '',
         manufacturer: machine.manufacturer || '',
         cost_to_acquire: machine.cost_to_acquire || '',
+        loss_on_sale_days: machine.loss_on_sale_days || '',
         description: machine.description || '',
-        operation_cost: machine.operation_cost || '',
+        operations_cost: machine.operations_cost || '',
         carbon_footprint: machine.carbon_footprint || '',
         quality_factor: machine.quality_factor || '',
         min_speed: machine.min_speed || '',
-        avg_speed: machine.avg_speed || '',
         max_speed: machine.max_speed || '',
         reliability_decay_days: machine.reliability_decay_days || '',
         maintenance_interval_days: machine.maintenance_interval_days || '',
         min_maintenance_cost: machine.min_maintenance_cost || '',
-        avg_maintenance_cost: machine.avg_maintenance_cost || '',
         max_maintenance_cost: machine.max_maintenance_cost || '',
         min_maintenance_time_days: machine.min_maintenance_time_days || '',
-        avg_maintenance_time_days: machine.avg_maintenance_time_days || '',
         max_maintenance_time_days: machine.max_maintenance_time_days || '',
         file: null,
-        employee_profiles: (machine.employee_profiles || []).map(profile => ({
-            employee_profile_id: profile.id,
-            employee_profile_name: profile.name,
-            required_count: profile.pivot.required_count
-        })),
-        outputs: (machine.products || []).map(product => ({
-            product_id: product.id,
-            product_name: product.name,
-            product_type_name: product.type_name,
-            product_image: product.image_url
+        employee_profile_id: machine.employee_profile_id || '',
+        outputs: (machine.outputs || []).map(output => ({
+            product_id: output.product.id,
+            product_name: output.product.name,
+            product_type_name: output.product.type_name,
+            product_image: output.product.image_url
         }))
     };
 
@@ -89,20 +83,7 @@
         const profileId = event.detail.value;
         const profileData = event.detail.data;
         
-        // Check if profile is already added
-        const exists = formData.employee_profiles.find(profile => profile.employee_profile_id === profileId);
-        if (!exists) {
-            formData.employee_profiles = [...formData.employee_profiles, { 
-                employee_profile_id: profileId,
-                employee_profile_name: profileData.name,
-                required_count: 1
-            }];
-        }
-        
-        // Clear the select2
-        if (employeeProfileSelectComponent) {
-            employeeProfileSelectComponent.clear();
-        }
+        formData.employee_profile_id = profileId;
     }
 
     // Handle product output selection
@@ -120,16 +101,6 @@
                 product_image: productData.image_url || null
             }];
         }
-        
-        // Clear the select2
-        if (productSelectComponent) {
-            productSelectComponent.clear();
-        }
-    }
-
-    // Remove employee profile
-    function removeEmployeeProfile(index) {
-        formData.employee_profiles = formData.employee_profiles.filter((_, i) => i !== index);
     }
 
     // Remove output
@@ -162,9 +133,8 @@
         }
     }
 
-    // Select2 component references
-    let employeeProfileSelectComponent;
     let productSelectComponent;
+    let employeeProfileSelectComponent;
 </script>
 
 <svelte:head>
@@ -291,7 +261,24 @@
                                     <p class="text-sm text-destructive">{errors.cost_to_acquire}</p>
                                 {/if}
                             </div>
-                        </div>
+
+                            <!-- Loss on Sale -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-medium text-mono" for="loss_on_sale_days">
+                                    Loss on Sale (%) <span class="text-destructive">*</span>
+                                </label>
+                                <input 
+                                    id="loss_on_sale_days"
+                                    type="number" 
+                                    bind:value={formData.loss_on_sale_days}
+                                    class="kt-input {errors.loss_on_sale_days ? 'kt-input-error' : ''}"
+                                    placeholder="Enter loss on sale (%) / day of cost to acquire"
+                                    min="0"
+                                    max="1"
+                                    step="0.001"
+                                    required
+                                />
+                            </div>
                     </div>
                 </div>
 
@@ -351,69 +338,8 @@
                     </div>
                     <div class="kt-card-content">
                         <div class="grid gap-4">
-                            <!-- Energy Consumption, Carbon Emissions, and Quality Factor -->
-                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                                <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="operation_cost">
-                                        Operation Cost (DZD/day) <span class="text-destructive">*</span>
-                                    </label>
-                                    <input 
-                                        id="operation_cost"
-                                        type="number" 
-                                        bind:value={formData.operation_cost}
-                                        class="kt-input {errors.operation_cost ? 'kt-input-error' : ''}"
-                                        placeholder="Enter hourly operation cost"
-                                        min="0"
-                                        step="0.001"
-                                        required
-                                    />
-                                    {#if errors.operation_cost}
-                                        <p class="text-sm text-destructive">{errors.operation_cost}</p>
-                                    {/if}
-                                </div>
-
-                                <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="carbon_footprint">
-                                        Carbon Footprint (kg CO2/day) <span class="text-destructive">*</span>
-                                    </label>
-                                    <input 
-                                        id="carbon_footprint"
-                                        type="number" 
-                                        bind:value={formData.carbon_footprint}
-                                        class="kt-input {errors.carbon_footprint ? 'kt-input-error' : ''}"
-                                        placeholder="Enter hourly carbon footprint"
-                                        min="0"
-                                        step="0.001"
-                                        required
-                                    />
-                                    {#if errors.carbon_footprint}
-                                        <p class="text-sm text-destructive">{errors.carbon_footprint}</p>
-                                    {/if}
-                                </div>
-
-                                <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="quality_factor">
-                                        Quality Factor <span class="text-destructive">*</span>
-                                    </label>
-                                    <input 
-                                        id="quality_factor"
-                                        type="number" 
-                                        bind:value={formData.quality_factor}
-                                        class="kt-input {errors.quality_factor ? 'kt-input-error' : ''}"
-                                        placeholder="Enter quality factor"
-                                        min="0"
-                                        max="1"
-                                        step="0.001"
-                                        required
-                                    />
-                                    {#if errors.quality_factor}
-                                        <p class="text-sm text-destructive">{errors.quality_factor}</p>
-                                    {/if}
-                                </div>
-                            </div>
-
                             <!-- Speed Ranges -->
-                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                 <div class="flex flex-col gap-2">
                                     <label class="text-sm font-medium text-mono" for="min_speed">
                                         Minimum Speed (units/day) <span class="text-destructive">*</span>
@@ -430,25 +356,6 @@
                                     />
                                     {#if errors.min_speed}
                                         <p class="text-sm text-destructive">{errors.min_speed}</p>
-                                    {/if}
-                                </div>
-
-                                <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="avg_speed">
-                                        Average Speed (units/day) <span class="text-destructive">*</span>
-                                    </label>
-                                    <input 
-                                        id="avg_speed"
-                                        type="number" 
-                                        bind:value={formData.avg_speed}
-                                        class="kt-input {errors.avg_speed ? 'kt-input-error' : ''}"
-                                        placeholder="Enter average speed"
-                                        min="0"
-                                        step="0.001"
-                                        required
-                                    />
-                                    {#if errors.avg_speed}
-                                        <p class="text-sm text-destructive">{errors.avg_speed}</p>
                                     {/if}
                                 </div>
 
@@ -472,8 +379,71 @@
                                 </div>
                             </div>
 
+                            <!-- Energy Consumption, Carbon Emissions, and Quality Factor -->
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                <div class="flex flex-col gap-2">
+                                    <label class="text-sm font-medium text-mono" for="operations_cost">
+                                        Operations Cost (DZD/week) <span class="text-destructive">*</span>
+                                    </label>
+                                    <input 
+                                        id="operations_cost"
+                                        type="number" 
+                                        bind:value={formData.operations_cost}
+                                        class="kt-input {errors.operations_cost ? 'kt-input-error' : ''}"
+                                        placeholder="Enter operations cost"
+                                        min="0"
+                                        step="0.001"
+                                        required
+                                    />
+                                    {#if errors.operations_cost}
+                                        <p class="text-sm text-destructive">{errors.operations_cost}</p>
+                                    {/if}
+                                </div>
+
+                                <div class="flex flex-col gap-2">
+                                    <label class="text-sm font-medium text-mono" for="carbon_footprint">
+                                        Carbon Footprint (kg CO2/unit) <span class="text-destructive">*</span>
+                                    </label>
+                                    <input 
+                                        id="carbon_footprint"
+                                        type="number" 
+                                        bind:value={formData.carbon_footprint}
+                                        class="kt-input {errors.carbon_footprint ? 'kt-input-error' : ''}"
+                                        placeholder="Enter carbon footprint"
+                                        min="0"
+                                        step="0.001"
+                                        required
+                                    />
+                                    {#if errors.carbon_footprint}
+                                        <p class="text-sm text-destructive">{errors.carbon_footprint}</p>
+                                    {/if}
+                                </div>
+                            </div>
+
+
+
                             <!-- Reliability -->
-                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                <div class="flex flex-col gap-2">
+                                    <label class="text-sm font-medium text-mono" for="quality_factor">
+                                        Quality Factor <span class="text-destructive">*</span>
+                                    </label>
+                                    <input 
+                                        id="quality_factor"
+                                        type="number" 
+                                        bind:value={formData.quality_factor}
+                                        class="kt-input {errors.quality_factor ? 'kt-input-error' : ''}"
+                                        placeholder="Enter quality factor"
+                                        min="0"
+                                        max="1"
+                                        step="0.001"
+                                        required
+                                    />
+                                    {#if errors.quality_factor}
+                                        <p class="text-sm text-destructive">{errors.quality_factor}</p>
+                                    {/if}
+                                </div>
+
                                 <div class="flex flex-col gap-2">
                                     <label class="text-sm font-medium text-mono" for="reliability_decay_days">
                                         Reliability Decay Days <span class="text-destructive">*</span>
@@ -493,25 +463,6 @@
                                         <p class="text-sm text-destructive">{errors.reliability_decay_days}</p>
                                     {/if}
                                 </div>
-
-                                <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="maintenance_interval_days">
-                                        Maintenance Interval (days) <span class="text-destructive">*</span>
-                                    </label>
-                                    <input 
-                                        id="maintenance_interval_days"
-                                        type="number" 
-                                        bind:value={formData.maintenance_interval_days}
-                                        class="kt-input {errors.maintenance_interval_days ? 'kt-input-error' : ''}"
-                                        placeholder="Enter maintenance interval"
-                                        min="1"
-                                        step="1"
-                                        required
-                                    />
-                                    {#if errors.maintenance_interval_days}
-                                        <p class="text-sm text-destructive">{errors.maintenance_interval_days}</p>
-                                    {/if}
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -525,7 +476,7 @@
                     <div class="kt-card-content">
                         <div class="grid gap-4">
                             <!-- Maintenance Costs -->
-                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                 <div class="flex flex-col gap-2">
                                     <label class="text-sm font-medium text-mono" for="min_maintenance_cost">
                                         Minimum Cost (DZD) <span class="text-destructive">*</span>
@@ -542,25 +493,6 @@
                                     />
                                     {#if errors.min_maintenance_cost}
                                         <p class="text-sm text-destructive">{errors.min_maintenance_cost}</p>
-                                    {/if}
-                                </div>
-
-                                <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="avg_maintenance_cost">
-                                        Average Cost (DZD) <span class="text-destructive">*</span>
-                                    </label>
-                                    <input 
-                                        id="avg_maintenance_cost"
-                                        type="number" 
-                                        bind:value={formData.avg_maintenance_cost}
-                                        class="kt-input {errors.avg_maintenance_cost ? 'kt-input-error' : ''}"
-                                        placeholder="Enter average cost"
-                                        min="0"
-                                        step="0.001"
-                                        required
-                                    />
-                                    {#if errors.avg_maintenance_cost}
-                                        <p class="text-sm text-destructive">{errors.avg_maintenance_cost}</p>
                                     {/if}
                                 </div>
 
@@ -585,7 +517,7 @@
                             </div>
 
                             <!-- Maintenance Times -->
-                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                 <div class="flex flex-col gap-2">
                                     <label class="text-sm font-medium text-mono" for="min_maintenance_time_days">
                                         Minimum Time (days) <span class="text-destructive">*</span>
@@ -602,25 +534,6 @@
                                     />
                                     {#if errors.min_maintenance_time_days}
                                         <p class="text-sm text-destructive">{errors.min_maintenance_time_days}</p>
-                                    {/if}
-                                </div>
-
-                                <div class="flex flex-col gap-2">
-                                    <label class="text-sm font-medium text-mono" for="avg_maintenance_time_days">
-                                        Average Time (days) <span class="text-destructive">*</span>
-                                    </label>
-                                    <input 
-                                        id="avg_maintenance_time_days"
-                                        type="number" 
-                                        bind:value={formData.avg_maintenance_time_days}
-                                        class="kt-input {errors.avg_maintenance_time_days ? 'kt-input-error' : ''}"
-                                        placeholder="Enter average time"
-                                        min="0"
-                                        step="1"
-                                        required
-                                    />
-                                    {#if errors.avg_maintenance_time_days}
-                                        <p class="text-sm text-destructive">{errors.avg_maintenance_time_days}</p>
                                     {/if}
                                 </div>
 
@@ -660,8 +573,18 @@
                                     Add Employee Profile Requirements
                                 </label>
                                 <p class="text-xs text-secondary-foreground mb-2">
-                                    Search and select employee profiles required to operate this machine
+                                    Search and select employee profile required to operate this machine
                                 </p>
+
+                                {#if machine.employee_profile}
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="kt-badge kt-badge-primary">
+                                            <i class="ki-filled ki-technology-1 text-xs"></i>
+                                            Last selected Employee Profile: {machine.employee_profile.name}
+                                        </span>
+                                    </div>
+                                {/if}
+
                                 <Select2
                                     bind:this={employeeProfileSelectComponent}
                                     id="employee-profile-selector"
@@ -683,7 +606,6 @@
                                                     id: profile.id,
                                                     text: profile.name,
                                                     name: profile.name,
-                                                    recruitment_difficulty: profile.recruitment_difficulty
                                                 }))
                                             };
                                         },
@@ -693,12 +615,7 @@
                                         if (data.loading) return data.text;
                                         
                                         const $elem = globalThis.$('<div class="flex items-center gap-3">' +
-                                            '<div class="flex items-center justify-center size-12 shrink-0 rounded bg-accent/50">' +
-                                            '<i class="ki-filled ki-profile-circle text-lg text-muted-foreground"></i>' +
-                                            '</div>' +
-                                            '<div class="flex flex-col">' +
                                             '<span class="font-medium text-sm">' + data.name + '</span>' +
-                                            '<span class="text-xs text-muted-foreground">Difficulty: ' + data.recruitment_difficulty + '</span>' +
                                             '</div>' +
                                             '</div>');
                                         return $elem;
@@ -708,65 +625,6 @@
                                         return data.name;
                                     }}
                                 />
-                            </div>
-                            
-                            <!-- Selected Employee Profiles -->
-                            <div>
-                                {#if formData.employee_profiles.length === 0}
-                                    <div class="kt-card bg-muted/20 border-dashed">
-                                        <div class="kt-card-content text-center py-8">
-                                            <i class="ki-filled ki-profile-circle text-2xl text-muted-foreground mb-2"></i>
-                                            <p class="text-sm text-muted-foreground">No employee profiles required yet</p>
-                                            <p class="text-xs text-muted-foreground mt-1">Use the search above to add employee requirements</p>
-                                        </div>
-                                    </div>
-                                {:else}
-                                    <div class="space-y-3">
-                                        {#each formData.employee_profiles as profile, index}
-                                            <div class="kt-card border">
-                                                <div class="kt-card-content p-4">
-                                                    <div class="flex items-center gap-4">
-                                                        <div class="flex items-center gap-3 flex-1">
-                                                            <div class="flex items-center justify-center size-10 shrink-0 rounded bg-accent/50">
-                                                                <i class="ki-filled ki-profile-circle text-lg text-muted-foreground"></i>
-                                                            </div>
-                                                            <div class="flex flex-col">
-                                                                <span class="text-sm font-medium text-mono">{profile.employee_profile_name}</span>
-                                                            </div>
-                                                        </div>
-                                                        
-                                                        <div class="flex items-center gap-2">
-                                                            <label class="text-sm font-medium text-mono" for="required-count-{index}">
-                                                                Required Count:
-                                                            </label>
-                                                            <input 
-                                                                id="required-count-{index}"
-                                                                type="number" 
-                                                                bind:value={profile.required_count}
-                                                                class="kt-input w-20 {errors[`employee_profiles.${index}.required_count`] ? 'kt-input-error' : ''}"
-                                                                min="1"
-                                                                required
-                                                            />
-                                                        </div>
-                                                        
-                                                        <button 
-                                                            type="button" 
-                                                            class="kt-btn kt-btn-sm kt-btn-icon kt-btn-ghost text-destructive"
-                                                            on:click={() => removeEmployeeProfile(index)}
-                                                            title="Remove requirement"
-                                                        >
-                                                            <i class="ki-filled ki-trash"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        {/each}
-                                    </div>
-                                {/if}
-
-                                {#if errors.employee_profiles}
-                                    <p class="text-sm text-destructive mt-2">{errors.employee_profiles}</p>
-                                {/if}
                             </div>
                         </div>
                     </div>

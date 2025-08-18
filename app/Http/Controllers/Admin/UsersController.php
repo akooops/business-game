@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Requests\Admin\Users\UpdateUserRequest;
 use App\Http\Requests\Admin\Users\StoreUserRequest;
 use Illuminate\Http\Request;
-use App\Models\Role;
 use App\Models\User;
 use App\Services\FileService;
 use App\Services\IndexService;
@@ -31,7 +30,10 @@ class UsersController extends Controller
                       ->orWhere('firstname', 'like', '%' . $search . '%')
                       ->orWhere('lastname', 'like', '%' . $search . '%')
                       ->orWhere('username', 'like', '%' . $search . '%')
-                      ->orWhere('email', 'like', '%' . $search . '%');
+                      ->orWhere('email', 'like', '%' . $search . '%')
+                      ->orWhereHas('company', function($query) use ($search) {
+                        $query->where('name', 'like', '%' . $search . '%');
+                      });
             });
         }
 
@@ -54,9 +56,7 @@ class UsersController extends Controller
      */
     public function create()
     {
-        $roles = Role::get();
-
-        return inertia('Admin/Users/Create', compact('roles'));
+        return inertia('Admin/Users/Create');
     }
     
     /**
@@ -68,7 +68,6 @@ class UsersController extends Controller
     public function store(StoreUserRequest $request)
     {
         $user = User::create($request->validated());
-        $user->roles()->syncWithoutDetaching($request->input('roles'));
     
         if($request->has('file')){
             //Upload the new file
@@ -91,7 +90,6 @@ class UsersController extends Controller
      */
     public function show(User $user)
     {    
-        $user->load('roles');
         return inertia('Admin/Users/Show', compact('user'));
     }
     
@@ -103,10 +101,7 @@ class UsersController extends Controller
      */
     public function edit(User $user)
     {
-        $user->load('roles');
-        $roles = Role::get();
-
-        return inertia('Admin/Users/Edit', compact('user', 'roles'));
+        return inertia('Admin/Users/Edit', compact('user'));
     }
     
     /**
@@ -130,8 +125,6 @@ class UsersController extends Controller
             'username' => $request->username,
             'email' => $request->email,
         ]);
-
-        $user->roles()->sync($request->input('roles'));
 
         if($request->file('file')){
             //Delete the old file if it exists

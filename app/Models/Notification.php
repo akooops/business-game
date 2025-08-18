@@ -16,8 +16,6 @@ class Notification extends Model
     ];
 
     // Notification types
-    // Finance
-    const TYPE_FINANCE_FUNDS_CHANGED = 'finance_funds_changed';
 
     // Technology research
     const TYPE_TECHNOLOGY_RESEARCH_STARTED = 'technology_research_started';
@@ -27,7 +25,6 @@ class Notification extends Model
     const TYPE_PURCHASE_ORDERED = 'purchase_ordered';
     const TYPE_PURCHASE_DELIVERED = 'purchase_delivered';
     const TYPE_PURCHASE_CANCELLED = 'purchase_cancelled';
-    const TYPE_PURCHASE_DELIVERY_DELAYED = 'purchase_delivery_delayed';
 
     // Countries import
     const TYPE_COUNTRIES_IMPORT_BLOCKED = 'countries_import_blocked';
@@ -58,7 +55,6 @@ class Notification extends Model
     const TYPE_SALE_INITIATED = 'sale_initiated';
     const TYPE_SALE_DELIVERED = 'sale_delivered';
     const TYPE_SALE_CANCELLED = 'sale_cancelled';
-    const TYPE_SALE_DELIVERY_DELAYED = 'sale_delivery_delayed';
 
     // Employees
     const TYPE_EMPLOYEE_HIRED = 'employee_hired';
@@ -73,20 +69,29 @@ class Notification extends Model
     const TYPE_MACHINE_PRODUCTION_COMPLETED = 'machine_production_completed';
     const TYPE_MACHINE_BROKEN = 'machine_broken';
     const TYPE_MACHINE_RELIABILITY_DECREASED = 'machine_reliability_decreased';
+    const TYPE_MACHINE_OPERATION_COSTS_PAID = 'machine_operation_costs_paid';
+    const TYPE_MACHINE_SOLD = 'machine_sold';
 
     // Maintenance
     const TYPE_MACHINE_MAINTENANCE_STARTED = 'machine_maintenance_started';
     const TYPE_MACHINE_MAINTENANCE_COMPLETED = 'machine_maintenance_completed';
 
+    // Loans
+    const TYPE_LOAN_BORROWED = 'loan_borrowed';
+    const TYPE_LOAN_BORROWED_INSUFFICIENT_FUNDS = 'loan_borrowed_insufficient_funds';
+    const TYPE_LOAN_PAID = 'loan_paid';
+
+    // Advertisers
+    const TYPE_AD_PACKAGE_CREATED = 'ad_package_created';
+    const TYPE_AD_PACKAGE_COMPLETED = 'ad_package_completed';
+
     // Icons for different notification types
     const ICONS = [
-        self::TYPE_FINANCE_FUNDS_CHANGED => 'ki-filled ki-dollar',
-        self::TYPE_TECHNOLOGY_RESEARCH_STARTED => 'ki-filled ki-technology-1',
-        self::TYPE_TECHNOLOGY_RESEARCH_COMPLETED => 'ki-filled ki-technology-1',
-        self::TYPE_PURCHASE_ORDERED => 'ki-filled ki-ship',
-        self::TYPE_PURCHASE_DELIVERED => 'ki-filled ki-ship',
-        self::TYPE_PURCHASE_CANCELLED => 'ki-filled ki-ship',
-        self::TYPE_PURCHASE_DELIVERY_DELAYED => 'ki-filled ki-ship',
+        self::TYPE_TECHNOLOGY_RESEARCH_STARTED => 'fa-solid fa-rocket',
+        self::TYPE_TECHNOLOGY_RESEARCH_COMPLETED => 'fa-solid fa-microchip',
+        self::TYPE_PURCHASE_ORDERED => 'fa-solid fa-coins',
+        self::TYPE_PURCHASE_DELIVERED => 'fa-solid fa-truck',
+        self::TYPE_PURCHASE_CANCELLED => 'fa-solid fa-circle-xmark',
         self::TYPE_COUNTRIES_IMPORT_BLOCKED => 'ki-filled ki-ship',
         self::TYPE_COUNTRIES_IMPORT_ALLOWED => 'ki-filled ki-ship',
         self::TYPE_COUNTRIES_CUSTOMS_DUTIES_RATE_RAISED => 'ki-filled ki-ship',
@@ -95,25 +100,31 @@ class Notification extends Model
         self::TYPE_OIL_PRICE_LOWERED => 'ki-filled ki-ship',
         self::TYPE_SUEZ_CANAL_CLOSED => 'ki-filled ki-ship',
         self::TYPE_SUEZ_CANAL_OPENED => 'ki-filled ki-ship',
-        self::TYPE_INVENTORY_EXPIRED => 'ki-filled ki-dropbox',
-        self::TYPE_INVENTORY_DAMAGED => 'ki-filled ki-dropbox',
-        self::TYPE_INVENTORY_COSTS_PAID => 'ki-filled ki-dropbox',
-        self::TYPE_SALE_INITIATED => 'ki-filled ki-ship',
-        self::TYPE_SALE_DELIVERED => 'ki-filled ki-ship',
-        self::TYPE_SALE_CANCELLED => 'ki-filled ki-ship',
-        self::TYPE_SALE_DELIVERY_DELAYED => 'ki-filled ki-ship',
-        self::TYPE_EMPLOYEE_HIRED => 'ki-filled ki-users',
-        self::TYPE_EMPLOYEE_MOOD_DECREASED => 'ki-filled ki-users',
-        self::TYPE_EMPLOYEE_RESIGNED => 'ki-filled ki-users',
-        self::TYPE_EMPLOYEE_SALARY_PAID => 'ki-filled ki-users',
-        self::TYPE_MACHINE_SETUP => 'ki-filled ki-setting-3',
-        self::TYPE_MACHINE_ASSIGNED_EMPLOYEE => 'ki-filled ki-setting-3',
-        self::TYPE_MACHINE_PRODUCTION_STARTED => 'ki-filled ki-setting-3',
-        self::TYPE_MACHINE_PRODUCTION_COMPLETED => 'ki-filled ki-setting-3',
-        self::TYPE_MACHINE_BROKEN => 'ki-filled ki-setting-3',
-        self::TYPE_MACHINE_RELIABILITY_DECREASED => 'ki-filled ki-setting-3',
-        self::TYPE_MACHINE_MAINTENANCE_STARTED => 'ki-filled ki-setting-3',
-        self::TYPE_MACHINE_MAINTENANCE_COMPLETED => 'ki-filled ki-setting-3',
+        self::TYPE_INVENTORY_EXPIRED => 'fa-solid fa-clock',
+        self::TYPE_INVENTORY_DAMAGED => 'fa-solid circle-exclamation',
+        self::TYPE_INVENTORY_COSTS_PAID => 'fa-solid fa-coins',
+        self::TYPE_SALE_INITIATED => 'fa-solid fa-cart-shopping',
+        self::TYPE_SALE_DELIVERED => 'fa-solid fa-truck',
+        self::TYPE_SALE_CANCELLED => 'fa-solid fa-circle-xmark',
+        self::TYPE_EMPLOYEE_HIRED => 'fa-solid fa-user-plus',
+        self::TYPE_EMPLOYEE_MOOD_DECREASED => 'fa-solid fa-face-frown',
+        self::TYPE_EMPLOYEE_RESIGNED => 'fa-solid fa-user-xmark',
+        self::TYPE_EMPLOYEE_SALARY_PAID => 'fa-solid fa-coins',
+        self::TYPE_MACHINE_SETUP => 'fa-solid fa-gear',
+        self::TYPE_MACHINE_ASSIGNED_EMPLOYEE => 'fa-solid fa-user-plus',
+        self::TYPE_MACHINE_PRODUCTION_STARTED => 'fa-solid fa-gears',
+        self::TYPE_MACHINE_PRODUCTION_COMPLETED => 'fa-solid fa-gears',
+        self::TYPE_MACHINE_BROKEN => 'fa-solid fa-screwdriver-wrench',
+        self::TYPE_MACHINE_RELIABILITY_DECREASED => 'fa-solid fa-screwdriver-wrench',
+        self::TYPE_MACHINE_MAINTENANCE_STARTED => 'fa-solid fa-hammer',
+        self::TYPE_MACHINE_OPERATION_COSTS_PAID => 'fa-solid fa-coins',
+        self::TYPE_MACHINE_MAINTENANCE_COMPLETED => 'fa-solid fa-hammer',
+        self::TYPE_MACHINE_SOLD => 'fa-solid fa-coins',
+        self::TYPE_LOAN_BORROWED => 'fa-solid fa-coins',
+        self::TYPE_LOAN_BORROWED_INSUFFICIENT_FUNDS => 'fa-solid fa-coins',
+        self::TYPE_LOAN_PAID => 'fa-solid fa-coins',
+        self::TYPE_AD_PACKAGE_CREATED => 'fa-solid fa-ad',
+        self::TYPE_AD_PACKAGE_COMPLETED => 'fa-solid fa-ad',
     ];
 
     // Methods

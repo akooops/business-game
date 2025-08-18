@@ -3,7 +3,7 @@
 namespace App\Http\Requests\Company\Employees;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Services\HrService;
+use App\Services\ValidationService;
 
 class FireEmployeeRequest extends FormRequest
 {
@@ -34,12 +34,7 @@ class FireEmployeeRequest extends FormRequest
         $validator->after(function ($validator) {
             $employee = request()->route('employee');
 
-            if (!$employee) {
-                $validator->errors()->add('employee', 'The selected employee does not exist.');
-                return;
-            }
-
-            $errors = HrService::validateFiring($employee);
+            $errors = ValidationService::validateEmployeeFiring($employee);
 
             if($errors) {
                 foreach($errors as $key => $error) {

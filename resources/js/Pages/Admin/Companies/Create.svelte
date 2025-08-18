@@ -31,6 +31,7 @@
         password: '',
         file: null,
         funds: 10000,
+        unpaid_loans: 0,
         carbon_footprint: 0,
         research_level: 0,
     };
@@ -290,12 +291,32 @@
                                     id="funds"
                                     type="number"
                                     class="kt-input {errors.funds ? 'kt-input-error' : ''}"
+                                    min="0"
                                     step="0.001"
-                                    placeholder="Enter funds"
+                                    placeholder="Enter funds (DZD)"
                                     bind:value={form.funds}
                                 />
                                 {#if errors.funds}
                                     <p class="text-sm text-destructive">{errors.funds}</p>
+                                {/if}
+                            </div>
+
+                            <!-- Unpaid Loans -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-medium text-mono" for="unpaid_loans">
+                                    Unpaid Loans <span class="text-destructive">*</span>
+                                </label>
+                                <input
+                                    id="unpaid_loans"
+                                    type="number"
+                                    class="kt-input {errors.unpaid_loans ? 'kt-input-error' : ''}"
+                                    placeholder="Enter unpaid loans (DZD)"
+                                    bind:value={form.unpaid_loans}
+                                    step="0.001"
+                                    min="0"
+                                />
+                                {#if errors.unpaid_loans}
+                                    <p class="text-sm text-destructive">{errors.unpaid_loans}</p>
                                 {/if}
                             </div>
 
@@ -308,8 +329,10 @@
                                     id="carbon_footprint"
                                     type="number"
                                     class="kt-input {errors.carbon_footprint ? 'kt-input-error' : ''}"
-                                    placeholder="Enter carbon footprint"
+                                    placeholder="Enter carbon footprint (kg CO2)"
                                     bind:value={form.carbon_footprint}
+                                    step="0.001"
+                                    min="0"
                                 />
                                 {#if errors.carbon_footprint}
                                     <p class="text-sm text-destructive">{errors.carbon_footprint}</p>
@@ -327,6 +350,7 @@
                                     class="kt-input {errors.research_level ? 'kt-input-error' : ''}"
                                     placeholder="Enter research level"
                                     bind:value={form.research_level}
+                                    min="0"
                                 />
                                 {#if errors.research_level}
                                     <p class="text-sm text-destructive">{errors.research_level}</p>

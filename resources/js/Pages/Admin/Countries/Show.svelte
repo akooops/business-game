@@ -20,11 +20,6 @@
     ];
     
     const pageTitle = 'Country Details';
-
-    // Format percentage
-    function formatPercentage(value) {
-        return `${(value * 100).toFixed(2)}%`;
-    }
 </script>
 
 <svelte:head>
@@ -47,12 +42,10 @@
                         <i class="ki-filled ki-arrow-left text-base"></i>
                         Back to Countries
                     </a>
-                    {#if hasPermission('admin.countries.update')}
                     <a href="{route('admin.countries.edit', { country: country.id })}" class="kt-btn kt-btn-primary">
                         <i class="ki-filled ki-pencil text-base"></i>
                         Edit Country
                     </a>
-                    {/if}
                 </div>
             </div>
 
@@ -64,17 +57,6 @@
                 <div class="kt-card-content">
                      <!-- Country Details -->
                      <div class="grid gap-4 w-full">
-                        <!-- Country Flag -->
-                        <div class="flex">
-                            <figure class="figure">
-                                <img 
-                                    src={country?.flag_url} 
-                                    alt={country?.name}
-                                    class="rounded-lg w-32 h-32 object-cover border"
-                                />
-                            </figure>
-                        </div>
-
                         <!-- Country Name -->
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Country Name</h4>
@@ -129,7 +111,7 @@
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Customs Duties Rate</h4>
                             <p class="text-sm text-secondary-foreground">
-                                {formatPercentage(country?.customs_duties_rate)}
+                                {(country?.customs_duties_rate * 100)}%
                                 <span class="text-xs text-muted-foreground ml-2">
                                     (Applied on total value of imported goods)
                                 </span>

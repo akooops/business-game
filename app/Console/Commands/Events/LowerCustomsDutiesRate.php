@@ -35,6 +35,7 @@ class LowerCustomsDutiesRate extends Command
             'Algeria',
             'Morocco',
             'Tunisia',
+            'China'
         ];
 
         // Get the target timestamp from settings

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
 
             $table->decimal('maintenances_cost', 10, 3);
+            $table->integer('maintenance_time_days');
 
             $table->enum('type', ['corrective', 'predictive'])->default('corrective');
             $table->enum('status', ['in_progress', 'completed', 'cancelled'])->default('in_progress');

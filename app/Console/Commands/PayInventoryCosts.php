@@ -2,12 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\CompanyTechnology;
-use App\Models\Technology;
 use App\Models\Company;
 use Illuminate\Console\Command;
-use App\Services\SettingsService;
-use App\Services\TechnolgiesResearchService;
 use App\Services\InventoryService;
 
 class PayInventoryCosts extends Command

@@ -42,12 +42,10 @@
                         <i class="ki-filled ki-arrow-left text-base"></i>
                         Back to Employee Profiles
                     </a>
-                    {#if hasPermission('admin.employee-profiles.update')}
                     <a href="{route('admin.employee-profiles.edit', { employeeProfile: employeeProfile.id })}" class="kt-btn kt-btn-primary">
                         <i class="ki-filled ki-pencil text-base"></i>
                         Edit Profile
                     </a>
-                    {/if}
                 </div>
             </div>
 
@@ -102,24 +100,16 @@
                         <!-- Minimum Salary -->
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Minimum Monthly Salary</h4>
-                            <p class="text-lg font-bold">
-                                ${employeeProfile?.min_salary_month}
-                            </p>
-                        </div>
-
-                        <!-- Average Salary -->
-                        <div class="flex flex-col gap-2">
-                            <h4 class="text-sm font-semibold text-mono">Average Monthly Salary</h4>
-                            <p class="text-lg font-bold">
-                                ${employeeProfile?.avg_salary_month}
+                            <p class="text-sm text-secondary-foreground">
+                                {employeeProfile?.min_salary_month} DZD
                             </p>
                         </div>
 
                         <!-- Maximum Salary -->
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Maximum Monthly Salary</h4>
-                            <p class="text-lg font-bold">
-                                ${employeeProfile?.max_salary_month}
+                            <p class="text-sm text-secondary-foreground">
+                                {employeeProfile?.max_salary_month} DZD
                             </p>
                         </div>
                     </div>
@@ -136,24 +126,16 @@
                         <!-- Minimum Salary -->
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Minimum Recruitment Cost</h4>
-                            <p class="text-lg font-bold">
-                                ${employeeProfile?.min_recruitment_cost}
-                            </p>
-                        </div>
-
-                        <!-- Average Salary -->
-                        <div class="flex flex-col gap-2">
-                            <h4 class="text-sm font-semibold text-mono">Average Recruitment Cost</h4>
-                            <p class="text-lg font-bold">
-                                ${employeeProfile?.avg_recruitment_cost}
+                            <p class="text-sm text-secondary-foreground">
+                                {employeeProfile?.min_recruitment_cost} DZD
                             </p>
                         </div>
 
                         <!-- Maximum Salary -->
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Maximum Recruitment Cost</h4>
-                            <p class="text-lg font-bold">
-                                ${employeeProfile?.max_recruitment_cost}
+                            <p class="text-sm text-secondary-foreground">
+                                {employeeProfile?.max_recruitment_cost} DZD
                             </p>
                         </div>
                     </div>

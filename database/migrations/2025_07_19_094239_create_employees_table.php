@@ -16,11 +16,12 @@ return new class extends Migration
 
             $table->string('name');
             $table->decimal('salary_month', 15, 3)->default(0);
+            $table->decimal('recruitment_cost', 15, 3)->default(0);
             $table->decimal('current_mood', 15, 3)->default(0);
             $table->decimal('mood_decay_rate_days', 15, 3)->default(0);
             $table->decimal('efficiency_factor', 15, 3)->default(0);
 
-            $table->enum('status', ['active', 'inactive', 'fired', 'resigned','applied'])->default('applied');
+            $table->enum('status', ['active', 'fired', 'resigned','applied'])->default('applied');
 
             // Timestamps
             $table->timestamp('applied_at')->nullable();

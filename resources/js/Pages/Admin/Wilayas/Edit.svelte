@@ -27,9 +27,7 @@
         name: wilaya.name || '',
         min_shipping_cost: wilaya.min_shipping_cost || 0,
         max_shipping_cost: wilaya.max_shipping_cost || 0,
-        avg_shipping_cost: wilaya.avg_shipping_cost || 0,
         min_shipping_time_days: wilaya.min_shipping_time_days || 1,
-        avg_shipping_time_days: wilaya.avg_shipping_time_days || 3,
         max_shipping_time_days: wilaya.max_shipping_time_days || 7
     };
 
@@ -136,7 +134,7 @@
                         </p>
                     </div>
                     <div class="kt-card-content">
-                        <div class="grid gap-4 lg:grid-cols-3">
+                        <div class="grid gap-4 lg:grid-cols-2">
                             <!-- Min Shipping Cost -->
                             <div class="flex flex-col gap-2">
                                 <label class="text-sm font-medium text-mono" for="min_shipping_cost">
@@ -146,7 +144,7 @@
                                     id="min_shipping_cost"
                                     type="number"
                                     class="kt-input {errors.min_shipping_cost ? 'kt-input-error' : ''}"
-                                    placeholder="0"
+                                    placeholder="Enter minimum shipping cost"
                                     step="0.001"
                                     min="0"
                                     bind:value={form.min_shipping_cost}
@@ -154,27 +152,6 @@
                                 {#if errors.min_shipping_cost}
                                     <p class="text-sm text-destructive">{errors.min_shipping_cost}</p>
                                 {/if}
-                                <p class="text-sm text-secondary-foreground">Lowest possible shipping cost (DZD)</p>
-                            </div>
-
-                            <!-- Avg Shipping Cost -->
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="avg_shipping_cost">
-                                    Average Shipping Cost <span class="text-destructive">*</span>
-                                </label>
-                                <input
-                                    id="avg_shipping_cost"
-                                    type="number"
-                                    class="kt-input {errors.avg_shipping_cost ? 'kt-input-error' : ''}"
-                                    placeholder="0"
-                                    step="0.001"
-                                    min="0"
-                                    bind:value={form.avg_shipping_cost}
-                                />
-                                {#if errors.avg_shipping_cost}
-                                    <p class="text-sm text-destructive">{errors.avg_shipping_cost}</p>
-                                {/if}
-                                <p class="text-sm text-secondary-foreground">Typical shipping cost (DZD)</p>
                             </div>
 
                             <!-- Max Shipping Cost -->
@@ -186,7 +163,7 @@
                                     id="max_shipping_cost"
                                     type="number"
                                     class="kt-input {errors.max_shipping_cost ? 'kt-input-error' : ''}"
-                                    placeholder="0"
+                                    placeholder="Enter maximum shipping cost"
                                     step="0.001"
                                     min="0"
                                     bind:value={form.max_shipping_cost}
@@ -194,7 +171,6 @@
                                 {#if errors.max_shipping_cost}
                                     <p class="text-sm text-destructive">{errors.max_shipping_cost}</p>
                                 {/if}
-                                <p class="text-sm text-secondary-foreground">Highest possible shipping cost (DZD)</p>
                             </div>
                         </div>
                     </div>
@@ -209,7 +185,7 @@
                         </p>
                     </div>
                     <div class="kt-card-content">
-                        <div class="grid gap-4 lg:grid-cols-3">
+                        <div class="grid gap-4 lg:grid-cols-2">
                             <!-- Min Shipping Time -->
                             <div class="flex flex-col gap-2">
                                 <label class="text-sm font-medium text-mono" for="min_shipping_time_days">
@@ -219,7 +195,7 @@
                                     id="min_shipping_time_days"
                                     type="number"
                                     class="kt-input {errors.min_shipping_time_days ? 'kt-input-error' : ''}"
-                                    placeholder="1"
+                                    placeholder="Enter minimum shipping time"
                                     step="1"
                                     min="0"
                                     bind:value={form.min_shipping_time_days}
@@ -227,27 +203,6 @@
                                 {#if errors.min_shipping_time_days}
                                     <p class="text-sm text-destructive">{errors.min_shipping_time_days}</p>
                                 {/if}
-                                <p class="text-sm text-secondary-foreground">Fastest delivery time (days)</p>
-                            </div>
-
-                            <!-- Avg Shipping Time -->
-                            <div class="flex flex-col gap-2">
-                                <label class="text-sm font-medium text-mono" for="avg_shipping_time_days">
-                                    Average Shipping Time <span class="text-destructive">*</span>
-                                </label>
-                                <input
-                                    id="avg_shipping_time_days"
-                                    type="number"
-                                    class="kt-input {errors.avg_shipping_time_days ? 'kt-input-error' : ''}"
-                                    placeholder="3"
-                                    step="1"
-                                    min="0"
-                                    bind:value={form.avg_shipping_time_days}
-                                />
-                                {#if errors.avg_shipping_time_days}
-                                    <p class="text-sm text-destructive">{errors.avg_shipping_time_days}</p>
-                                {/if}
-                                <p class="text-sm text-secondary-foreground">Typical delivery time (days)</p>
                             </div>
 
                             <!-- Max Shipping Time -->
@@ -259,7 +214,7 @@
                                     id="max_shipping_time_days"
                                     type="number"
                                     class="kt-input {errors.max_shipping_time_days ? 'kt-input-error' : ''}"
-                                    placeholder="7"
+                                    placeholder="Enter maximum shipping time"
                                     step="1"
                                     min="0"
                                     bind:value={form.max_shipping_time_days}
@@ -267,7 +222,6 @@
                                 {#if errors.max_shipping_time_days}
                                     <p class="text-sm text-destructive">{errors.max_shipping_time_days}</p>
                                 {/if}
-                                <p class="text-sm text-secondary-foreground">Longest delivery time (days)</p>
                             </div>
                         </div>
                     </div>

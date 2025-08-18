@@ -10,17 +10,16 @@ use App\Services\SettingsService;
 class HrService
 {
     public static function generateEmployees($company, $employeeProfile){
-        $numberOfEmployees = rand(1, 4);
+        $numberOfEmployees = rand(1, 3);
 
         $employees = [];
 
         for($i = 0; $i < $numberOfEmployees; $i++){
-            $salary = CalculationsService::calculatePertValue($employeeProfile->min_salary_month, $employeeProfile->avg_salary_month, $employeeProfile->max_salary_month);
+            $salary = CalculationsService::calcaulteRandomBetweenMinMax($employeeProfile->min_salary_month, $employeeProfile->max_salary_month);
+            $recruitmentCost = CalculationsService::calcaulteRandomBetweenMinMax($employeeProfile->min_recruitment_cost, $employeeProfile->max_recruitment_cost);
 
-            // Add salary variation (-10% to +10%)
-            $salaryVariation = rand(-10, 10) / 100;
-            $salaryVariation = $salary * $salaryVariation;
-            $realSalary = $salary + $salaryVariation;
+            $realSalary = self::addVariationToSalary($salary);
+            $realRecruitmentCost = self::addVariationToRecruitmentCost($recruitmentCost);
 
             if($realSalary < $employeeProfile->min_salary_month){
                 $realSalary = $employeeProfile->min_salary_month;
@@ -28,6 +27,14 @@ class HrService
             
             if($realSalary > $employeeProfile->max_salary_month){
                 $realSalary = $employeeProfile->max_salary_month;
+            }
+
+            if($realRecruitmentCost < $employeeProfile->min_recruitment_cost){
+                $realRecruitmentCost = $employeeProfile->min_recruitment_cost;
+            }
+            
+            if($realRecruitmentCost > $employeeProfile->max_recruitment_cost){
+                $realRecruitmentCost = $employeeProfile->max_recruitment_cost;
             }
 
             // Calculate factor based on real salary vs expected salary
@@ -46,6 +53,7 @@ class HrService
             $employee = Employee::create([
                 'name' => self::getRandomName(),
                 'salary_month' => $realSalary,
+                'recruitment_cost' => $realRecruitmentCost,
                 'current_mood' => 1,
                 'mood_decay_rate_days' => $mood_decay_rate_days,
                 'efficiency_factor' => min(2, $efficiency_factor),
@@ -62,6 +70,23 @@ class HrService
         return $employees;
     }
 
+    public static function addVariationToSalary($salary){
+        // Add salary variation (-10% to +10%)
+        $salaryVariation = rand(-10, 10) / 100;
+        $salaryVariation = $salary * $salaryVariation;
+        $realSalary = round($salary + $salaryVariation);
+
+        return $realSalary;
+    }
+
+    public static function addVariationToRecruitmentCost($recruitmentCost){
+        $variation = rand(-10, 10) / 100;
+        $recruitmentCostVariation = $recruitmentCost * $variation;
+        $realRecruitmentCost = round($recruitmentCost + $recruitmentCostVariation);
+
+        return $realRecruitmentCost;
+    }
+
     public static function getRandomName(){
         $names = [
             // Male names
@@ -75,56 +100,16 @@ class HrService
         return $names[array_rand($names)];
     }
 
-    public static function validateRecruitment($employee){
-        $errors = [];
-
-        $recruitmentCost = $employee->employeeProfile->real_recruitment_cost;
-
-        if(!FinanceService::haveSufficientFunds($employee->company, $recruitmentCost)){
-            $errors['funds'] = 'This company does not have enough funds to recruit this employee.';
-        }
-
-        if($employee->status != Employee::STATUS_APPLIED){
-            $errors['status'] = 'This employee is not available for recruitment.';
-        }
-        
-        return $errors;
-    }
-
-    public static function validatePromotion($employee){    
-        $errors = [];
-
-        if($employee->status != Employee::STATUS_ACTIVE){
-            $errors['status'] = 'This employee is not active.';
-        }
-
-        return $errors;
-    }
-
-    public static function validateFiring($employee){
-        $errors = [];
-
-        if($employee->status != Employee::STATUS_ACTIVE){
-            $errors['status'] = 'This employee is not active.';
-        }
-
-        if($employee->companyMachine){
-            if($employee->companyMachine->status == CompanyMachine::STATUS_ACTIVE){
-                $errors['companyMachine'] = 'This employee is assigned to a machine that is active. Wait until the production is completed.';
-            }
-        }
-
-        return $errors;
-    }
-
-    public static function recruitEmployee($employee){       
+    public static function recruitEmployee($employee){    
+        // Recruit the employee
         $employee->update([
             'status' => Employee::STATUS_ACTIVE,
             'hired_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
+        // Pay the recruitment cost
         FinanceService::payEmployeeRecruitmentCost($employee->company, $employee);
-        NotificationService::createEmployeeHiredNotification($employee);
+        NotificationService::createEmployeeHiredNotification($employee->company, $employee->employeeProfile, $employee);
     }
 
     public static function paySalaries($company){
@@ -163,6 +148,8 @@ class HrService
                 $resignationThreshold = 25; // 25% chance
             } else if($mood < 0.4){
                 $resignationThreshold = 10; // 10% chance
+            } else {
+                $resignationThreshold = 5; // 5% chance
             }
 
             if($resignationChance <= $resignationThreshold){
@@ -189,12 +176,12 @@ class HrService
                 }
 
                 // Create resignation notification
-                NotificationService::createEmployeeResignedNotification($employee);
+                NotificationService::createEmployeeResignedNotification($employee->company, $employee);
                 continue; // Skip mood update since employee resigned
             }
 
             if($mood < 0.5){
-                NotificationService::createEmployeeMoodDecreasedNotification($employee);
+                NotificationService::createEmployeeMoodDecreasedNotification($employee->company, $employee);
             }
             
             $employee->update([
@@ -204,9 +191,11 @@ class HrService
     }
 
     public static function promoteEmployee($employee, $newSalary){
+        // Promote the employee
         $factor = $newSalary / $employee->salary_month;
         $mood_decay_rate_days = $employee->mood_decay_rate_days / $factor;
 
+        // Update the employee's salary, mood, efficiency, and mood decay rate
         $employee->update([
             'salary_month' => $newSalary,
             'current_mood' => min(1, $employee->current_mood * $factor),
@@ -217,15 +206,18 @@ class HrService
     }
 
     public static function fireEmployee($employee){
+        // Fire the employee
         $employee->update([
             'status' => Employee::STATUS_FIRED,
             'fired_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
+        // Remove the employee from the machine
         $employee->companyMachine->update([
             'employee_id' => null,
         ]);
 
+        // Decrease the mood of the other employees
         $companyEmployees = $employee->company->employees()->where('status', Employee::STATUS_ACTIVE)->get();
 
         foreach($companyEmployees as $companyEmployee){
@@ -241,6 +233,22 @@ class HrService
             $companyEmployee->update([
                 'current_mood' => $newMood,
             ]);
+        }
+    }
+
+    public static function processAppliedEmployees($company){
+        // Process applied employees
+        $appliedEmployees = $company->employees()->where('status', Employee::STATUS_APPLIED)->get();
+
+        foreach($appliedEmployees as $employee){
+            $currentTimestamp = SettingsService::getCurrentTimestamp();
+            $appliedAt = $employee->applied_at;
+            $timeLimitDays = $employee->timelimit_days;
+            
+            // Check if employee has exceeded its time limit
+            if($appliedAt->addDays($timeLimitDays) <= $currentTimestamp){
+                $employee->delete();
+            }
         }
     }
 }

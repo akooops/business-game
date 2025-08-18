@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Services\CalculationsService;
 
 class SupplierProduct extends Model
 {
@@ -14,7 +15,6 @@ class SupplierProduct extends Model
 
     protected $casts = [
         'min_sale_price' => 'decimal:3',
-        'avg_sale_price' => 'decimal:3',
         'max_sale_price' => 'decimal:3',
         'real_sale_price' => 'decimal:3',
     ];
@@ -27,5 +27,15 @@ class SupplierProduct extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    //Boot
+    public static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($model) {
+            $model->real_sale_price = CalculationsService::calcaulteRandomBetweenMinMax($model->min_sale_price, $model->max_sale_price);
+        });
     }
 }

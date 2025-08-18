@@ -51,24 +51,11 @@ class GameTimeLoop extends Command
         // Process sales
         $this->call('game:sales-processing');
 
-        // Pay inventory costs
-        $this->call('game:pay-inventory-costs');
-
-        // Change supplier prices and costs
-        $this->call('game:change-supplier-prices-and-costs');
-        $this->call('game:change-wilayas-costs');
-
-        // Process sales
-        $this->call('game:generate-new-sales');
-
         // Expire old job applications
         $this->call('game:expire-old-job-applications');
 
         // Process employees mood
         $this->call('game:process-employees-mood');
-
-        // Pay machines operation costs
-        $this->call('game:pay-machines-operation-costs');
 
         // Process production orders
         $this->call('game:production-orders-processing');
@@ -76,9 +63,40 @@ class GameTimeLoop extends Command
         // Process machines reliability
         $this->call('game:process-machines-reliability');
 
+        // Process machines value
+        $this->call('game:process-machines-value');
+
+        // Process maintenances
+        $this->call('game:process-maintenances');
+
+        // Process ad packages completion
+        $this->call('game:process-ad-packages-completion');
+
+        // Every start of the month
         if($newTime->day == 1 ){
             // Pay employees salaries
             $this->call('game:pay-employees-salaries');
+
+            // Pay monthly loans
+            $this->call('game:pay-monthly-loans');
+        }
+
+        // Every week
+        if($newTime->day % 7 == 0){
+            // Change supplier prices and costs and shipping times
+            $this->call('game:change-supplier-prices-and-costs');
+
+            // Change wilayas costs and shipping times
+            $this->call('game:change-wilayas-costs');
+
+            // Pay inventory costs
+            $this->call('game:pay-inventory-costs');
+
+            // Pay machines operation costs
+            $this->call('game:pay-machines-operation-costs');
+
+            // Generate new sales
+            $this->call('game:generate-new-sales'); 
         }
 
         $this->info("New game time: " . $newTime->format('Y-m-d H:i:s'));

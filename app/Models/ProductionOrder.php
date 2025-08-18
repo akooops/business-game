@@ -14,16 +14,16 @@ class ProductionOrder extends Model
 
     protected $casts = [
         'quantity' => 'decimal:3',
+        'quality_factor' => 'decimal:3',
+        'employee_efficiency_factor' => 'decimal:3',
+        'carbon_footprint' => 'decimal:3',
         'started_at' => 'datetime',
-        'estimated_completed_at' => 'datetime',
-        'real_completed_at' => 'datetime',
         'completed_at' => 'datetime',
     ];
 
     protected $appends = ['is_producing', 'producing_progress'];
 
     // Statuses
-    const STATUS_PENDING = 'pending';
     const STATUS_IN_PROGRESS = 'in_progress';
     const STATUS_COMPLETED = 'completed';
     const STATUS_CANCELLED = 'cancelled';
@@ -58,14 +58,14 @@ class ProductionOrder extends Model
 
         $currentTimestamp = SettingsService::getCurrentTimestamp();
         $startedAt = $this->started_at;
-        $realCompletedAt = $this->real_completed_at;
+        $completedAt = $this->started_at->copy()->addDays($this->time_to_complete);
 
-        if (!$startedAt || !$realCompletedAt) {
+        if (!$startedAt || !$completedAt) {
             return 0;
         }
 
         $progress = $startedAt->diffInHours($currentTimestamp);
-        $totalDays = $startedAt->diffInHours($realCompletedAt);
+        $totalDays = $startedAt->diffInHours($completedAt);
 
         if($totalDays == 0){
             return 100;

@@ -2,15 +2,13 @@
     import { onMount, onDestroy } from 'svelte';
 
     let currentTimestamp = '';
-    let loading = false;
+    let currentGameWeek = '';
     let fetchInterval;
 
     // Fetch current timestamp from API
     async function fetchCurrentTimestamp() {
-        try {
-            loading = true;
-            
-            const response = await fetch(route('utilities.current-timestamp'), {
+        try {            
+            const response = await fetch(route('utilities.index'), {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
@@ -19,35 +17,10 @@
             
             if (data.status === 'success') {
                 currentTimestamp = data.timestamp;
+                currentGameWeek = data.currentGameWeek;
             }
         } catch (error) {
             console.error('Error fetching current timestamp:', error);
-        } finally {
-            loading = false;
-        }
-    }
-
-    // Toggle drawer
-    function toggleDrawer() {
-        fetchCurrentTimestamp();
-    }
-
-    // Format timestamp for display
-    function formatTimestamp(timestamp) {
-        if (!timestamp) return '';
-        
-        try {
-            const date = new Date(timestamp);
-            return date.toLocaleString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-            });
-        } catch (error) {
-            return timestamp;
         }
     }
 
@@ -68,11 +41,11 @@
 
 <!-- Timer -->
 <button 
-    class="kt-btn kt-btn-ghost kt-btn-icon size-8 hover:bg-background hover:[&_i]:text-primary relative" 
+    class="kt-btn kt-btn-primary kt-btn-icon size-9 rounded-full relative" 
     data-kt-drawer-toggle="#timer_drawer"
     on:click={toggleDrawer}
 >
-    <i class="ki-filled ki-time text-lg"></i>
+    <i class="fa-regular fa-clock text-lg"></i>
     
     <!-- Unread count badge -->
 
@@ -94,15 +67,22 @@
 
     <!-- Game Timer Display -->
     <div class="flex items-center gap-2 px-3 py-2 bg-background border border-border rounded-lg">
-        <i class="ki-filled ki-time text-primary text-sm"></i>
+        <i class="fa-regular fa-clock text-primary text-sm"></i>
         <div class="flex flex-col">
             <span class="text-xs text-muted-foreground font-medium">Game Time</span>
             <span class="text-sm font-semibold text-foreground">
-                {#if loading}
-                    <div class="animate-pulse">Loading...</div>
-                {:else}
-                    {formatTimestamp(currentTimestamp)}
-                {/if}
+                {formatTimestamp(currentTimestamp)}
+            </span>
+        </div>
+    </div>
+
+    <!-- Game Week Display -->
+    <div class="flex items-center gap-2 px-3 py-2 bg-background border border-border rounded-lg">
+        <i class="fa-regular fa-calendar-days text-primary text-sm"></i>
+        <div class="flex flex-col">
+            <span class="text-xs text-muted-foreground font-medium">Game Week</span>
+            <span class="text-sm font-semibold text-foreground">
+                {currentGameWeek}
             </span>
         </div>
     </div>

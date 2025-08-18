@@ -32,28 +32,9 @@ class UpdateProductRequest extends FormRequest
             'storage_cost' => 'required|numeric|min:0', 
             'has_expiration' => 'required|boolean',
             'shelf_life_days' => 'required_if:has_expiration,true|integer|min:1',
-            'measurement_unit' => 'required|string|max:255',
-            'need_technology' => 'required|boolean',
-            'technology_id' => 'required_if:need_technology,true|exists:technologies,id',
+            'needs_technology' => 'required|boolean',
+            'technology_id' => 'required_if:needs_technology,true|exists:technologies,id',
             'file' => 'nullable|file|mimes:jpg,jpeg,png',
-        ];
-    }
-
-    /**
-     * Get custom attributes for validator errors.
-     *
-     * @return array
-     */
-    public function attributes(): array
-    {
-        return [
-            'elasticity_coefficient' => 'elasticity coefficient',
-            'storage_cost' => 'storage cost',
-            'shelf_life_days' => 'shelf life (days)',
-            'has_expiration' => 'has expiration',
-            'measurement_unit' => 'measurement unit',
-            'need_technology' => 'need technology',
-            'technology_id' => 'technology',
         ];
     }
 } 
