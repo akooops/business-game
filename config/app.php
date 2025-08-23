@@ -184,6 +184,4 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         // 'Example' => App\Facades\Example::class,
     ])->toArray(),
-
-    'enable_permissions' => env('ENABLE_PERMISSIONS', true),
 ];

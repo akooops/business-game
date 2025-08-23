@@ -1,23 +1,42 @@
 <script>
-    import { onMount, tick } from 'svelte';
+    import { onMount, onDestroy, tick } from 'svelte';
 
     let notifications = [];
     let pagination = {};
     let unreadCount = 0;
+    let previousUnreadCount = 0;
     let loading = false;
     let search = '';
-    let perPage = 10;
+    let perPage = 20;
     let currentPage = 1;
     let searchTimeout;
     let drawerOpen = false;
     let markingAllAsRead = false;
+    let fetchInterval;
+    let notificationSound;
+
+    // Initialize notification sound
+    function initNotificationSound() {
+        notificationSound = new Audio('/assets/media/beep.mp3');
+        notificationSound.volume = 0.5; // Set volume to 50%
+    }
+
+    // Play notification sound
+    function playNotificationSound() {
+        if (notificationSound) {
+            notificationSound.currentTime = 0; // Reset to beginning
+            notificationSound.play().catch(error => {
+                console.log('Could not play notification sound:', error);
+            });
+        }
+    }
 
     // Fetch notifications from API
     async function fetchNotifications() {
         try {
             loading = true;
-            /*
-            const response = await fetch(route('admin.notifications.index', {
+            
+            const response = await fetch(route('notifications.index', {
                 page: currentPage,
                 perPage: perPage,
                 search: search
@@ -29,11 +48,6 @@
             const data = await response.json();
             notifications = data.notifications;
             pagination = data.pagination;
-            */
-
-            notifications = [];
-            pagination = {};
-            unreadCount = 0;
 
             // Wait for DOM to update, then initialize menus
             await tick();
@@ -50,12 +64,22 @@
     // Fetch unread count
     async function fetchUnreadCount() {
         try {
-            /*
-            const response = await fetch(route('admin.notifications.unread-count'));
+            const response = await fetch(route('notifications.unread-count'));
             const data = await response.json();
-            unreadCount = data.count;
-            */
-            unreadCount = 0;
+            const newUnreadCount = data.count;
+            
+            previousUnreadCount = unreadCount;
+            console.log(previousUnreadCount);
+
+            if(newUnreadCount > 0 && newUnreadCount > previousUnreadCount){
+                showToast(`You have ${newUnreadCount} new notification`, 'primary');
+                playNotificationSound();
+
+                fetchNotifications();
+            }
+            
+            unreadCount = newUnreadCount;
+            previousUnreadCount = newUnreadCount;
         } catch (error) {
             console.error('Error fetching unread count:', error);
         }
@@ -88,19 +112,11 @@
             fetchNotifications();
         }
     }
-
-    // Handle per page change
-    function handlePerPageChange(newPerPage) {
-        perPage = newPerPage;
-        currentPage = 1;
-        fetchNotifications();
-    }
-
+    
     // Mark notification as read
     async function markAsRead(notificationId) {
-        /*
         try {
-            await fetch(route('admin.notifications.mark-read', { notification: notificationId }), {
+            await fetch(route('notifications.mark-read', { notification: notificationId }), {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -111,7 +127,6 @@
             // Update local state
             const notification = notifications.find(n => n.id === notificationId);
             if (notification) {
-                notification.read_at = true;
                 notification.read_at = new Date().toISOString();
             }
             
@@ -120,19 +135,16 @@
         } catch (error) {
             console.error('Error marking notification as read:', error);
         }
-        */
     }
 
     // Mark all notifications as read
     async function markAllAsRead() {
-        /*
-
         if (markingAllAsRead) return; // Prevent multiple clicks
         
         try {
             markingAllAsRead = true;
             
-            await fetch(route('admin.notifications.mark-all-read'), {
+            await fetch(route('notifications.mark-all-read'), {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -154,7 +166,6 @@
         } finally {
             markingAllAsRead = false;
         }
-        */
     }
 
     // Handle notification click
@@ -174,6 +185,7 @@
     function toggleDrawer() {
         drawerOpen = !drawerOpen;
         if (drawerOpen) {
+            markAllAsRead();
             fetchNotifications();
         }
     }
@@ -190,41 +202,33 @@
         return `${Math.floor(diffInSeconds / 86400)}d ago`;
     }
 
-    // Get notification type label
-    function getNotificationTypeLabel(type) {
-        const labels = {
-            'contact_submission': 'Contact',
-            'inquiry': 'Inquiry',
-            'visit_booking': 'Visit',
-            'job_application': 'Job'
-        };
-        return labels[type] || type;
-    }
-
-    // Get status badge class
-    function getStatusBadgeClass(isRead) {
-        return isRead ? 'kt-badge-secondary' : 'kt-badge-success';
-    }
-
     onMount(() => {
+        initNotificationSound();
         fetchUnreadCount();
         
-        // Refresh unread count every 60 seconds
-        setInterval(fetchUnreadCount, 60000);
+        // Fetch unread count every minute (60 seconds)
+        fetchInterval = setInterval(fetchUnreadCount, 30000);
+    });
+
+    // Cleanup interval on component destroy
+    onDestroy(() => {
+        if (fetchInterval) {
+            clearInterval(fetchInterval);
+        }
     });
 </script>
 
 <!-- Notifications -->
 <button 
-    class="kt-btn kt-btn-ghost kt-btn-icon size-8 hover:bg-background hover:[&_i]:text-primary relative" 
+    class="kt-btn kt-btn-primary kt-btn-icon size-9 rounded-full relative" 
     data-kt-drawer-toggle="#notifications_drawer"
     on:click={toggleDrawer}
->
-    <i class="ki-filled ki-notification-status text-lg"></i>
-    
+>    
+    <i class="fa-regular fa-bell text-lg"></i>
+
     <!-- Unread count badge -->
     {#if unreadCount > 0}
-        <span class="absolute -top-1 -right-1 bg-danger kt-badge kt-badge-destructive text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+        <span class="absolute -top-1 -right-1 bg-danger kt-badge kt-badge-destructive text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
             {unreadCount > 99 ? '99+' : unreadCount}
         </span>
     {/if}
@@ -244,15 +248,7 @@
         </button>
     </div>
     
-    <div class="kt-tabs kt-tabs-line justify-between px-5 mb-2" data-kt-tabs="true" id="notifications_tabs">
-        <div class="flex items-center gap-5">
-            <button class="kt-tab-toggle py-3 active" data-kt-tab-toggle="#notifications_tab_all">
-                All
-            </button>
-        </div>
-    </div>
-    
-    <div class="grow flex flex-col kt-scrollable-y-auto" id="notifications_tab_all" data-kt-scrollable="true" data-kt-scrollable-dependencies="#header" data-kt-scrollable-max-height="auto" data-kt-scrollable-offset="150px">
+    <div class="grow flex flex-col mt-4 kt-scrollable-y-auto" data-kt-scrollable="true" data-kt-scrollable-dependencies="#header" data-kt-scrollable-max-height="auto" data-kt-scrollable-offset="0px">
         <!-- Search Bar -->
         <div class="px-5 pb-3">
             <div class="kt-input max-w-full">
@@ -282,7 +278,7 @@
             {:else}
                 <div class="grow flex flex-col gap-5 pt-3 pb-4 divider-y divider-border">
                     {#each notifications as notification, index}
-                        <div class="flex grow gap-2.5 px-5 transition-all duration-300 {notification.read_at ? 'opacity-75' : ''}">
+                        <div class="flex grow gap-2.5 px-5 transition-all duration-300">
                             <div class="kt-avatar size-8">
                                 <div class="kt-avatar-image">
                                     <i class="{notification.icon} text-lg text-primary"></i>
@@ -296,7 +292,7 @@
                             <div class="flex flex-col gap-1 flex-1">
                                 <div class="text-sm font-medium mb-px">
                                     <button 
-                                        class="hover:text-primary text-mono font-semibold text-left {notification.read_at ? 'text-muted-foreground' : ''}"
+                                        class="hover:text-primary text-mono font-semibold text-left"
                                         style="cursor: pointer;"
                                         on:click={() => handleNotificationClick(notification)}
                                     >
@@ -309,11 +305,6 @@
                                 <div class="flex items-center justify-between">
                                     <span class="flex items-center text-xs font-medium text-muted-foreground">
                                         {formatTimeAgo(notification.created_at)}
-                                        <span class="rounded-full size-1 bg-mono/30 mx-1.5"></span>
-                                        {getNotificationTypeLabel(notification.type)}
-                                    </span>
-                                    <span class="kt-badge {getStatusBadgeClass(notification.read_at)} text-xs transition-all duration-300 transform {notification.read_at ? 'scale-95' : 'scale-100'}">
-                                        {notification.read_at ? 'Read' : 'New'}
                                     </span>
                                 </div>
                             </div>
@@ -359,21 +350,8 @@
     {#if notifications.length > 0}
     <div class="flex items-center justify-between" id="notifications_footer">
         <div class="border-b border-b-border"></div>
-        <div class="grid grid-cols-2 p-5 gap-2.5" id="notifications_all_footer">
-            <button 
-                class="kt-btn kt-btn-outline justify-center transition-all duration-200 {markingAllAsRead ? 'opacity-75 cursor-not-allowed' : ''}" 
-                on:click={markAllAsRead}
-                disabled={markingAllAsRead}
-            >
-                {#if markingAllAsRead}
-                    <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
-                    Marking...
-                {:else}
-                    <i class="ki-filled ki-check text-base mr-2"></i>
-                    Mark all as read
-                {/if}
-            </button>
-            <a class="kt-btn kt-btn-primary justify-center" href={route('admin.notifications.index')}>
+        <div class="grid p-5 gap-2.5" id="notifications_all_footer">
+            <a class="kt-btn kt-btn-primary justify-center" href={route('notifications.index')}>
                 View all
             </a>
         </div>

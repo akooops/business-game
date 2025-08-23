@@ -12,7 +12,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        // Game time loop - runs every minute
+        $schedule->command('game:time-loop')->everyMinute()->withoutOverlapping()->runInBackground();
     }
 
     /**

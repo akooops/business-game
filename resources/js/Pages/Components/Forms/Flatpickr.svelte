@@ -68,16 +68,7 @@
     $: if (flatpickrInstance && value !== flatpickrInstance.input.value) {
         flatpickrInstance.setDate(value);
     }
-
-    // Update disabled state
-    $: if (flatpickrInstance) {
-        if (disabled) {
-            flatpickrInstance.disable();
-        } else {
-            flatpickrInstance.enable();
-        }
-    }
-
+    
     // Update readonly state
     $: if (flatpickrInstance) {
         flatpickrInstance.config.allowInput = !readonly;

@@ -1,0 +1,60 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Requests\Admin\Settings\UpdateSettingRequest;
+use Illuminate\Http\Request;
+use App\Models\Setting;
+
+class SettingsController extends Controller
+{
+/**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index(Request $request)
+    {
+        $perPage = $this->indexService->limitPerPage($request->query('perPage', 10));
+        $page = $this->indexService->checkPageIfNull($request->query('page', 1));
+        $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
+
+        $settings = Setting::orderBy('created_at', 'desc');
+
+        if ($search) {
+            $settings->where(function($query) use ($search) {
+                $query->where('id', $search)
+                    ->orWhere('key', 'like', '%' . $search . '%')
+                    ->orWhere('name', 'like', '%' . $search . '%')
+                    ->orWhere('description', 'like', '%' . $search . '%');
+            });
+        }
+
+        $settings = $settings->paginate($perPage, ['*'], 'page', $page);
+
+        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+            return response()->json([
+                'settings' => $settings->items(),
+                'pagination' => $this->indexService->handlePagination($settings)
+            ]);
+        }
+
+        return inertia('Admin/Settings/Index');
+    }
+    
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Setting $setting, UpdateSettingRequest $request){
+        $setting->update($request->validated());
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Setting updated successfully',
+        ]);
+    }
+}

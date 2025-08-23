@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Admin\Users;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class StoreUserRequest extends FormRequest
 {
@@ -31,9 +30,6 @@ class StoreUserRequest extends FormRequest
             'password' => 'required|string|min:6|max:255',
 
             'file' => 'nullable|file|mimes:jpg,jpeg,png',
-
-            'roles' => 'required|array',
-            'roles.*' => 'exists:roles,id'
         ];
     }
 }

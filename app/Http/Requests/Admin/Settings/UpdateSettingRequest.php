@@ -1,0 +1,34 @@
+<?php
+
+namespace App\Http\Requests\Admin\Settings;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class UpdateSettingRequest extends FormRequest
+{
+    public function rules()
+    {
+        $setting = request()->route('setting');
+        $type = $setting->type;
+        $options = $setting->options;
+
+        $baseRule = ['required'];
+
+        $typeRules = match($type) {
+            'text' => ['string'],
+            'number' => array_filter([
+                'numeric', 
+                'min:' . ($options['min'] ?? 0), 
+                isset($options['max']) ? 'max:' . $options['max'] : null
+            ]),
+            'select' => $options && is_array($options) ? ['string', 'in:' . implode(',', $options)] : ['string'],
+            'array' => ['string'], // Arrays come as JSON string from frontend
+            'timestamp' => ['string', 'date_format:Y-m-d H:i:s'],
+            default => ['string'],
+        };
+
+        return [
+            'value' => array_merge($baseRule, $typeRules)
+        ];
+    }
+}

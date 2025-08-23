@@ -1,0 +1,115 @@
+:root{
+    --primary: #0c3c3c;
+    --card: #fdfff7;
+}
+
+#app{
+    width: 100%;
+    min-height: 100vh;
+}
+.kt-skeleton {
+    background: linear-gradient(90deg, var(--accent) 25%, var(--border) 50%, var(--accent) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+}
+
+.select2{
+  width: 100% !important;
+}
+
+.select2-selection--single{
+    display: flex !important;
+}
+
+.select2-container .select2-selection--single .select2-selection__rendered{
+    padding-left: 0 !important;
+}
+
+.select2-container .select2-selection--single .select2-selection__clear{
+    cursor: pointer !important;
+}
+
+.dark .select2-container .select2-selection--single{
+  background-color: #000 !important;
+}
+
+.dark .select2-container--default .select2-selection--single .select2-selection__clear{
+  color: #fff !important;
+}
+
+.dark .select2-dropdown{
+  background-color: #000 !important;
+}
+
+.note-editable{
+  background-color: #fff
+} 
+
+.sortable-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.sortable-list .list-group-item {
+    cursor: move;
+    margin: 5px 0;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    padding: 15px;
+    border-radius: 8px;
+    position: relative;
+    transition: all 0.2s ease;
+}
+.sortable-list .list-group-item:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+}
+.handle {
+    margin-right: 15px;
+    cursor: move;
+    color: #6c757d;
+    font-size: 18px;
+}
+.sortable-ghost {
+    opacity: 0.4;
+}
+.sortable-chosen {
+    background-color: #e3f2fd !important;
+    border-color: #2196f3 !important;
+}
+.sortable-drag {
+    background-color: #fff3cd !important;
+    border-color: #ffc107 !important;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.w-fit{
+  width: fit-content;
+}
+
+.header{
+    background-color: #256b6b;
+}
+
+.navbar{
+    border-top: px solid var(--primary);
+    background-color: var(--primary);
+}
+
+.navbar .text-foreground{
+    color: #fff !important;
+}
+
+.bg-company-technology-completed-level{
+    background-color: #f9ffea;
+}
+
+.bg-company-technology-current-level{
+    background-color: #256b6b08;
+}

@@ -1,21 +1,27 @@
 <script>
-  import { page } from '@inertiajs/svelte';
-  import Sidebar from '../Components/Sidebar.svelte';
-  import Topbar from '../Components/Topbar.svelte';
+  import AdminTopbar from '../Components/AdminTopbar.svelte';
+  import AdminNavbar from '../Components/AdminNavbar.svelte';
+
   import Breadcrumbs from '../Components/Breadcrumbs.svelte';
   
   // Props for the layout
   export let breadcrumbs = [];
   export let pageTitle = 'Dashboard';
 
-  // Global utility functions for admin components
-  function hasPermission(permission) {
-    if (!$page.props.auth.permissions) return false;
-    return $page.props.auth.permissions.some(p => p === permission);
+  function isActiveRoute(pattern) {
+    return window.location.href.includes(pattern);
   }
 
-  function isActiveRoute(routePattern) {
-    return $page.url.startsWith(route(routePattern));
+  // Show toast notification
+  function showToast(message, type = 'info') {
+    if (window.KTToast) {
+        KTToast.show({
+            icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
+            message: message,
+            variant: type,
+            position: 'bottom-end',
+        });
+    }
   }
 
   function formatTimestamp(timestamp) {
@@ -30,32 +36,28 @@
   }
 
   // Make functions globally available for child components
-  window.hasPermission = hasPermission;
   window.isActiveRoute = isActiveRoute;
   window.formatTimestamp = formatTimestamp;
+  window.showToast = showToast;
 </script>
 
-<div class="flex grow">
+<div class="flex grow flex-col in-data-kt-[sticky-header=on]:pt-(--header-height)">
     <!-- Header -->
-    <Topbar />
+    <AdminTopbar />
     <!-- End of Header -->
 
+    <!-- Navbar -->
+    <AdminNavbar />
+    <!-- End of Navbar -->
+
     <!-- Wrapper -->
-    <div class="flex flex-col lg:flex-row grow pt-(--header-height) lg:pt-0">
-        <!-- Sidebar -->
-        <Sidebar />
-        <!-- End of Sidebar -->
-
+    <div class="container-fixed w-full flex px-0" style="padding-bottom: 36px;">
         <!-- Main -->
-        <div class="flex grow rounded-xl bg-background border border-input lg:ms-(--sidebar-width) mt-0 lg:m-5 m-5 pb-10" style="height: 100vh;">
-            <div class="flex flex-col grow kt-scrollable-y-auto lg:[--kt-scrollbar-width:auto] pt-5" id="scrollable_content">
-                <div class="grow" role="content">
-                    <Breadcrumbs {breadcrumbs} {pageTitle} />
+          <main class="grow" role="content">
+              <Breadcrumbs {breadcrumbs} {pageTitle} />
 
-                    <slot />
-                </div>
-            </div>
-        </div>
+              <slot />
+        </main>
         <!-- End of Main -->
     </div>
 </div>

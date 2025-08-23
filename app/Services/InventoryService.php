@@ -1,0 +1,238 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\InventoryMovement;
+use App\Models\Product;
+
+class InventoryService
+{
+    //-------------------------------------
+    // Inventory
+    //-------------------------------------
+    public static function haveSufficientStock($company, $product, $quantity){
+        $companyProduct = $company->companyProducts()->where('product_id', $product->id)->first();
+        
+        if(!$companyProduct){
+            return false;
+        }
+        
+        return $companyProduct->available_stock >= $quantity;
+    }
+
+    //-------------------------------------
+    // Purchases
+    //-------------------------------------
+    public static function purchaseDelivered($purchase){
+        $company = $purchase->company;
+        $product = $purchase->product;
+        $quantity = $purchase->quantity;
+
+        $companyProduct = $company->companyProducts()->where('product_id', $product->id)->first();
+        $companyProduct->update(['available_stock' => $companyProduct->available_stock + $quantity]);
+
+        $inventoryMovement = InventoryMovement::create([
+            'company_id' => $company->id,
+            'product_id' => $product->id,
+            'movement_type' => InventoryMovement::MOVEMENT_TYPE_IN,
+            'original_quantity' => $quantity,
+            'current_quantity' => $quantity,
+            'reference_type' => 'purchase',
+            'reference_id' => $purchase->id,
+            'moved_at' => SettingsService::getCurrentTimestamp(),
+        ]);
+    }
+
+    //-------------------------------------
+    // Expiration
+    //-------------------------------------
+    public static function expireInventory($company){
+        $products = Product::where('has_expiration', true)->get();
+
+        foreach($products as $product){
+            $expiredQuantity = 0;
+
+            $companyInventory = $company->inventoryMovements()->where([
+                'product_id' => $product->id,
+                'movement_type' => InventoryMovement::MOVEMENT_TYPE_IN,
+            ])->get();
+
+            $companyProduct = $company->companyProducts()->where('product_id', $product->id)->first();
+
+            if(!$companyInventory || !$companyProduct){
+                continue;
+            }
+
+            $currentTimestamp = SettingsService::getCurrentTimestamp();
+
+            foreach($companyInventory as $inventory){
+                $expiresAt = $inventory->moved_at->addDays($product->shelf_life_days);
+
+                if($expiresAt->isAfter($currentTimestamp)){
+                    continue;
+                }
+
+                $leftAvailableStock = $inventory->current_quantity;
+
+                if($leftAvailableStock <= 0){
+                    continue;
+                }
+
+                InventoryMovement::create([
+                    'company_id' => $company->id,
+                    'product_id' => $product->id,
+                    'movement_type' => InventoryMovement::MOVEMENT_TYPE_EXPIRED,
+                    'original_quantity' => $leftAvailableStock,
+                    'current_quantity' => $leftAvailableStock,
+                    'moved_at' => $currentTimestamp,
+                ]);
+    
+                $companyProduct->update(['available_stock' => $companyProduct->available_stock - $leftAvailableStock]);
+                $inventory->update(['current_quantity' => 0]);
+
+                $expiredQuantity += $leftAvailableStock;
+            }
+
+            if($expiredQuantity > 0){
+                NotificationService::createInventoryExpiredNotification($company, $product, $expiredQuantity);
+            }
+        }
+    }
+
+    //-------------------------------------
+    // Inventory costs
+    //-------------------------------------
+    public static function payInventoryCosts($company){
+        $products = Product::where('storage_cost', '>', 0)->get();
+
+        foreach($products as $product){
+            $leftAvailableStock = $company->inventoryMovements()->where([
+                'product_id' => $product->id,
+                'movement_type' => InventoryMovement::MOVEMENT_TYPE_IN,
+            ])->sum('current_quantity');
+
+            $companyProduct = $company->companyProducts()->where('product_id', $product->id)->first();
+
+            if(!$companyProduct || $leftAvailableStock <= 0){
+                continue;
+            }
+
+            $totalCost = $product->storage_cost * $leftAvailableStock;
+            
+            FinanceService::payInventoryCosts($company, $product, $totalCost);
+            NotificationService::createInventoryCostsPaidNotification($company, $product, $leftAvailableStock, $totalCost);
+        }
+    }
+
+    //-------------------------------------
+    // Sales
+    //-------------------------------------
+    public static function saleConfirmed($sale){
+        $company = $sale->company;
+        $product = $sale->product;
+        $quantity = $sale->quantity;
+
+        $companyProduct = $company->companyProducts()->where('product_id', $product->id)->first();
+        $companyProduct->update(['available_stock' => $companyProduct->available_stock - $quantity]);
+
+        // Get all IN movements for this product, ordered by moved_at (FIFO)
+        $companyInventories = $company->inventoryMovements()->where([
+            'product_id' => $product->id,
+            'movement_type' => InventoryMovement::MOVEMENT_TYPE_IN
+        ])->where('current_quantity', '>', 0)->orderBy('moved_at', 'asc')->get();
+
+        $remainingQuantity = $quantity;
+
+        // Apply FIFO: subtract from oldest inventory first
+        foreach($companyInventories as $companyInventory){
+            if($remainingQuantity <= 0){
+                break; // We've allocated all the sale quantity
+            }
+
+            $availableInThisBatch = $companyInventory->current_quantity;
+            $quantityToSubtract = min($remainingQuantity, $availableInThisBatch);
+
+            // Update the inventory movement
+            $companyInventory->update([
+                'current_quantity' => $availableInThisBatch - $quantityToSubtract
+            ]);
+
+            $remainingQuantity -= $quantityToSubtract;
+        }
+
+        // Create the OUT movement for the sale
+        $inventoryMovement = InventoryMovement::create([
+            'company_id' => $company->id,
+            'product_id' => $product->id,
+            'movement_type' => InventoryMovement::MOVEMENT_TYPE_OUT,
+            'original_quantity' => $quantity,
+            'current_quantity' => $quantity,
+            'reference_type' => 'sale',
+            'reference_id' => $sale->id,
+            'moved_at' => SettingsService::getCurrentTimestamp(),
+        ]);
+    }
+
+    //-------------------------------------
+    // Production
+    //-------------------------------------
+    public static function productionStarted($productionOrder, $material, $requiredQuantity){
+        $company = $productionOrder->companyMachine->company;
+        $quantity = $requiredQuantity;
+
+        $companyInventory = $company->inventoryMovements()->where([
+            'product_id' => $material->id,
+            'movement_type' => InventoryMovement::MOVEMENT_TYPE_IN,
+        ])->get();
+
+        $remainingQuantity = $quantity;
+
+        foreach($companyInventory as $inventory){
+            $availableInThisBatch = $inventory->current_quantity;
+            $quantityToSubtract = min($remainingQuantity, $availableInThisBatch);
+
+            $inventory->update([
+                'current_quantity' => $inventory->current_quantity - $quantityToSubtract
+            ]);
+
+            $remainingQuantity -= $quantityToSubtract;
+        }
+
+        $companyProduct = $company->companyProducts()->where('product_id', $material->id)->first();
+
+        $companyProduct->update(['available_stock' => $companyProduct->available_stock - $quantity]);
+
+        $inventoryMovement = InventoryMovement::create([
+            'company_id' => $company->id,
+            'product_id' => $material->id,
+            'movement_type' => InventoryMovement::MOVEMENT_TYPE_OUT,
+            'original_quantity' => $quantity,
+            'current_quantity' => $quantity,
+            'reference_type' => 'production',
+            'reference_id' => $productionOrder->id,
+            'moved_at' => SettingsService::getCurrentTimestamp(),
+        ]);
+    }
+
+    //-------------------------------------
+    // Production
+    //-------------------------------------
+    public static function productionCompleted($productionOrder, $outputQuantity){
+        $company = $productionOrder->companyMachine->company;
+        $product = $productionOrder->product;
+
+        $companyInventory = InventoryMovement::create([
+            'company_id' => $company->id,
+            'product_id' => $product->id,
+            'movement_type' => InventoryMovement::MOVEMENT_TYPE_IN,
+            'original_quantity' => $outputQuantity,
+            'current_quantity' => $outputQuantity,
+            'reference_type' => 'production',
+            'reference_id' => $productionOrder->id,
+            'moved_at' => SettingsService::getCurrentTimestamp(),
+        ]);
+
+        $companyProduct = $company->companyProducts()->where('product_id', $product->id)->first();
+        $companyProduct->update(['available_stock' => $companyProduct->available_stock + $outputQuantity]);
+    }
+}

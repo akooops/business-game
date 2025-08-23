@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Requests\Admin\Users\UpdateUserRequest;
 use App\Http\Requests\Admin\Users\StoreUserRequest;
 use Illuminate\Http\Request;
-use App\Models\Role;
 use App\Models\User;
-use Illuminate\Support\Facades\Route;
+use App\Services\FileService;
+use App\Services\IndexService;
 
 class UsersController extends Controller
 {
@@ -18,9 +18,9 @@ class UsersController extends Controller
      */
     public function index(Request $request)
     {
-        $perPage = $this->indexService->limitPerPage($request->query('perPage', 10));
-        $page = $this->indexService->checkPageIfNull($request->query('page', 1));
-        $search = $this->indexService->checkIfSearchEmpty($request->query('search'));
+        $perPage = IndexService::limitPerPage($request->query('perPage', 10));
+        $page = IndexService::checkPageIfNull($request->query('page', 1));
+        $search = IndexService::checkIfSearchEmpty($request->query('search'));
 
         $users = User::latest();
 
@@ -30,7 +30,10 @@ class UsersController extends Controller
                       ->orWhere('firstname', 'like', '%' . $search . '%')
                       ->orWhere('lastname', 'like', '%' . $search . '%')
                       ->orWhere('username', 'like', '%' . $search . '%')
-                      ->orWhere('email', 'like', '%' . $search . '%');
+                      ->orWhere('email', 'like', '%' . $search . '%')
+                      ->orWhereHas('company', function($query) use ($search) {
+                        $query->where('name', 'like', '%' . $search . '%');
+                      });
             });
         }
 
@@ -39,7 +42,7 @@ class UsersController extends Controller
         if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
             return response()->json([
                 'users' => $users->items(),
-                'pagination' => $this->indexService->handlePagination($users)
+                'pagination' => IndexService::handlePagination($users)
             ]);
         }
 
@@ -53,9 +56,7 @@ class UsersController extends Controller
      */
     public function create()
     {
-        $roles = Role::get();
-
-        return inertia('Admin/Users/Create', compact('roles'));
+        return inertia('Admin/Users/Create');
     }
     
     /**
@@ -67,10 +68,13 @@ class UsersController extends Controller
     public function store(StoreUserRequest $request)
     {
         $user = User::create($request->validated());
-        $user->roles()->syncWithoutDetaching($request->input('roles'));
     
         if($request->has('file')){
-            $file = $this->fileService->upload($request->file('file'), 'App\\Models\\User', $user->id);
+            //Upload the new file
+            $file = FileService::upload($request->file('file'));
+
+            //Link the file to the user
+            FileService::linkModel($file, 'user', $user->id, 1);
         }
 
         return inertia('Admin/Users/Index', [
@@ -86,7 +90,6 @@ class UsersController extends Controller
      */
     public function show(User $user)
     {    
-        $user->load('roles');
         return inertia('Admin/Users/Show', compact('user'));
     }
     
@@ -98,10 +101,7 @@ class UsersController extends Controller
      */
     public function edit(User $user)
     {
-        $user->load('roles');
-        $roles = Role::get();
-
-        return inertia('Admin/Users/Edit', compact('user', 'roles'));
+        return inertia('Admin/Users/Edit', compact('user'));
     }
     
     /**
@@ -126,12 +126,17 @@ class UsersController extends Controller
             'email' => $request->email,
         ]);
 
-        $user->roles()->sync($request->input('roles'));
+        if($request->file('file')){
+            //Delete the old file if it exists
+            if($user->file){
+                FileService::delete($user->file);
+            }
 
-        if($request->has('file')){
-            if($user->file) $user->file->detach();
+            //Upload the new file
+            $file = FileService::upload($request->file('file'));
 
-            $file = $this->fileService->upload($request->file('file'), 'App\\Models\\User', $user->id);
+            //Link the file to the user
+            FileService::linkModel($file, 'user', $user->id, 1);
         }
     
         return inertia('Admin/Users/Index', [
