@@ -15,6 +15,18 @@ class DatabaseSeeder extends Seeder
         $this->call([
             InitAdminAccountSeeder::class,
             SettingsSeeder::class,
+            CountriesSeeder::class,
+            WilayasSeeder::class,
+            TechnologiesSeeder::class,
+            ProductsSeeder::class,
+            ProductRecipesSeeder::class,
+            SuppliersSeeder::class,
+            SupplierProductsSeeder::class,
+            EmployeeProfilesSeeder::class,
+            MachinesSeeder::class,
+            MachineOutputsSeeder::class,
+            CompaniesSeeder::class,
+            CompaniesBootstrapSeeder::class,
         ]);
     }
 }
