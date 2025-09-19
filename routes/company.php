@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Company\DashboardController;
 use App\Http\Controllers\Company\TechnologiesController;
 use App\Http\Controllers\Company\ProductsController;
 use App\Http\Controllers\Company\SuppliersController;
@@ -18,6 +17,9 @@ use App\Http\Controllers\Company\ProductionOrdersController;
 use App\Http\Controllers\Company\TransactionsController;
 use App\Http\Controllers\Company\BanksController;
 use App\Http\Controllers\Company\LoansController;
+use App\Http\Controllers\Company\AdvertisersController;
+use App\Http\Controllers\Company\AdsController;
+use App\Http\Controllers\Company\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +35,8 @@ use App\Http\Controllers\Company\LoansController;
 Route::prefix('company')->middleware(['auth', 'check.company', 'handle.inertia'])->group(function () {
     // Dashboard
     Route::get('/', [DashboardController::class, 'index'])->name('company.dashboard.index');
+    Route::get('/dashboard/current', [DashboardController::class, 'current'])->name('company.dashboard.current');
+    Route::get('/dashboard/historical', [DashboardController::class, 'historical'])->name('company.dashboard.historical');
 
     // Banks
     Route::get('/banks', [BanksController::class, 'index'])->name('company.banks.index');
@@ -41,6 +45,13 @@ Route::prefix('company')->middleware(['auth', 'check.company', 'handle.inertia']
     Route::get('/loans', [LoansController::class, 'index'])->name('company.loans.index');
     Route::post('/loans', [LoansController::class, 'store'])->name('company.loans.store');
     Route::post('/loans/{loan}/pay', [LoansController::class, 'pay'])->name('company.loans.pay');
+
+    // Advertisers
+    Route::get('/advertisers', [AdvertisersController::class, 'index'])->name('company.advertisers.index');
+
+    // Ads
+    Route::get('/ads', [AdsController::class, 'index'])->name('company.ads.index');
+    Route::post('/ads', [AdsController::class, 'store'])->name('company.ads.store');
 
     // Countries
     Route::get('/countries', [CountriesController::class, 'index'])->name('company.countries.index');

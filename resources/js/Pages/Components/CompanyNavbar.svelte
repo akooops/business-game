@@ -8,7 +8,7 @@
     <div class="kt-container-fixed lg:flex lg:flex-wrap lg:justify-between lg:items-center gap-2 px-0 lg:px-7.5">
         <!-- Mega Menu -->
         <div class="kt-menu items-stretch flex-col lg:flex-row gap-5 lg:gap-7.5 grow lg:grow-0" data-kt-menu="true" id="mega_menu">
-            <div class="kt-menu-item active">
+            <div class="kt-menu-item {$page.url === route('company.dashboard.index') ? 'active' : ''}">
                 <a class="kt-menu-link lg:py-3.5 border-b border-b-transparent kt-menu-item-active:border-b-mono text-foreground kt-menu-item-hover:text-mono kt-menu-item-active:text-mono kt-menu-item-here:border-b-mono kt-menu-item-here:text-mono" 
                     href={route('company.dashboard.index')}>
                     <span class="kt-menu-title font-medium text-foreground text-sm">
@@ -139,6 +139,30 @@
                                 <i class="fa-solid fa-users text-sm"></i>
                             </span>
                             <span class="kt-menu-title grow-0">Employees</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-menu-item" data-kt-menu-item-toggle="dropdown" data-kt-menu-item-trigger="click|lg:hover">
+                <div class="kt-menu-link lg:py-3.5 border-b border-b-transparent kt-menu-item-active:border-b-mono text-foreground kt-menu-item-hover:text-mono kt-menu-item-active:text-mono kt-menu-item-here:border-b-mono kt-menu-item-here:text-mono">
+                    <span class="kt-menu-title font-medium text-foreground text-sm">Marketing</span>
+                </div>
+                <div class="kt-menu-dropdown kt-menu-default py-2.5 w-full max-w-[220px]">
+                    <div class="kt-menu-item">
+                        <a class="kt-menu-link" href={route('company.advertisers.index')} tabindex="0">
+                            <span class="kt-menu-icon">
+                                <i class="fa-solid fa-users text-sm"></i>
+                            </span>
+                            <span class="kt-menu-title grow-0">Advertisers</span>
+                        </a>
+                    </div>
+                    <div class="kt-menu-item">
+                        <a class="kt-menu-link" href={route('company.ads.index')} tabindex="0">
+                            <span class="kt-menu-icon">
+                                <i class="fa-solid fa-bullhorn text-sm"></i>
+                            </span>
+                            <span class="kt-menu-title grow-0">Ad Campaigns</span>
                         </a>
                     </div>
                 </div>

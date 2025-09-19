@@ -61,6 +61,8 @@ Route::middleware(['auth', 'handle.inertia'])->group(function () {
 
 Route::prefix('admin')->middleware(['auth', 'check.admin', 'handle.inertia'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('admin.dashboard.index');
+    Route::get('/leaderboard', [DashboardController::class, 'leaderboard'])->name('admin.dashboard.leaderboard');
+    Route::get('/stats', [DashboardController::class, 'stats'])->name('admin.dashboard.stats');
 
     // Advertisers
     Route::get('advertisers', [AdvertisersController::class, 'index'])->name('admin.advertisers.index');

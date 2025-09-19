@@ -25,6 +25,6 @@ class CalculationsService
         
         $result = $expectedValue + ($z * $standardDeviation);
         
-        return round(max($min, min($max, $result)));
+        return round(max($min, min($max, $result)), 3);
     }
 }

@@ -23,12 +23,11 @@ class SuppliersSeeder extends Seeder
                 'wilaya_id' => optional($algiers)->id,
                 'country_id' => null,
                 'min_shipping_cost' => 20,
-                'avg_shipping_cost' => 30,
                 'max_shipping_cost' => 45,
                 'real_shipping_cost' => 30,
                 'min_shipping_time_days' => 1,
-                'avg_shipping_time_days' => 2,
                 'max_shipping_time_days' => 3,
+                'real_shipping_time_days' => 2,
             ],
             [
                 'name' => 'FR Components',
@@ -37,12 +36,11 @@ class SuppliersSeeder extends Seeder
                 'wilaya_id' => null,
                 'country_id' => optional($france)->id,
                 'min_shipping_cost' => 100,
-                'avg_shipping_cost' => 150,
                 'max_shipping_cost' => 220,
                 'real_shipping_cost' => 150,
                 'min_shipping_time_days' => 3,
-                'avg_shipping_time_days' => 5,
                 'max_shipping_time_days' => 7,
+                'real_shipping_time_days' => 5,
             ],
         ];
 
