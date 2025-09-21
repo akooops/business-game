@@ -289,7 +289,7 @@
                                                 </div>
                                                 <div class="flex justify-center gap-1">
                                                     <i class="ki-filled ki-chart text-blue-500"></i>
-                                                    <span>Impact: {advertiser.min_market_impact_percentage}% - {advertiser.max_market_impact_percentage}%</span>
+                                                    <span>Impact: {(advertiser.min_market_impact_percentage * 100).toFixed(2)}% - {(advertiser.max_market_impact_percentage * 100).toFixed(2)}%</span>
                                                 </div>
                                             </div>
 
@@ -382,7 +382,7 @@
                         </span>
                         <div>
                             <span class="text-xs font-medium text-foreground">
-                                {selectedAdvertiser.min_market_impact_percentage}% - {selectedAdvertiser.max_market_impact_percentage}%
+                                {(selectedAdvertiser.min_market_impact_percentage * 100).toFixed(2)}% - {(selectedAdvertiser.max_market_impact_percentage * 100).toFixed(2)}%
                             </span>
                         </div>
                     </div>
@@ -502,7 +502,7 @@
                                         Market Impact Range
                                     </span>
                                     <span class="text-sm font-medium text-mono">
-                                        {createAdAdvertiser.min_market_impact_percentage}% - {createAdAdvertiser.max_market_impact_percentage}%
+                                        {(createAdAdvertiser.min_market_impact_percentage * 100).toFixed(2)}% - {(createAdAdvertiser.max_market_impact_percentage * 100).toFixed(2)}%
                                     </span>
                                 </div>
                             </div>

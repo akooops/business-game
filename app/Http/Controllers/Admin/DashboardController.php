@@ -14,47 +14,15 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         // Get leaderboard data
-        $leaderboard = LeaderboardService::getLeaderboard();
-        $leaderboardStats = LeaderboardService::getLeaderboardStats();
-        
+        $companies = LeaderboardService::getLeaderboard();
+    
         // If it's an AJAX request, return JSON
         if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
             return response()->json([
-                'leaderboard' => $leaderboard,
-                'stats' => $leaderboardStats
+                'companies' => $companies,
             ]);
         }
 
-        return Inertia::render('Admin/Dashboard/Index', [
-            'leaderboard' => $leaderboard,
-            'stats' => $leaderboardStats
-        ]);
-    }
-
-    /**
-     * Get leaderboard data only (for real-time updates)
-     */
-    public function leaderboard(Request $request)
-    {
-        $withWeights = $request->query('weights', true);
-        $leaderboard = LeaderboardService::getLeaderboard($withWeights);
-        
-        return response()->json([
-            'leaderboard' => $leaderboard,
-            'timestamp' => now()->toISOString()
-        ]);
-    }
-
-    /**
-     * Get leaderboard statistics
-     */
-    public function stats(Request $request)
-    {
-        $stats = LeaderboardService::getLeaderboardStats();
-        
-        return response()->json([
-            'stats' => $stats,
-            'timestamp' => now()->toISOString()
-        ]);
+        return Inertia::render('Admin/Dashboard/Index');
     }
 }

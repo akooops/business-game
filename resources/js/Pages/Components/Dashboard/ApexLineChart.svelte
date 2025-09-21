@@ -9,6 +9,7 @@
     export let height = 350;
     export let colors = ['#3b82f6', '#10b981'];
     export let loading = false;
+    export let currency = 'DZD';
 
     let chartContainer;
     let chart;
@@ -44,12 +45,20 @@
                     colors: '#6b7280'
                 },
                 formatter: function(value) {
-                    return new Intl.NumberFormat('en-US', {
-                        style: 'currency',
-                        currency: 'DZD',
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0
-                    }).format(value);
+                    if (currency) {   
+                        return new Intl.NumberFormat('en-US', {
+                            style: 'currency',
+                            currency: currency,
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0
+                        }).format(value);
+                    }
+                    else {
+                        return new Intl.NumberFormat('en-US', {
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0
+                        }).format(value);
+                    }
                 }
             }
         },

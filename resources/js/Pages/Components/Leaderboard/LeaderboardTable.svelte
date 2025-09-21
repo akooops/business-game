@@ -1,54 +1,6 @@
 <script>
-    export let leaderboard = [];
+    export let companies = [];
     export let loading = false;
-
-    // Format currency
-    function formatCurrency(amount) {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'DZD',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-        }).format(amount || 0);
-    }
-
-    // Format number
-    function formatNumber(number) {
-        return new Intl.NumberFormat('en-US').format(number || 0);
-    }
-
-    // Format score (4 decimal places)
-    function formatScore(score) {
-        return parseFloat(score || 0).toFixed(4);
-    }
-
-    // Get rank badge class
-    function getRankBadgeClass(rank) {
-        switch (rank) {
-            case 1:
-                return 'kt-badge-light-warning'; // Gold
-            case 2:
-                return 'kt-badge-light-secondary'; // Silver
-            case 3:
-                return 'kt-badge-light-primary'; // Bronze
-            default:
-                return 'kt-badge-light-info';
-        }
-    }
-
-    // Get rank icon
-    function getRankIcon(rank) {
-        switch (rank) {
-            case 1:
-                return 'ki-crown-2';
-            case 2:
-                return 'ki-medal-star';
-            case 3:
-                return 'ki-award';
-            default:
-                return 'ki-ranking';
-        }
-    }
 </script>
 
 <div class="kt-card">
@@ -58,7 +10,7 @@
             Company Leaderboard
         </h3>
         <div class="kt-card-subtitle">
-            Ranked by performance score (funds - loans - carbon + research)
+            Ranked by performance score: Net Worth (50%) - Carbon Impact (25%) + Research Level (25%)
         </div>
     </div>
     
@@ -102,11 +54,6 @@
                                 <span class="kt-table-col-label">Research</span>
                             </span>
                         </th>
-                        <th>
-                            <span class="kt-table-col">
-                                <span class="kt-table-col-label">Technologies</span>
-                            </span>
-                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -114,17 +61,17 @@
                         <!-- Loading skeleton rows -->
                         {#each Array(10) as _, i}
                             <tr>
-                                {#each Array(8) as _, j}
+                                {#each Array(9) as _, j}
                                     <td class="p-4">
                                         <div class="kt-skeleton w-16 h-4 rounded"></div>
                                     </td>
                                 {/each}
                             </tr>
                         {/each}
-                    {:else if leaderboard.length === 0}
+                    {:else if companies.length === 0}
                         <!-- Empty state -->
                         <tr>
-                            <td colspan="8" class="p-10">
+                            <td colspan="9" class="p-10">
                                 <div class="flex flex-col items-center justify-center text-center">
                                     <div class="mb-4">
                                         <i class="ki-filled ki-information-2 text-4xl text-muted-foreground"></i>
@@ -138,55 +85,56 @@
                         </tr>
                     {:else}
                         <!-- Actual data rows -->
-                        {#each leaderboard as company}
+                        {#each companies as company, index}
                             <tr class="hover:bg-muted/50">
                                 <!-- Rank -->
                                 <td>
                                     <div class="flex items-center gap-2">
-                                        <div class="kt-badge {getRankBadgeClass(company.rank)} kt-badge-circle size-8">
-                                            <i class="ki-filled {getRankIcon(company.rank)} text-sm"></i>
-                                        </div>
-                                        <span class="text-sm font-bold text-mono">#{company.rank}</span>
+                                        <span class="text-sm font-bold text-mono">#{index + 1}</span>
                                     </div>
                                 </td>
 
                                 <!-- Company -->
                                 <td>
-                                    <div class="flex flex-col gap-1">
-                                        <span class="text-sm font-medium text-mono">
-                                            {company.name}
-                                        </span>
-                                        <span class="text-xs text-secondary-foreground">
-                                            {company.user_name}
-                                        </span>
+                                    <div class="flex items-center gap-3">
+                                        <div>
+                                            <img 
+                                                src={company.user.avatarUrl} 
+                                                alt={company.user.fullname}
+                                                class="w-10 h-10 rounded-lg object-cover"
+                                            />
+                                        </div>
+                                        <div class="flex flex-col gap-1">
+                                            <span class="text-sm font-medium text-mono hover:text-primary">
+                                                @{company.user.username}
+                                            </span>
+                                            <span class="text-xs text-secondary-foreground">
+                                                {company.user.email}
+                                            </span>
+                                        </div>
                                     </div>
                                 </td>
 
                                 <!-- Score -->
                                 <td>
                                     <div class="flex flex-col gap-1">
-                                        <span class="text-sm font-bold text-mono {company.final_score >= 0 ? 'text-success' : 'text-danger'}">
-                                            {formatScore(company.final_score)}
+                                        <span class="text-sm font-bold text-mono {company.score >= 0 ? 'text-success' : 'text-danger'}">
+                                            {company.score}
                                         </span>
-                                        <div class="flex gap-1">
-                                            <div class="kt-badge kt-badge-sm kt-badge-light-primary" title="Normalized Funds">
-                                                F: {formatScore(company.normalized_funds)}
-                                            </div>
-                                        </div>
                                     </div>
                                 </td>
 
                                 <!-- Funds -->
                                 <td>
                                     <span class="text-sm font-medium text-success">
-                                        {formatCurrency(company.funds)}
+                                        {(company.funds || 0)} DZD
                                     </span>
                                 </td>
 
                                 <!-- Loans -->
                                 <td>
                                     <span class="text-sm font-medium text-danger">
-                                        {formatCurrency(company.unpaid_loans)}
+                                        {(company.unpaid_loans || 0)} DZD
                                     </span>
                                 </td>
 
@@ -194,10 +142,10 @@
                                 <td>
                                     <div class="flex flex-col gap-1">
                                         <span class="text-sm font-medium text-warning">
-                                            {formatNumber(company.carbon_footprint)}
+                                            {(company.carbon_footprint || 0)}
                                         </span>
                                         <span class="text-xs text-secondary-foreground">
-                                            tons CO₂
+                                            Kg CO₂
                                         </span>
                                     </div>
                                 </td>
@@ -206,19 +154,11 @@
                                 <td>
                                     <div class="flex flex-col gap-1">
                                         <span class="text-sm font-medium text-info">
-                                            {formatScore(company.research_level)}
+                                            {(company.research_level || 0)}
                                         </span>
                                         <span class="text-xs text-secondary-foreground">
                                             level
                                         </span>
-                                    </div>
-                                </td>
-
-                                <!-- Technologies -->
-                                <td>
-                                    <div class="kt-badge kt-badge-light-success kt-badge-sm">
-                                        <i class="ki-filled ki-flask text-xs me-1"></i>
-                                        {company.completed_technologies}
                                     </div>
                                 </td>
                             </tr>

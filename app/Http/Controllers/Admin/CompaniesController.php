@@ -41,7 +41,7 @@ class CompaniesController extends Controller
         }
 
         $companies = $companies->paginate($perPage, ['*'], 'page', $page);
-
+        
         if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
             return response()->json([
                 'companies' => $companies->items(),

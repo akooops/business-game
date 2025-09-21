@@ -2,13 +2,9 @@
     import CompanyLayout from '../../Layouts/CompanyLayout.svelte';
     import StatsCard from '../../Components/Dashboard/StatsCard.svelte';
     import ApexLineChart from '../../Components/Dashboard/ApexLineChart.svelte';
-    import ApexBarChart from '../../Components/Dashboard/ApexBarChart.svelte';
     import ApexDonutChart from '../../Components/Dashboard/ApexDonutChart.svelte';
+    import LeaderboardTable from '../../Components/Leaderboard/LeaderboardTable.svelte';
     import { onMount, onDestroy } from 'svelte';
-
-    // Props from server
-    export let stats = {};
-    export let trends = {};
 
     // Define breadcrumbs for this page
     const breadcrumbs = [
@@ -22,10 +18,16 @@
     const pageTitle = 'Dashboard';
 
     // Reactive variables
-    let loading = false;
+    let loading = true;
     let fetchInterval = null;
-    let currentStats = stats;
-    let currentTrends = trends;
+    let stats = {
+        basic: {},
+        financial: {},
+        operations: {},
+        trends: { revenue: [], expenses: [], sales: [], purchases: [] },
+        breakdowns: { revenue: {}, expenses: {} },
+        leaderboard: []
+    };
 
     // Format currency
     function formatCurrency(amount) {
@@ -42,38 +44,31 @@
         return new Intl.NumberFormat('en-US').format(number || 0);
     }
 
-    // Format percentage
-    function formatPercentage(percentage) {
-        return new Intl.NumberFormat('en-US', {
-            style: 'percent',
-            minimumFractionDigits: 1,
-            maximumFractionDigits: 1
-        }).format((percentage || 0) / 100);
-    }
-
-    // Fetch current stats (for real-time updates)
-    async function fetchCurrentStats() {
+    // Fetch dashboard data
+    async function fetchDashboardData() {
         try {
-            const response = await fetch(route('company.dashboard.current'), {
+            const response = await fetch(route('company.dashboard.index'), {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             });
             
             const data = await response.json();
-            currentStats = data.stats;
+            stats = data.stats;
         } catch (error) {
-            console.error('Error fetching current stats:', error);
+            console.error('Error fetching dashboard data:', error);
+        } finally {
+            loading = false;
         }
     }
 
     // Prepare chart data
-    $: revenueTrendData = currentTrends.revenue_trend ? {
+    $: revenueTrendData = stats.trends?.revenue ? {
         series: [{
             name: 'Revenue',
-            data: currentTrends.revenue_trend.map(item => item.total || 0)
+            data: stats.trends.revenue.map(item => item.total || 0)
         }],
-        categories: currentTrends.revenue_trend.map(item => {
+        categories: stats.trends.revenue.map(item => {
             return new Date(item.date).toLocaleDateString('en-US', { 
                 month: 'short', 
                 day: 'numeric' 
@@ -81,12 +76,12 @@
         })
     } : { series: [], categories: [] };
 
-    $: expenseTrendData = currentTrends.expense_trend ? {
+    $: expenseTrendData = stats.trends?.expenses ? {
         series: [{
             name: 'Expenses',
-            data: currentTrends.expense_trend.map(item => item.total || 0)
+            data: stats.trends.expenses.map(item => item.total || 0)
         }],
-        categories: currentTrends.expense_trend.map(item => {
+        categories: stats.trends.expenses.map(item => {
             return new Date(item.date).toLocaleDateString('en-US', { 
                 month: 'short', 
                 day: 'numeric' 
@@ -94,58 +89,64 @@
         })
     } : { series: [], categories: [] };
 
-    $: revenueVsExpensesData = {
-        series: [
-            {
-                name: 'Revenue',
-                data: currentTrends.revenue_trend ? currentTrends.revenue_trend.map(item => item.total || 0) : []
-            },
-            {
-                name: 'Expenses',
-                data: currentTrends.expense_trend ? currentTrends.expense_trend.map(item => item.total || 0) : []
-            }
-        ],
-        categories: currentTrends.revenue_trend ? currentTrends.revenue_trend.map(item => {
-            return new Date(item.date).toLocaleDateString('en-US', { 
-                month: 'short', 
-                day: 'numeric' 
-            });
-        }) : []
-    };
-
-    $: salesTrendData = currentTrends.sales_trend ? {
-        series: [
-            {
-                name: 'Sales Count',
-                data: currentTrends.sales_trend.map(item => item.count || 0)
-            },
-            {
-                name: 'Sales Revenue',
-                data: currentTrends.sales_trend.map(item => item.revenue || 0)
-            }
-        ],
-        categories: currentTrends.sales_trend.map(item => {
+    $: salesTrendData = stats.trends?.sales ? {
+        series: [{
+            name: 'Sales Count',
+            data: stats.trends.sales.map(item => item.count || 0)
+        }],
+        categories: stats.trends.sales.map(item => {
             return new Date(item.date).toLocaleDateString('en-US', { 
                 month: 'short', 
                 day: 'numeric' 
             });
         })
     } : { series: [], categories: [] };
+
+    $: purchaseTrendData = stats.trends?.purchases ? {
+        series: [{
+            name: 'Purchase Amount',
+            data: stats.trends.purchases.map(item => item.count || 0)
+        }],
+        categories: stats.trends.purchases.map(item => {
+            return new Date(item.date).toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        })
+    } : { series: [], categories: [] };
+
+    // Revenue breakdown for donut chart
+    $: revenueBreakdownData = stats.breakdowns?.revenue ? {
+        series: [
+            stats.breakdowns.revenue.sale_payments || 0,
+            stats.breakdowns.revenue.machine_sales || 0,
+            stats.breakdowns.revenue.loans_received || 0
+        ],
+        labels: ['Sale Payments', 'Machine Sales', 'Loans Received']
+    } : { series: [], labels: [] };
 
     // Expense breakdown for donut chart
-    $: expenseBreakdownData = currentStats.expenses ? {
+    $: expenseBreakdownData = stats.breakdowns?.expenses ? {
         series: [
-            currentStats.marketing?.active_ads_cost || 0,
-            currentStats.employees?.total_monthly_salaries || 0,
-            currentStats.loans?.total_monthly_payments || 0,
-            currentStats.expenses?.expenses_today || 0
+            stats.breakdowns.expenses.employee_salaries || 0,
+            stats.breakdowns.expenses.marketing || 0,
+            stats.breakdowns.expenses.purchases || 0,
+            stats.breakdowns.expenses.machine_operations || 0,
+            stats.breakdowns.expenses.maintenance || 0,
+            (stats.breakdowns.expenses.technology || 0) + 
+            (stats.breakdowns.expenses.inventory || 0) + 
+            (stats.breakdowns.expenses.shipping || 0) + 
+            (stats.breakdowns.expenses.employee_recruitment || 0) + 
+            (stats.breakdowns.expenses.machine_setup || 0) + 
+            (stats.breakdowns.expenses.loan_payments || 0)
         ],
-        labels: ['Marketing', 'Salaries', 'Loan Payments', 'Other Expenses']
+        labels: ['Employee Salaries', 'Marketing', 'Purchases', 'Machine Operations', 'Maintenance', 'Other']
     } : { series: [], labels: [] };
 
     onMount(() => {
+        fetchDashboardData();
         // Set up real-time updates every 60 seconds
-        fetchInterval = setInterval(fetchCurrentStats, 60000);
+        fetchInterval = setInterval(fetchDashboardData, 60000);
     });
 
     onDestroy(() => {
@@ -156,7 +157,6 @@
 
     // Flash message handling
     export let success;
-
     $: if (success) {
         showToast(success, 'success');
     }
@@ -178,48 +178,58 @@
                         Overview of your company's performance and key metrics
                     </p>
                 </div>
-                <div class="flex items-center gap-2">
-                    <div class="kt-badge kt-badge-light-success kt-badge-sm">
-                        <i class="ki-filled ki-pulse text-xs me-1"></i>
-                        Live Data
-                    </div>
-                    <span class="text-xs text-secondary-foreground">
-                        Updates every day
-                    </span>
-                </div>
             </div>
 
-            <!-- Main Stats Cards Grid -->
+            <!-- Basic Stats Cards Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-7.5">
                 <!-- Funds Card -->
                 <StatsCard
                     title="Current Funds"
-                    value={formatCurrency(currentStats.funds?.current_funds)}
+                    value={formatCurrency(stats.basic?.funds)}
                     subtitle="Available balance"
                     icon="ki-wallet"
                     iconColor="kt-badge-light-primary"
-                    trend={currentStats.funds?.change_percentage ? {
-                        value: currentStats.funds.change_percentage,
-                        isPositive: currentStats.funds.change_percentage > 0
-                    } : null}
                     {loading}
                 />
 
-                <!-- Loans Card -->
+                <!-- Unpaid Loans Card -->
                 <StatsCard
-                    title="Total Loans"
-                    value={formatCurrency(currentStats.loans?.total_unpaid_loans)}
-                    subtitle="{formatNumber(currentStats.loans?.active_loans_count)} active loans"
+                    title="Unpaid Loans"
+                    value={formatCurrency(stats.basic?.unpaid_loans)}
+                    subtitle="Outstanding debt"
                     icon="ki-bank"
                     iconColor="kt-badge-light-warning"
                     {loading}
                 />
 
+                <!-- Carbon Footprint Card -->
+                <StatsCard
+                    title="Carbon Footprint"
+                    value={formatNumber(stats.basic?.carbon_footprint)}
+                    subtitle="KG CO₂"
+                    icon="ki-delivery-3"
+                    iconColor="kt-badge-light-danger"
+                    {loading}
+                />
+
+                <!-- Research Level Card -->
+                <StatsCard
+                    title="Research Level"
+                    value={formatNumber(stats.basic?.research_level)}
+                    subtitle="current level"
+                    icon="ki-flask"
+                    iconColor="kt-badge-light-info"
+                    {loading}
+                />
+            </div>
+
+            <!-- Financial Stats Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-7.5">
                 <!-- Revenue Card -->
                 <StatsCard
-                    title="Revenue Today"
-                    value={formatCurrency(currentStats.revenue?.revenue_today)}
-                    subtitle="Daily income"
+                    title="Revenue This Month"
+                    value={formatCurrency(stats.financial?.revenue_this_month)}
+                    subtitle="Monthly income"
                     icon="ki-arrow-up"
                     iconColor="kt-badge-light-success"
                     {loading}
@@ -227,22 +237,22 @@
 
                 <!-- Expenses Card -->
                 <StatsCard
-                    title="Expenses Today"
-                    value={formatCurrency(currentStats.expenses?.expenses_today)}
-                    subtitle="Daily costs"
+                    title="Expenses This Month"
+                    value={formatCurrency(stats.financial?.expenses_this_month)}
+                    subtitle="Monthly costs"
                     icon="ki-arrow-down"
                     iconColor="kt-badge-light-danger"
                     {loading}
                 />
             </div>
 
-            <!-- Secondary Stats Grid -->
+            <!-- Operations Stats Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-7.5">
                 <!-- Employees Card -->
                 <StatsCard
-                    title="Employees"
-                    value={formatNumber(currentStats.employees?.total_employees)}
-                    subtitle={formatCurrency(currentStats.employees?.total_monthly_salaries) + " monthly"}
+                    title="Active Employees"
+                    value={formatNumber(stats.operations?.active_employees)}
+                    subtitle="currently working"
                     icon="ki-people"
                     iconColor="kt-badge-light-info"
                     {loading}
@@ -251,127 +261,87 @@
                 <!-- Production Card -->
                 <StatsCard
                     title="Active Production"
-                    value={formatNumber(currentStats.production?.active_production_orders)}
-                    subtitle="{formatNumber(currentStats.production?.total_producing_quantity)} units"
+                    value={formatNumber(stats.operations?.active_production_orders)}
+                    subtitle="orders in progress"
                     icon="ki-setting-3"
                     iconColor="kt-badge-light-secondary"
                     {loading}
                 />
-
-                <!-- Inventory Card -->
-                <StatsCard
-                    title="Inventory Value"
-                    value={formatCurrency(currentStats.inventory?.total_inventory_value)}
-                    subtitle="{formatNumber(currentStats.inventory?.total_products)} products"
-                    icon="ki-package"
-                    iconColor="kt-badge-light-primary"
-                    {loading}
-                />
-
-                <!-- Marketing Card -->
-                <StatsCard
-                    title="Active Ads"
-                    value={formatNumber(currentStats.marketing?.active_ads_count)}
-                    subtitle={formatCurrency(currentStats.marketing?.active_ads_cost) + " cost"}
-                    icon="ki-chart-pie-simple"
-                    iconColor="kt-badge-light-warning"
-                    {loading}
-                />
             </div>
 
-            <!-- Charts Grid -->
+            <!-- Trend Charts Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-7.5">
-                <!-- Revenue vs Expenses Trend -->
-                <ApexLineChart
-                    title="Revenue vs Expenses Trend"
-                    subtitle="Last 30 days performance"
-                    series={revenueVsExpensesData.series}
-                    categories={revenueVsExpensesData.categories}
-                    colors={['#10b981', '#ef4444']}
-                    {loading}
-                />
-
-                <!-- Sales Performance -->
-                <ApexBarChart
-                    title="Sales Performance"
-                    subtitle="Daily sales count and revenue"
-                    series={salesTrendData.series}
-                    categories={salesTrendData.categories}
-                    colors={['#3b82f6', '#10b981']}
-                    {loading}
-                />
-            </div>
-
-            <!-- Bottom Charts Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-7.5">
                 <!-- Revenue Trend -->
                 <ApexLineChart
                     title="Revenue Trend"
-                    subtitle="Daily revenue over time"
+                    subtitle="Daily revenue over the last 30 days"
                     series={revenueTrendData.series}
                     categories={revenueTrendData.categories}
                     colors={['#10b981']}
-                    height={300}
                     {loading}
                 />
 
                 <!-- Expenses Trend -->
                 <ApexLineChart
                     title="Expenses Trend"
-                    subtitle="Daily expenses over time"
+                    subtitle="Daily expenses over the last 30 days"
                     series={expenseTrendData.series}
                     categories={expenseTrendData.categories}
                     colors={['#ef4444']}
-                    height={300}
+                    {loading}
+                />
+            </div>
+
+            <!-- Sales and Purchase Trends -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-7.5">
+                <!-- Sales Trend -->
+                <ApexLineChart
+                    title="Sales Trend"
+                    subtitle="Daily sales count over the last 30 days"
+                    series={salesTrendData.series}
+                    categories={salesTrendData.categories}
+                    colors={['#3b82f6']}
+                    currency={null}
+                    {loading}
+                />
+
+                <!-- Purchase Trend -->
+                <ApexLineChart
+                    title="Purchase Trend"
+                    subtitle="Daily purchase amounts over the last 30 days"
+                    series={purchaseTrendData.series}
+                    categories={purchaseTrendData.categories}
+                    colors={['#f59e0b']}
+                    currency={null}
+                    {loading}
+                />
+            </div>
+
+            <!-- Breakdown Pie Charts -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-7.5">
+                <!-- Revenue Breakdown -->
+                <ApexDonutChart
+                    title="Revenue Structure"
+                    subtitle="Revenue sources this month"
+                    series={revenueBreakdownData.series}
+                    labels={revenueBreakdownData.labels}
+                    colors={['#10b981', '#3b82f6', '#f59e0b']}
                     {loading}
                 />
 
                 <!-- Expense Breakdown -->
                 <ApexDonutChart
-                    title="Expense Breakdown"
-                    subtitle="Current expense distribution"
+                    title="Expense Structure"
+                    subtitle="Expense categories this month"
                     series={expenseBreakdownData.series}
                     labels={expenseBreakdownData.labels}
-                    colors={['#f59e0b', '#8b5cf6', '#ef4444', '#6b7280']}
-                    height={300}
+                    colors={['#8b5cf6', '#ef4444', '#f59e0b', '#6b7280', '#14b8a6', '#ec4899']}
                     {loading}
                 />
             </div>
 
-            <!-- Quick Stats Summary -->
-            <div class="kt-card">
-                <div class="kt-card-header">
-                    <h3 class="kt-card-title">Quick Summary</h3>
-                </div>
-                <div class="kt-card-content">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-                        <div class="flex flex-col gap-2">
-                            <span class="text-xs font-medium text-secondary-foreground">Monthly Revenue</span>
-                            <span class="text-lg font-bold text-success">
-                                {formatCurrency(currentStats.revenue?.revenue_this_month)}
-                            </span>
-                        </div>
-                        <div class="flex flex-col gap-2">
-                            <span class="text-xs font-medium text-secondary-foreground">Monthly Expenses</span>
-                            <span class="text-lg font-bold text-danger">
-                                {formatCurrency(currentStats.expenses?.expenses_this_month)}
-                            </span>
-                        </div>
-                        <div class="flex flex-col gap-2">
-                            <span class="text-xs font-medium text-secondary-foreground">Net Profit</span>
-                            <span class="text-lg font-bold {(currentStats.revenue?.revenue_this_month || 0) - (currentStats.expenses?.expenses_this_month || 0) >= 0 ? 'text-success' : 'text-danger'}">
-                                {formatCurrency((currentStats.revenue?.revenue_this_month || 0) - (currentStats.expenses?.expenses_this_month || 0))}
-                            </span>
-                        </div>
-                        <div class="flex flex-col gap-2">
-                            <span class="text-xs font-medium text-secondary-foreground">Average Employee Efficiency</span>
-                            <span class="text-lg font-bold text-info">
-                                {formatPercentage(currentStats.employees?.average_efficiency)}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <LeaderboardTable companies={stats.leaderboard || []} {loading} />
+
         </div>
     </div>
     <!-- End of Container -->

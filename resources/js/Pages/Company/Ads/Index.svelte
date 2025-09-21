@@ -275,7 +275,7 @@
                                                     </div>
                                                     <div class="text-right">
                                                         <div class="text-sm font-medium text-mono">
-                                                            {ad.market_impact_percentage}%
+                                                            {(ad.market_impact_percentage * 100).toFixed(2)}%
                                                         </div>
                                                         <div class="text-xs text-secondary-foreground">
                                                             Impact

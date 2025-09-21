@@ -190,18 +190,6 @@
         }
     }
 
-    // Format time ago
-    function formatTimeAgo(dateString) {
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffInSeconds = Math.floor((now - date) / 1000);
-        
-        if (diffInSeconds < 60) return 'Just now';
-        if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
-        if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
-        return `${Math.floor(diffInSeconds / 86400)}d ago`;
-    }
-
     onMount(() => {
         initNotificationSound();
         fetchUnreadCount();
@@ -304,7 +292,7 @@
                                 </p>
                                 <div class="flex items-center justify-between">
                                     <span class="flex items-center text-xs font-medium text-muted-foreground">
-                                        {formatTimeAgo(notification.created_at)}
+                                        {formatTimestamp(notification.created_at)}
                                     </span>
                                 </div>
                             </div>

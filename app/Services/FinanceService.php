@@ -23,6 +23,7 @@ class FinanceService
             'company_id' => $company->id,
             'amount' => $technology->research_cost,
             'type' => Transaction::TYPE_TECHNOLOGY,
+            'transaction_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
         return $funds;  
@@ -40,6 +41,7 @@ class FinanceService
             'company_id' => $company->id,
             'amount' => $purchase->total_cost,
             'type' => Transaction::TYPE_PURCHASE,
+            'transaction_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
 
@@ -64,6 +66,7 @@ class FinanceService
             'company_id' => $company->id,
             'amount' => $totalCost,
             'type' => Transaction::TYPE_INVENTORY,
+            'transaction_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
         return $funds;
@@ -81,6 +84,7 @@ class FinanceService
             'company_id' => $company->id,
             'amount' => $sale->shipping_cost * $sale->quantity,
             'type' => Transaction::TYPE_SALE_SHIPPING,
+            'transaction_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
 
@@ -96,6 +100,7 @@ class FinanceService
             'company_id' => $company->id,
             'amount' => $sale->sale_price * $sale->quantity,
             'type' => Transaction::TYPE_SALE_PAYMENT,
+            'transaction_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
         return $funds;
@@ -113,6 +118,7 @@ class FinanceService
             'company_id' => $company->id,
             'amount' => $employee->recruitment_cost,
             'type' => Transaction::TYPE_EMPLOYEE_RECRUITMENT,
+            'transaction_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
         return $funds;
@@ -133,6 +139,7 @@ class FinanceService
             'company_id' => $company->id,
             'amount' => $totalSalaries,
             'type' => Transaction::TYPE_EMPLOYEE_SALARY,
+            'transaction_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
         return $funds;
@@ -150,6 +157,7 @@ class FinanceService
             'company_id' => $company->id,
             'amount' => $machine->cost_to_acquire,
             'type' => Transaction::TYPE_MACHINE_SETUP,
+            'transaction_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
         return $funds;
@@ -170,6 +178,7 @@ class FinanceService
             'company_id' => $company->id,
             'amount' => $machine->operations_cost,
             'type' => Transaction::TYPE_MACHINE_OPERATIONS,
+            'transaction_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
         return $funds;
@@ -187,6 +196,7 @@ class FinanceService
             'company_id' => $company->id,
             'amount' => $maintenance->maintenances_cost,
             'type' => Transaction::TYPE_MAINTENANCE,
+            'transaction_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
         return $funds;
@@ -206,6 +216,7 @@ class FinanceService
             'company_id' => $company->id,
             'amount' => $loanAmount,
             'type' => Transaction::TYPE_LOAN_RECEIVED,
+            'transaction_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
         return $funds;
@@ -222,6 +233,7 @@ class FinanceService
             'company_id' => $company->id,
             'amount' => $paymentAmount,
             'type' => Transaction::TYPE_LOAN_PAYMENT,
+            'transaction_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
         return $funds;
@@ -240,6 +252,7 @@ class FinanceService
             'company_id' => $company->id,
             'amount' => $soldPrice,
             'type' => Transaction::TYPE_MACHINE_SOLD,
+            'transaction_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
         return $funds;
@@ -257,6 +270,7 @@ class FinanceService
             'company_id' => $company->id,
             'amount' => $ad->price,
             'type' => Transaction::TYPE_MARKETING,
+            'transaction_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
         return $funds;
