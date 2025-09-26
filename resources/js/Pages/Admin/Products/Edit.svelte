@@ -247,8 +247,6 @@
                                     id="elasticity_coefficient"
                                     type="number"
                                     step="0.001"
-                                    min="-1"
-                                    max="1"
                                     class="kt-input {errors.elasticity_coefficient ? 'kt-input-error' : ''}"
                                     placeholder="Enter elasticity coefficient"
                                     bind:value={form.elasticity_coefficient}

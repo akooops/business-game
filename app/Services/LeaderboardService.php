@@ -20,6 +20,10 @@ class LeaderboardService
             $netWorths[] = $netWorth;
         }
 
+        if(empty($netWorths)) {
+            return $companies;
+        }
+
         // Get max values for normalization
         $maxNetWorth = max($netWorths);
 
