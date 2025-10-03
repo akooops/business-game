@@ -31,7 +31,7 @@ class StoreProductRecipeRequest extends FormRequest
                 Rule::unique('product_recipes', 'material_id')
                     ->where('product_id', $this->input('product_id'))
             ],
-            'quantity' => 'required|numeric|min:0.01'        
+            'quantity' => 'required|numeric|min:0.001'        
         ];
     }
 

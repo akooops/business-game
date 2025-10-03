@@ -30,6 +30,7 @@ class UpdateMachineRequest extends FormRequest
             ],
             'model' => 'required|string|max:255',
             'manufacturer' => 'required|string|max:255',
+            'description' => 'nullable|string',
             'cost_to_acquire' => 'required|numeric|min:0',
             'loss_on_sale_days' => 'required|numeric|min:0',
 
