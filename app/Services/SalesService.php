@@ -12,7 +12,7 @@ class SalesService
     {
         $productDemand = $product->demands()->where('gameweek', SettingsService::getCurrentGameWeek())->first();
 
-        return ($productDemand) ? $productDemand->market_price : 0.000;
+        return ($productDemand) ? $productDemand->market_price : $product->avg_market_price;
     }
 
     //Fix the sale price of a product
@@ -42,26 +42,36 @@ class SalesService
             // Get the product demand for the current gameweek
             $product = $companyProduct->product;
             $productDemand = $product->demands()->where('gameweek', SettingsService::getCurrentGameWeek())->first();
-            if(!$productDemand){
-                continue;
-            }
+
+            $marketPrice = ($productDemand) ? $productDemand->market_price : $product->avg_market_price; 
+            $realDemand = ($productDemand) ? $productDemand->real_demand : $product->avg_demand;
 
             // Calculate the price difference between the market price and the company product sale price
-            $priceDifference = $productDemand->market_price - $companyProduct->sale_price;
+            $priceDifference = $marketPrice - $companyProduct->sale_price;
 
             // Get the ad market impact percentage
             $adMarketImpactPercentage = AdsService::getAdMarketImpactPercentage($company, $product);
 
             // Calculate the demand for the week based on the price difference and the elasticity coefficient with marketing boost
-            $baseDemand = $productDemand->real_demand * (1 + $adMarketImpactPercentage);
-            $demandForWeek = $baseDemand - $product->elasticity_coefficient * $baseDemand * ($priceDifference / $productDemand->market_price);
+            $baseDemand = $realDemand * (1 + $adMarketImpactPercentage);
+            $demandForWeek = $baseDemand - $product->elasticity_coefficient * $baseDemand * ($priceDifference / $marketPrice);
 
-            if($demandForWeek > $productDemand->max_demand){
-                $demandForWeek = $productDemand->max_demand;
-            }
+            if($productDemand){
+                if($demandForWeek > $productDemand->max_demand){
+                    $demandForWeek = $productDemand->max_demand;
+                }
 
-            if($demandForWeek < 0){
-                $demandForWeek = 0;
+                if($demandForWeek < 0){
+                    $demandForWeek = 0;
+                }
+            }else{
+                if($demandForWeek > $product->avg_demand * 1.2){
+                    $demandForWeek = $product->avg_demand;
+                }
+
+                if($demandForWeek < 0){
+                    $demandForWeek = 0;
+                }
             }
 
             $numberOfSales = rand(1, 4);

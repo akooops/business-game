@@ -108,6 +108,12 @@
                             <p class="text-sm text-secondary-foreground">{machine.manufacturer}</p>
                         </div>
 
+                        <!-- Description -->
+                        <div class="flex flex-col gap-2">
+                            <h4 class="text-sm font-semibold text-mono">Description</h4>
+                            <p class="text-sm text-secondary-foreground">{machine.description}</p>
+                        </div>
+
                         <!-- Cost to Acquire -->
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Acquisition Cost</h4>

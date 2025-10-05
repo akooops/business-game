@@ -16,6 +16,9 @@ class Product extends Model
 
     protected $casts = [
         'elasticity_coefficient' => 'decimal:3',
+        'avg_demand' => 'decimal:3',
+        'avg_market_price' => 'decimal:3',
+        'is_saleable' => 'boolean',
         'storage_cost' => 'decimal:3',
         'has_expiration' => 'boolean',
     ];

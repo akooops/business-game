@@ -277,19 +277,19 @@
                                             </td>
                                             <td>
                                                 <div class="flex items-center gap-3">
-                                                    <div class="flex-shrink-0">
-                                                        {#if machine.image_url}
-                                                            <img 
-                                                                src={machine.image_url} 
-                                                                alt={machine.name}
-                                                                class="w-10 h-10 rounded-lg object-cover"
-                                                            />
-                                                        {:else}
-                                                            <div class="w-10 h-10 rounded-lg bg-accent/50 flex items-center justify-center">
-                                                                <i class="ki-filled ki-technology text-lg text-muted-foreground"></i>
-                                                            </div>
-                                                        {/if}
-                                                    </div>
+                                                    {#if machine.image_url}
+                                                        <img 
+                                                            src={machine.image_url} 
+                                                            alt={machine.name}
+                                                            class="rounded-lg object-cover"
+                                                            style="min-width: 36px; min-height: 36px; max-width: 36px; max-height: 36px;"
+                                                        />
+                                                    {:else}
+                                                        <div class="w-10 h-10 rounded-lg bg-accent/50 flex items-center justify-center">
+                                                            <i class="ki-filled ki-package text-lg text-muted-foreground"></i>
+                                                        </div>
+                                                    {/if}
+
                                                     <div class="flex flex-col gap-1">
                                                         <span class="text-sm font-medium text-mono hover:text-primary">
                                                             {machine.name}

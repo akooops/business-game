@@ -303,7 +303,7 @@
             },
             fontSize: '12px',
         },
-        colors: ['#EF4444', '#10B981', '#3B82F6'],
+        colors: ['#EF4444', '#F59E0B', '#10B981'],
         series: []
     };
 
@@ -314,7 +314,7 @@
             currentProduct = {
                 id: event.detail.data.id,
                 name: event.detail.data.name,
-
+                avg_demand: event.detail.data.avg_demand
             };
             
             // Update URL with product information
@@ -402,6 +402,15 @@
             }
         ];
 
+        // Add avg demand series if available
+        if (currentProduct && currentProduct.avg_demand !== null && currentProduct.avg_demand !== undefined) {
+            series.push({
+                name: 'Avg Demand',
+                type: 'line',
+                data: demandData.map(d => ({ x: parseInt(d.gameweek), y: parseFloat(currentProduct.avg_demand) }))
+            });
+        }
+
         console.log('Updating chart with series:', series);
         
         try {
@@ -449,7 +458,8 @@
             selectedProductId = initialProductId;
             currentProduct = {
                 id: initialProductId,
-                name: initialProductName || `Product #${initialProductId}`
+                name: initialProductName || `Product #${initialProductId}`,
+                avg_demand: null // Will be fetched when product data is loaded
             };
             fetchDemandData();
         }
@@ -575,7 +585,8 @@
                                                             text: `${product.name}`,
                                                             name: product.name,
                                                             type: product.type,
-                                                            type_name: product.type_name
+                                                            type_name: product.type_name,
+                                                            avg_demand: product.avg_demand,
                                                         }))
                                                     };
                                                 },
@@ -665,6 +676,7 @@
                                             <tr>
                                                 <th>Gameweek</th>
                                                 <th>Min Demand</th>
+                                                <th>Avg Demand</th>
                                                 <th>Max Demand</th>
                                                 <th>Market Price</th>
                                                 <th>Actions</th>
@@ -677,6 +689,13 @@
                                                         <span class="font-medium text-mono">Week {demand.gameweek}</span>
                                                     </td>
                                                     <td>{demand.min_demand}</td>
+                                                    <td>
+                                                        {#if currentProduct && currentProduct.avg_demand !== null && currentProduct.avg_demand !== undefined}
+                                                            {currentProduct.avg_demand}
+                                                        {:else}
+                                                            <span class="text-muted-foreground">-</span>
+                                                        {/if}
+                                                    </td>
                                                     <td>{demand.max_demand}</td>
                                                     <td>{demand.market_price} DZD</td>
                                                     <td>

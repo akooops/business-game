@@ -33,6 +33,9 @@
         description: '',
         type: 'raw_material',
         elasticity_coefficient: 0,
+        avg_demand: 0,
+        avg_market_price: 0,
+        is_saleable: true,
         storage_cost: 0,
         shelf_life_days: '',
         has_expiration: false,
@@ -106,9 +109,12 @@
             if (form[key] !== null && form[key] !== '') {
                 if (key === 'file' && form.file) {
                     formData.append(key, form.file);
-                } else if (key === 'has_expiration' || key === 'needs_technology') {
+                } else if (key === 'has_expiration' || key === 'needs_technology' || key === 'is_saleable') {
                     formData.append(key, form[key] ? '1' : '0');
-                } else if (key !== 'file') {
+                } else if (key === 'is_saleable') {
+                    formData.append(key, form[key] ? '1' : '0');
+                }
+                else if (key !== 'file') {
                     formData.append(key, form[key]);
                 }
             }
@@ -245,6 +251,69 @@
                                 </p>
                                 {#if errors.elasticity_coefficient}
                                     <p class="text-sm text-destructive">{errors.elasticity_coefficient}</p>
+                                {/if}
+                            </div>
+
+                            <!-- Avg Demand -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-medium text-mono" for="avg_demand">
+                                    Avg Demand <span class="text-destructive">*</span>
+                                </label>
+                                <input
+                                    id="avg_demand"
+                                    type="number"
+                                    step="0.001"
+                                    class="kt-input {errors.avg_demand ? 'kt-input-error' : ''}"
+                                    placeholder="Enter avg demand"
+                                    bind:value={form.avg_demand}
+                                />
+                                <p class="text-xs text-secondary-foreground">
+                                    Average demand per week (this value is used if there were no min and max demand set for a week)
+                                </p>
+                                {#if errors.avg_demand}
+                                    <p class="text-sm text-destructive">{errors.avg_demand}</p>
+                                {/if}
+                            </div>
+
+                            <!-- Avg Market Price -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-medium text-mono" for="avg_market_price">
+                                    Avg Market Price <span class="text-destructive">*</span>
+                                </label>
+                                <input
+                                    id="avg_market_price"
+                                    type="number"
+                                    step="0.001"
+                                    class="kt-input {errors.avg_market_price ? 'kt-input-error' : ''}"
+                                    placeholder="Enter avg market price"
+                                    bind:value={form.avg_market_price}
+                                />
+                                <p class="text-xs text-secondary-foreground">
+                                    Average market price per week (this value is used if there were market price set for a week)
+                                </p>
+                                {#if errors.avg_market_price}
+                                    <p class="text-sm text-destructive">{errors.avg_market_price}</p>
+                                {/if}
+                            </div>
+
+                            <!-- Is Saleable -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-medium text-mono">
+                                    Product Saleability
+                                </label>
+                                <div class="flex items-center gap-3">
+                                    <input 
+                                        class="kt-switch" 
+                                        type="checkbox" 
+                                        id="is_saleable" 
+                                        bind:checked={form.is_saleable}
+                                    />
+                                    <label class="kt-label cursor-pointer" for="is_saleable">
+                                        This product is saleable
+                                    </label>
+                                </div>
+                                {#if errors.is_saleable}
+                                    <p class="text-sm text-destructive">{errors.is_saleable}</p>
                                 {/if}
                             </div>
 
