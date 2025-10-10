@@ -411,7 +411,7 @@
                                         class="kt-input {errors.carbon_footprint ? 'kt-input-error' : ''}"
                                         placeholder="Enter carbon footprint"
                                         min="0"
-                                        step="0.0001"
+                                        step="any"
                                         required
                                     />
                                     {#if errors.carbon_footprint}
