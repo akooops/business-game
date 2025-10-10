@@ -116,6 +116,16 @@ class EventsController extends Controller
                 'category' => 'Labor',
                 'impact' => 'positive',
                 'icon' => 'fa-solid fa-handshake'
+            ],
+            
+            // Workplace Safety Events
+            [
+                'key' => 'start-work-accident',
+                'name' => 'Start Work Accident',
+                'description' => 'Workplace accident breaks a machine, cancels production, employee resigns, and reduces all employees efficiency by 10-20%',
+                'category' => 'Safety',
+                'impact' => 'negative',
+                'icon' => 'fa-solid fa-triangle-exclamation'
             ]
         ];
 

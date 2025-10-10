@@ -20,7 +20,7 @@ class RunEventRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'event' => 'required|in:allow-countries-import,block-countries-import,open-suez-canal,close-suez-canal,open-ormuz-canal,close-ormuz-canal,start-heat-wave,stop-heat-wave,start-health-complaint,stop-health-complaint,start-workers-protest,end-workers-protest',
+            'event' => 'required|in:allow-countries-import,block-countries-import,open-suez-canal,close-suez-canal,open-ormuz-canal,close-ormuz-canal,start-heat-wave,stop-heat-wave,start-health-complaint,stop-health-complaint,start-workers-protest,end-workers-protest,start-work-accident',
         ];
     }
 } 

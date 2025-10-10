@@ -635,7 +635,7 @@
                     <input 
                         type="number" 
                         bind:value={formData.quantity}
-                        min="0.001"
+                        min="0.0001"
                         step="0.001"
                         class="kt-input w-full {errors.quantity ? 'kt-input-error' : ''}"
                         required

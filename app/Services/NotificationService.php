@@ -444,6 +444,16 @@ class NotificationService
         }
     }
 
+    public static function createWorkAccedentStartedNotification($company, $machine, $employee){
+        return Notification::create([
+            'type' => Notification::TYPE_WORK_ACCEDENT_STARTED,
+            'title' => 'Work Accedent Started',
+            'message' => "Work accedent started for {$machine->name}. Any production orders for this machine will be cancelled and materials will be lost. Employees will be less productive and less efficient because of employee {$employee->name} resign after injury.",
+            'url' => route('company.machines.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
     // ------------------------------------------------------------
     // Loans
     // ------------------------------------------------------------

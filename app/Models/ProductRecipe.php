@@ -12,7 +12,7 @@ class ProductRecipe extends Model
     protected $guarded = ['id'];
 
     protected $casts = [
-        'quantity' => 'decimal:3',
+        'quantity' => 'decimal:4',
     ];
 
     //Relations

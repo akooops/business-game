@@ -31,7 +31,7 @@ class StoreProductRecipeRequest extends FormRequest
                     ->where('product_id', $this->product_id)
                     ->where('material_id', $this->material_id)
             ],
-            'quantity' => ['required', 'numeric', 'min:0.001'],
+            'quantity' => ['required', 'numeric', 'min:0.0001'],
         ];
     }
 } 

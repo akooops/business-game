@@ -50,6 +50,9 @@ class Notification extends Model
     const TYPE_WORKERS_PROTEST_STARTED = 'workers_protest_started';
     const TYPE_WORKERS_PROTEST_ENDED = 'workers_protest_ended';
 
+    // Work accedent
+    const TYPE_WORK_ACCEDENT_STARTED = 'work_accedent_started';
+
     // Inventory expired
     const TYPE_INVENTORY_EXPIRED = 'inventory_expired';
 
@@ -112,6 +115,7 @@ class Notification extends Model
         self::TYPE_HEALTH_COMPLAINT_ENDED => 'fa-solid fa-head-side-cough',
         self::TYPE_WORKERS_PROTEST_STARTED => 'fa-solid fa-people-protest',
         self::TYPE_WORKERS_PROTEST_ENDED => 'fa-solid fa-people-protest',
+        self::TYPE_WORK_ACCEDENT_STARTED => 'fa-solid fa-screwdriver-wrench',
         self::TYPE_INVENTORY_COSTS_PAID => 'fa-solid fa-coins',
         self::TYPE_SALE_INITIATED => 'fa-solid fa-cart-shopping',
         self::TYPE_SALE_DELIVERED => 'fa-solid fa-truck',
