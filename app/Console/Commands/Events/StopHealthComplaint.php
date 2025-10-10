@@ -48,8 +48,8 @@ class StopHealthComplaint extends Command
             $productDemand = ProductDemand::where('product_id', $product->id)->first();
 
             $productDemand->update([
-                'min_demand' => $productDemand->min_demand + (1 - $rate),
-                'max_demand' => $productDemand->max_demand + (1 - $rate),
+                'min_demand' => $productDemand->min_demand / (1 - $rate),
+                'max_demand' => $productDemand->max_demand / (1 - $rate),
             ]);
         }
 

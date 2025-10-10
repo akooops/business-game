@@ -416,6 +416,34 @@ class NotificationService
         }
     }
 
+    public static function createWorkersProtestStartedNotification($rate){
+        $companies = Company::get();
+
+        foreach($companies as $company){
+            Notification::create([
+                'type' => Notification::TYPE_WORKERS_PROTEST_STARTED,
+                'title' => 'Workers Protest Started',
+                'message' => "Workers protest started after one of them did not receive injury compensation which will cause employees to be less productive and less efficient by " . $rate * 100 . "%.",
+                'url' => route('company.products.index'),
+                'user_id' => $company->user_id,
+            ]);
+        }
+    }
+
+    public static function createWorkersProtestEndedNotification(){
+        $companies = Company::get();
+
+        foreach($companies as $company){
+            Notification::create([
+                'type' => Notification::TYPE_WORKERS_PROTEST_ENDED,
+                'title' => 'Workers Protest Ended',
+                'message' => "Workers protest ended and the employees are back to normal",
+                'url' => route('company.products.index'),
+                'user_id' => $company->user_id,
+            ]);
+        }
+    }
+
     // ------------------------------------------------------------
     // Loans
     // ------------------------------------------------------------

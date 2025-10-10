@@ -46,6 +46,10 @@ class Notification extends Model
     const TYPE_HEALTH_COMPLAINT_STARTED = 'health_complaint_started';
     const TYPE_HEALTH_COMPLAINT_ENDED = 'health_complaint_ended';
 
+    // Workers protest
+    const TYPE_WORKERS_PROTEST_STARTED = 'workers_protest_started';
+    const TYPE_WORKERS_PROTEST_ENDED = 'workers_protest_ended';
+
     // Inventory expired
     const TYPE_INVENTORY_EXPIRED = 'inventory_expired';
 
@@ -106,6 +110,8 @@ class Notification extends Model
         self::TYPE_HEAT_WAVE_ENDED => 'fa-solid fa-fire',
         self::TYPE_HEALTH_COMPLAINT_STARTED => 'fa-solid fa-head-side-cough',
         self::TYPE_HEALTH_COMPLAINT_ENDED => 'fa-solid fa-head-side-cough',
+        self::TYPE_WORKERS_PROTEST_STARTED => 'fa-solid fa-people-protest',
+        self::TYPE_WORKERS_PROTEST_ENDED => 'fa-solid fa-people-protest',
         self::TYPE_INVENTORY_COSTS_PAID => 'fa-solid fa-coins',
         self::TYPE_SALE_INITIATED => 'fa-solid fa-cart-shopping',
         self::TYPE_SALE_DELIVERED => 'fa-solid fa-truck',
