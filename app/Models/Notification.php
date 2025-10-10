@@ -42,6 +42,10 @@ class Notification extends Model
     const TYPE_HEAT_WAVE_STARTED = 'heat_wave_started';
     const TYPE_HEAT_WAVE_ENDED = 'heat_wave_ended';
 
+    // Health complaint
+    const TYPE_HEALTH_COMPLAINT_STARTED = 'health_complaint_started';
+    const TYPE_HEALTH_COMPLAINT_ENDED = 'health_complaint_ended';
+
     // Inventory expired
     const TYPE_INVENTORY_EXPIRED = 'inventory_expired';
 
@@ -100,6 +104,8 @@ class Notification extends Model
         self::TYPE_SUEZ_CANAL_OPENED => 'ki-filled ki-ship',
         self::TYPE_HEAT_WAVE_STARTED => 'fa-solid fa-fire',
         self::TYPE_HEAT_WAVE_ENDED => 'fa-solid fa-fire',
+        self::TYPE_HEALTH_COMPLAINT_STARTED => 'fa-solid fa-head-side-cough',
+        self::TYPE_HEALTH_COMPLAINT_ENDED => 'fa-solid fa-head-side-cough',
         self::TYPE_INVENTORY_COSTS_PAID => 'fa-solid fa-coins',
         self::TYPE_SALE_INITIATED => 'fa-solid fa-cart-shopping',
         self::TYPE_SALE_DELIVERED => 'fa-solid fa-truck',

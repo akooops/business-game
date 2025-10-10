@@ -1,0 +1,58 @@
+<?php
+
+namespace App\Console\Commands\Events;
+
+use Illuminate\Console\Command;
+use App\Services\SettingsService;
+use App\Models\Country;
+use App\Services\NotificationService;
+use App\Models\Supplier;
+use App\Services\CalculationsService;
+use App\Models\Product;
+use App\Models\ProductDemand;
+
+class StartHealthComplaint extends Command
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'game:start-health-complaint';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Start health complaint';
+
+    /**
+     * Execute the console command.
+     */
+    public function handle()
+    {
+        $this->info('Queueing start health complaint job...');
+
+        // Define the list of countries that will be affected by the Suez canal opening
+        $rate = 0.2;
+
+        // Get the target timestamp from settings
+        $currentTimestamp = SettingsService::getCurrentTimestamp();
+
+        $this->info('Current timestamp: ' . $currentTimestamp->format('Y-m-d H:i:s'));
+
+        $products = Product::get();
+
+        foreach($products as $product){
+            $productDemand = ProductDemand::where('product_id', $product->id)->first();
+
+            $productDemand->update([
+                'min_demand' => $productDemand->min_demand - $productDemand->min_demand * $rate,
+                'max_demand' => $productDemand->max_demand - $productDemand->max_demand * $rate,
+            ]);
+        }
+
+        NotificationService::createHealthComplaintStartedNotification($rate);
+    }
+} 

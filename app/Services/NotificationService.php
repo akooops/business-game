@@ -388,6 +388,34 @@ class NotificationService
         }
     }
 
+    public static function createHealthComplaintStartedNotification($rate){
+        $companies = Company::get();
+
+        foreach($companies as $company){
+            Notification::create([
+                'type' => Notification::TYPE_HEALTH_COMPLAINT_STARTED,
+                'title' => 'Health Complaint Started',
+                'message' => "Health complaint started which will cause demand decline by " . $rate * 100 . "%.",
+                'url' => route('company.products.index'),
+                'user_id' => $company->user_id,
+            ]);
+        }
+    }
+
+    public static function createHealthComplaintEndedNotification(){
+        $companies = Company::get();
+
+        foreach($companies as $company){
+            Notification::create([
+                'type' => Notification::TYPE_HEALTH_COMPLAINT_ENDED,
+                'title' => 'Health Complaint Ended',
+                'message' => "Health complaint ended which will cause demand to be back to normal",
+                'url' => route('company.products.index'),
+                'user_id' => $company->user_id,
+            ]);
+        }
+    }
+
     // ------------------------------------------------------------
     // Loans
     // ------------------------------------------------------------
