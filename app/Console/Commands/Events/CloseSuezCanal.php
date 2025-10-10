@@ -33,8 +33,8 @@ class CloseSuezCanal extends Command
         $this->info('Queueing Suez canal closing job...');
 
         // Define the list of countries that will be affected by the Suez canal closing
-        $countries = ['Egypt', 'China'];
-        $rate = 1.5;
+        $countries = ['China', 'India'];
+        $rate = 0.2;
 
         // Get the target timestamp from settings
         $currentTimestamp = SettingsService::getCurrentTimestamp();
@@ -48,10 +48,10 @@ class CloseSuezCanal extends Command
             $supplier = Supplier::where('country_id', $country->id)->first();
 
             if($supplier){
-                $minShippingCost = $supplier->min_shipping_cost * $rate;
-                $maxShippingCost = $supplier->max_shipping_cost * $rate;
-                $minShippingTimeDays = $supplier->min_shipping_time_days * $rate;
-                $maxShippingTimeDays = $supplier->max_shipping_time_days * $rate;
+                $minShippingCost = $supplier->min_shipping_cost + $supplier->min_shipping_cost * $rate;
+                $maxShippingCost = $supplier->max_shipping_cost + $supplier->max_shipping_cost * $rate;
+                $minShippingTimeDays = $supplier->min_shipping_time_days + $supplier->min_shipping_time_days * $rate;
+                $maxShippingTimeDays = $supplier->max_shipping_time_days + $supplier->max_shipping_time_days * $rate;
 
                 $supplier->update([
                     'min_shipping_cost' => $minShippingCost,

@@ -30,17 +30,17 @@ class Notification extends Model
     const TYPE_COUNTRIES_IMPORT_BLOCKED = 'countries_import_blocked';
     const TYPE_COUNTRIES_IMPORT_ALLOWED = 'countries_import_allowed';
 
-    // Countries customs duties rate
-    const TYPE_COUNTRIES_CUSTOMS_DUTIES_RATE_RAISED = 'countries_customs_duties_rate_raised';
-    const TYPE_COUNTRIES_CUSTOMS_DUTIES_RATE_LOWERED = 'countries_customs_duties_rate_lowered';
-
     // Oil price
-    const TYPE_OIL_PRICE_RAISED = 'oil_price_raised';
-    const TYPE_OIL_PRICE_LOWERED = 'oil_price_lowered';
+    const TYPE_ORMUZ_CANAL_CLOSED = 'ormuz_canal_closed';
+    const TYPE_ORMUZ_CANAL_OPENED = 'ormuz_canal_opened';
 
     // Suez canal
     const TYPE_SUEZ_CANAL_CLOSED = 'suez_canal_closed';
     const TYPE_SUEZ_CANAL_OPENED = 'suez_canal_opened';
+
+    // Heat wave
+    const TYPE_HEAT_WAVE_STARTED = 'heat_wave_started';
+    const TYPE_HEAT_WAVE_ENDED = 'heat_wave_ended';
 
     // Inventory expired
     const TYPE_INVENTORY_EXPIRED = 'inventory_expired';
@@ -94,14 +94,12 @@ class Notification extends Model
         self::TYPE_PURCHASE_CANCELLED => 'fa-solid fa-circle-xmark',
         self::TYPE_COUNTRIES_IMPORT_BLOCKED => 'ki-filled ki-ship',
         self::TYPE_COUNTRIES_IMPORT_ALLOWED => 'ki-filled ki-ship',
-        self::TYPE_COUNTRIES_CUSTOMS_DUTIES_RATE_RAISED => 'ki-filled ki-ship',
-        self::TYPE_COUNTRIES_CUSTOMS_DUTIES_RATE_LOWERED => 'ki-filled ki-ship',
-        self::TYPE_OIL_PRICE_RAISED => 'ki-filled ki-ship',
-        self::TYPE_OIL_PRICE_LOWERED => 'ki-filled ki-ship',
+        self::TYPE_ORMUZ_CANAL_CLOSED => 'ki-filled ki-ship',
+        self::TYPE_ORMUZ_CANAL_OPENED => 'ki-filled ki-ship',
         self::TYPE_SUEZ_CANAL_CLOSED => 'ki-filled ki-ship',
         self::TYPE_SUEZ_CANAL_OPENED => 'ki-filled ki-ship',
-        self::TYPE_INVENTORY_EXPIRED => 'fa-solid fa-clock',
-        self::TYPE_INVENTORY_DAMAGED => 'fa-solid circle-exclamation',
+        self::TYPE_HEAT_WAVE_STARTED => 'fa-solid fa-fire',
+        self::TYPE_HEAT_WAVE_ENDED => 'fa-solid fa-fire',
         self::TYPE_INVENTORY_COSTS_PAID => 'fa-solid fa-coins',
         self::TYPE_SALE_INITIATED => 'fa-solid fa-cart-shopping',
         self::TYPE_SALE_DELIVERED => 'fa-solid fa-truck',

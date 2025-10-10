@@ -4,49 +4,51 @@ namespace App\Console\Commands\Events;
 
 use Illuminate\Console\Command;
 use App\Services\SettingsService;
-use App\Models\Country;
-use App\Services\NotificationService;
 use App\Models\Supplier;
+use App\Models\SupplierProduct;
+use App\Models\Wilaya;
+use App\Services\NotificationService;
 use App\Services\CalculationsService;
 
-class OpenSuezCanal extends Command
+class OpenOrmuzCanal extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'game:open-suez-canal';
+    protected $signature = 'game:open-ormuz-canal';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Open Suez canal';
+    protected $description = 'Open Ormuz canal';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        $this->info('Queueing Suez canal opening job...');
+        $this->info('Queueing Ormuz canal opening job...');
 
-        // Define the list of countries that will be affected by the Suez canal opening
-        $countries = ['China', 'India'];
-        $rate = 0.2;
+        // Define the list of countries to block
+        $rate = 0.15;
 
         // Get the target timestamp from settings
         $currentTimestamp = SettingsService::getCurrentTimestamp();
 
         $this->info('Current timestamp: ' . $currentTimestamp->format('Y-m-d H:i:s'));
-        $this->info('Countries affected by Suez canal opening: ' . implode(', ', $countries));
 
-        foreach($countries as $country){
-            $country = Country::where('name', $country)->first();
+        $products = ["Silicones", "Surfactants", "Preservatives", "Thickener / Gelling Agent", "Packaging Material"];
+        $countries = ["United Arab Emirates"];
 
-            $supplier = Supplier::where('country_id', $country->id)->first();
+        $suppliers = Supplier::whereHas('country', function($query) use ($countries){
+            $query->whereIn('name', $countries);
+        })->get();
 
+        foreach($suppliers as $supplier){
             if($supplier){
                 $minShippingCost = $supplier->min_shipping_cost / (1 + $rate);
                 $maxShippingCost = $supplier->max_shipping_cost / (1 + $rate);
@@ -62,10 +64,22 @@ class OpenSuezCanal extends Command
                     'real_shipping_time_days' => CalculationsService::calcaulteRandomBetweenMinMax($minShippingTimeDays, $maxShippingTimeDays),
                 ]);
 
-                $this->info('Country ' . $country->name . ' affected successfully');
+                $this->info('Supplier ' . $supplier->name . ' raised successfully with min shipping cost ' . $minShippingCost . ' and max shipping cost ' . $maxShippingCost);
             }
         }
 
-        NotificationService::createSuezCanalOpenedNotification($countries);
+        $supplierProducts = SupplierProduct::whereHas('product', function($query) use ($products){
+            $query->whereIn('name', $products);
+        })->get();
+
+        foreach($supplierProducts as $supplierProduct){
+            $supplierProduct->update([
+                'min_sale_price' => $supplierProduct->min_sale_price / (1 + $rate),
+                'max_sale_price' => $supplierProduct->max_sale_price / (1 + $rate),
+                'real_sale_price' => CalculationsService::calcaulteRandomBetweenMinMax($supplierProduct->min_sale_price, $supplierProduct->max_sale_price),
+            ]);
+        }
+
+        NotificationService::createOrmuzCanalOpenedNotification($products, $countries);
     }
 } 
