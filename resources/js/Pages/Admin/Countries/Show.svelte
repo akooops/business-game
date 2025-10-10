@@ -111,7 +111,7 @@
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Customs Duties Rate</h4>
                             <p class="text-sm text-secondary-foreground">
-                                {(country?.customs_duties_rate * 100)}%
+                                {(country?.customs_duties_rate * 100).toFixed(2)}%
                                 <span class="text-xs text-muted-foreground ml-2">
                                     (Applied on total value of imported goods)
                                 </span>

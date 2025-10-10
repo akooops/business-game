@@ -115,8 +115,10 @@ class HrService
     public static function paySalaries($company){
         $totalSalaries = $company->employees()->where('status', Employee::STATUS_ACTIVE)->sum('salary_month');
 
-        FinanceService::payEmployeesSalary($company, $totalSalaries);
-        NotificationService::createEmployeeSalaryPaidNotification($company, $totalSalaries);
+        if($totalSalaries > 0){
+            FinanceService::payEmployeesSalary($company, $totalSalaries);
+            NotificationService::createEmployeeSalaryPaidNotification($company, $totalSalaries);
+        }
     }
 
     public static function processEmployeesMood($company){

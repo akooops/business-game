@@ -111,7 +111,7 @@
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Market Impact</h4>
                             <p class="text-sm text-secondary-foreground font-bold">
-                                {advertiser.min_market_impact_percentage * 100}% - {advertiser.max_market_impact_percentage * 100}%
+                                {(advertiser.min_market_impact_percentage * 100).toFixed(2)}% - {(advertiser.max_market_impact_percentage * 100).toFixed(2)}%
                             </p>
                         </div>
 

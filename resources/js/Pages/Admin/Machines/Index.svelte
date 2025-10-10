@@ -313,7 +313,7 @@
                                                     </div>
                                                     <div class="flex items-center gap-1">
                                                         <span class="text-xs text-muted-foreground">Quality:</span>
-                                                        <span class="text-xs font-medium">{machine.quality_factor * 100}%</span>
+                                                        <span class="text-xs font-medium">{(machine.quality_factor * 100).toFixed(2)}%</span>
                                                     </div>
                                                     <div class="flex items-center gap-1">
                                                         <span class="text-xs text-muted-foreground">Operations Cost:</span>
@@ -332,7 +332,7 @@
                                                 </div>
                                                 <div class="flex items-center gap-1">
                                                     <span class="text-xs text-muted-foreground">Loss on Sale:</span>
-                                                    <span class="text-xs font-medium">{machine.loss_on_sale_days * 100}% / day</span>
+                                                    <span class="text-xs font-medium">{(machine.loss_on_sale_days * 100).toFixed(2)}% / day</span>
                                                 </div>
                                             </td>
                                             <td class="text-center">

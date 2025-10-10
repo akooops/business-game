@@ -25,8 +25,8 @@ return new class extends Migration
             $table->timestamp('started_at')->nullable();
             $table->timestamp('completed_at')->nullable();
 
-            $table->foreignId('company_machine_id')->constrained('company_machines');
-            $table->foreignId('product_id')->constrained('products');
+            $table->foreignId('company_machine_id')->constrained('company_machines')->onDelete('cascade');
+            $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
 
             $table->timestamps();
         });

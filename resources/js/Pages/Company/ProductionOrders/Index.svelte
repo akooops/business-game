@@ -461,7 +461,7 @@
                         </span>
                         <div>
                             <span class="text-xs font-medium text-foreground">
-                                {(selectedProductionOrder.quality_factor * 100).toFixed(1)}%
+                                {(selectedProductionOrder.quality_factor * 100).toFixed(2)}%
                             </span>
                         </div>
                     </div>

@@ -323,7 +323,7 @@
                                                                 <span class="text-xs font-normal text-secondary-foreground uppercase">
                                                                     Interest Rate:
                                                                     <span class="text-xs font-medium text-foreground">
-                                                                        {loan.interest_rate * 100}%
+                                                                        {(loan.interest_rate * 100).toFixed(2)}%
                                                                     </span>
                                                                 </span>
                                                             </div>
@@ -430,7 +430,7 @@
                                 <p class="text-sm text-muted-foreground mb-1">Loan ID: #{selectedLoan.id}</p>
                                 <div class="flex gap-2">
                                     <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                                        {selectedLoan.interest_rate * 100}% Interest
+                                        {(selectedLoan.interest_rate * 100).toFixed(2)}% Interest
                                     </span>
                                     <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
                                         {selectedLoan.duration_months} months
@@ -606,7 +606,7 @@
                         </span>
                         <div>
                             <span class="text-xs font-medium text-foreground">
-                                {selectedLoanDetails.interest_rate * 100}%
+                                {(selectedLoanDetails.interest_rate * 100).toFixed(2)}%
                             </span>
                         </div>
                     </div>

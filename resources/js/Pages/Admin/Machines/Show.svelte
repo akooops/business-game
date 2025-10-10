@@ -128,7 +128,7 @@
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Loss on Sale</h4>
                             <p class="text-sm text-secondary-foreground">
-                                {machine.loss_on_sale_days * 100}% / day of acquisition cost
+                                {(machine.loss_on_sale_days * 100).toFixed(2)}% / day of acquisition cost
                             </p>
                         </div>
 

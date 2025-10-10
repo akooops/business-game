@@ -25,8 +25,8 @@ return new class extends Migration
             $table->timestamp('borrowed_at')->nullable();
             $table->timestamp('paid_at')->nullable();
 
-            $table->foreignId('bank_id')->constrained('banks');
-            $table->foreignId('company_id')->constrained('companies');
+            $table->foreignId('bank_id')->constrained('banks')->onDelete('cascade');
+            $table->foreignId('company_id')->constrained('companies')->onDelete('cascade');
 
             $table->timestamps();
         });

@@ -74,63 +74,38 @@ class SalesService
                 }
             }
 
-            $numberOfSales = rand(1, 4);
-            
-            // Generate individual sale quantities with fluctuations
-            $saleQuantities = [];
-            $totalAllocated = 0;
-            
-            // Generate random weights for each sale to create fluctuations
-            for($i = 0; $i < $numberOfSales; $i++){
-                // Generate a random weight between 0.5 and 1.5 for each sale
-                $weight = (rand(50, 150) / 100);
-                $saleQuantities[] = $weight;
-                $totalAllocated += $weight;
-            }
-            
-            // Normalize the weights to ensure they sum to the daily demand
-            for($i = 0; $i < $numberOfSales; $i++){
-                $saleQuantities[$i] = ($saleQuantities[$i] / $totalAllocated) * $demandForWeek;
-            }
+            // Create one sale with the full demand
+            $saleDemand = round($demandForWeek);
 
-            // Create the sales
-            for($i = 0; $i < $numberOfSales; $i++){
-                // Calculate the demand for each sale
-                $saleDemand = round($saleQuantities[$i]);
+            // Get a random wilaya
+            $randomWilaya = Wilaya::inRandomOrder()->first();
 
-                // Get a random wilaya
-                $randomWilaya = Wilaya::inRandomOrder()->first();
+            // Get the wilaya shipping cost
+            $wilayaShippingCost = $randomWilaya->real_shipping_cost;
 
-                // Get the wilaya shipping cost
-                $wilayaShippingCost = $randomWilaya->real_shipping_cost;
+            // Get the current gameweek and the timelimit days
+            $gameWeek = SettingsService::getCurrentGameWeek();
+            $timelimit_days = CalculationsService::calcaulteRandomBetweenMinMax(2, 10);
 
-                // Get the current gameweek and the timelimit days
-                // Get current timestamp
-                $gameWeek = SettingsService::getCurrentGameWeek();
-                $timelimit_days = CalculationsService::calcaulteRandomBetweenMinMax(2, 10);
+            // Create the sale
+            $sale = Sale::create([
+                'gameweek' => $gameWeek,
+                'timelimit_days' => $timelimit_days,
 
-                // Create the sale
-                $sale = Sale::create([
-                    'gameweek' => $gameWeek,
-                    'timelimit_days' => $timelimit_days,
+                'quantity' => $saleDemand,
+                'sale_price' => $companyProduct->sale_price,
+                'shipping_cost' => $wilayaShippingCost,
+                'shipping_time_days' => $randomWilaya->real_shipping_time_days,
 
-                    'quantity' => $saleDemand,
-                    'sale_price' => $companyProduct->sale_price,
-                    'shipping_cost' => $wilayaShippingCost,
-                    'shipping_time_days' => $randomWilaya->real_shipping_time_days,
+                'status' => Sale::STATUS_INITIATED,
+                'initiated_at' => SettingsService::getCurrentTimestamp(),
 
-                    'status' => Sale::STATUS_INITIATED,
-                    'initiated_at' => SettingsService::getCurrentTimestamp(),
+                'company_id' => $company->id,
+                'product_id' => $product->id,
+                'wilaya_id' => $randomWilaya->id,
+            ]);
 
-                    'company_id' => $company->id,
-                    'product_id' => $product->id,
-                    'wilaya_id' => $randomWilaya->id,
-                ]);
-            }
-
-            if($numberOfSales > 0){
-                NotificationService::createSaleInitiatedNotification($company, $product, $numberOfSales);
-            }
+            NotificationService::createSaleInitiatedNotification($company, $product, 1);
         }
     }
 

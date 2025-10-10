@@ -96,7 +96,7 @@ class ProcurementService
         ]);
 
         // Release carbon footprint
-        $carbonFootprint = $supplier->carbon_footprint * $quantity;
+        $carbonFootprint = $supplier->carbon_footprint;
         PollutionService::releaseCarbonFootprint($company, $carbonFootprint);
 
         // Pay for the purchase

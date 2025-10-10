@@ -288,7 +288,7 @@
                                             </td>
 
                                             <td>
-                                                <span class="text-sm">{(country.customs_duties_rate * 100)}%</span>
+                                                <span class="text-sm">{(country.customs_duties_rate * 100).toFixed(2)}%</span>
                                             </td>
                                             <td>
                                                 <span class={getImportStatusBadgeClass(country.allows_imports)}>

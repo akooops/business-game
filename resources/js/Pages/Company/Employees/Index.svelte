@@ -406,7 +406,7 @@
                                                 </div>
                                                 <div class="flex justify-center gap-1">
                                                     <i class="fa-solid fa-heart text-destructive"></i>
-                                                    <span>{(employee.current_mood * 100).toFixed(0)}% Mood</span>
+                                                    <span>{(employee.current_mood * 100).toFixed(2)}% Mood</span>
                                                 </div>
                                             </div>
 
@@ -544,7 +544,7 @@
                     <h3 class="text-sm font-semibold text-mono mb-3">Current Mood</h3>
                     <div class="space-y-2">
                         <div class="flex items-center gap-2">
-                            <span class="text-xs font-medium">{(selectedEmployee.current_mood * 100).toFixed(0)}%</span>
+                            <span class="text-xs font-medium">{(selectedEmployee.current_mood * 100).toFixed(2)}%</span>
 
                             <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
                                 <div class="kt-progress kt-progress-primary {selectedEmployee.current_mood > 0.7 ? 'kt-progress-primary' : selectedEmployee.current_mood > 0.4 ? 'kt-progress-warning' : 'kt-progress-destructive'}">
@@ -617,8 +617,8 @@
                             <div class="kt-alert-content">
                                 <h4 class="kt-alert-title">Low Morale Warning</h4>
                                 <p class="kt-alert-text">
-                                    This employee has low morale ({(selectedEmployee.current_mood * 100).toFixed(0)}%). 
-                                    There's a {(5 + ((0.4 - selectedEmployee.current_mood) / 0.4 * 15)).toFixed(1)}% chance they may resign.
+                                    This employee has low morale ({(selectedEmployee.current_mood * 100).toFixed(2)}%). 
+                                    There's a {(5 + ((0.4 - selectedEmployee.current_mood) / 0.4 * 15)).toFixed(2)}% chance they may resign.
                                 </p>
                             </div>
                         </div>
@@ -688,7 +688,7 @@
                                     </div>
                                     <div class="flex justify-between">
                                         <span class="text-sm text-muted-foreground">Current Mood:</span>
-                                        <span class="font-medium">{(promoteData.currentMood * 100).toFixed(0)}%</span>
+                                        <span class="font-medium">{(promoteData.currentMood * 100).toFixed(2)}%</span>
                                     </div>
                                     <div class="flex justify-between">
                                         <span class="text-sm text-muted-foreground">Mood Decay Rate:</span>
@@ -742,7 +742,7 @@
                                         <div class="flex justify-between">
                                             <span class="text-sm text-muted-foreground">Percentage Increase:</span>
                                             <span class="text-sm font-medium text-green-600">
-                                                +{(((newSalary - promoteData.currentSalary) / promoteData.currentSalary) * 100).toFixed(1)}%
+                                                +{(((newSalary - promoteData.currentSalary) / promoteData.currentSalary) * 100).toFixed(2)}%
                                             </span>
                                         </div>
                                     </div>
@@ -860,7 +860,7 @@
                                     </div>
                                     <div class="flex justify-between">
                                         <span class="text-sm text-muted-foreground">Current Mood:</span>
-                                        <span class="font-medium">{(fireData.currentMood * 100).toFixed(0)}%</span>
+                                        <span class="font-medium">{(fireData.currentMood * 100).toFixed(2)}%</span>
                                     </div>
                                     <div class="flex justify-between">
                                         <span class="text-sm text-muted-foreground">Mood Decay Rate:</span>

@@ -508,7 +508,7 @@
                                                 </div>
                                                 <div class="flex justify-between">
                                                     <span>Quality Factor:</span>
-                                                    <span class="font-medium">{companyMachine.quality_factor * 100}%</span>
+                                                    <span class="font-medium">{(companyMachine.quality_factor * 100).toFixed(2)}%</span>
                                                 </div>
                                                 <div class="flex justify-between">
                                                     <span>Operation Cost:</span>
@@ -774,7 +774,7 @@
                 <h3 class="text-sm font-semibold text-mono mb-3">Reliability</h3>
                 <div class="space-y-2">
                     <div class="flex items-center gap-2">
-                        <span class="text-xs font-medium">{(selectedMachine.current_reliability * 100).toFixed(0)}%</span>
+                        <span class="text-xs font-medium">{(selectedMachine.current_reliability * 100).toFixed(2)}%</span>
 
                         <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
                             <div class="kt-progress kt-progress-primary {selectedMachine.current_reliability > 0.7 ? 'kt-progress-primary' : selectedMachine.current_reliability > 0.4 ? 'kt-progress-warning' : 'kt-progress-destructive'}">
@@ -850,7 +850,7 @@
                         </div>
                         <div class="flex justify-between">
                             <span class="text-xs text-muted-foreground">Quality Factor:</span>
-                            <span class="text-xs font-medium">{selectedMachine.machine?.quality_factor * 100}%</span>
+                            <span class="text-xs font-medium">{(selectedMachine.machine?.quality_factor * 100).toFixed(2)}%</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-xs text-muted-foreground">Operation Cost:</span>
@@ -872,7 +872,7 @@
                     <div class="space-y-2">
                         <div class="flex justify-between">
                             <span class="text-xs text-muted-foreground">Reliability Decay:</span>
-                            <span class="text-xs font-medium">{selectedMachine.machine?.reliability_decay_days * 100}%/day</span>
+                            <span class="text-xs font-medium">{(selectedMachine.machine?.reliability_decay_days * 100).toFixed(2)}%/day</span>
                         </div>
                     </div>
                 </div>
@@ -1140,7 +1140,7 @@
                                     </div>
                                     <div class="flex justify-between items-center">
                                         <span class="text-sm font-normal text-secondary-foreground">Quality Factor:</span>
-                                        <span class="text-sm font-medium text-mono">{machineToProduce.machine?.quality_factor * 100}% (Expect as output: {productionQuantity * machineToProduce.machine?.quality_factor} units)</span>
+                                        <span class="text-sm font-medium text-mono">{(machineToProduce.machine?.quality_factor * 100).toFixed(2)}% (Expect as output: {productionQuantity * machineToProduce.machine?.quality_factor} units)</span>
                                     </div>
                                     <div class="flex justify-between items-center">
                                         <span class="text-sm font-normal text-secondary-foreground">Carbon Footprint:</span>

@@ -170,7 +170,7 @@
                                     <p class="text-sm text-destructive">{errors.customs_duties_rate}</p>
                                 {/if}
                                 <p class="text-sm text-secondary-foreground">
-                                    Current: {(form.customs_duties_rate * 100)}%
+                                    Current: {(form.customs_duties_rate * 100).toFixed(2)}%
                                 </p>
                             </div>
                         </div>

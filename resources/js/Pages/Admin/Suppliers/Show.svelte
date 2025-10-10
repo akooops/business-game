@@ -209,7 +209,7 @@
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Carbon Footprint</h4>
                             <p class="text-sm text-secondary-foreground">
-                                {supplier.carbon_footprint} kg CO2/unit
+                                {supplier.carbon_footprint} kg CO2/purchase
                             </p>
                         </div>
                     </div>

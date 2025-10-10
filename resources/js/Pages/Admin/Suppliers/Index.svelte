@@ -335,7 +335,7 @@
                                             <td>
                                                 <div class="flex flex-col gap-1">
                                                     <span class="text-xs text-muted-foreground">
-                                                        ({supplier.carbon_footprint} kg CO2/unit)
+                                                        ({supplier.carbon_footprint} kg CO2/purchase)
                                                     </span>
                                                 </div>
                                             </td>

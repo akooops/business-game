@@ -455,7 +455,7 @@
                                     step="0.001"
                                     min="0"
                                     class="kt-input {errors.carbon_footprint ? 'kt-input-error' : ''}"
-                                    placeholder="Enter carbon footprint (kg CO2/unit)"
+                                    placeholder="Enter carbon footprint (kg CO2/purchase)"
                                     bind:value={form.carbon_footprint}
                                 />
                                 {#if errors.carbon_footprint}
