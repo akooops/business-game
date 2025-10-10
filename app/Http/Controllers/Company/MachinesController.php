@@ -25,13 +25,18 @@ class MachinesController extends Controller
      */
     public function index(Request $request)
     {
+        $perPage = IndexService::limitPerPage($request->query('perPage', 10));
+        $page = IndexService::checkPageIfNull($request->query('page', 1));
+
         $company = $request->company;   
         $machines = $company->companyMachines()->with(['machine', 'machine.outputs', 'machine.outputs.product', 'machine.employeeProfile', 'employee', 'ongoingProductionOrder', 'ongoingProductionOrder.product'])->latest();
 
+        $machines = $machines->paginate($perPage, ['*'], 'page', $page);
 
         if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
             return response()->json([
-                'machines' => $machines->get(),
+                'machines' => $machines->items(),
+                'pagination' => IndexService::handlePagination($machines)
             ]);
         }
 

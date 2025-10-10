@@ -1,5 +1,6 @@
 <script>
     import CompanyLayout from '../../Layouts/CompanyLayout.svelte';
+    import Pagination from '../../Components/Pagination.svelte';
     import { onMount, onDestroy, tick } from 'svelte';
     import { page } from '@inertiajs/svelte'
 
@@ -23,6 +24,9 @@
     let purchases = [];
     let loading = true;
     let fetchInterval = null;
+    let pagination = {};
+    let perPage = 10;
+    let currentPage = 1;
 
     // Drawer state
     let selectedPurchase = null;
@@ -33,7 +37,12 @@
         if(purchases.length == 0) loading = true;
 
         try {
-            const response = await fetch(route('company.purchases.index'), {
+            const params = new URLSearchParams({
+                page: currentPage,
+                perPage: perPage,
+            });
+
+            const response = await fetch(route('company.purchases.index') + '?' + params.toString(), {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
@@ -41,6 +50,7 @@
             
             const data = await response.json();
             purchases = data.purchases;
+            pagination = data.pagination;
             
             // Wait for DOM to update, then initialize menus
             await tick();
@@ -52,6 +62,23 @@
         } finally {
             loading = false;
         }
+    }
+
+    // Handle pagination
+    function goToPage(page) {
+        if (page && page !== currentPage) {
+            currentPage = page;
+            loading = true;
+            fetchPurchases();
+        }
+    }
+
+    // Handle per page change
+    function handlePerPageChange(newPerPage) {
+        perPage = newPerPage;
+        currentPage = 1;
+        loading = true;
+        fetchPurchases();
     }
 
     // Open purchase drawer
@@ -265,6 +292,18 @@
                                 {/each}
                             </div>
                         </div>
+
+                        <!-- Pagination -->
+                        {#if pagination && pagination.total > 0}
+                            <div class="border-t border-gray-200">
+                                <Pagination 
+                                    {pagination} 
+                                    {perPage}
+                                    onPageChange={goToPage} 
+                                    onPerPageChange={handlePerPageChange}
+                                />
+                            </div>
+                        {/if}
                     {/if}
                 </div>
             </div>

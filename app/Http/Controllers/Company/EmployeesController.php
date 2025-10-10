@@ -14,6 +14,8 @@ class EmployeesController extends Controller
 {
     public function index(Request $request)
     {   
+        $perPage = IndexService::limitPerPage($request->query('perPage', 10));
+        $page = IndexService::checkPageIfNull($request->query('page', 1));
         $status = IndexService::checkIfSearchEmpty($request->query('status'));
 
         $company = $request->company;
@@ -25,9 +27,12 @@ class EmployeesController extends Controller
             $employees->whereNotIn('status', [Employee::STATUS_APPLIED]);
         }
 
+        $employees = $employees->paginate($perPage, ['*'], 'page', $page);
+
         if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
             return response()->json([
-                'employees' => $employees->get(),
+                'employees' => $employees->items(),
+                'pagination' => IndexService::handlePagination($employees)
             ]);
         }
 

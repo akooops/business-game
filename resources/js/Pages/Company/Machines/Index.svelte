@@ -1,6 +1,7 @@
 <script>
     // --- Config & Constants ---
     import CompanyLayout from '../../Layouts/CompanyLayout.svelte';
+    import Pagination from '../../Components/Pagination.svelte';
     import { onMount, onDestroy, tick } from 'svelte';
     import Select2 from '../../Components/Forms/Select2.svelte';
     import { page } from '@inertiajs/svelte';
@@ -23,6 +24,9 @@
     let machines = [];
     let loading = true;
     let fetchInterval = null;
+    let pagination = {};
+    let perPage = 10;
+    let currentPage = 1;
 
     let employeeSelectComponent = null;
 
@@ -81,13 +85,19 @@
         if(machines.length == 0) loading = true;
 
         try {
-            const response = await fetch(route('company.machines.index'), {
+            const params = new URLSearchParams({
+                page: currentPage,
+                perPage: perPage,
+            });
+
+            const response = await fetch(route('company.machines.index') + '?' + params.toString(), {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             });
             const data = await response.json();
             machines = data.machines;
+            pagination = data.pagination;
             await tick();
             if (window.KTMenu) {
                 window.KTMenu.init();
@@ -97,6 +107,23 @@
         } finally {
             loading = false;
         }
+    }
+
+    // Handle pagination
+    function goToPage(page) {
+        if (page && page !== currentPage) {
+            currentPage = page;
+            loading = true;
+            fetchMachines();
+        }
+    }
+
+    // Handle per page change
+    function handlePerPageChange(newPerPage) {
+        perPage = newPerPage;
+        currentPage = 1;
+        loading = true;
+        fetchMachines();
     }
 
     // --- Modal/Drawer Handlers ---
@@ -715,6 +742,18 @@
                                 {/each}
                             </div>
                         </div>
+
+                        <!-- Pagination -->
+                        {#if pagination && pagination.total > 0}
+                            <div class="border-t border-gray-200">
+                                <Pagination 
+                                    {pagination} 
+                                    {perPage}
+                                    onPageChange={goToPage} 
+                                    onPerPageChange={handlePerPageChange}
+                                />
+                            </div>
+                        {/if}
                     {/if}
                 </div>
             </div>

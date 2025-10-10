@@ -14,12 +14,17 @@ class PurchasesController extends Controller
 {
     public function index(Request $request)
     {   
+        $perPage = IndexService::limitPerPage($request->query('perPage', 10));
+        $page = IndexService::checkPageIfNull($request->query('page', 1));
+
         $company = $request->company;
         $purchases = $company->purchases()->with('supplier', 'product')->latest();
+        $purchases = $purchases->paginate($perPage, ['*'], 'page', $page);
 
         if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
             return response()->json([
-                'purchases' => $purchases->get(),
+                'purchases' => $purchases->items(),
+                'pagination' => IndexService::handlePagination($purchases)
             ]);
         }
 

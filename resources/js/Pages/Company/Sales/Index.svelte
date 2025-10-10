@@ -73,6 +73,7 @@
     function goToPage(page) {
         if (page && page !== currentPage) {
             currentPage = page;
+            loading = true;
             fetchSales();
         }
     }
@@ -81,6 +82,7 @@
     function handlePerPageChange(newPerPage) {
         perPage = newPerPage;
         currentPage = 1;
+        loading = true;
         fetchSales();
     }
 

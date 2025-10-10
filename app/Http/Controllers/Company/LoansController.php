@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\Company\Loans\BorrowMoneyRequest;
 use App\Http\Requests\Company\Loans\PayLoanRequest;
 use App\Services\LoansService;
+use App\Services\IndexService;
 
 class LoansController extends Controller
 {
@@ -18,12 +19,18 @@ class LoansController extends Controller
      */
     public function index(Request $request)
     {
+        $perPage = IndexService::limitPerPage($request->query('perPage', 10));
+        $page = IndexService::checkPageIfNull($request->query('page', 1));
+
         $company = $request->company;
-        $loans = $company->loans()->with('bank')->latest();       
+        $loans = $company->loans()->with('bank')->latest();   
+
+        $loans = $loans->paginate($perPage, ['*'], 'page', $page);
 
         if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
             return response()->json([
-                'loans' => $loans->get(),
+                'loans' => $loans->items(),
+                'pagination' => IndexService::handlePagination($loans)
             ]);
         }
 
