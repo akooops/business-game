@@ -38,11 +38,12 @@
         elasticity_coefficient: product.elasticity_coefficient || 0,
         avg_demand: product.avg_demand || 0,
         avg_market_price: product.avg_market_price || 0,
-        is_saleable: product.is_saleable || true,
+        // Use nullish coalescing to preserve explicit false from backend
+        is_saleable: product.is_saleable ?? false,
         storage_cost: product.storage_cost || 0,
         shelf_life_days: product.shelf_life_days || '',
-        has_expiration: product.has_expiration || false,
-        needs_technology: product.technology_id || false,
+        has_expiration: product.has_expiration ?? false,
+        needs_technology: (product.needs_technology ?? false) || Boolean(product.technology_id),
         technology_id: product.technology_id || null,
         file: null
     };
@@ -109,14 +110,19 @@
         
         // Add form fields
         Object.keys(form).forEach(key => {
+            // Always include explicit values for boolean toggles
+            if (key === 'is_saleable' || key === 'has_expiration' || key === 'needs_technology') {
+                formData.append(key, form[key] ? '1' : '0');
+                return;
+            }
+
+            if (key === 'file') {
+                if (form.file) formData.append(key, form.file);
+                return;
+            }
+
             if (form[key] !== null && form[key] !== '') {
-                if (key === 'file' && form.file) {
-                    formData.append(key, form.file);
-                } else if (key === 'has_expiration' || key === 'needs_technology' || key === 'is_saleable') {
-                    formData.append(key, form[key] ? '1' : '0');
-                } else if (key !== 'file') {
-                    formData.append(key, form[key]);
-                }
+                formData.append(key, form[key]);
             }
         });
 
