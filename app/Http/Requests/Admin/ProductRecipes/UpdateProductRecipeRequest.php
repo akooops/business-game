@@ -21,7 +21,7 @@ class UpdateProductRecipeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'quantity' => ['required', 'numeric', 'min:0.0001'],
+            'quantity' => ['required', 'numeric', 'min:0.000001', 'max:999999999.999999'],
         ];
     }
 } 

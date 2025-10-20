@@ -31,6 +31,7 @@ class UpdateProductRequest extends FormRequest
             'elasticity_coefficient' => 'required|numeric',
             'avg_demand' => 'required|numeric|min:0', 
             'avg_market_price' => 'required|numeric|min:0',
+            'storage_cost' => 'required|numeric|min:0',
             'is_saleable' => 'required|boolean',
             'has_expiration' => 'required|boolean',
             'shelf_life_days' => 'required_if:has_expiration,true|integer|min:1',
