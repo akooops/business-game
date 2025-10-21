@@ -303,8 +303,8 @@
                                             </div>
 
                                             <div class="flex items-center gap-2.5">
-                                                <span class="kt-badge kt-badge-{supplier.is_international ? 'warning' : 'info'} kt-badge-sm">
-                                                    {supplier.is_international ? 'International' : 'Local'}
+                                                <span class="kt-badge kt-badge-{supplier.country_id ? 'warning' : 'info'} kt-badge-sm">
+                                                    {supplier.country_id ? 'International' : 'Local'}
                                                 </span>
 
                                                 <span>

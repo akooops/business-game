@@ -314,8 +314,8 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <span class={getSupplierTypeBadgeClass(supplier.is_international)}>
-                                                    {supplier.is_international ? 'International' : 'Local'} - { supplier.location_name}
+                                                <span class={getSupplierTypeBadgeClass(supplier.country_id)}>
+                                                    {supplier.country_id ? 'International' : 'Local'} - { supplier.location_name}
                                                 </span>
                                             </td>
                                             <td>

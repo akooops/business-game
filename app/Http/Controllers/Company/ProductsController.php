@@ -6,6 +6,7 @@ use App\Services\SalesService;
 use Illuminate\Http\Request;
 use App\Http\Requests\Company\Sales\FixProductSalePriceRequest;
 use App\Models\Product;
+use App\Services\IndexService;
 
 class ProductsController extends Controller
 {
@@ -16,8 +17,22 @@ class ProductsController extends Controller
      */
     public function index(Request $request)
     {
+        $search = IndexService::checkIfSearchEmpty($request->query('search'));
+
         $company = $request->company;
         $products = $company->companyProducts()->with(['product', 'product.recipes.material'])->latest();
+
+        if ($search) {
+            $products->where(function($query) use ($search) {
+                $query->where('id', $search)
+                      ->orWhere('product_id', $search)
+                      ->orWhereHas('product', function($query) use ($search) {
+                        $query->where('name', 'like', '%' . $search . '%')
+                              ->orWhere('description', 'like', '%' . $search . '%')
+                              ->orWhere('type', 'like', '%' . $search . '%');
+                      });
+            });
+        }
 
         if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
             return response()->json([
