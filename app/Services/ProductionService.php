@@ -173,6 +173,10 @@ class ProductionService
                 $valueLoss = $currentValue * $lossOnSaleDays * $timeSinceSetup;
                 $currentValue -= $valueLoss;
 
+                if($currentValue < 0){
+                    $currentValue = 0;
+                }
+
                 $companyMachine->update([
                     'current_value' => $currentValue,
                 ]);

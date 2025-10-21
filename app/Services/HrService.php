@@ -162,20 +162,24 @@ class HrService
                     'current_mood' => $mood
                 ]);
 
-                $employee->companyMachine->update([
-                    'employee_id' => null,
-                ]);
-
-                $productionOrders = ProductionOrder::where([
-                    'company_machine_id' => $employee->companyMachine->id,
-                    'status' => ProductionOrder::STATUS_IN_PROGRESS,
-                ])->get();
-
-                foreach($productionOrders as $productionOrder){ 
-                    $productionOrder->update([
-                        'status' => ProductionOrder::STATUS_CANCELLED,
+                // Unassign employee from machine
+                if($employee->companyMachine){
+                    $employee->companyMachine->update([
+                        'employee_id' => null,
                     ]);
+
+                    $productionOrders = ProductionOrder::where([
+                        'company_machine_id' => $employee->companyMachine->id,
+                        'status' => ProductionOrder::STATUS_IN_PROGRESS,
+                    ])->get();
+
+                    foreach($productionOrders as $productionOrder){ 
+                        $productionOrder->update([
+                            'status' => ProductionOrder::STATUS_CANCELLED,
+                        ]);
+                    }
                 }
+
 
                 // Create resignation notification
                 NotificationService::createEmployeeResignedNotification($employee->company, $employee);
