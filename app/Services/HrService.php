@@ -148,15 +148,15 @@ class HrService
 
             $resignationThreshold = 0;
             if($mood < 0.05){           // Was 0.1
-                $resignationThreshold = 50; // Was 75% - reduced
+                $resignationThreshold = 75; // Was 75% - reduced
             } else if($mood < 0.15){    // Was 0.2
-                $resignationThreshold = 25; // Was 50% - reduced
+                $resignationThreshold = 20; // Was 50% - reduced
             } else if($mood < 0.25){    // Was 0.3
-                $resignationThreshold = 10; // Was 25% - reduced
+                $resignationThreshold = 20; // Was 25% - reduced
             } else if($mood < 0.35){    // Was 0.4
-                $resignationThreshold = 3;  // Was 10% - reduced
-            } else {
-                $resignationThreshold = 1;  // Was 5% - reduced
+                $resignationThreshold = 10;  // Was 10% - reduced
+            } else if($mood < 0.5) {
+                $resignationThreshold = 5;  // Was 5% - reduced
             }
 
             if($resignationChance <= $resignationThreshold){

@@ -42,15 +42,15 @@ class MaintenanceService
             // Calculate break threshold
             $breakThreshold = 0;
             if($reliability < 0.05){           // Was 0.1
-                $breakThreshold = 50; // Was 75% - reduced
+                $breakThreshold = 75; // Was 75% - reduced
             } else if($reliability < 0.15){    // Was 0.2
-                $breakThreshold = 25; // Was 50% - reduced
+                $breakThreshold = 20; // Was 50% - reduced
             } else if($reliability < 0.25){    // Was 0.3
-                $breakThreshold = 10; // Was 25% - reduced
+                $breakThreshold = 20; // Was 25% - reduced
             } else if($reliability < 0.35){    // Was 0.4
-                $breakThreshold = 3;  // Was 10% - reduced
-            } else {
-                $breakThreshold = 1;  // Was 5% - reduced
+                $breakThreshold = 10;  // Was 10% - reduced
+            } else if($reliability < 0.5) {
+                $breakThreshold = 5;  // Was 5% - reduced
             }
 
             // If break chance is less than or equal to break threshold, machine breaks
