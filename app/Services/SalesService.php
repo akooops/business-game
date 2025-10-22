@@ -84,6 +84,11 @@ class SalesService
             // Create one sale with the full demand
             $saleDemand = round($demandForWeek);
 
+            // Skip if there's no demand
+            if ($saleDemand <= 0) {
+                continue;
+            }
+
             // Get a random wilaya
             $randomWilaya = Wilaya::inRandomOrder()->first();
 

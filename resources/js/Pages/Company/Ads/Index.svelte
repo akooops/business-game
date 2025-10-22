@@ -88,7 +88,7 @@
         const startDate = new Date(ad.started_at);
         const completionDate = new Date(startDate);
         completionDate.setDate(startDate.getDate() + ad.duration_days);
-        return completionDate;
+        return completionDate.toISOString();
     }
 
     // Get status color

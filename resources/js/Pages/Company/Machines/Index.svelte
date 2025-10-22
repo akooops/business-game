@@ -85,7 +85,7 @@
         const startDate = new Date(productionOrder.started_at);
         const completionDate = new Date(startDate);
         completionDate.setDate(startDate.getDate() + productionOrder.time_to_complete);
-        return completionDate;
+        return completionDate.toISOString();
     }
 
     // --- Fetch Functions ---
