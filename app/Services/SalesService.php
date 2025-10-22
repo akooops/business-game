@@ -54,7 +54,14 @@ class SalesService
 
             // Calculate the demand for the week based on the price difference and the elasticity coefficient with marketing boost
             $baseDemand = $realDemand * (1 + $adMarketImpactPercentage);
-            $demandForWeek = $baseDemand - $product->elasticity_coefficient * $baseDemand * ($priceDifference / $marketPrice);
+            
+            // Prevent division by zero if market price is 0
+            if ($marketPrice > 0) {
+                $demandForWeek = $baseDemand - $product->elasticity_coefficient * $baseDemand * ($priceDifference / $marketPrice);
+            } else {
+                // If no market price exists, use base demand without price elasticity adjustment
+                $demandForWeek = $baseDemand;
+            }
 
             if($productDemand){
                 if($demandForWeek > $productDemand->max_demand){

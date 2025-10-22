@@ -181,6 +181,14 @@
         }
     }
 
+    // Calculate estimated completion date
+    function getEstimatedCompletionDate(productionOrder) {
+        const startDate = new Date(productionOrder.started_at);
+        const completionDate = new Date(startDate);
+        completionDate.setDate(startDate.getDate() + productionOrder.time_to_complete);
+        return completionDate;
+    }
+
     onMount(() => {
         fetchProductionOrders();
         fetchInterval = setInterval(fetchProductionOrders, 60000);
@@ -314,6 +322,16 @@
                                                 </span>
                                                 <span class="text-sm font-medium text-mono">
                                                     {formatTimestamp(productionOrder.completed_at)}
+                                                </span>
+                                            </div>
+                                            {/if}
+                                            {#if productionOrder.status === 'in_progress' && productionOrder.time_to_complete}
+                                            <div class="flex flex-col gap-1.5">
+                                                <span class="text-xs font-normal text-secondary-foreground">
+                                                    Est. Completion
+                                                </span>
+                                                <span class="text-sm font-medium text-mono">
+                                                    {formatTimestamp(getEstimatedCompletionDate(productionOrder))}
                                                 </span>
                                             </div>
                                             {/if}
@@ -534,6 +552,18 @@
                             </span>
                         </div>
                     </div>
+                    {#if selectedProductionOrder.status === 'in_progress' && selectedProductionOrder.time_to_complete}
+                        <div class="flex items-center gap-2.5">
+                            <span class="text-xs font-normal text-foreground min-w-14 xl:min-w-24 shrink-0">
+                                Est. Completion
+                            </span>
+                            <div>
+                                <span class="text-xs font-medium text-foreground">
+                                    {formatDate(getEstimatedCompletionDate(selectedProductionOrder))}
+                                </span>
+                            </div>
+                        </div>
+                    {/if}
                     {#if selectedProductionOrder.completed_at}
                         <div class="flex items-center gap-2.5">
                             <span class="text-xs font-normal text-foreground min-w-14 xl:min-w-24 shrink-0">

@@ -80,6 +80,14 @@
         }
     }
 
+    // Calculate estimated completion date for production
+    function getProductionEstimatedCompletionDate(productionOrder) {
+        const startDate = new Date(productionOrder.started_at);
+        const completionDate = new Date(startDate);
+        completionDate.setDate(startDate.getDate() + productionOrder.time_to_complete);
+        return completionDate;
+    }
+
     // --- Fetch Functions ---
     async function fetchMachines() {
         if(machines.length == 0) loading = true;
@@ -577,6 +585,10 @@
                                                             <div class="flex-1 min-w-0">
                                                                 <h4 class="text-sm font-semibold text-mono mb-2 truncate">{companyMachine.ongoing_production_order.product.name}</h4>
                                                                 <p class="text-xs text-muted-foreground mb-2">x{companyMachine.ongoing_production_order.quantity}</p>
+                                                                <p class="text-xs text-blue-500 mb-2">
+                                                                    <i class="ki-filled ki-calendar text-blue-500 mr-1"></i>
+                                                                    Est. Completion: {formatTimestamp(getProductionEstimatedCompletionDate(companyMachine.ongoing_production_order))}
+                                                                </p>
                                                                 <div class="w-full bg-gray-200 rounded-full h-2">
                                                                     <div class="kt-progress kt-progress-primary">
                                                                         <div class="kt-progress-indicator" style="width: {companyMachine.ongoing_production_order.producing_progress}%"></div>
