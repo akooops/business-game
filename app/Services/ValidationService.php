@@ -279,15 +279,20 @@ class ValidationService
 
         //Check if company has enough materials to produce the product
         $productRecipes = $product->recipes;
-
+        
+        $missingMaterials = [];
         foreach($productRecipes as $recipe){
             $material = $recipe->material;
             $requiredQuantity = $recipe->quantity * $quantity;
 
             $hasSufficientStock = InventoryService::haveSufficientStock($companyMachine->company, $material, $requiredQuantity);
             if(!$hasSufficientStock){
-                $errors['material'] = 'This company does not have enough stock of ' . $material->name . ' to produce this product.';
+                $missingMaterials[] = $material->name;
             }
+        }
+
+        if(!empty($missingMaterials)){
+            $errors['material'] = 'Insufficient stock of: ' . implode(', ', $missingMaterials);
         }
 
         return $errors;

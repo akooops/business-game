@@ -163,20 +163,20 @@ class FinanceService
         return $funds;
     }
 
-    public static function payMachineOperationCost($company, $machine){
-        if($machine->operations_cost > $company->funds){
+    public static function payMachineOperationCost($company, $totalCost){
+        if($totalCost > $company->funds){
             $randomBank = Bank::inRandomOrder()->first();
 
-            LoansService::borrowMoney($company, $randomBank, $machine->operations_cost, "machine operation costs");
+            LoansService::borrowMoney($company, $randomBank, $totalCost, "machine operation costs");
         }
 
         $funds = $company->funds;
-        $funds -= $machine->operations_cost;
+        $funds -= $totalCost;
         $company->update(['funds' => $funds]);
 
         Transaction::create([
             'company_id' => $company->id,
-            'amount' => $machine->operations_cost,
+            'amount' => $totalCost,
             'type' => Transaction::TYPE_MACHINE_OPERATIONS,
             'transaction_at' => SettingsService::getCurrentTimestamp(),
         ]);

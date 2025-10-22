@@ -10,7 +10,7 @@ use App\Services\SettingsService;
 class HrService
 {
     public static function generateEmployees($company, $employeeProfile){
-        $numberOfEmployees = rand(1, 3);
+        $numberOfEmployees = 3;
 
         $employees = [];
 

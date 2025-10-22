@@ -16,8 +16,7 @@ class Technology extends Model
     protected $appends = ['image_url', 'is_researched'];
 
     protected $casts = [
-        'research_cost' => 'decimal:3',
-        'level' => 'integer',
+        'research_cost' => 'decimal:3'
     ];
 
     //Relations

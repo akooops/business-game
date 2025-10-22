@@ -585,6 +585,34 @@
                                                             </div>
                                                     </div>
                                                 </div>
+                                            {:else}
+                                                <div class="mt-4 pt-3 border-t border-border">
+                                                    <h3 class="text-sm font-semibold text-mono mb-4">Output Products</h3>
+
+                                                    <div class="flex flex-wrap gap-4">  
+                                                        {#each companyMachine.machine.outputs as output}
+                                                            {#if output.product.is_researched}
+                                                            <!-- Product Image -->
+                                                            <div class="size-10 mb-4">
+                                                                <img 
+                                                                    class="rounded-lg w-full h-full object-cover bg-gray-100" 
+                                                                    src={output.product.image_url}
+                                                                    alt={output.product.name}
+                                                                    />
+                                                                </div>
+                                                            {:else} 
+                                                                <div class="flex items-center size-10">
+                                                                    <div class="flex-shrink-0 relative" style="width: 100%; height: 100%;">
+                                                                        <div class="rounded-lg bg-muted animate-pulse" style="width: 100%; height: 100%;"></div>
+                                                                        <div class="absolute inset-0 flex items-center justify-center" style="top: 50%; left: 50%; bottom: 50%; right: 50%;">
+                                                                            <i class="ki-filled ki-lock text-muted-foreground text-sm"></i>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            {/if}
+                                                        {/each}
+                                                    </div>
+                                                </div>
                                             {/if}
                                             
                                             <!-- Employee Assignment Section -->
@@ -915,6 +943,76 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Output Products Section -->
+                {#if selectedMachine.machine.outputs && selectedMachine.machine.outputs.length > 0}
+                <div class="border-t border-border pt-4">
+                    <h3 class="text-sm font-semibold text-mono mb-3">Output Products</h3>
+                    <div class="space-y-3">
+                        {#each selectedMachine.machine.outputs as output}
+                            {#if output.product.is_researched}
+                                <div class="kt-card">
+                                    <div class="kt-card-body p-3">
+                                        <div class="flex items-center gap-3">
+                                            <div class="flex-shrink-0 relative">
+                                                {#if output.product.image_url}
+                                                    <img 
+                                                        src={output.product.image_url} 
+                                                        alt={output.product.name}
+                                                        class="w-12 h-12 rounded-lg object-cover"
+                                                    />
+                                                {:else}
+                                                    <div class="w-12 h-12 rounded-lg bg-accent/50 flex items-center justify-center">
+                                                        <i class="ki-filled ki-abstract-26 text-lg text-muted-foreground"></i>
+                                                    </div>
+                                                {/if}
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <h4 class="text-sm font-semibold text-mono mb-1 truncate">{output.product.name}</h4>
+                                                <p class="text-xs text-muted-foreground mb-1">{output.product.type_name}</p>
+                                                <span class="text-xs text-green-500 font-medium">Researched</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {:else}
+                                <div class="kt-card">
+                                    <div class="kt-card-body p-3">
+                                        <div class="flex items-center gap-3">
+                                            <div class="flex-shrink-0 relative">
+                                                <div class="w-12 h-12 rounded-lg bg-muted animate-pulse"></div>
+                                                <div class="absolute inset-0 flex items-center justify-center" style="top: 50%; left: 50%; bottom: 50%; right: 50%;">
+                                                    <i class="ki-filled ki-lock text-muted-foreground text-sm"></i>
+                                                </div>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <div class="kt-skeleton h-4 w-24 mb-1"></div>
+                                                <div class="kt-skeleton h-3 w-16 mb-1"></div>
+                                                <div class="flex items-center gap-1">
+                                                    <i class="ki-filled ki-search text-orange-500 text-xs"></i>
+                                                    <span class="text-xs text-orange-500 font-medium">Need Research to Unlock</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {/if}
+                        {/each}
+                    </div>
+                </div>
+            {:else}
+                <div class="border-t border-border pt-4">
+                    <h3 class="text-sm font-semibold text-mono mb-3">Output Products</h3>
+                    <div class="kt-card">
+                        <div class="kt-card-body p-4">
+                            <div class="flex flex-col items-center justify-center text-center">
+                                <i class="ki-filled ki-abstract-26 text-2xl text-muted-foreground mb-2"></i>
+                                <p class="text-xs text-muted-foreground">No output products</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {/if}
             {/if}
         </div>
     </div>
