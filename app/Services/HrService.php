@@ -123,11 +123,16 @@ class HrService
 
     public static function processEmployeesMood($company){
         $employees = $company->employees()->where('status', Employee::STATUS_ACTIVE)->get();
+        $currentTimestamp = SettingsService::getCurrentTimestamp();
 
         foreach($employees as $employee){
             $mood = $employee->current_mood;
             $mood_decay_rate_days = $employee->mood_decay_rate_days;
             
+            $daysSinceHired = $currentTimestamp->diffInDays($employee->hired_at);
+
+            if($daysSinceHired < 15) continue;
+
             // Calculate mood decay: subtract the decay rate from current mood
             // Both values are between 0 and 1, so we just subtract directly
             $mood -= $mood_decay_rate_days;
@@ -142,16 +147,16 @@ class HrService
             $resignationChance = rand(1, 100); 
 
             $resignationThreshold = 0;
-            if($mood < 0.1){
-                $resignationThreshold = 75; // 75% chance
-            } else if($mood < 0.2){
-                $resignationThreshold = 50; // 50% chance
-            } else if($mood < 0.3){
-                $resignationThreshold = 25; // 25% chance
-            } else if($mood < 0.4){
-                $resignationThreshold = 10; // 10% chance
+            if($mood < 0.05){           // Was 0.1
+                $resignationThreshold = 50; // Was 75% - reduced
+            } else if($mood < 0.15){    // Was 0.2
+                $resignationThreshold = 25; // Was 50% - reduced
+            } else if($mood < 0.25){    // Was 0.3
+                $resignationThreshold = 10; // Was 25% - reduced
+            } else if($mood < 0.35){    // Was 0.4
+                $resignationThreshold = 3;  // Was 10% - reduced
             } else {
-                $resignationThreshold = 5; // 5% chance
+                $resignationThreshold = 1;  // Was 5% - reduced
             }
 
             if($resignationChance <= $resignationThreshold){

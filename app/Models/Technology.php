@@ -17,6 +17,7 @@ class Technology extends Model
 
     protected $casts = [
         'research_cost' => 'decimal:3',
+        'level' => 'integer',
     ];
 
     //Relations

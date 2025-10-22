@@ -18,7 +18,7 @@
     // Initialize notification sound
     function initNotificationSound() {
         notificationSound = new Audio('/assets/media/beep.mp3');
-        notificationSound.volume = 0.5; // Set volume to 50%
+        notificationSound.volume = 0.25; // Set volume to 50%
     }
 
     // Play notification sound
