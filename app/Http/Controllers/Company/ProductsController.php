@@ -18,9 +18,20 @@ class ProductsController extends Controller
     public function index(Request $request)
     {
         $search = IndexService::checkIfSearchEmpty($request->query('search'));
+        $forProcurement = $request->query('for_procurement', false);
 
         $company = $request->company;
-        $products = $company->companyProducts()->with(['product', 'product.recipes.material'])->latest();
+        $products = $company->companyProducts()
+            ->with(['product', 'product.recipes.material']);
+
+        // If this is for procurement, only show raw materials and components
+        if ($forProcurement) {
+            $products->whereHas('product', function($query) {
+                $query->whereIn('type', ['raw_material', 'component']);
+            });
+        }
+
+        $products = $products->latest();
 
         if ($search) {
             $products->where(function($query) use ($search) {
@@ -35,8 +46,21 @@ class ProductsController extends Controller
         }
 
         if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+            $perPage = $request->query('perPage', 10);
+            $page = $request->query('page', 1);
+            
+            $products = $products->paginate($perPage, ['*'], 'page', $page);
+            
             return response()->json([
-                'companyProducts' => $products->get(),
+                'companyProducts' => $products->items(),
+                'pagination' => [
+                    'current_page' => $products->currentPage(),
+                    'last_page' => $products->lastPage(),
+                    'per_page' => $products->perPage(),
+                    'total' => $products->total(),
+                    'from' => $products->firstItem(),
+                    'to' => $products->lastItem(),
+                ]
             ]);
         }
 

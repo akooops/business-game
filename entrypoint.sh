@@ -15,8 +15,10 @@ php artisan config:cache || true
 php artisan route:cache || true
 php artisan view:cache || true
 
-# Run database migrations
-php artisan migrate --force --no-interaction
+# Run database migrations (skip if SKIP_MIGRATIONS is set)
+if [ "${SKIP_MIGRATIONS}" != "true" ] && [ "${SKIP_MIGRATIONS}" != "1" ]; then
+  php artisan migrate --force --no-interaction || echo "Migration failed, continuing..."
+fi
 
 # Optionally seed demo data (set SEED_DEMO=true to enable)
 if [ "${SEED_DEMO}" = "true" ] || [ "${SEED_DEMO}" = "1" ]; then

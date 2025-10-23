@@ -262,24 +262,53 @@
                                                 data: function(params) {
                                                     return {
                                                         search: params.term,
-                                                        perPage: 100
+                                                        perPage: 10,
+                                                        page: params.page || 1,
+                                                        for_procurement: true
                                                     };
                                                 },
-                                                processResults: function(data) {
+                                                processResults: function(data, params) {
+                                                    const results = data.companyProducts.map(companyProduct => ({
+                                                        id: companyProduct.product.id,
+                                                        text: companyProduct.product.name,
+                                                        name: companyProduct.product.name,
+                                                        image_url: companyProduct.product.image_url,
+                                                        type_name: companyProduct.product.type_name
+                                                    }));
+
+                                                    const hasMore = data.pagination && data.pagination.current_page < data.pagination.last_page;
+
                                                     return {
-                                                        results: data.companyProducts.map(companyProduct => ({
-                                                            id: companyProduct.product.id,
-                                                            text: companyProduct.product.name,
-                                                            name: companyProduct.product.name,
-                                                            image_url: companyProduct.product.image_url,
-                                                            type_name: companyProduct.product.type_name
-                                                        }))
+                                                        results: results,
+                                                        pagination: {
+                                                            more: hasMore
+                                                        }
                                                     };
                                                 },
-                                                cache: true
+                                                cache: false
+                                            }}
+                                            pageSize={10}
+                                            allowClear={true}
+                                            minimumInputLength={0}
+                                            closeOnSelect={true}
+                                            selectOnClose={false}
+                                            language={{
+                                                inputTooShort: function() {
+                                                    return 'Please enter at least 0 characters';
+                                                },
+                                                noResults: function() {
+                                                    return 'No products found';
+                                                },
+                                                searching: function() {
+                                                    return 'Searching...';
+                                                },
+                                                loadingMore: function() {
+                                                    return 'Loading more results...';
+                                                }
                                             }}
                                             templateResult={function(data) {
                                                 if (data.loading) return data.text;
+                                                if (data.id === undefined) return data.text; // For pagination option
                                                 
                                                 const $elem = globalThis.$('<div class="flex flex-col">' +
                                                     '<span class="font-medium">' + data.name + '</span>' +
@@ -289,7 +318,6 @@
                                             }}
                                             templateSelection={function(data) {
                                                 if (!data.id) return data.text;
-                                                
                                                 return data.name + ' (' + data.type_name + ')';
                                             }}
                                         />
