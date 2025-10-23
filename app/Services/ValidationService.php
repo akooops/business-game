@@ -70,6 +70,11 @@ class ValidationService
             $errors['product_id'] = 'The selected product does not exist.';
         }
 
+        // Only allow raw materials and components for purchase
+        if($product && $product->type === 'finished_product'){
+            $errors['product_id'] = 'Finished products cannot be purchased. They must be manufactured.';
+        }
+
         if(!$product->is_researched){
             $errors['product_id'] = 'This product is not researched yet.';
         }

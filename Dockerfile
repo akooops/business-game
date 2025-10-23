@@ -32,7 +32,7 @@ COPY . .
 COPY --from=node_builder /app/public /var/www/html/public
 
 # Laravel install
-RUN composer install --no-dev --prefer-dist --optimize-autoloader \
+RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction \
     && chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R ug+rwx storage bootstrap/cache
 

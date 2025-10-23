@@ -339,18 +339,24 @@
                                                 data: function(params) {
                                                     return {
                                                         search: params.term,
-                                                        perPage: 100
+                                                        perPage: 10,
+                                                        page: params.page || 1
                                                     };
                                                 },
-                                                processResults: function(data) {
-                                                    return {
-                                                        results: data.companyProducts.map(companyProduct => ({
-                                                            id: companyProduct.product.id,
-                                                            text: `${companyProduct.product.name}`,
+                                                processResults: function(data, params) {
+                                                    const results = data.companyProducts.map(companyProduct => ({
+                                                        id: companyProduct.product.id,
+                                                        text: `${companyProduct.product.name}`,
                                                             name: companyProduct.product.name,
                                                             type: companyProduct.product.type,
                                                             type_name: companyProduct.product.type_name
-                                                        }))
+                                                        }));
+
+                                                    return {
+                                                        results: results,
+                                                        pagination: {
+                                                            more: data.pagination && data.pagination.current_page < data.pagination.last_page
+                                                        }
                                                     };
                                                 },
                                                 cache: true
