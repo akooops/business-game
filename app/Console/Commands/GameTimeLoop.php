@@ -6,6 +6,23 @@ use Illuminate\Console\Command;
 use App\Services\SettingsService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use App\Jobs\ProcessTechnologiesResearch;
+use App\Jobs\ProcessPurchases;
+use App\Jobs\ProcessSales;
+use App\Jobs\ExpireOldJobApplications;
+use App\Jobs\ProcessEmployeesMood;
+use App\Jobs\ProcessProductionOrders;
+use App\Jobs\ProcessMachinesReliability;
+use App\Jobs\ProcessMachinesValue;
+use App\Jobs\ProcessMaintenances;
+use App\Jobs\ProcessAdPackagesCompletion;
+use App\Jobs\PayEmployeesSalaries;
+use App\Jobs\PayMonthlyLoans;
+use App\Jobs\ChangeSupplierPricesAndCosts;
+use App\Jobs\ChangeWilayasCosts;
+use App\Jobs\PayInventoryCosts;
+use App\Jobs\PayMachinesOperationCosts;
+use App\Jobs\GenerateNewSales;
 
 class GameTimeLoop extends Command
 {
@@ -42,61 +59,64 @@ class GameTimeLoop extends Command
         // Update the game time
         SettingsService::setCurrentTimestamp($newTime);
 
+        // Dispatch jobs to process game mechanics asynchronously
+        // This ensures the time loop completes quickly and consistently
+        
         // Process technologies research
-        $this->call('game:technolgies-research-processing');
+        ProcessTechnologiesResearch::dispatch();
 
         // Process purchases
-        $this->call('game:purchases-processing');
+        ProcessPurchases::dispatch();
 
         // Process sales
-        $this->call('game:sales-processing');
+        ProcessSales::dispatch();
 
         // Expire old job applications
-        $this->call('game:expire-old-job-applications');
+        ExpireOldJobApplications::dispatch();
 
         // Process employees mood
-        $this->call('game:process-employees-mood');
+        ProcessEmployeesMood::dispatch();
 
         // Process production orders
-        $this->call('game:production-orders-processing');
+        ProcessProductionOrders::dispatch();
 
         // Process machines reliability
-        $this->call('game:process-machines-reliability');
+        ProcessMachinesReliability::dispatch();
 
         // Process machines value
-        $this->call('game:process-machines-value');
+        ProcessMachinesValue::dispatch();
 
         // Process maintenances
-        $this->call('game:process-maintenances');
+        ProcessMaintenances::dispatch();
 
         // Process ad packages completion
-        $this->call('game:process-ad-packages-completion');
+        ProcessAdPackagesCompletion::dispatch();
 
         // Every start of the month
         if($newTime->day == 1 ){
             // Pay employees salaries
-            $this->call('game:pay-employees-salaries');
+            PayEmployeesSalaries::dispatch();
 
             // Pay monthly loans
-            $this->call('game:pay-monthly-loans');
+            PayMonthlyLoans::dispatch();
         }
 
         // Every week
         if($newTime->day % 7 == 0){
             // Change supplier prices and costs and shipping times
-            $this->call('game:change-supplier-prices-and-costs');
+            ChangeSupplierPricesAndCosts::dispatch();
 
             // Change wilayas costs and shipping times
-            $this->call('game:change-wilayas-costs');
+            ChangeWilayasCosts::dispatch();
 
             // Pay inventory costs
-            $this->call('game:pay-inventory-costs');
+            PayInventoryCosts::dispatch();
 
             // Pay machines operation costs
-            $this->call('game:pay-machines-operation-costs');
+            PayMachinesOperationCosts::dispatch();
 
             // Generate new sales
-            $this->call('game:generate-new-sales'); 
+            GenerateNewSales::dispatch(); 
         }
 
         $this->info("New game time: " . $newTime->format('Y-m-d H:i:s'));
