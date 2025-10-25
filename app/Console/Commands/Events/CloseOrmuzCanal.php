@@ -41,7 +41,7 @@ class CloseOrmuzCanal extends Command
 
         $this->info('Current timestamp: ' . $currentTimestamp->format('Y-m-d H:i:s'));
 
-        $products = ["Silicones", "Surfactants", "Preservatives", "Thickener / Gelling Agent", "Packaging Material"];
+        $products = ["Silicones", "Surfactants", "Preservatives", "Thickener / Gelling Agent", "Packaging"];
         $countries = ["United Arab Emirates"];
 
         $suppliers = Supplier::whereHas('country', function($query) use ($countries){
@@ -58,10 +58,8 @@ class CloseOrmuzCanal extends Command
                 $supplier->update([
                     'min_shipping_cost' => $minShippingCost,
                     'max_shipping_cost' => $maxShippingCost,
-                    'real_shipping_cost' => CalculationsService::calcaulteRandomBetweenMinMax($minShippingCost, $maxShippingCost),
                     'min_shipping_time_days' => $minShippingTimeDays,
                     'max_shipping_time_days' => $maxShippingTimeDays,
-                    'real_shipping_time_days' => CalculationsService::calcaulteRandomBetweenMinMax($minShippingTimeDays, $maxShippingTimeDays),
                 ]);
 
                 $this->info('Supplier ' . $supplier->name . ' raised successfully with min shipping cost ' . $minShippingCost . ' and max shipping cost ' . $maxShippingCost);
@@ -76,7 +74,6 @@ class CloseOrmuzCanal extends Command
             $supplierProduct->update([
                 'min_sale_price' => $supplierProduct->min_sale_price + $supplierProduct->min_sale_price * $rate,
                 'max_sale_price' => $supplierProduct->max_sale_price + $supplierProduct->max_sale_price * $rate,
-                'real_sale_price' => CalculationsService::calcaulteRandomBetweenMinMax($supplierProduct->min_sale_price, $supplierProduct->max_sale_price),
             ]);
         }
 

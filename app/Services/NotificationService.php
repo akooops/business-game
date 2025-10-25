@@ -367,7 +367,7 @@ class NotificationService
             Notification::create([
                 'type' => Notification::TYPE_HEAT_WAVE_STARTED,
                 'title' => 'Heat Wave Started',
-                'message' => "Heat wave started. You will lose {$rate}% of your products in inventory: " . implode(', ', $products) . ". Also your employees will be more tired and less productive and local suppliers will raise their prices.",
+                'message' => "Heat wave started. You will lose " . $rate * 100 . "% of your products in inventory: " . implode(', ', $products) . ". Also your employees will be more tired and less productive and local suppliers will raise their prices.",
                 'url' => route('company.inventory.index'),
                 'user_id' => $company->user_id,
             ]);

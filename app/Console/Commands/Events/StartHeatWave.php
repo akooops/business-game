@@ -88,15 +88,17 @@ class StartHeatWave extends Command
                     }
                 }
 
-                InventoryMovement::create([
-                    'company_id' => $company->id,
-                    'product_id' => $product->id,
-                    'movement_type' => InventoryMovement::MOVEMENT_TYPE_DAMAGED,
-                    'original_quantity' => $overAllDamagedQuantity,
-                    'current_quantity' => $overAllDamagedQuantity,
-                    'moved_at' => SettingsService::getCurrentTimestamp(),
-                    'note' => 'Inventory damaged with ' . $rate * 100 . '% by heat wave',
-                ]);
+                if($overAllDamagedQuantity > 0){
+                    InventoryMovement::create([
+                        'company_id' => $company->id,
+                        'product_id' => $product->id,
+                        'movement_type' => InventoryMovement::MOVEMENT_TYPE_DAMAGED,
+                        'original_quantity' => $overAllDamagedQuantity,
+                        'current_quantity' => $overAllDamagedQuantity,
+                        'moved_at' => SettingsService::getCurrentTimestamp(),
+                        'note' => 'Inventory damaged with ' . $rate * 100 . '% by heat wave',
+                    ]);
+                }
             }
         }
 
