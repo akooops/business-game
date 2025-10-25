@@ -37,10 +37,15 @@ class SalesService
     {
         // Get all company products
         $companyProducts = $company->companyProducts()->get();
+        
+        // Collect all products with new sales for batched notification
+        $salesGenerated = [];
 
         foreach($companyProducts as $companyProduct){
             // Get the product demand for the current gameweek
             $product = $companyProduct->product;
+            if(!$product->is_saleable) continue;
+            
             $productDemand = $product->demands()->where('gameweek', SettingsService::getCurrentGameWeek())->first();
 
             $marketPrice = ($productDemand) ? $productDemand->market_price : $product->avg_market_price; 
@@ -117,7 +122,17 @@ class SalesService
                 'wilaya_id' => $randomWilaya->id,
             ]);
 
-            NotificationService::createSaleInitiatedNotification($company, $product, 1);
+            // Add to notification batch
+            $salesGenerated[] = [
+                'product' => $product,
+                'quantity' => $saleDemand,
+                'wilaya' => $randomWilaya->name,
+            ];
+        }
+
+        // Create ONE notification for all generated sales
+        if (!empty($salesGenerated)) {
+            NotificationService::createBatchSalesInitiatedNotification($company, $salesGenerated);
         }
     }
 
@@ -165,6 +180,9 @@ class SalesService
     public static function cancelSales($company){
         $sales = $company->sales()->where('status', Sale::STATUS_INITIATED)->get();
         
+        // Collect all cancelled sales for batched notification
+        $cancelledSales = [];
+        
         foreach($sales as $sale){
             $currentTimestamp = SettingsService::getCurrentTimestamp();
             $saleInitiatedAt = $sale->initiated_at;
@@ -175,8 +193,18 @@ class SalesService
                     'status' => Sale::STATUS_CANCELLED,
                 ]);
 
-                NotificationService::createSaleCancelledNotification($company, $sale, $sale->product, $sale->quantity);
+                // Add to notification batch
+                $cancelledSales[] = [
+                    'product' => $sale->product,
+                    'quantity' => $sale->quantity,
+                    'wilaya' => $sale->wilaya->name,
+                ];
             }
+        }
+
+        // Create ONE notification for all cancelled sales
+        if (!empty($cancelledSales)) {
+            NotificationService::createBatchSalesCancelledNotification($company, $cancelledSales);
         }
     }
 }

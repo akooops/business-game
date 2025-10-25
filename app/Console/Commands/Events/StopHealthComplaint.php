@@ -45,12 +45,14 @@ class StopHealthComplaint extends Command
         $products = Product::get();
 
         foreach($products as $product){
-            $productDemand = ProductDemand::where('product_id', $product->id)->first();
+            $productDemand = ProductDemand::where('product_id', $product->id)->get();
 
-            $productDemand->update([
-                'min_demand' => $productDemand->min_demand / (1 - $rate),
-                'max_demand' => $productDemand->max_demand / (1 - $rate),
-            ]);
+            foreach($productDemand as $demand){
+                $demand->update([
+                    'min_demand' => $demand->min_demand / (1 - $rate),
+                    'max_demand' => $demand->max_demand / (1 - $rate),
+                ]);
+            }
         }
 
         NotificationService::createHealthComplaintEndedNotification();

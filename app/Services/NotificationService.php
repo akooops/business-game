@@ -121,6 +121,44 @@ class NotificationService
         ]);
     }
 
+    // Batch notification for multiple sales initiated
+    public static function createBatchSalesInitiatedNotification($company, $salesData){
+        $totalSales = count($salesData);
+        
+        // Build detailed message
+        $message = "New demand for {$totalSales} product(s):\n";
+        foreach($salesData as $data) {
+            $message .= "• {$data['product']->name}: {$data['quantity']} units to {$data['wilaya']}\n";
+        }
+        
+        return Notification::create([
+            'type' => Notification::TYPE_SALE_INITIATED,
+            'title' => 'New Sales Generated',
+            'message' => rtrim($message),
+            'url' => route('company.sales.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
+    // Batch notification for multiple sales cancelled
+    public static function createBatchSalesCancelledNotification($company, $cancelledData){
+        $totalCancelled = count($cancelledData);
+        
+        // Build detailed message
+        $message = "{$totalCancelled} sale(s) cancelled due to time limit:\n";
+        foreach($cancelledData as $data) {
+            $message .= "• {$data['product']->name}: {$data['quantity']} units to {$data['wilaya']}\n";
+        }
+        
+        return Notification::create([
+            'type' => Notification::TYPE_SALE_CANCELLED,
+            'title' => 'Sales Cancelled',
+            'message' => rtrim($message),
+            'url' => route('company.sales.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
     // ------------------------------------------------------------
     // Employees
     // ------------------------------------------------------------

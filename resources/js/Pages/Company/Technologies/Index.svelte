@@ -53,10 +53,6 @@
             maxResearchLevel = data.maxResearchLevel;
             currentResearchLevel = data.currentResearchLevel;
 
-            companyTechnologies.forEach(ct => {
-                companyTechMap[ct.technology_id] = ct;
-            });
-
             // Wait for DOM to update, then initialize menus
             await tick();
             if (window.KTMenu) {
@@ -69,8 +65,11 @@
         }
     }
 
-    // Map companyTechnologies by technology_id for quick lookup
-    $: companyTechMap = {};
+    // Map companyTechnologies by technology_id for quick lookup (reactive)
+    $: companyTechMap = companyTechnologies.reduce((map, ct) => {
+        map[ct.technology_id] = ct;
+        return map;
+    }, {});
 
     // Helper to get technologies for a level
     function getTechnologiesByLevel(level) {
@@ -131,6 +130,7 @@
     // Start research
     async function startResearch() {
         if (!researchTechnology) return;
+                
         try {
             const response = await fetch(route('company.technologies.research', researchTechnology.id), {
                 method: 'POST',
