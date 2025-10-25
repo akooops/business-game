@@ -1078,8 +1078,22 @@
                             };
                         },
                         processResults: function(data) {
+                            // Filter employees: exclude those already assigned to a machine
+                            // and those whose profile doesn't match the machine's required profile
+                            const filteredEmployees = data.employees.filter(employee => {
+                                // Exclude employees already assigned to a machine
+                                if (employee.company_machine !== null) {
+                                    return false;
+                                }
+                                // Only include employees whose profile matches the machine's required profile
+                                if (selectedMachine && selectedMachine.machine && selectedMachine.machine.employee_profile_id) {
+                                    return employee.employee_profile_id === selectedMachine.machine.employee_profile_id;
+                                }
+                                return true;
+                            });
+
                             return {
-                                results: data.employees.map(employee => ({
+                                results: filteredEmployees.map(employee => ({
                                     id: employee.id,
                                     text: employee.name,
                                     name: employee.name,
