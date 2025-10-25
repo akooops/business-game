@@ -145,10 +145,8 @@
                 // Close modal
                 closeRecruitModal();
                 
-                // Reset form
-                selectedEmployeeProfile = null;
-                selectedEmployeeProfileId = '';
-                availableEmployees = [];
+                // Remove recruited employee from the list
+                availableEmployees = availableEmployees.filter(emp => emp.id !== recruitData.employee.id);
                 
                 // Refetch applied employees if we're on that tab
                 const appliedTab = document.getElementById('tab_applied');
