@@ -262,7 +262,7 @@
                                                 data: function(params) {
                                                     return {
                                                         search: params.term,
-                                                        perPage: 100
+                                                        perPage: 10
                                                     };
                                                 },
                                                 processResults: function(data) {
