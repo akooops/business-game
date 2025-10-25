@@ -56,10 +56,8 @@ class CloseSuezCanal extends Command
                 $supplier->update([
                     'min_shipping_cost' => $minShippingCost,
                     'max_shipping_cost' => $maxShippingCost,
-                    'real_shipping_cost' => CalculationsService::calcaulteRandomBetweenMinMax($minShippingCost , $maxShippingCost),
                     'min_shipping_time_days' => $minShippingTimeDays,
                     'max_shipping_time_days' => $maxShippingTimeDays,
-                    'real_shipping_time_days' => CalculationsService::calcaulteRandomBetweenMinMax($minShippingTimeDays, $maxShippingTimeDays),
                 ]);
 
                 $this->info('Country ' . $country->name . ' affected successfully');
