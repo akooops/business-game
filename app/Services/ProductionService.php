@@ -154,8 +154,10 @@ class ProductionService
             $totalCost += $machine->operations_cost;
         }
 
-        FinanceService::payMachineOperationCost($company, $totalCost);
-        NotificationService::createMachineOperationCostsPaidNotification($company, $totalCost);
+        if($totalCost > 0){
+            FinanceService::payMachineOperationCost($company, $totalCost);
+            NotificationService::createMachineOperationCostsPaidNotification($company, $totalCost);
+        }
     }
 
     public static function calculateMachinesValue($company){
