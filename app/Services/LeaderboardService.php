@@ -30,6 +30,18 @@ class LeaderboardService
         $maxCarbon = Company::max('carbon_footprint');
         $maxResearch = Company::max('research_level');
 
+        if($maxCarbon == 0) {
+            $maxCarbon = 1;
+        }
+
+        if($maxResearch == 0) {
+            $maxResearch = 1;
+        }
+
+        if($maxNetWorth == 0) {
+            $maxNetWorth = 1;
+        }
+
         // Calculate scores and add to company collection
         foreach ($companies as $company) {            
             // Normalize values (0-1 range)
