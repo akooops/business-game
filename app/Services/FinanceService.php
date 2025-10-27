@@ -72,25 +72,6 @@ class FinanceService
         return $funds;
     }
 
-    //-------------------------------------
-    // Sales
-    //-------------------------------------
-    public static function paySaleShippingCost($company, $sale){
-        $funds = $company->funds;
-        $funds -= $sale->shipping_cost * $sale->quantity;
-        $company->update(['funds' => $funds]);
-
-        Transaction::create([
-            'company_id' => $company->id,
-            'amount' => $sale->shipping_cost * $sale->quantity,
-            'type' => Transaction::TYPE_SALE_SHIPPING,
-            'transaction_at' => SettingsService::getCurrentTimestamp(),
-        ]);
-
-
-        return $funds;
-    }
-
     public static function receiveSalePayment($company, $sale){
         $funds = $company->funds;
         $funds += $sale->sale_price * $sale->quantity;

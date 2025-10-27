@@ -127,7 +127,7 @@ class InventoryService
     //-------------------------------------
     // Sales
     //-------------------------------------
-    public static function saleConfirmed($sale){
+    public static function saleDelivered($sale){
         $company = $sale->company;
         $product = $sale->product;
         $quantity = $sale->quantity;

@@ -31,10 +31,10 @@
     // Modal state
     let selectedSale = null;
     let showSaleModal = false;
-    let confirmingSale = false;
+    let deliveringSale = false;
 
-    // Drawer state for confirmed sales
-    let selectedConfirmedSale = null;
+    // Drawer state for delivered sales
+    let selectedDeliveredSale = null;
     let showSaleDrawer = false;
 
     // Fetch sales data
@@ -102,7 +102,7 @@
     function closeSaleModal() {
         showSaleModal = false;
         selectedSale = null;
-        confirmingSale = false;
+        deliveringSale = false;
         
         // Simulate button click to use KT framework logic
         const dismissButton = document.querySelector('[data-kt-modal-dismiss="#sale_modal"]');
@@ -111,9 +111,9 @@
         }
     }
 
-    // Open sale drawer for confirmed sales
+    // Open sale drawer for delivered sales
     function openSaleDrawer(sale) {
-        selectedConfirmedSale = sale;
+        selectedDeliveredSale = sale;
         showSaleDrawer = true;
         
         // Show drawer
@@ -126,14 +126,14 @@
     // Close sale drawer
     function closeSaleDrawer() {
         showSaleDrawer = false;
-        selectedConfirmedSale = null;
+        selectedDeliveredSale = null;
     }
 
-    // Confirm sale
+    // Deliver sale
     async function confirmSale() {
         if (!selectedSale) return;
 
-        confirmingSale = true;
+        deliveringSale = true;
         try {
             const response = await fetch(route('company.sales.store', selectedSale.id), {
                 method: 'POST',
@@ -148,7 +148,7 @@
                 const data = await response.json();
                 
                 // Show success toast
-                showToast(data.message || 'Sale confirmed successfully!', 'success');
+                showToast(data.message || 'Sale delivered successfully!', 'success');
                 
                 // Close modal
                 closeSaleModal();
@@ -163,7 +163,7 @@
             console.error('Error confirming sale:', error);
             showToast('Network error. Please check your connection and try again.', 'error');
         } finally {
-            confirmingSale = false;
+            deliveringSale = false;
         }
     }
 
@@ -172,8 +172,6 @@
         switch (status) {
             case 'initiated':
                 return 'kt-badge-warning';
-            case 'confirmed':
-                return 'kt-badge-primary';
             case 'delivered':
                 return 'kt-badge-success';
             case 'cancelled':
@@ -308,13 +306,13 @@
                                                     {formatTimestamp(sale.initiated_at)}
                                                 </span>
                                             </div>
-                                            {#if sale.confirmed_at}
+                                            {#if sale.delivered_at}
                                             <div class="flex flex-col gap-1.5">
                                                 <span class="text-xs font-normal text-secondary-foreground">
-                                                    Confirmed
+                                                    Delivered
                                                 </span>
                                                 <span class="text-sm font-medium text-mono">
-                                                    {formatTimestamp(sale.confirmed_at)}
+                                                    {formatTimestamp(sale.delivered_at)}
                                                 </span>
                                             </div>
                                             {/if}
@@ -335,7 +333,7 @@
                                                     on:click|stopPropagation={() => openSaleModal(sale)}
                                                 >
                                                     <i class="ki-filled ki-check text-sm"></i>
-                                                    Confirm
+                                                    Deliver
                                                 </button>
                                             </div>
                                             {/if}
@@ -411,11 +409,11 @@
     <!-- Hidden button to trigger drawer -->
     <button style="display:none" data-kt-drawer-toggle="#sale_drawer"></button>
 
-    <!-- Sale Confirmation Modal -->
+    <!-- Sale Deliveration Modal -->
     <div class="kt-modal" data-kt-modal="true" id="sale_modal">
         <div class="kt-modal-content max-w-[600px] top-[5%]">
             <div class="kt-modal-header">
-                <h3 class="kt-modal-title">Confirm Sale</h3>
+                <h3 class="kt-modal-title">Deliver Sale</h3>
                 <button
                     type="button"
                     class="kt-modal-close"
@@ -477,14 +475,6 @@
                                         <span class="text-sm text-muted-foreground">Sale Price:</span>
                                         <span class="font-medium">DZD {selectedSale.sale_price}</span>
                                     </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-sm text-muted-foreground">Shipping Cost:</span>
-                                        <span class="font-medium">DZD {selectedSale.shipping_cost}</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-sm text-muted-foreground">Shipping Time:</span>
-                                        <span class="font-medium">{selectedSale.shipping_time_days} days</span>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -505,14 +495,6 @@
                                         DZD {(selectedSale.sale_price * selectedSale.quantity).toFixed(3)}
                                     </span>
                                 </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-sm font-normal text-secondary-foreground">
-                                        Shipping
-                                    </span>
-                                    <span class="text-sm font-medium text-mono">
-                                        DZD {(selectedSale.shipping_cost * selectedSale.quantity).toFixed(3)}
-                                    </span>
-                                </div>
                             </div>
                         </div>
 
@@ -524,18 +506,17 @@
                                     <div class="space-y-2">
                                         <h5 class="font-medium text-warning">Important Notice</h5>
                                         <div class="text-sm text-warning/80 space-y-1">
-                                            <p>• You will pay <strong>DZD {(selectedSale.shipping_cost * selectedSale.quantity).toFixed(3)}</strong> in shipping costs immediately</p>
                                             <p>• You will receive <strong>DZD {(selectedSale.sale_price * selectedSale.quantity).toFixed(3)}</strong> only after delivery is completed</p>
-                                            <p>• Make sure you have sufficient inventory and funds before confirming</p>
+                                            <p>• Make sure you have sufficient inventory before confirming</p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Confirmation Message -->
+                        <!-- Deliveration Message -->
                         <div class="text-sm text-muted-foreground">
-                            Are you sure you want to confirm this sale? This will deduct shipping costs from your funds and reserve inventory for delivery.
+                            Are you sure you want to deliver this sale?.
                         </div>
                     </div>
                 {/if}
@@ -547,21 +528,21 @@
                         class="kt-btn kt-btn-secondary"
                         data-kt-modal-dismiss="#sale_modal"
                         on:click={closeSaleModal}
-                        disabled={confirmingSale}
+                        disabled={deliveringSale}
                     >
                         Cancel
                     </button>
                     <button 
                         class="kt-btn kt-btn-primary"
                         on:click={confirmSale}
-                        disabled={confirmingSale}
+                        disabled={deliveringSale}
                     >
-                        {#if confirmingSale}
+                        {#if deliveringSale}
                             <i class="ki-filled ki-loading animate-spin text-sm"></i>
-                            Confirming...
+                            Delivering...
                         {:else}
                             <i class="ki-filled ki-check text-sm"></i>
-                            Confirm Sale
+                            Deliver Sale
                         {/if}
                     </button>
                 </div>
@@ -579,13 +560,13 @@
         </div>
         
         <div class="kt-card-content flex flex-col space-y-3 p-5 kt-scrollable-y-auto">
-            {#if selectedConfirmedSale}
+            {#if selectedDeliveredSale}
                 <!-- Sale Image -->
                 <div class="kt-card relative items-center justify-center bg-accent/50 mb-6.5 h-[180px] shadow-none">
-                    {#if selectedConfirmedSale.product.image_url}
+                    {#if selectedDeliveredSale.product.image_url}
                         <img 
-                            src={selectedConfirmedSale.product.image_url} 
-                            alt={selectedConfirmedSale.product.name}
+                            src={selectedDeliveredSale.product.image_url} 
+                            alt={selectedDeliveredSale.product.name}
                             class="h-[180px] w-full object-cover rounded-sm"
                         />
                     {:else}
@@ -597,7 +578,7 @@
 
                 <!-- Sale Name -->
                 <span class="text-base font-medium text-mono">
-                    {selectedConfirmedSale.product.name}
+                    {selectedDeliveredSale.product.name}
                 </span>
 
                 <!-- Sale Details -->
@@ -608,7 +589,7 @@
                         </span>
                         <div>
                             <span class="text-xs font-medium text-foreground">
-                                #{selectedConfirmedSale.id}
+                                #{selectedDeliveredSale.id}
                             </span>
                         </div>
                     </div>
@@ -617,8 +598,8 @@
                             Status
                         </span>
                         <div>
-                            <span class="kt-badge kt-badge-sm {getStatusBadgeClass(selectedConfirmedSale.status)}">
-                                {selectedConfirmedSale.status}
+                            <span class="kt-badge kt-badge-sm {getStatusBadgeClass(selectedDeliveredSale.status)}">
+                                {selectedDeliveredSale.status}
                             </span>
                         </div>
                     </div>
@@ -628,7 +609,7 @@
                         </span>
                         <div>
                             <span class="text-xs font-medium text-foreground">
-                                {selectedConfirmedSale.wilaya.name}
+                                {selectedDeliveredSale.wilaya.name}
                             </span>
                         </div>
                     </div>
@@ -638,7 +619,7 @@
                         </span>
                         <div>
                             <span class="text-xs font-medium text-foreground">
-                                {selectedConfirmedSale.quantity}
+                                {selectedDeliveredSale.quantity}
                             </span>
                         </div>
                     </div>
@@ -648,27 +629,7 @@
                         </span>
                         <div>
                             <span class="text-xs font-medium text-foreground">
-                                DZD {selectedConfirmedSale.sale_price}
-                            </span>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2.5">
-                        <span class="text-xs font-normal text-foreground min-w-14 xl:min-w-24 shrink-0">
-                            Shipping Cost
-                        </span>
-                        <div>
-                            <span class="text-xs font-medium text-foreground">
-                                DZD {selectedConfirmedSale.shipping_cost}
-                            </span>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2.5">
-                        <span class="text-xs font-normal text-foreground min-w-14 xl:min-w-24 shrink-0">
-                            Shipping Time
-                        </span>
-                        <div>
-                            <span class="text-xs font-medium text-foreground">
-                                {selectedConfirmedSale.shipping_time_days} days
+                                DZD {selectedDeliveredSale.sale_price}
                             </span>
                         </div>
                     </div>
@@ -678,30 +639,18 @@
                         </span>
                         <div>
                             <span class="text-xs font-medium text-foreground">
-                                {formatTimestamp(selectedConfirmedSale.initiated_at)}
+                                {formatTimestamp(selectedDeliveredSale.initiated_at)}
                             </span>
                         </div>
                     </div>
-                    {#if selectedConfirmedSale.confirmed_at}
-                        <div class="flex items-center gap-2.5">
-                            <span class="text-xs font-normal text-foreground min-w-14 xl:min-w-24 shrink-0">
-                                Confirmed At
-                            </span>
-                            <div>
-                                <span class="text-xs font-medium text-foreground">
-                                    {formatTimestamp(selectedConfirmedSale.confirmed_at)}
-                                </span>
-                            </div>
-                        </div>
-                    {/if}
-                    {#if selectedConfirmedSale.delivered_at}
+                    {#if selectedDeliveredSale.delivered_at}
                         <div class="flex items-center gap-2.5">
                             <span class="text-xs font-normal text-foreground min-w-14 xl:min-w-24 shrink-0">
                                 Delivered At
                             </span>
                             <div>
                                 <span class="text-xs font-medium text-foreground">
-                                    {formatTimestamp(selectedConfirmedSale.delivered_at)}
+                                    {formatTimestamp(selectedDeliveredSale.delivered_at)}
                                 </span>
                             </div>
                         </div>
@@ -726,15 +675,7 @@
                                 Subtotal
                             </span>
                             <span class="text-sm font-medium text-mono">
-                                DZD {(selectedConfirmedSale.sale_price * selectedConfirmedSale.quantity).toFixed(3)}
-                            </span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm font-normal text-secondary-foreground">
-                                Shipping
-                            </span>
-                            <span class="text-sm font-medium text-mono">
-                                DZD {(selectedConfirmedSale.shipping_cost * selectedConfirmedSale.quantity).toFixed(3)}
+                                DZD {(selectedDeliveredSale.sale_price * selectedDeliveredSale.quantity).toFixed(3)}
                             </span>
                         </div>
                     </div>

@@ -19,7 +19,6 @@ use App\Jobs\ProcessAdPackagesCompletion;
 use App\Jobs\PayEmployeesSalaries;
 use App\Jobs\PayMonthlyLoans;
 use App\Jobs\ChangeSupplierPricesAndCosts;
-use App\Jobs\ChangeWilayasCosts;
 use App\Jobs\PayInventoryCosts;
 use App\Jobs\PayMachinesOperationCosts;
 use App\Jobs\GenerateNewSales;
@@ -99,16 +98,13 @@ class GameTimeLoop extends Command
 
             // Pay monthly loans
             PayMonthlyLoans::dispatch();
+
+            // Change supplier prices and costs and shipping times
+            ChangeSupplierPricesAndCosts::dispatch();
         }
 
         // Every week
         if($newTime->day % 7 == 0){
-            // Change supplier prices and costs and shipping times
-            ChangeSupplierPricesAndCosts::dispatch();
-
-            // Change wilayas costs and shipping times
-            ChangeWilayasCosts::dispatch();
-
             // Pay inventory costs
             PayInventoryCosts::dispatch();
 

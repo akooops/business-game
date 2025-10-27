@@ -24,14 +24,6 @@ class SalesService
         ]);
     }
 
-    //Change wilaya shipping costs
-    public static function changeWilayaShippingCosts($wilaya){
-        $wilaya->update([
-            'real_shipping_time_days' => CalculationsService::calcaulteRandomBetweenMinMax($wilaya->min_shipping_time_days, $wilaya->max_shipping_time_days),
-            'real_shipping_cost' => CalculationsService::calcaulteRandomBetweenMinMax($wilaya->min_shipping_cost, $wilaya->max_shipping_cost),
-        ]);
-    }
-
     // Generate demand for a company
     public static function generateDemand($company)
     {
@@ -97,9 +89,6 @@ class SalesService
             // Get a random wilaya
             $randomWilaya = Wilaya::inRandomOrder()->first();
 
-            // Get the wilaya shipping cost
-            $wilayaShippingCost = $randomWilaya->real_shipping_cost;
-
             // Get the current gameweek and the timelimit days
             $gameWeek = SettingsService::getCurrentGameWeek();
             $timelimit_days = CalculationsService::calcaulteRandomBetweenMinMax(2, 10);
@@ -111,8 +100,6 @@ class SalesService
 
                 'quantity' => $saleDemand,
                 'sale_price' => $companyProduct->sale_price,
-                'shipping_cost' => $wilayaShippingCost,
-                'shipping_time_days' => $randomWilaya->real_shipping_time_days,
 
                 'status' => Sale::STATUS_INITIATED,
                 'initiated_at' => SettingsService::getCurrentTimestamp(),
@@ -139,41 +126,21 @@ class SalesService
     // Confirm a sale
     public static function confirmSale($sale){
         // Get current timestamp
-        $confirmedAt = SettingsService::getCurrentTimestamp();
+        $deliveredAt = SettingsService::getCurrentTimestamp();
 
         $sale->update([
-            'status' => Sale::STATUS_CONFIRMED,
-            'confirmed_at' => $confirmedAt,
+            'status' => Sale::STATUS_DELIVERED,
+            'delivered_at' => $deliveredAt,
         ]);
 
-        // Pay the sale shipping cost
-        FinanceService::paySaleShippingCost($sale->company, $sale);
-
         // Update the inventory
-        InventoryService::saleConfirmed($sale);
-    }
+        InventoryService::saleDelivered($sale);
 
-    // Deliver a sale
-    public static function processDeliveredSale($company){
-        $sales = $company->sales()->where('status', Sale::STATUS_CONFIRMED)->get();
+        // Receive the sale payment
+        FinanceService::receiveSalePayment($sale->company, $sale);
 
-        foreach($sales as $sale){
-            $currentTimestamp = SettingsService::getCurrentTimestamp();
-            $deliveredAt = $sale->confirmed_at->copy()->addDays($sale->shipping_time_days);
-
-            if($deliveredAt <= $currentTimestamp){
-                $sale->update([
-                    'status' => Sale::STATUS_DELIVERED,
-                    'delivered_at' => $currentTimestamp,
-                ]);
-
-                // Receive the sale payment
-                FinanceService::receiveSalePayment($sale->company, $sale);
-
-                // Create notification
-                NotificationService::createSaleDeliveredNotification($company, $sale, $sale->product, $sale->quantity);
-            }
-        }
+        // Create notification
+        NotificationService::createSaleDeliveredNotification($sale->company, $sale, $sale->product, $sale->quantity);
     }
 
     // Cancel sales that have exceeded their time limit
