@@ -171,6 +171,7 @@ class HrService
                 if($employee->companyMachine){
                     $employee->companyMachine->update([
                         'employee_id' => null,
+                        'status' => CompanyMachine::STATUS_INACTIVE,
                     ]);
 
                     $productionOrders = ProductionOrder::where([
