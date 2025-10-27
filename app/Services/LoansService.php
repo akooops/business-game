@@ -36,11 +36,17 @@ class LoansService
     }
 
     public static function processMonthlyPayment($company){
-        $loans = $company->loans()->where('paid_at', null)->get();
+        $currentTimestamp = SettingsService::getCurrentTimestamp();
+        
+        // Only process loans where at least 30 days (1 month) have passed since borrowed_at
+        $oneMonthAgo = $currentTimestamp->copy()->subDays(30);
+        
+        $loans = $company->loans()
+            ->where('paid_at', null)
+            ->where('borrowed_at', '<=', $oneMonthAgo)
+            ->get();
 
         foreach($loans as $loan){
-            $currentTimestamp = SettingsService::getCurrentTimestamp();
-
             $loan->update(['remaining_amount' => $loan->remaining_amount - $loan->monthly_payment]);
 
             if($loan->remaining_amount <= 0){

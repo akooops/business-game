@@ -227,7 +227,7 @@
                     {#if loading}
                         <!-- Loading skeleton -->
                         <div class="p-6">
-                            <div class="grid grid-cols-1 gap-6 p-4">
+                            <div class="grid grid-cols-1 grid-cols-md-2 gap-6 p-4grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
                                 {#each Array(perPage) as _, i}
                                     <div class="kt-card animate-pulse">
                                         <div class="kt-card-header justify-start bg-muted/70 gap-9 h-auto py-5">
@@ -272,7 +272,7 @@
                     {:else}
                         <!-- Sales Grid -->
                         <div class="p-6">
-                            <div class="grid grid-cols-1 gap-6 p-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
                                 {#each sales as sale}
                                     <div class="kt-card kt-card-hover cursor-pointer" on:click={() => {
                                         if (sale.status === 'initiated') {
@@ -310,16 +310,6 @@
                                             <div class="flex flex-col gap-1.5">
                                                 <span class="text-xs font-normal text-secondary-foreground">
                                                     Delivered
-                                                </span>
-                                                <span class="text-sm font-medium text-mono">
-                                                    {formatTimestamp(sale.delivered_at)}
-                                                </span>
-                                            </div>
-                                            {/if}
-                                            {#if sale.delivered_at}
-                                            <div class="flex flex-col gap-1.5">
-                                                <span class="text-xs font-normal text-secondary-foreground">
-                                                    Delivered At
                                                 </span>
                                                 <span class="text-sm font-medium text-mono">
                                                     {formatTimestamp(sale.delivered_at)}

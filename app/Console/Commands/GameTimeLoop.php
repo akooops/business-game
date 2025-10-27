@@ -22,6 +22,7 @@ use App\Jobs\ChangeSupplierPricesAndCosts;
 use App\Jobs\PayInventoryCosts;
 use App\Jobs\PayMachinesOperationCosts;
 use App\Jobs\GenerateNewSales;
+use App\Models\Company;
 
 class GameTimeLoop extends Command
 {
@@ -58,64 +59,80 @@ class GameTimeLoop extends Command
         // Update the game time
         SettingsService::setCurrentTimestamp($newTime);
 
-        // Dispatch jobs to process game mechanics asynchronously
-        // This ensures the time loop completes quickly and consistently
+        // Fetch company IDs once (lightweight query)
+        $companyIds = Company::pluck('id')->toArray();
+        $totalCompanies = count($companyIds);
+        $this->info("Dispatching jobs for {$totalCompanies} companies...");
+
+        // Dispatch per-company jobs asynchronously
+        // This ensures parallel processing and better performance
         
-        // Process technologies research
-        ProcessTechnologiesResearch::dispatch();
+        foreach($companyIds as $companyId) {
+            // Process technologies research
+            ProcessTechnologiesResearch::dispatch($companyId);
 
-        // Process purchases
-        ProcessPurchases::dispatch();
+            // Process purchases
+            ProcessPurchases::dispatch($companyId);
 
-        // Process sales
-        ProcessSales::dispatch();
+            // Process sales
+            ProcessSales::dispatch($companyId);
 
-        // Expire old job applications
-        ExpireOldJobApplications::dispatch();
+            // Expire old job applications
+            ExpireOldJobApplications::dispatch($companyId);
 
-        // Process employees mood
-        ProcessEmployeesMood::dispatch();
+            // Process employees mood
+            ProcessEmployeesMood::dispatch($companyId);
 
-        // Process production orders
-        ProcessProductionOrders::dispatch();
+            // Process production orders
+            ProcessProductionOrders::dispatch($companyId);
 
-        // Process machines reliability
-        ProcessMachinesReliability::dispatch();
+            // Process machines reliability
+            ProcessMachinesReliability::dispatch($companyId);
 
-        // Process machines value
-        ProcessMachinesValue::dispatch();
+            // Process machines value
+            ProcessMachinesValue::dispatch($companyId);
 
-        // Process maintenances
-        ProcessMaintenances::dispatch();
+            // Process maintenances
+            ProcessMaintenances::dispatch($companyId);
 
-        // Process ad packages completion
-        ProcessAdPackagesCompletion::dispatch();
+            // Process ad packages completion
+            ProcessAdPackagesCompletion::dispatch($companyId);
+        }
 
         // Every start of the month
         if($newTime->day == 1 ){
-            // Pay employees salaries
-            PayEmployeesSalaries::dispatch();
+            foreach($companyIds as $companyId) {
+                // Pay employees salaries
+                PayEmployeesSalaries::dispatch($companyId);
 
-            // Pay monthly loans
-            PayMonthlyLoans::dispatch();
+                // Pay monthly loans
+                PayMonthlyLoans::dispatch($companyId);
+            }
 
-            // Change supplier prices and costs and shipping times
+            // Change supplier prices and costs (system-wide, not per-company)
             ChangeSupplierPricesAndCosts::dispatch();
         }
 
         // Every week
         if($newTime->day % 7 == 0){
-            // Pay inventory costs
-            PayInventoryCosts::dispatch();
+            foreach($companyIds as $companyId) {
+                // Pay inventory costs
+                PayInventoryCosts::dispatch($companyId);
 
-            // Pay machines operation costs
-            PayMachinesOperationCosts::dispatch();
+                // Pay machines operation costs
+                PayMachinesOperationCosts::dispatch($companyId);
 
-            // Generate new sales
-            GenerateNewSales::dispatch(); 
+                // Generate new sales
+                GenerateNewSales::dispatch($companyId);
+            }
         }
 
+        $totalJobsDispatched = $totalCompanies * 10; // Base jobs
+        if($newTime->day == 1) $totalJobsDispatched += $totalCompanies * 2; // Monthly
+        if($newTime->day % 7 == 0) $totalJobsDispatched += $totalCompanies * 3 + 1; // Weekly + supplier
+
         $this->info("New game time: " . $newTime->format('Y-m-d H:i:s'));
+        $this->info("Dispatched {$totalJobsDispatched} jobs for processing!");
         $this->info('Game time loop completed successfully!');
     }
 } 

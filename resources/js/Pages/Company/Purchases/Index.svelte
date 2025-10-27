@@ -162,7 +162,7 @@
                     {#if loading}
                         <!-- Loading skeleton -->
                         <div class="p-6">
-                            <div class="grid grid-cols-1 gap-6 p-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
                                 {#each Array(10) as _, i}
                                     <div class="kt-card animate-pulse">
                                         <div class="kt-card-header justify-start bg-muted/70 gap-9 h-auto py-5">
@@ -207,7 +207,7 @@
                     {:else}
                         <!-- Purchases Grid -->
                         <div class="p-6">
-                            <div class="grid grid-cols-1 gap-6 p-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
                                 {#each purchases as purchase}
                                     <div class="kt-card kt-card-hover cursor-pointer" on:click={() => openPurchaseDrawer(purchase)}>
                                         <div class="kt-card-header justify-start bg-muted/70 gap-9 h-auto py-5">
