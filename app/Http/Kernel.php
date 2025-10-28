@@ -67,5 +67,6 @@ class Kernel extends HttpKernel
         'check.admin' => \App\Http\Middleware\CheckAdmin::class,
         'check.company' => \App\Http\Middleware\CheckCompany::class,
         'handle.inertia' => \App\Http\Middleware\HandleInertiaRequests::class,
+        'throttle.company' => \App\Http\Middleware\ThrottleCompanyRequests::class,
     ];
 }
