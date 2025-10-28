@@ -31,6 +31,24 @@ class ChangeDemand extends Seeder
             'Women\'s Perfume (100 mL)' => ['min' => 224, 'avg' => 249, 'max' => 274],
         ];
 
+        // Assign unique demand patterns to each product
+        $productPatterns = [
+            'Moisturizing Cream (120 mL)' => ['type' => 'winter_peak', 'volatility' => 'medium', 'trend' => 'stable'],
+            'Serum (30 mL)' => ['type' => 'growing', 'volatility' => 'high', 'trend' => 'upward'],
+            'Face Scrub (150 mL)' => ['type' => 'summer_peak', 'volatility' => 'low', 'trend' => 'stable'],
+            'Shower Gel (250 ml)' => ['type' => 'summer_peak', 'volatility' => 'medium', 'trend' => 'stable'],
+            'Soap (100g)' => ['type' => 'steady', 'volatility' => 'low', 'trend' => 'downward'],
+            'Shampoo (250 mL)' => ['type' => 'random_spikes', 'volatility' => 'high', 'trend' => 'stable'],
+            'Conditioner (250 mL)' => ['type' => 'winter_peak', 'volatility' => 'medium', 'trend' => 'upward'],
+            'Deodorant (200 mL)' => ['type' => 'summer_peak', 'volatility' => 'high', 'trend' => 'stable'],
+            'Liquid Foundation (30 mL)' => ['type' => 'seasonal_dual', 'volatility' => 'medium', 'trend' => 'stable'],
+            'BB Cream (30 mL)' => ['type' => 'spring_peak', 'volatility' => 'medium', 'trend' => 'upward'],
+            'Lip Balm (10 mL)' => ['type' => 'winter_peak', 'volatility' => 'high', 'trend' => 'stable'],
+            'Mascara (100g)' => ['type' => 'steady', 'volatility' => 'low', 'trend' => 'stable'],
+            'Men\'s Perfume (100 mL)' => ['type' => 'holiday_spikes', 'volatility' => 'medium', 'trend' => 'downward'],
+            'Women\'s Perfume (100 mL)' => ['type' => 'holiday_spikes', 'volatility' => 'medium', 'trend' => 'upward'],
+        ];
+
         foreach ($demandsData as $productName => $demandRange) {
             // Find the product by name
             $product = Product::where('name', $productName)->first();
@@ -41,26 +59,90 @@ class ChangeDemand extends Seeder
             }
 
             $this->command->info("Processing product: {$productName}");
+            
+            $pattern = $productPatterns[$productName];
 
             // Create demand data for weeks 1 to 52
             for ($week = 1; $week <= 52; $week++) {
-                // Generate random demand within min-max range for this week
-                // Using a weighted random approach that favors values closer to average
                 $minDemand = $demandRange['min'];
                 $maxDemand = $demandRange['max'];
-                $avgDemand = $demandRange['avg'];
 
-                // Add some seasonal variation (optional - peaks around week 26)
-                $seasonalFactor = 1 + (0.15 * sin(2 * M_PI * $week / 52));
+                // 1. Calculate trend factor (upward, downward, or stable)
+                $trendFactor = 1.0;
+                switch ($pattern['trend']) {
+                    case 'upward':
+                        $trendFactor = 1 + ($week / 52 * 0.3); // 30% growth over year
+                        break;
+                    case 'downward':
+                        $trendFactor = 1 - ($week / 52 * 0.2); // 20% decline over year
+                        break;
+                    case 'stable':
+                        $trendFactor = 1.0;
+                        break;
+                }
+
+                // 2. Calculate seasonal factor based on pattern type
+                $seasonalFactor = 1.0;
+                switch ($pattern['type']) {
+                    case 'summer_peak':
+                        // Peaks around week 26 (mid-year)
+                        $seasonalFactor = 1 + (0.25 * sin(2 * M_PI * ($week - 13) / 52));
+                        break;
+                    case 'winter_peak':
+                        // Peaks around week 1 and 52 (winter)
+                        $seasonalFactor = 1 + (0.25 * cos(2 * M_PI * $week / 52));
+                        break;
+                    case 'spring_peak':
+                        // Peaks around week 13 (spring)
+                        $seasonalFactor = 1 + (0.2 * sin(2 * M_PI * ($week - 26) / 52));
+                        break;
+                    case 'seasonal_dual':
+                        // Two peaks per year (spring & fall)
+                        $seasonalFactor = 1 + (0.18 * sin(4 * M_PI * $week / 52));
+                        break;
+                    case 'holiday_spikes':
+                        // Spikes around specific weeks (holidays)
+                        $isHolidayWeek = in_array($week, [1, 12, 24, 48, 52]);
+                        $seasonalFactor = $isHolidayWeek ? 1.4 : 0.85;
+                        break;
+                    case 'random_spikes':
+                        // Random spikes throughout the year
+                        $seasonalFactor = 1 + (mt_rand(-20, 35) / 100);
+                        break;
+                    case 'steady':
+                        // Very minimal variation
+                        $seasonalFactor = 1 + (mt_rand(-5, 5) / 100);
+                        break;
+                }
+
+                // 3. Add volatility (random noise)
+                $volatilityFactor = 1.0;
+                switch ($pattern['volatility']) {
+                    case 'high':
+                        $volatilityFactor = 1 + (mt_rand(-25, 25) / 100);
+                        break;
+                    case 'medium':
+                        $volatilityFactor = 1 + (mt_rand(-15, 15) / 100);
+                        break;
+                    case 'low':
+                        $volatilityFactor = 1 + (mt_rand(-8, 8) / 100);
+                        break;
+                }
+
+                // 4. Apply all factors
+                $combinedFactor = $trendFactor * $seasonalFactor * $volatilityFactor;
                 
-                // Apply seasonal factor to the range
-                $adjustedMin = round($minDemand * $seasonalFactor);
-                $adjustedMax = round($maxDemand * $seasonalFactor);
+                $adjustedMin = round($minDemand * $combinedFactor);
+                $adjustedMax = round($maxDemand * $combinedFactor);
 
                 // Ensure min is always less than max
                 if ($adjustedMin >= $adjustedMax) {
                     $adjustedMax = $adjustedMin + 1;
                 }
+
+                // Ensure values don't go negative
+                $adjustedMin = max(1, $adjustedMin);
+                $adjustedMax = max(2, $adjustedMax);
 
                 ProductDemand::updateOrCreate(
                     [
@@ -74,7 +156,7 @@ class ChangeDemand extends Seeder
                 );
             }
 
-            $this->command->info("Completed 52 weeks of demand for: {$productName}");
+            $this->command->info("Completed 52 weeks of demand for: {$productName} (Pattern: {$pattern['type']}, Trend: {$pattern['trend']})");
         }
 
         $this->command->info('Product demands seeding completed!');
