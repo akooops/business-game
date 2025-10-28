@@ -14,22 +14,22 @@ class ProductsSeeder extends Seeder
 
         $products = [
             [
-                'name' => 'Steel',
-                'description' => 'Raw steel material',
+                'name' => 'Base Oil',
+                'description' => 'Raw base oil for cosmetics',
                 'type' => 'raw_material',
                 'elasticity_coefficient' => 1.000,
                 'technology_id' => null,
             ],
             [
-                'name' => 'Motor',
-                'description' => 'Electric motor component',
+                'name' => 'Active Ingredient',
+                'description' => 'Active cosmetic ingredient component',
                 'type' => 'component',
                 'elasticity_coefficient' => 1.000,
                 'technology_id' => optional($techBasic)->id,
             ],
             [
-                'name' => 'E-Bike',
-                'description' => 'Finished e-bike',
+                'name' => 'Face Cream',
+                'description' => 'Finished face cream product',
                 'type' => 'finished_product',
                 'elasticity_coefficient' => 1.200,
                 'technology_id' => optional($techBasic)->id,

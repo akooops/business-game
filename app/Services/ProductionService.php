@@ -14,7 +14,7 @@ class ProductionService
     {
         $speed = CalculationsService::calcaulteRandomBetweenMinMax($machine->min_speed, $machine->max_speed);
         $maintenance_cost = CalculationsService::calcaulteRandomBetweenMinMax($machine->min_maintenance_cost, $machine->max_maintenance_cost);
-        $maintenance_time_days = CalculationsService::calcaulteRandomBetweenMinMax($machine->min_maintenance_time_days, $machine->max_maintenance_time_days);
+        $maintenance_time_days = (int) round(CalculationsService::calcaulteRandomBetweenMinMax($machine->min_maintenance_time_days, $machine->max_maintenance_time_days));
 
         $companyMachine = CompanyMachine::create([
             'speed' => $speed,

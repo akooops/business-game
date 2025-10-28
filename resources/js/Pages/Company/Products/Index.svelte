@@ -23,6 +23,30 @@
     let companyProducts = [];
     let loading = true;
     let fetchInterval = null;
+    
+    // Filtering
+    let searchTerm = '';
+    let sortBy = '';
+    let filterType = ''; // '', 'raw_material', 'component', 'finished_product'
+    let searchTimeout = null;
+    
+    // Computed filtered products
+    $: filteredProducts = (companyProducts || [])
+        .filter(product => {
+            if (!product || !product.product || !product.product.name) return false;
+            const matchesSearch = searchTerm === '' || product.product.name.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesFilter = filterType === '' || product.product.type === filterType;
+            return matchesSearch && matchesFilter;
+        })
+        .sort((a, b) => {
+            if (sortBy === 'name_asc') return a.product.name.localeCompare(b.product.name);
+            if (sortBy === 'name_desc') return b.product.name.localeCompare(a.product.name);
+            if (sortBy === 'stock_asc') return (a.available_stock || 0) - (b.available_stock || 0);
+            if (sortBy === 'stock_desc') return (b.available_stock || 0) - (a.available_stock || 0);
+            if (sortBy === 'price_asc') return (a.sale_price || 0) - (b.sale_price || 0);
+            if (sortBy === 'price_desc') return (b.sale_price || 0) - (a.sale_price || 0);
+            return 0;
+        });
 
     // Drawer state
     let selectedProduct = null;
@@ -39,7 +63,13 @@
         if(companyProducts.length == 0) loading = true;
 
         try {
-            const response = await fetch(route('company.products.index'), {
+            const params = new URLSearchParams();
+            if (searchTerm) {
+                params.append('search', searchTerm);
+            }
+            
+            const url = route('company.products.index') + (params.toString() ? '?' + params.toString() : '');
+            const response = await fetch(url, {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
@@ -76,6 +106,17 @@
     function closeProductDrawer() {
         showProductDrawer = false;
         selectedProduct = null;
+    }
+    
+    // Handle search
+    function handleSearch(event) {
+        searchTerm = event.target.value;
+        
+        // Debounce search
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            fetchProducts();
+        }, 300);
     }
 
     // Open price modal
@@ -226,25 +267,115 @@
                                 {/each}
                             </div>
                         </div>
-                    {:else if companyProducts.length === 0}
-                        <!-- Empty state -->
-                        <div class="p-10">
-                            <div class="flex flex-col items-center justify-center text-center">
-                                <div class="mb-4">
-                                    <i class="ki-filled ki-abstract-26 text-4xl text-muted-foreground"></i>
+                    {:else}
+                        <!-- Filter Bar -->
+                        <div class="px-6 pt-6 pb-4 border-b border-border">
+                            <!-- Controls Layout -->
+                            <div class="space-y-4">
+                                <!-- Filter Buttons -->
+                                <div class="flex justify-center">
+                                    <div class="flex gap-2">
+                                        <button 
+                                            class="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 {filterType === '' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}"
+                                            on:click={() => filterType = ''}
+                                        >
+                                            All Products
+                                        </button>
+                                        <button 
+                                            class="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 {filterType === 'raw_material' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}"
+                                            on:click={() => filterType = 'raw_material'}
+                                        >
+                                            Raw Materials
+                                        </button>
+                                        <button 
+                                            class="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 {filterType === 'component' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}"
+                                            on:click={() => filterType = 'component'}
+                                        >
+                                            Components
+                                        </button>
+                                        <button 
+                                            class="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 {filterType === 'finished_product' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}"
+                                            on:click={() => filterType = 'finished_product'}
+                                        >
+                                            Finished Products
+                                        </button>
+                                    </div>
                                 </div>
-                                <h3 class="text-lg font-semibold text-mono mb-2">No products found</h3>
-                                <a href="{route('company.technologies.index')}" class="kt-btn kt-btn-primary">
-                                    <i class="fa-solid fa-rocket text-base"></i>
-                                    Research Technologies to unlock products
-                                </a>
+                                
+                                <!-- Search and Sort -->
+                                <div class="flex justify-center gap-4">
+                                    <!-- Sort Dropdown -->
+                                    <div class="relative">
+                                        <select 
+                                            class="h-10 px-4 pr-8 text-sm bg-white border border-gray-300 rounded-lg hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 cursor-pointer appearance-none shadow-sm" 
+                                            style="width: 140px; min-width: 140px;" 
+                                            bind:value={sortBy}
+                                        >
+                                            <option value="">Sort by</option>
+                                            <option value="name_asc">Name A-Z</option>
+                                            <option value="name_desc">Name Z-A</option>
+                                            <option value="stock_asc">Stock ↑</option>
+                                            <option value="stock_desc">Stock ↓</option>
+                                            <option value="price_asc">Price ↑</option>
+                                            <option value="price_desc">Price ↓</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- Search Bar - Modern Design -->
+                                    <div class="relative group">
+                                        <div class="absolute left-6 top-1/2 transform -translate-y-1/2 pointer-events-none transition-colors duration-200 group-focus-within:text-blue-500">
+                                            <i class="fa-solid fa-search text-base text-gray-400"></i>
+                                        </div>
+                                        <input
+                                            type="text"
+                                            class="h-11 pl-14 pr-14 text-base font-normal text-center bg-gradient-to-r from-white to-gray-50 border-2 border-gray-200 rounded-xl hover:border-blue-300 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 placeholder-gray-400 shadow-sm hover:shadow-md focus:shadow-lg"
+                                            style="width: 350px; min-width: 350px;"
+                                            placeholder="Search by name..."
+                                            value={searchTerm}
+                                            on:input={handleSearch}
+                                        />
+                                        {#if searchTerm}
+                                            <button 
+                                                class="absolute right-5 top-1/2 transform -translate-y-1/2 p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700 transition-all duration-200 hover:scale-110"
+                                                on:click={() => searchTerm = ''}
+                                            >
+                                                <i class="fa-solid fa-times text-xs"></i>
+                                            </button>
+                                        {/if}
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    {:else}
+                        
                         <!-- Products Grid -->
                         <div class="p-6">
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-                                {#each companyProducts as companyProduct}
+                            {#if filteredProducts.length === 0 && companyProducts.length > 0}
+                                <div class="flex flex-col items-center justify-center h-48 text-center">
+                                    <i class="ki-filled ki-search text-4xl text-muted-foreground mb-4"></i>
+                                    <h3 class="text-lg font-semibold text-mono mb-2">No products found</h3>
+                                    <p class="text-sm text-secondary-foreground">
+                                        Try adjusting your search or filters
+                                    </p>
+                                </div>
+                            {:else if companyProducts.length === 0}
+                                <div class="p-10">
+                                    <div class="flex flex-col items-center justify-center text-center">
+                                        <div class="mb-4">
+                                            <i class="ki-filled ki-abstract-26 text-4xl text-muted-foreground"></i>
+                                        </div>
+                                        <h3 class="text-lg font-semibold text-mono mb-2">No products available</h3>
+                                        <p class="text-sm text-secondary-foreground mb-4">
+                                            You need to research technologies to unlock products.
+                                        </p>
+                                        <a href="{route('company.technologies.index')}" class="kt-btn kt-btn-primary">
+                                            <i class="fa-solid fa-rocket text-base"></i>
+                                            Research Technologies
+                                        </a>
+                                    </div>
+                                </div>
+                            {:else}
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+                                    {#each filteredProducts as companyProduct}
                                     <div class="kt-card kt-card-hover cursor-pointer" on:click={() => openProductDrawer(companyProduct)}>
                                         <div class="kt-card-body p-4">
                                             <!-- Product Image -->
@@ -300,8 +431,9 @@
                                             </div>
                                         </div>
                                     </div>
-                                {/each}
-                            </div>
+                                    {/each}
+                                </div>
+                            {/if}
                         </div>
                     {/if}
                 </div>

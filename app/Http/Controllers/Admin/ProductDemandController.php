@@ -19,8 +19,20 @@ class ProductDemandController extends Controller
     {
         if($request->has('product_id')){
             $product = Product::findOrFail($request->product_id);
+            $search = IndexService::checkIfSearchEmpty($request->query('search'));
 
             $productDemands = $product->demands()->latest();
+
+            // Apply search filter
+            if ($search) {
+                $productDemands->where(function($query) use ($search) {
+                    if (is_numeric($search)) {
+                        $query->where('id', $search)
+                              ->orWhere('gameweek', $search);
+                    }
+                    $query->orWhere('quantity', 'like', '%' . $search . '%');
+                });
+            }
 
             if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
                 return response()->json([

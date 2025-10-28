@@ -29,6 +29,7 @@
     let perPage = 10;
     let currentPage = 1;
     let searchTimeout;
+    let initialLoad = true;
 
     // Select2 component reference
     let technologySelectComponent;
@@ -50,23 +51,38 @@
 
     // Fetch products data
     async function fetchProducts() {
-        loading = true;
+        // Only show loading on initial load
+        if (initialLoad) {
+            loading = true;
+        }
         try {
             const params = new URLSearchParams({
                 page: currentPage,
                 perPage: perPage,
                 search: search
             });
+            
+            console.log('Search term:', search);
+            console.log('URL params:', params.toString());
 
             const response = await fetch(route('admin.products.index') + '?' + params.toString(), {
+                method: 'GET',
                 headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'same-origin'
             });
             
             const data = await response.json();
+            console.log('Products returned:', data.products.length);
+            console.log('Products:', data.products);
             products = data.products;
             pagination = data.pagination;
+            
+            // Mark initial load as complete
+            initialLoad = false;
             
             // Wait for DOM to update, then initialize menus
             await tick();
@@ -192,13 +208,23 @@
             <div class="kt-card">
                 <div class="kt-card-header">
                     <div class="kt-card-toolbar">
-                        <div class="flex items-center gap-4">
-                            <div class="kt-input max-w-64 w-64">
-                                <i class="ki-filled ki-magnifier"></i>
+                        <div class="flex items-center gap-2 justify-end">
+                            <!-- Sort Dropdown - Very small -->
+                            <select class="kt-input h-8 text-xs px-2" style="width: 70px;">
+                                <option value="">Sort</option>
+                                <option value="name_asc">A-Z</option>
+                                <option value="name_desc">Z-A</option>
+                                <option value="id_asc">ID ↑</option>
+                                <option value="id_desc">ID ↓</option>
+                            </select>
+                            
+                            <!-- Search Bar - Compact -->
+                            <div class="kt-input" style="width: 180px;">
+                                <i class="ki-filled ki-magnifier text-xs"></i>
                                 <input 
                                     type="text" 
-                                    class="kt-input" 
-                                    placeholder="Search products..." 
+                                    class="kt-input h-8 text-xs" 
+                                    placeholder="Search..." 
                                     bind:value={search}
                                     on:input={handleSearchInput}
                                 />

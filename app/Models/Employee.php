@@ -43,6 +43,6 @@ class Employee extends Model
 
     public function companyMachine()
     {
-        return $this->hasOne(CompanyMachine::class);
+        return $this->hasOne(CompanyMachine::class, 'employee_id');
     }
 }

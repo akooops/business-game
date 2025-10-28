@@ -23,6 +23,27 @@
     let suppliers = [];
     let loading = true;
     let fetchInterval = null;
+    
+    // Filtering
+    let searchTerm = '';
+    let sortBy = '';
+    let filterType = 'all'; // 'all', 'local', 'international'
+    
+    // Computed filtered suppliers
+    $: filteredSuppliers = (suppliers || [])
+        .filter(supplier => {
+            if (!supplier || !supplier.name) return false;
+            const matchesSearch = searchTerm === '' || supplier.name.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesFilter = filterType === 'all' || 
+                (filterType === 'local' && !supplier.is_international) ||
+                (filterType === 'international' && supplier.is_international);
+            return matchesSearch && matchesFilter;
+        })
+        .sort((a, b) => {
+            if (sortBy === 'name_asc') return a.name.localeCompare(b.name);
+            if (sortBy === 'name_desc') return b.name.localeCompare(a.name);
+            return 0;
+        });
 
     // Drawer state
     let selectedSupplier = null;
@@ -231,6 +252,74 @@
                 </div>                      
             </div>
 
+            <!-- Filter Controls -->
+            <div class="kt-card">
+                <div class="kt-card-content">
+                    <div class="space-y-4">
+                        <!-- Filter Buttons -->
+                        <div class="flex flex-wrap gap-2">
+                            <button 
+                                class="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 {filterType === 'all' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}"
+                                on:click={() => filterType = 'all'}
+                            >
+                                All Suppliers
+                            </button>
+                            <button 
+                                class="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 {filterType === 'local' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}"
+                                on:click={() => filterType = 'local'}
+                            >
+                                Local
+                            </button>
+                            <button 
+                                class="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 {filterType === 'international' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}"
+                                on:click={() => filterType = 'international'}
+                            >
+                                International
+                            </button>
+                        </div>
+                        
+                        <!-- Search and Sort Row -->
+                        <div class="flex gap-3 justify-end items-center">
+                            <!-- Sort Dropdown -->
+                            <div class="relative">
+                                <select 
+                                    class="h-10 px-4 pr-8 text-sm bg-white border border-gray-300 rounded-lg hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 cursor-pointer appearance-none shadow-sm" 
+                                    style="width: 140px; min-width: 140px;" 
+                                    bind:value={sortBy}
+                                >
+                                    <option value="">Sort by...</option>
+                                    <option value="name_asc">Name A-Z</option>
+                                    <option value="name_desc">Name Z-A</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Search Bar -->
+                            <div class="relative group">
+                                <div class="absolute left-6 top-1/2 transform -translate-y-1/2 pointer-events-none transition-colors duration-200 group-focus-within:text-blue-500">
+                                    <i class="fa-solid fa-search text-base text-gray-400"></i>
+                                </div>
+                                <input
+                                    type="text"
+                                    class="h-10 pl-14 pr-14 text-sm font-normal text-center bg-gradient-to-r from-white to-gray-50 border-2 border-gray-200 rounded-xl hover:border-blue-300 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 placeholder-gray-400 shadow-sm hover:shadow-md focus:shadow-lg"
+                                    style="width: 300px; min-width: 300px;"
+                                    placeholder="Search suppliers..."
+                                    value={searchTerm}
+                                    on:input={() => {}}
+                                />
+                                {#if searchTerm}
+                                    <button 
+                                        class="absolute right-5 top-1/2 transform -translate-y-1/2 p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700 transition-all duration-200 hover:scale-110"
+                                        on:click={() => searchTerm = ''}
+                                    >
+                                        <i class="fa-solid fa-times text-xs"></i>
+                                    </button>
+                                {/if}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Suppliers Grid -->
             <div class="kt-card">
                 <div class="kt-card-content p-0">
@@ -277,8 +366,17 @@
                     {:else}
                         <!-- Suppliers Grid -->
                         <div class="p-6">
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
-                                {#each suppliers as supplier}
+                            {#if filteredSuppliers.length === 0}
+                                <div class="flex flex-col items-center justify-center h-48 text-center">
+                                    <i class="ki-filled ki-search text-4xl text-muted-foreground mb-4"></i>
+                                    <h3 class="text-lg font-semibold text-mono mb-2">No suppliers found</h3>
+                                    <p class="text-sm text-secondary-foreground">
+                                        Try adjusting your search or filters
+                                    </p>
+                                </div>
+                            {:else}
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
+                                    {#each filteredSuppliers as supplier}
                                     <div class="kt-card kt-card-hover cursor-pointer" on:click={() => openSupplierDrawer(supplier)}>
                                         <div class="kt-card-content flex flex-col items-center lg:pt-10">
                                             <div class="mb-3">
@@ -354,8 +452,9 @@
                                             {/if}
                                         </div>
                                     </div>      
-                                {/each}
-                            </div>
+                                    {/each}
+                                </div>
+                            {/if}
                         </div>
                     {/if}
                 </div>

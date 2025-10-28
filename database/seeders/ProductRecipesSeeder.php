@@ -10,20 +10,20 @@ class ProductRecipesSeeder extends Seeder
 {
     public function run(): void
     {
-        $ebike = Product::where('name', 'E-Bike')->first();
-        $motor = Product::where('name', 'Motor')->first();
-        $steel = Product::where('name', 'Steel')->first();
+        $faceCream = Product::where('name', 'Face Cream')->first();
+        $activeIngredient = Product::where('name', 'Active Ingredient')->first();
+        $baseOil = Product::where('name', 'Base Oil')->first();
 
-        if ($ebike && $motor) {
+        if ($faceCream && $activeIngredient) {
             ProductRecipe::updateOrCreate(
-                ['product_id' => $ebike->id, 'material_id' => $motor->id],
+                ['product_id' => $faceCream->id, 'material_id' => $activeIngredient->id],
                 ['quantity' => 1]
             );
         }
 
-        if ($motor && $steel) {
+        if ($activeIngredient && $baseOil) {
             ProductRecipe::updateOrCreate(
-                ['product_id' => $motor->id, 'material_id' => $steel->id],
+                ['product_id' => $activeIngredient->id, 'material_id' => $baseOil->id],
                 ['quantity' => 5]
             );
         }

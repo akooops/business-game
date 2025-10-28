@@ -113,3 +113,151 @@
 .bg-company-technology-current-level{
     background-color: #256b6b08;
 }
+
+/* Navbar from Figma Design */
+.navbar {
+    background: #193D39 !important;
+    border-radius: 145px !important;
+    padding: 12px 0;
+}
+
+.navbar .kt-container-fixed {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+}
+
+.navbar .kt-menu {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+}
+
+.navbar .kt-menu-link {
+    color: #FFFFFF !important;
+    padding: 10px 20px;
+}
+
+.navbar .kt-menu-title {
+    font-family: 'Lexend', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 100%;
+    color: #FFFFFF;
+}
+
+/* Active Menu Item */
+.kt-menu-item.active {
+    background: #E2A673 !important;
+    border-radius: 28px !important;
+    min-width: 138px;
+    justify-content: center;
+}
+
+.kt-menu-item.active .kt-menu-link {
+    color: #000000 !important;
+}
+
+.kt-menu-item.active .kt-menu-title {
+    font-weight: 700 !important;
+    color: #000000 !important;
+}
+
+/* Regular Menu Items */
+.kt-menu-item:not(.active) {
+    padding: 0;
+}
+
+/* Navbar Menu Hover Effects */
+.kt-menu-item {
+    transition: all 0.3s ease-out;
+}
+
+.kt-menu-item:not(.active):hover {
+    background: rgba(226, 166, 115, 0.2) !important;
+    border-radius: 28px;
+}
+
+.kt-menu-item:not(.active):hover .kt-menu-link {
+    color: #FFFFFF !important;
+}
+
+.kt-menu-item:not(.active):hover .kt-menu-title {
+    color: #FFFFFF !important;
+}
+
+.kt-menu-item.active:hover {
+    background: #E6B184 !important;
+}
+
+/* Dropdown Menu Items - More Specific Overrides */
+.kt-menu-dropdown {
+    background: #FFFFFF !important;
+}
+
+.kt-menu-dropdown .kt-menu-item {
+    background: transparent !important;
+}
+
+.kt-menu-dropdown .kt-menu-link {
+    color: #000000 !important;
+}
+
+.kt-menu-dropdown .kt-menu-title {
+    color: #000000 !important;
+    font-weight: 500 !important;
+}
+
+.kt-menu-dropdown .kt-menu-icon {
+    color: #666666 !important;
+}
+
+/* Override any inherited text colors */
+.kt-menu-dropdown * {
+    color: #000000 !important;
+}
+
+.kt-menu-dropdown .kt-menu-icon * {
+    color: #666666 !important;
+}
+
+/* Additional specific overrides for KTUI */
+.kt-menu-dropdown .kt-menu-item .kt-menu-link .kt-menu-title {
+    color: #000000 !important;
+}
+
+.kt-menu-dropdown .kt-menu-item .kt-menu-link {
+    color: #000000 !important;
+}
+
+.kt-menu-dropdown .kt-menu-item .kt-menu-link span {
+    color: #000000 !important;
+}
+
+.kt-menu-dropdown .kt-menu-item .kt-menu-link i {
+    color: #666666 !important;
+}
+
+/* Force override with higher specificity */
+.navbar .kt-menu-dropdown .kt-menu-item .kt-menu-link .kt-menu-title {
+    color: #000000 !important;
+}
+
+.navbar .kt-menu-dropdown .kt-menu-item .kt-menu-link {
+    color: #000000 !important;
+}
+
+/* Dropdown Menu Item Hover */
+.kt-menu-dropdown .kt-menu-item:hover {
+    background: rgba(226, 166, 115, 0.1) !important;
+}
+
+.kt-menu-dropdown .kt-menu-item:hover .kt-menu-link {
+    color: #000000 !important;
+}
+
+.kt-menu-dropdown .kt-menu-item:hover .kt-menu-title {
+    color: #000000 !important;
+}

@@ -28,8 +28,10 @@ class SuppliersController extends Controller
         // Apply search filter
         if ($search) {
             $suppliers->where(function($query) use ($search) {
-                $query->where('id', $search)
-                      ->orWhere('name', 'like', '%' . $search . '%')
+                if (is_numeric($search)) {
+                    $query->where('id', $search);
+                }
+                $query->orWhere('name', 'like', '%' . $search . '%')
                       ->orWhereHas('country', function($q) use ($search) {
                           $q->where('name', 'like', '%' . $search . '%');
                       })

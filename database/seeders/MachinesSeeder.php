@@ -14,9 +14,9 @@ class MachinesSeeder extends Seeder
 
         $machines = [
             [
-                'name' => 'Lathe',
-                'model' => 'L-100',
-                'manufacturer' => 'Machina',
+                'name' => 'Mixing Tank',
+                'model' => 'MX-200',
+                'manufacturer' => 'Cosmetic Machines Ltd',
                 'cost_to_acquire' => 5000,
                 'operations_cost' => 10,
                 'carbon_footprint' => 1.2,
