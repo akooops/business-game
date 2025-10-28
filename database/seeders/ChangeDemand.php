@@ -31,22 +31,22 @@ class ChangeDemand extends Seeder
             'Women\'s Perfume (100 mL)' => ['min' => 224, 'avg' => 249, 'max' => 274],
         ];
 
-        // Assign unique demand patterns to each product
+        // Assign unique demand patterns to each product (smoothed)
         $productPatterns = [
-            'Moisturizing Cream (120 mL)' => ['type' => 'winter_peak', 'volatility' => 'medium', 'trend' => 'stable'],
-            'Serum (30 mL)' => ['type' => 'growing', 'volatility' => 'high', 'trend' => 'upward'],
+            'Moisturizing Cream (120 mL)' => ['type' => 'winter_peak', 'volatility' => 'low', 'trend' => 'stable'],
+            'Serum (30 mL)' => ['type' => 'growing', 'volatility' => 'medium', 'trend' => 'upward'],
             'Face Scrub (150 mL)' => ['type' => 'summer_peak', 'volatility' => 'low', 'trend' => 'stable'],
-            'Shower Gel (250 ml)' => ['type' => 'summer_peak', 'volatility' => 'medium', 'trend' => 'stable'],
+            'Shower Gel (250 ml)' => ['type' => 'summer_peak', 'volatility' => 'low', 'trend' => 'stable'],
             'Soap (100g)' => ['type' => 'steady', 'volatility' => 'low', 'trend' => 'downward'],
-            'Shampoo (250 mL)' => ['type' => 'random_spikes', 'volatility' => 'high', 'trend' => 'stable'],
-            'Conditioner (250 mL)' => ['type' => 'winter_peak', 'volatility' => 'medium', 'trend' => 'upward'],
-            'Deodorant (200 mL)' => ['type' => 'summer_peak', 'volatility' => 'high', 'trend' => 'stable'],
-            'Liquid Foundation (30 mL)' => ['type' => 'seasonal_dual', 'volatility' => 'medium', 'trend' => 'stable'],
-            'BB Cream (30 mL)' => ['type' => 'spring_peak', 'volatility' => 'medium', 'trend' => 'upward'],
-            'Lip Balm (10 mL)' => ['type' => 'winter_peak', 'volatility' => 'high', 'trend' => 'stable'],
+            'Shampoo (250 mL)' => ['type' => 'steady', 'volatility' => 'medium', 'trend' => 'stable'],
+            'Conditioner (250 mL)' => ['type' => 'winter_peak', 'volatility' => 'low', 'trend' => 'upward'],
+            'Deodorant (200 mL)' => ['type' => 'summer_peak', 'volatility' => 'medium', 'trend' => 'stable'],
+            'Liquid Foundation (30 mL)' => ['type' => 'seasonal_dual', 'volatility' => 'low', 'trend' => 'stable'],
+            'BB Cream (30 mL)' => ['type' => 'spring_peak', 'volatility' => 'low', 'trend' => 'upward'],
+            'Lip Balm (10 mL)' => ['type' => 'winter_peak', 'volatility' => 'medium', 'trend' => 'stable'],
             'Mascara (100g)' => ['type' => 'steady', 'volatility' => 'low', 'trend' => 'stable'],
-            'Men\'s Perfume (100 mL)' => ['type' => 'holiday_spikes', 'volatility' => 'medium', 'trend' => 'downward'],
-            'Women\'s Perfume (100 mL)' => ['type' => 'holiday_spikes', 'volatility' => 'medium', 'trend' => 'upward'],
+            'Men\'s Perfume (100 mL)' => ['type' => 'holiday_spikes', 'volatility' => 'low', 'trend' => 'downward'],
+            'Women\'s Perfume (100 mL)' => ['type' => 'holiday_spikes', 'volatility' => 'low', 'trend' => 'upward'],
         ];
 
         foreach ($demandsData as $productName => $demandRange) {
@@ -71,10 +71,10 @@ class ChangeDemand extends Seeder
                 $trendFactor = 1.0;
                 switch ($pattern['trend']) {
                     case 'upward':
-                        $trendFactor = 1 + ($week / 52 * 0.3); // 30% growth over year
+                        $trendFactor = 1 + ($week / 52 * 0.12); // 12% growth over year
                         break;
                     case 'downward':
-                        $trendFactor = 1 - ($week / 52 * 0.2); // 20% decline over year
+                        $trendFactor = 1 - ($week / 52 * 0.08); // 8% decline over year
                         break;
                     case 'stable':
                         $trendFactor = 1.0;
@@ -86,46 +86,39 @@ class ChangeDemand extends Seeder
                 switch ($pattern['type']) {
                     case 'summer_peak':
                         // Peaks around week 26 (mid-year)
-                        $seasonalFactor = 1 + (0.25 * sin(2 * M_PI * ($week - 13) / 52));
+                        $seasonalFactor = 1 + (0.15 * sin(2 * M_PI * ($week - 13) / 52));
                         break;
                     case 'winter_peak':
                         // Peaks around week 1 and 52 (winter)
-                        $seasonalFactor = 1 + (0.25 * cos(2 * M_PI * $week / 52));
+                        $seasonalFactor = 1 + (0.15 * cos(2 * M_PI * $week / 52));
                         break;
                     case 'spring_peak':
                         // Peaks around week 13 (spring)
-                        $seasonalFactor = 1 + (0.2 * sin(2 * M_PI * ($week - 26) / 52));
+                        $seasonalFactor = 1 + (0.12 * sin(2 * M_PI * ($week - 26) / 52));
                         break;
                     case 'seasonal_dual':
                         // Two peaks per year (spring & fall)
-                        $seasonalFactor = 1 + (0.18 * sin(4 * M_PI * $week / 52));
+                        $seasonalFactor = 1 + (0.10 * sin(4 * M_PI * $week / 52));
                         break;
                     case 'holiday_spikes':
                         // Spikes around specific weeks (holidays)
                         $isHolidayWeek = in_array($week, [1, 12, 24, 48, 52]);
-                        $seasonalFactor = $isHolidayWeek ? 1.4 : 0.85;
-                        break;
-                    case 'random_spikes':
-                        // Random spikes throughout the year
-                        $seasonalFactor = 1 + (mt_rand(-20, 35) / 100);
+                        $seasonalFactor = $isHolidayWeek ? 1.20 : 0.95;
                         break;
                     case 'steady':
                         // Very minimal variation
-                        $seasonalFactor = 1 + (mt_rand(-5, 5) / 100);
+                        $seasonalFactor = 1 + (mt_rand(-3, 3) / 100);
                         break;
                 }
 
                 // 3. Add volatility (random noise)
                 $volatilityFactor = 1.0;
                 switch ($pattern['volatility']) {
-                    case 'high':
-                        $volatilityFactor = 1 + (mt_rand(-25, 25) / 100);
-                        break;
                     case 'medium':
-                        $volatilityFactor = 1 + (mt_rand(-15, 15) / 100);
+                        $volatilityFactor = 1 + (mt_rand(-10, 10) / 100);
                         break;
                     case 'low':
-                        $volatilityFactor = 1 + (mt_rand(-8, 8) / 100);
+                        $volatilityFactor = 1 + (mt_rand(-5, 5) / 100);
                         break;
                 }
 
