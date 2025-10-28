@@ -20,7 +20,7 @@ class ProductsController extends Controller
         $search = IndexService::checkIfSearchEmpty($request->query('search'));
 
         $company = $request->company;
-        $products = $company->companyProducts()->with(['product', 'product.recipes.material'])->orderBy('product.type', 'asc')->latest();
+        $products = $company->companyProducts()->with(['product', 'product.recipes.material'])->latest();
 
         if ($search) {
             $products->where(function($query) use ($search) {
