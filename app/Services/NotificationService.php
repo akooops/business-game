@@ -121,6 +121,38 @@ class NotificationService
         ]);
     }
 
+    // Batch notification for multiple sales initiated
+    public static function createBatchSalesInitiatedNotification($company, $salesData){
+        $totalSales = count($salesData);
+        
+        // Build detailed message
+        $message = "New demand for {$totalSales} product(s):\n";
+        
+        return Notification::create([
+            'type' => Notification::TYPE_SALE_INITIATED,
+            'title' => 'New Sales Generated',
+            'message' => rtrim($message),
+            'url' => route('company.sales.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
+    // Batch notification for multiple sales cancelled
+    public static function createBatchSalesCancelledNotification($company, $cancelledData){
+        $totalCancelled = count($cancelledData);
+        
+        // Build detailed message
+        $message = "{$totalCancelled} sale(s) cancelled due to time limit:\n";
+        
+        return Notification::create([
+            'type' => Notification::TYPE_SALE_CANCELLED,
+            'title' => 'Sales Cancelled',
+            'message' => rtrim($message),
+            'url' => route('company.sales.index'),
+            'user_id' => $company->user_id,
+        ]);
+    }
+
     // ------------------------------------------------------------
     // Employees
     // ------------------------------------------------------------
@@ -281,7 +313,7 @@ class NotificationService
             Notification::create([
                 'type' => Notification::TYPE_COUNTRIES_IMPORT_BLOCKED,
                 'title' => 'Countries Import Blocked',
-                'message' => "Countries import blocked for " . implode(', ', $countries) . ".",
+                'message' => "Because of political reasons, countries import blocked for " . implode(', ', $countries) . ".",
                 'url' => route('company.purchases.index'),
                 'user_id' => $company->user_id,
             ]);
@@ -295,65 +327,36 @@ class NotificationService
             Notification::create([
                 'type' => Notification::TYPE_COUNTRIES_IMPORT_ALLOWED,
                 'title' => 'Countries Import Allowed',
-                'message' => "Countries import allowed for " . implode(', ', $countries) . ".",
+                'message' => "All political reasons are resolved, relation with countries are restored and import is allowed for " . implode(', ', $countries) . ".",
                 'url' => route('company.purchases.index'),
                 'user_id' => $company->user_id,
             ]);
         }
     }
 
-    public static function createCountriesCustomsDutiesRateRaisedNotification($countries, $rate){
+    public static function createOrmuzCanalClosedNotification($products, $countries, $rate){
         $companies = Company::get();
 
         foreach($companies as $company){
             Notification::create([
-                'type' => Notification::TYPE_COUNTRIES_CUSTOMS_DUTIES_RATE_RAISED,
-                'title' => 'Countries Customs Duties Rate Raised',
-                'message' => "Countries customs duties rate raised for " . implode(', ', $countries) . " with " . $rate . "%.",
+                'type' => Notification::TYPE_ORMUZ_CANAL_CLOSED,
+                'title' => 'Ormuz Canal Closed',
+                'message' => "Because of Israel Iran war, the ormuz canal is closed. Prices of oil, will increase causing oil based products: " . implode(', ', $products) . " to increase by " . $rate * 100 . "%, causing shipping costs and delays from " . implode(', ', $countries) . " to increase.",
                 'url' => route('company.purchases.index'),
                 'user_id' => $company->user_id,
             ]);
         }
     }
 
-    public static function createCountriesCustomsDutiesRateLoweredNotification($countries, $rate)
+    public static function createOrmuzCanalOpenedNotification($products, $countries)
     {
         $companies = Company::get();
 
         foreach($companies as $company){
             Notification::create([
-                'type' => Notification::TYPE_COUNTRIES_CUSTOMS_DUTIES_RATE_LOWERED,
-                'title' => 'Countries Customs Duties Rate Lowered',
-                'message' => "Countries customs duties rate lowered for " . implode(', ', $countries) . " with " . $rate . "%.",
-                'url' => route('company.purchases.index'),
-                'user_id' => $company->user_id,
-            ]);
-        }
-    }
-
-    public static function createOilPriceRaisedNotification($rate){
-        $companies = Company::get();
-
-        foreach($companies as $company){
-            Notification::create([
-                'type' => Notification::TYPE_OIL_PRICE_RAISED,
-                'title' => 'Oil Price Raised',
-                'message' => "Oil price raised with " . $rate . "%. This will affect the shipping costs of your products from suppliers and to customers.",
-                'url' => route('company.purchases.index'),
-                'user_id' => $company->user_id,
-            ]);
-        }
-    }
-
-    public static function createOilPriceLoweredNotification($rate)
-    {
-        $companies = Company::get();
-
-        foreach($companies as $company){
-            Notification::create([
-                'type' => Notification::TYPE_OIL_PRICE_LOWERED,
-                'title' => 'Oil Price Lowered',
-                'message' => "Oil price lowered with " . $rate . "%. This will affect the shipping costs of your products from suppliers and to customers.",
+                'type' => Notification::TYPE_ORMUZ_CANAL_OPENED,
+                'title' => 'Ormuz Canal Opened',
+                'message' => "Ormuz canal reopened. Prices of oil, will be back to normal causing oil based products: " . implode(', ', $products) . " and also shipping costs and delays from " . implode(', ', $countries) . " will be back to normal.",
                 'url' => route('company.purchases.index'),
                 'user_id' => $company->user_id,
             ]);
@@ -368,33 +371,117 @@ class NotificationService
             Notification::create([
                 'type' => Notification::TYPE_SUEZ_CANAL_CLOSED,
                 'title' => 'Suez Canal Closed',
-                'message' => "Suez canal closed for " . implode(', ', $countries) . ". This will affect the shipping costs and delivery time of your products from suppliers by " . $rate . "%.",
+                'message' => "Suez canal closed for " . implode(', ', $countries) . ". This will affect the shipping costs and delivery time of your products from suppliers by " . $rate * 100 . "%.",
                 'url' => route('company.purchases.index'),
                 'user_id' => $company->user_id,
             ]);
         }
     }
 
-    public static function createSuezCanalOpenedNotification($countries, $rate){
+    public static function createSuezCanalOpenedNotification($countries){
         $companies = Company::get();
 
         foreach($companies as $company){
             Notification::create([
                 'type' => Notification::TYPE_SUEZ_CANAL_OPENED,
                 'title' => 'Suez Canal Opened',
-                'message' => "Suez canal opened for " . implode(', ', $countries) . ". This will affect the shipping costs and delivery time of your products from suppliers by " . $rate . "%.",
+                'message' => "Suez canal reopened for " . implode(', ', $countries) . ". The shipping costs and delivery time of your products from suppliers are back to normal.",
                 'url' => route('company.purchases.index'),
                 'user_id' => $company->user_id,
             ]);
         }
     }
 
-    public static function createInventoryDamagedNotification($company, $rate){
+    public static function createHeatWaveStartedNotification($products, $rate){
+        $companies = Company::get();
+
+        foreach($companies as $company){
+            Notification::create([
+                'type' => Notification::TYPE_HEAT_WAVE_STARTED,
+                'title' => 'Heat Wave Started',
+                'message' => "Heat wave started. You will lose " . $rate * 100 . "% of your products in inventory: " . implode(', ', $products) . ". Also your employees will be more tired and less productive and local suppliers will raise their prices.",
+                'url' => route('company.inventory.index'),
+                'user_id' => $company->user_id,
+            ]);
+        }
+    }
+
+    public static function createHeatWaveEndedNotification($products, $rate){
+        $companies = Company::get();
+
+        foreach($companies as $company){
+            Notification::create([
+                'type' => Notification::TYPE_HEAT_WAVE_ENDED,
+                'title' => 'Heat Wave Ended',
+                'message' => "Heat wave ended. Your employees will be more productive and less tired and local suppliers will lower their prices.",
+                'url' => route('company.inventory.index'),
+                'user_id' => $company->user_id,
+            ]);
+        }
+    }
+
+    public static function createHealthComplaintStartedNotification($rate){
+        $companies = Company::get();
+
+        foreach($companies as $company){
+            Notification::create([
+                'type' => Notification::TYPE_HEALTH_COMPLAINT_STARTED,
+                'title' => 'Health Complaint Started',
+                'message' => "Health complaint started which will cause demand decline by " . $rate * 100 . "%.",
+                'url' => route('company.products.index'),
+                'user_id' => $company->user_id,
+            ]);
+        }
+    }
+
+    public static function createHealthComplaintEndedNotification(){
+        $companies = Company::get();
+
+        foreach($companies as $company){
+            Notification::create([
+                'type' => Notification::TYPE_HEALTH_COMPLAINT_ENDED,
+                'title' => 'Health Complaint Ended',
+                'message' => "Health complaint ended which will cause demand to be back to normal",
+                'url' => route('company.products.index'),
+                'user_id' => $company->user_id,
+            ]);
+        }
+    }
+
+    public static function createWorkersProtestStartedNotification($rate){
+        $companies = Company::get();
+
+        foreach($companies as $company){
+            Notification::create([
+                'type' => Notification::TYPE_WORKERS_PROTEST_STARTED,
+                'title' => 'Workers Protest Started',
+                'message' => "Workers protest started after one of them did not receive injury compensation which will cause employees to be less productive and less efficient by " . $rate * 100 . "%.",
+                'url' => route('company.products.index'),
+                'user_id' => $company->user_id,
+            ]);
+        }
+    }
+
+    public static function createWorkersProtestEndedNotification(){
+        $companies = Company::get();
+
+        foreach($companies as $company){
+            Notification::create([
+                'type' => Notification::TYPE_WORKERS_PROTEST_ENDED,
+                'title' => 'Workers Protest Ended',
+                'message' => "Workers protest ended and the employees are back to normal",
+                'url' => route('company.products.index'),
+                'user_id' => $company->user_id,
+            ]);
+        }
+    }
+
+    public static function createWorkAccedentStartedNotification($company, $machine, $employee){
         return Notification::create([
-            'type' => Notification::TYPE_INVENTORY_DAMAGED,
-            'title' => 'Inventory Damaged',
-            'message' => "Inventory damaged with {$rate}%. You will lose {$rate}% of your products in inventory.",
-            'url' => route('company.inventory.index'),
+            'type' => Notification::TYPE_WORK_ACCEDENT_STARTED,
+            'title' => 'Work Accedent Started',
+            'message' => "Work accedent started for {$machine->name}. Any production orders for this machine will be cancelled and materials will be lost. Employees will be less productive and less efficient because of employee {$employee->name} resign after injury.",
+            'url' => route('company.machines.index'),
             'user_id' => $company->user_id,
         ]);
     }

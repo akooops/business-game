@@ -290,7 +290,7 @@
                                             <div class="flex flex-col gap-1 text-xs text-secondary-foreground mb-4">
                                                 <div class="flex justify-center gap-1">
                                                     <i class="ki-filled ki-percentage text-blue-500"></i>
-                                                    <span>Interest: {bank.loan_interest_rate * 100}%</span>
+                                                    <span>Interest: {(bank.loan_interest_rate * 100).toFixed(2)}%</span>
                                                 </div>
                                                 <div class="flex justify-center gap-1">
                                                     <i class="ki-filled ki-calendar text-green-500"></i>
@@ -369,7 +369,7 @@
                         </span>
                         <div>
                             <span class="text-xs font-medium text-foreground">
-                                {selectedBank.loan_interest_rate * 100}%
+                                {(selectedBank.loan_interest_rate * 100).toFixed(2)}%
                             </span>
                         </div>
                     </div>
@@ -451,7 +451,7 @@
                                 <h4 class="font-semibold text-mono mb-1">{loanBank.name}</h4>
                                 <div class="flex gap-2">
                                     <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                                        {loanBank.loan_interest_rate * 100}% Interest
+                                        {(loanBank.loan_interest_rate * 100).toFixed(2)}% Interest
                                     </span>
                                     <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
                                         {loanBank.loan_duration_months} months

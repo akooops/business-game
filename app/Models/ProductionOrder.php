@@ -73,4 +73,9 @@ class ProductionOrder extends Model
 
         return round(($progress / $totalDays) * 100, 2);
     }
+
+    public function getTimeToCompleteDaysAttribute()
+    {
+        return round($this->time_to_complete / 24, 2);
+    }
 }

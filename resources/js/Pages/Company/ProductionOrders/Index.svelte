@@ -1,5 +1,6 @@
 <script>
     import CompanyLayout from '../../Layouts/CompanyLayout.svelte';
+    import Pagination from '../../Components/Pagination.svelte';
     import { onMount, onDestroy, tick } from 'svelte';
     import { page } from '@inertiajs/svelte'
 
@@ -23,6 +24,9 @@
     let productionOrders = [];
     let loading = true;
     let fetchInterval = null;
+    let pagination = {};
+    let perPage = 10;
+    let currentPage = 1;
 
     // Drawer state
     let selectedProductionOrder = null;
@@ -38,7 +42,12 @@
         if(productionOrders.length == 0) loading = true;
 
         try {
-            const response = await fetch(route('company.production-orders.index'), {
+            const params = new URLSearchParams({
+                page: currentPage,
+                perPage: perPage,
+            });
+
+            const response = await fetch(route('company.production-orders.index') + '?' + params.toString(), {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
@@ -46,6 +55,7 @@
             
             const data = await response.json();
             productionOrders = data.productionOrders;
+            pagination = data.pagination;
             
             // Wait for DOM to update, then initialize menus
             await tick();
@@ -57,6 +67,23 @@
         } finally {
             loading = false;
         }
+    }
+
+    // Handle pagination
+    function goToPage(page) {
+        if (page && page !== currentPage) {
+            currentPage = page;
+            loading = true;
+            fetchProductionOrders();
+        }
+    }
+
+    // Handle per page change
+    function handlePerPageChange(newPerPage) {
+        perPage = newPerPage;
+        currentPage = 1;
+        loading = true;
+        fetchProductionOrders();
     }
 
     // Open production order drawer
@@ -203,7 +230,7 @@
                     {#if loading}
                         <!-- Loading skeleton -->
                         <div class="p-6">
-                            <div class="grid grid-cols-1 gap-6 p-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
                                 {#each Array(10) as _, i}
                                     <div class="kt-card animate-pulse">
                                         <div class="kt-card-header justify-start bg-muted/70 gap-9 h-auto py-5">
@@ -252,7 +279,7 @@
                     {:else}
                         <!-- Production Orders Grid -->
                         <div class="p-6">
-                            <div class="grid grid-cols-1 gap-6 p-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
                                 {#each productionOrders as productionOrder}
                                     <div class="kt-card kt-card-hover cursor-pointer" on:click={() => openProductionOrderDrawer(productionOrder)}>
                                         <div class="kt-card-header justify-start bg-muted/70 gap-9 h-auto py-5">
@@ -287,6 +314,16 @@
                                                 </span>
                                                 <span class="text-sm font-medium text-mono">
                                                     {formatTimestamp(productionOrder.completed_at)}
+                                                </span>
+                                            </div>
+                                            {/if}
+                                            {#if productionOrder.status === 'in_progress' && productionOrder.time_to_complete}
+                                            <div class="flex flex-col gap-1.5">
+                                                <span class="text-xs font-normal text-secondary-foreground">
+                                                    Time needed
+                                                </span>
+                                                <span class="text-sm font-medium text-mono">
+                                                    {productionOrder.time_to_complete} days
                                                 </span>
                                             </div>
                                             {/if}
@@ -368,6 +405,18 @@
                                 {/each}
                             </div>
                         </div>
+
+                        <!-- Pagination -->
+                        {#if pagination && pagination.total > 0}
+                            <div class="border-t border-gray-200">
+                                <Pagination 
+                                    {pagination} 
+                                    {perPage}
+                                    onPageChange={goToPage} 
+                                    onPerPageChange={handlePerPageChange}
+                                />
+                            </div>
+                        {/if}
                     {/if}
                 </div>
             </div>
@@ -461,7 +510,7 @@
                         </span>
                         <div>
                             <span class="text-xs font-medium text-foreground">
-                                {(selectedProductionOrder.quality_factor * 100).toFixed(1)}%
+                                {(selectedProductionOrder.quality_factor * 100).toFixed(2)}%
                             </span>
                         </div>
                     </div>
@@ -495,6 +544,18 @@
                             </span>
                         </div>
                     </div>
+                    {#if selectedProductionOrder.status === 'in_progress'}
+                        <div class="flex items-center gap-2.5">
+                            <span class="text-xs font-normal text-foreground min-w-14 xl:min-w-24 shrink-0">
+                                Time needed
+                            </span>
+                            <div>
+                                <span class="text-xs font-medium text-foreground">
+                                    {selectedProductionOrder.time_to_complete} days
+                                </span>
+                            </div>
+                        </div>
+                    {/if}
                     {#if selectedProductionOrder.completed_at}
                         <div class="flex items-center gap-2.5">
                             <span class="text-xs font-normal text-foreground min-w-14 xl:min-w-24 shrink-0">

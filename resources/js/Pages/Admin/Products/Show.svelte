@@ -143,6 +143,40 @@
                             </p>
                         </div>
 
+                        <!-- Avg Demand -->
+                        <div class="flex flex-col gap-2">
+                            <h4 class="text-sm font-semibold text-mono">Avg Demand</h4>
+                            <p class="text-sm text-secondary-foreground">
+                                {product?.avg_demand}
+                            </p>
+                        </div>
+
+                        <!-- Avg Market Price -->
+                        <div class="flex flex-col gap-2">
+                            <h4 class="text-sm font-semibold text-mono">Avg Market Price</h4>
+                            <p class="text-sm text-secondary-foreground">
+                                {product?.avg_market_price} DZD
+                            </p>
+                        </div>
+
+                        <!-- Is Saleable -->
+                        <div class="flex flex-col gap-2">
+                            <h4 class="text-sm font-semibold text-mono">Is Saleable</h4>
+                            <div class="flex items-center gap-2">
+                                {#if product?.is_saleable}
+                                    <span class="kt-badge kt-badge-destructive kt-badge-sm">Saleable</span>
+                                    <span class="text-sm text-secondary-foreground">
+                                        This product is saleable
+                                    </span>
+                                {:else}
+                                    <span class="kt-badge kt-badge-outline kt-badge-sm">Not Saleable</span>
+                                    <span class="text-sm text-secondary-foreground">
+                                        This product is not saleable
+                                    </span>
+                                {/if}
+                            </div>
+                        </div>
+
                         <!-- Storage Cost -->
                         <div class="flex flex-col gap-2">
                             <h4 class="text-sm font-semibold text-mono">Storage Cost</h4>

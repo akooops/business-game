@@ -103,21 +103,15 @@ class ValidationService
     public static function validateSaleConfirmation($company, $sale){
         $errors = [];
 
-        // Check if the sale is available for confirmation
+        // Check if the sale is available for delivery
         if($sale->status != Sale::STATUS_INITIATED){
-            $errors['status'] = 'This sale is not available for confirmation.';
+            $errors['status'] = 'This sale is not available for delivery.';
         }
 
         // Check if the company has enough stock of the product
         $hasSufficientStock = InventoryService::haveSufficientStock($company, $sale->product, $sale->quantity);
         if(!$hasSufficientStock){
             $errors['stock'] = 'This company does not have enough stock of this product.';
-        }
-
-        // Check if the company has enough funds to confirm the sale
-        $hasSufficientFunds = FinanceService::haveSufficientFunds($company, $sale->total_cost);
-        if(!$hasSufficientFunds){
-            $errors['funds'] = 'This company does not have enough funds to confirm this sale shipping cost.';
         }
 
         // Check if the company sells the product
@@ -279,15 +273,20 @@ class ValidationService
 
         //Check if company has enough materials to produce the product
         $productRecipes = $product->recipes;
-
+        
+        $missingMaterials = [];
         foreach($productRecipes as $recipe){
             $material = $recipe->material;
             $requiredQuantity = $recipe->quantity * $quantity;
 
             $hasSufficientStock = InventoryService::haveSufficientStock($companyMachine->company, $material, $requiredQuantity);
             if(!$hasSufficientStock){
-                $errors['material'] = 'This company does not have enough stock of ' . $material->name . ' to produce this product.';
+                $missingMaterials[] = $material->name;
             }
+        }
+
+        if(!empty($missingMaterials)){
+            $errors['material'] = 'Insufficient stock of: ' . implode(', ', $missingMaterials);
         }
 
         return $errors;

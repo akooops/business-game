@@ -154,8 +154,10 @@ class ProductionService
             $totalCost += $machine->operations_cost;
         }
 
-        FinanceService::payMachineOperationCost($company, $totalCost);
-        NotificationService::createMachineOperationCostsPaidNotification($company, $totalCost);
+        if($totalCost > 0){
+            FinanceService::payMachineOperationCost($company, $totalCost);
+            NotificationService::createMachineOperationCostsPaidNotification($company, $totalCost);
+        }
     }
 
     public static function calculateMachinesValue($company){
@@ -172,6 +174,10 @@ class ProductionService
             if($timeSinceSetup > 0){
                 $valueLoss = $currentValue * $lossOnSaleDays * $timeSinceSetup;
                 $currentValue -= $valueLoss;
+
+                if($currentValue < 0){
+                    $currentValue = 0;
+                }
 
                 $companyMachine->update([
                     'current_value' => $currentValue,

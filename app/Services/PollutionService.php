@@ -5,8 +5,8 @@ namespace App\Services;
 class PollutionService
 {
     public static function releaseCarbonFootprint($company, $carbonFootprint){
-        $company->update(['footprint' => $company->footprint + $carbonFootprint]);
+        $company->update(['carbon_footprint' => $company->carbon_footprint + $carbonFootprint]);
 
-        return $company->footprint;
+        return $company->carbon_footprint;
     }
 }

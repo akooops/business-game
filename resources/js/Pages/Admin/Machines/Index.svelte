@@ -277,19 +277,19 @@
                                             </td>
                                             <td>
                                                 <div class="flex items-center gap-3">
-                                                    <div class="flex-shrink-0">
-                                                        {#if machine.image_url}
-                                                            <img 
-                                                                src={machine.image_url} 
-                                                                alt={machine.name}
-                                                                class="w-10 h-10 rounded-lg object-cover"
-                                                            />
-                                                        {:else}
-                                                            <div class="w-10 h-10 rounded-lg bg-accent/50 flex items-center justify-center">
-                                                                <i class="ki-filled ki-technology text-lg text-muted-foreground"></i>
-                                                            </div>
-                                                        {/if}
-                                                    </div>
+                                                    {#if machine.image_url}
+                                                        <img 
+                                                            src={machine.image_url} 
+                                                            alt={machine.name}
+                                                            class="rounded-lg object-cover"
+                                                            style="min-width: 36px; min-height: 36px; max-width: 36px; max-height: 36px;"
+                                                        />
+                                                    {:else}
+                                                        <div class="w-10 h-10 rounded-lg bg-accent/50 flex items-center justify-center">
+                                                            <i class="ki-filled ki-package text-lg text-muted-foreground"></i>
+                                                        </div>
+                                                    {/if}
+
                                                     <div class="flex flex-col gap-1">
                                                         <span class="text-sm font-medium text-mono hover:text-primary">
                                                             {machine.name}
@@ -313,7 +313,7 @@
                                                     </div>
                                                     <div class="flex items-center gap-1">
                                                         <span class="text-xs text-muted-foreground">Quality:</span>
-                                                        <span class="text-xs font-medium">{machine.quality_factor * 100}%</span>
+                                                        <span class="text-xs font-medium">{(machine.quality_factor * 100).toFixed(2)}%</span>
                                                     </div>
                                                     <div class="flex items-center gap-1">
                                                         <span class="text-xs text-muted-foreground">Operations Cost:</span>
@@ -332,7 +332,7 @@
                                                 </div>
                                                 <div class="flex items-center gap-1">
                                                     <span class="text-xs text-muted-foreground">Loss on Sale:</span>
-                                                    <span class="text-xs font-medium">{machine.loss_on_sale_days * 100}% / day</span>
+                                                    <span class="text-xs font-medium">{(machine.loss_on_sale_days * 100).toFixed(2)}% / day</span>
                                                 </div>
                                             </td>
                                             <td class="text-center">

@@ -314,8 +314,8 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <span class={getSupplierTypeBadgeClass(supplier.is_international)}>
-                                                    {supplier.is_international ? 'International' : 'Local'} - { supplier.location_name}
+                                                <span class={getSupplierTypeBadgeClass(supplier.country_id)}>
+                                                    {supplier.country_id ? 'International' : 'Local'} - { supplier.location_name}
                                                 </span>
                                             </td>
                                             <td>
@@ -335,7 +335,7 @@
                                             <td>
                                                 <div class="flex flex-col gap-1">
                                                     <span class="text-xs text-muted-foreground">
-                                                        ({supplier.carbon_footprint} kg CO2/unit)
+                                                        ({supplier.carbon_footprint} kg CO2/purchase)
                                                     </span>
                                                 </div>
                                             </td>

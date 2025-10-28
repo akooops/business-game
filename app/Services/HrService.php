@@ -10,7 +10,7 @@ use App\Services\SettingsService;
 class HrService
 {
     public static function generateEmployees($company, $employeeProfile){
-        $numberOfEmployees = rand(1, 3);
+        $numberOfEmployees = 3;
 
         $employees = [];
 
@@ -115,17 +115,24 @@ class HrService
     public static function paySalaries($company){
         $totalSalaries = $company->employees()->where('status', Employee::STATUS_ACTIVE)->sum('salary_month');
 
-        FinanceService::payEmployeesSalary($company, $totalSalaries);
-        NotificationService::createEmployeeSalaryPaidNotification($company, $totalSalaries);
+        if($totalSalaries > 0){
+            FinanceService::payEmployeesSalary($company, $totalSalaries);
+            NotificationService::createEmployeeSalaryPaidNotification($company, $totalSalaries);
+        }
     }
 
     public static function processEmployeesMood($company){
         $employees = $company->employees()->where('status', Employee::STATUS_ACTIVE)->get();
+        $currentTimestamp = SettingsService::getCurrentTimestamp();
 
         foreach($employees as $employee){
             $mood = $employee->current_mood;
             $mood_decay_rate_days = $employee->mood_decay_rate_days;
             
+            $daysSinceHired = $currentTimestamp->diffInDays($employee->hired_at);
+
+            if($daysSinceHired < 15) continue;
+
             // Calculate mood decay: subtract the decay rate from current mood
             // Both values are between 0 and 1, so we just subtract directly
             $mood -= $mood_decay_rate_days;
@@ -140,16 +147,16 @@ class HrService
             $resignationChance = rand(1, 100); 
 
             $resignationThreshold = 0;
-            if($mood < 0.1){
-                $resignationThreshold = 75; // 75% chance
-            } else if($mood < 0.2){
-                $resignationThreshold = 50; // 50% chance
-            } else if($mood < 0.3){
-                $resignationThreshold = 25; // 25% chance
-            } else if($mood < 0.4){
-                $resignationThreshold = 10; // 10% chance
-            } else {
-                $resignationThreshold = 5; // 5% chance
+            if($mood < 0.05){           // Was 0.1
+                $resignationThreshold = 75; // Was 75% - reduced
+            } else if($mood < 0.15){    // Was 0.2
+                $resignationThreshold = 20; // Was 50% - reduced
+            } else if($mood < 0.25){    // Was 0.3
+                $resignationThreshold = 20; // Was 25% - reduced
+            } else if($mood < 0.35){    // Was 0.4
+                $resignationThreshold = 10;  // Was 10% - reduced
+            } else if($mood < 0.5) {
+                $resignationThreshold = 5;  // Was 5% - reduced
             }
 
             if($resignationChance <= $resignationThreshold){
@@ -160,20 +167,25 @@ class HrService
                     'current_mood' => $mood
                 ]);
 
-                $employee->companyMachine->update([
-                    'employee_id' => null,
-                ]);
-
-                $productionOrders = ProductionOrder::where([
-                    'company_machine_id' => $employee->companyMachine->id,
-                    'status' => ProductionOrder::STATUS_IN_PROGRESS,
-                ])->get();
-
-                foreach($productionOrders as $productionOrder){ 
-                    $productionOrder->update([
-                        'status' => ProductionOrder::STATUS_CANCELLED,
+                // Unassign employee from machine
+                if($employee->companyMachine){
+                    $employee->companyMachine->update([
+                        'employee_id' => null,
+                        'status' => CompanyMachine::STATUS_INACTIVE,
                     ]);
+
+                    $productionOrders = ProductionOrder::where([
+                        'company_machine_id' => $employee->companyMachine->id,
+                        'status' => ProductionOrder::STATUS_IN_PROGRESS,
+                    ])->get();
+
+                    foreach($productionOrders as $productionOrder){ 
+                        $productionOrder->update([
+                            'status' => ProductionOrder::STATUS_CANCELLED,
+                        ]);
+                    }
                 }
+
 
                 // Create resignation notification
                 NotificationService::createEmployeeResignedNotification($employee->company, $employee);
@@ -213,9 +225,12 @@ class HrService
         ]);
 
         // Remove the employee from the machine
-        $employee->companyMachine->update([
-            'employee_id' => null,
-        ]);
+        if($employee->companyMachine){
+            $employee->companyMachine->update([
+                'employee_id' => null,
+            ]);
+        }
+
 
         // Decrease the mood of the other employees
         $companyEmployees = $employee->company->employees()->where('status', Employee::STATUS_ACTIVE)->get();

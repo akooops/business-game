@@ -1,5 +1,6 @@
 <script>
     import CompanyLayout from '../../Layouts/CompanyLayout.svelte';
+    import Pagination from '../../Components/Pagination.svelte';
     import { onMount, onDestroy, tick } from 'svelte';
     import { page } from '@inertiajs/svelte'
 
@@ -23,32 +24,22 @@
     let ads = [];
     let loading = true;
     let fetchInterval = null;
-    let currentGameTimestamp = null;
 
-    // Fetch current game timestamp
-    async function fetchCurrentTimestamp() {
-        try {
-            const response = await fetch(route('utilities.index'), {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            });
-            const data = await response.json();
-            
-            if (data.status === 'success') {
-                currentGameTimestamp = new Date(data.timestamp);
-            }
-        } catch (error) {
-            console.error('Error fetching current timestamp:', error);
-        }
-    }
+    let pagination = {};
+    let perPage = 10;
+    let currentPage = 1;
 
     // Fetch ads data
     async function fetchAds() {
         if(ads.length == 0) loading = true;
         
         try {
-            const response = await fetch(route('company.ads.index'), {
+            const params = new URLSearchParams({
+                page: currentPage,
+                perPage: perPage,
+            });
+
+            const response = await fetch(route('company.ads.index') + '?' + params.toString(), {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
@@ -56,6 +47,7 @@
             
             const data = await response.json();
             ads = data.ads;
+            pagination = data.pagination;
             
             // Wait for DOM to update, then initialize menus
             await tick();
@@ -69,33 +61,34 @@
         }
     }
 
-    // Format date
-    function formatDate(dateString) {
-        return new Date(dateString).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
+    // Handle pagination
+    function goToPage(page) {
+        if (page && page !== currentPage) {
+            currentPage = page;
+            loading = true;
+            fetchAds();
+        }
     }
 
-    // Calculate days remaining
-    function getDaysRemaining(ad) {
-        if (ad.status === 'completed') return 0;
-        if (!currentGameTimestamp) return ad.duration_days; // Fallback if timestamp not loaded
-        
-        const startedAt = new Date(ad.started_at);
-        const endDate = new Date(startedAt.getTime() + (ad.duration_days * 24 * 60 * 60 * 1000));
-        const diffTime = endDate - currentGameTimestamp;
-        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-        
-        return Math.max(0, diffDays);
+    // Handle per page change
+    function handlePerPageChange(newPerPage) {
+        perPage = newPerPage;
+        currentPage = 1;
+        loading = true;
+        fetchAds();
     }
 
     // Calculate total duration
     function getTotalDuration(ad) {
         return ad.duration_days;
+    }
+
+    // Calculate completion date
+    function getCompletionDate(ad) {
+        const startDate = new Date(ad.started_at);
+        const completionDate = new Date(startDate);
+        completionDate.setDate(startDate.getDate() + ad.duration_days);
+        return completionDate.toISOString();
     }
 
     // Get status color
@@ -123,10 +116,8 @@
     }
     
     onMount(() => {
-        fetchCurrentTimestamp();
         fetchAds();
         fetchInterval = setInterval(() => {
-            fetchCurrentTimestamp();
             fetchAds();
         }, 60000);
     });
@@ -246,17 +237,17 @@
                                                         <div class="flex items-center gap-4 mt-2 text-xs text-secondary-foreground">
                                                             <span>
                                                                 <i class="ki-filled ki-calendar text-blue-500 mr-1"></i>
-                                                                Started: {formatDate(ad.started_at)}
+                                                                Started: {formatTimestamp(ad.started_at)}
                                                             </span>
                                                             {#if ad.status === 'active'}
                                                                 <span>
-                                                                    <i class="ki-filled ki-time text-green-500 mr-1"></i>
-                                                                    {getDaysRemaining(ad)} days remaining
+                                                                    <i class="ki-filled ki-check-circle text-blue-500 mr-1"></i>
+                                                                    Completes: {formatTimestamp(getCompletionDate(ad))}
                                                                 </span>
                                                             {:else if ad.status === 'completed'}
                                                                 <span>
                                                                     <i class="ki-filled ki-check text-gray-500 mr-1"></i>
-                                                                    Completed: {formatDate(ad.completed_at)}
+                                                                    Completed: {formatTimestamp(ad.completed_at)}
                                                                 </span>
                                                             {/if}
                                                         </div>
@@ -296,6 +287,18 @@
                                 {/each}
                             </div>
                         </div>
+
+                        <!-- Pagination -->
+                        {#if pagination && pagination.total > 0}
+                            <div class="border-t border-gray-200">
+                                <Pagination 
+                                    {pagination} 
+                                    {perPage}
+                                    onPageChange={goToPage} 
+                                    onPerPageChange={handlePerPageChange}
+                                />
+                            </div>
+                        {/if}
                     {/if}
                 </div>
             </div>

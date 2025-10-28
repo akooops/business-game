@@ -53,10 +53,6 @@
             maxResearchLevel = data.maxResearchLevel;
             currentResearchLevel = data.currentResearchLevel;
 
-            companyTechnologies.forEach(ct => {
-                companyTechMap[ct.technology_id] = ct;
-            });
-
             // Wait for DOM to update, then initialize menus
             await tick();
             if (window.KTMenu) {
@@ -69,12 +65,15 @@
         }
     }
 
-    // Map companyTechnologies by technology_id for quick lookup
-    $: companyTechMap = {};
+    // Map companyTechnologies by technology_id for quick lookup (reactive)
+    $: companyTechMap = companyTechnologies.reduce((map, ct) => {
+        map[ct.technology_id] = ct;
+        return map;
+    }, {});
 
     // Helper to get technologies for a level
     function getTechnologiesByLevel(level) {
-        return technologies.filter(t => t.level === level);
+        return technologies.filter(t => t.level ==level);
     }
 
     // Open technology drawer (locked/unresearched)
@@ -131,6 +130,7 @@
     // Start research
     async function startResearch() {
         if (!researchTechnology) return;
+                
         try {
             const response = await fetch(route('company.technologies.research', researchTechnology.id), {
                 method: 'POST',
@@ -237,7 +237,7 @@
                                 {/each}
                             </div>
                         </div>
-                    {:else if technologies.length === 0}
+                    {:else if technologies.length ==0}
                         <div class="p-10">
                             <div class="flex flex-col items-center justify-center text-center">
                                 <div class="mb-4">
@@ -252,12 +252,12 @@
                     {:else}
                         <!-- Loop by level -->
                         {#each Array(maxResearchLevel + 1) as _, level}
-                            <div class="kt-card mb-12 {level < currentResearchLevel ? 'bg-company-technology-completed-level border-blue-400 border-2' : level === currentResearchLevel ? 'bg-company-technology-current-level border-green-400 border-2' : 'bg-white'} rounded-xl p-4">
+                            <div class="kt-card mb-12 {level < currentResearchLevel ? 'bg-company-technology-completed-level border-blue-400 border-2' : level ==currentResearchLevel ? 'bg-company-technology-current-level border-green-400 border-2' : 'bg-white'} rounded-xl p-4">
                                 <div class="kt-card-header">
                                     <div class="kt-card-toolbar">
                                         <div class="flex items-center mb-4">
                                             <h2 class="text-lg font-bold text-mono">Level {level}</h2>
-                                            {#if level === currentResearchLevel}
+                                            {#if level ==currentResearchLevel}
                                                 <span class="kt-badge kt-badge-primary" style="margin-left: 10px;">Current Level</span>
                                             {/if}
                                         </div>
@@ -321,7 +321,7 @@
                                         {:else}
                                             <!-- TechnologyCard (locked) -->
                                             <div class="kt-card kt-card-hover cursor-pointer" style="{currentResearchLevel >= technology.level ? 'opacity: 0.9;' : 'opacity: 0.5; filter: blur(2px);'}" on:click={() => {
-                                                if(currentResearchLevel === technology.level){
+                                                if(currentResearchLevel ==technology.level){
                                                     openTechnologyDrawer(technology);
                                                 }
                                             }}>
@@ -361,7 +361,7 @@
                                                             <span class="font-medium">{technology.research_time_days} days</span>
                                                         </div>
                                                     </div>
-                                                    {#if level === currentResearchLevel}
+                                                    {#if level ==currentResearchLevel}
                                                         <button class="kt-btn kt-btn-primary w-full mt-4" on:click|stopPropagation={() => openResearchModal(technology)}>
                                                             <i class="fa-solid fa-rocket text-base"></i>
                                                             Research

@@ -295,20 +295,20 @@
                                                 <span class="text-sm font-medium text-mono">#{product.id}</span>
                                             </td>
                                             <td>
-                                                <div class="flex items-center gap-3">
-                                                    <div class="flex-shrink-0">
-                                                        {#if product.image_url}
-                                                            <img 
-                                                                src={product.image_url} 
-                                                                alt={product.name}
-                                                                class="w-10 h-10 rounded-lg object-cover"
-                                                            />
-                                                        {:else}
-                                                            <div class="w-10 h-10 rounded-lg bg-accent/50 flex items-center justify-center">
-                                                                <i class="ki-filled ki-package text-lg text-muted-foreground"></i>
-                                                            </div>
-                                                        {/if}
-                                                    </div>
+                                                <div class="flex items-center">
+                                                    {#if product.image_url}
+                                                        <img 
+                                                            src={product.image_url} 
+                                                            alt={product.name}
+                                                            class="rounded-lg object-cover"
+                                                            style="min-width: 36px; min-height: 36px; max-width: 36px; max-height: 36px;"
+                                                        />
+                                                    {:else}
+                                                        <div class="w-10 h-10 rounded-lg bg-accent/50 flex items-center justify-center">
+                                                            <i class="ki-filled ki-package text-lg text-muted-foreground"></i>
+                                                        </div>
+                                                    {/if}
+
                                                     <div class="flex flex-col gap-1">
                                                         <span class="text-sm font-medium text-mono">
                                                             {product.name}

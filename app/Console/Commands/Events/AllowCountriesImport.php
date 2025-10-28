@@ -31,7 +31,7 @@ class AllowCountriesImport extends Command
         $this->info('Queueing countries import allowing job...');
 
         // Define the list of countries to block
-        $countries = ['China', 'Morocco', 'Tunisia'];
+        $countries = ['Spain'];
 
         // Get the target timestamp from settings
         $currentTimestamp = SettingsService::getCurrentTimestamp();

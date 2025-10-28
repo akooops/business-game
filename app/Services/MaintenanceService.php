@@ -14,11 +14,17 @@ class MaintenanceService
         // Get all company machines that are active or inactive
         $companyMachines = CompanyMachine::where('company_id', $company->id)
             ->whereIn('status', [CompanyMachine::STATUS_ACTIVE, CompanyMachine::STATUS_INACTIVE])->get();
+        
+        $currentTimestamp = SettingsService::getCurrentTimestamp();
 
         // Process each company machine
         foreach($companyMachines as $companyMachine){
             $machine = $companyMachine->machine;
             $reliability = $companyMachine->current_reliability;
+
+            $daysSinceSetup = $currentTimestamp->diffInDays($companyMachine->setup_at);
+
+            if($daysSinceSetup < 15) continue;
 
             // Calculate reliability decay
             $reliability_decay_days = $machine->reliability_decay_days;
@@ -35,24 +41,16 @@ class MaintenanceService
 
             // Calculate break threshold
             $breakThreshold = 0;
-
-            // If reliability is less than 0.1, set break threshold to 75%
-            if($reliability < 0.1){
-                $breakThreshold = 75; // 75% chance
-            } 
-            // If reliability is less than 0.2, set break threshold to 50%
-            else if($reliability < 0.2){
-                $breakThreshold = 50; // 50% chance
-            } 
-            // If reliability is less than 0.3, set break threshold to 25%
-            else if($reliability < 0.3){
-                $breakThreshold = 25; // 25% chance
-            } 
-            // If reliability is less than 0.4, set break threshold to 10%
-            else if($reliability < 0.4){
-                $breakThreshold = 10; // 10% chance
-            } else {
-                $breakThreshold = 5; // 5% chance
+            if($reliability < 0.05){           // Was 0.1
+                $breakThreshold = 75; // Was 75% - reduced
+            } else if($reliability < 0.15){    // Was 0.2
+                $breakThreshold = 20; // Was 50% - reduced
+            } else if($reliability < 0.25){    // Was 0.3
+                $breakThreshold = 20; // Was 25% - reduced
+            } else if($reliability < 0.35){    // Was 0.4
+                $breakThreshold = 10;  // Was 10% - reduced
+            } else if($reliability < 0.5) {
+                $breakThreshold = 5;  // Was 5% - reduced
             }
 
             // If break chance is less than or equal to break threshold, machine breaks

@@ -13,8 +13,8 @@ class InventoryMovement extends Model
     protected $guarded = ['id'];
 
     protected $casts = [
-        'original_quantity' => 'decimal:3',
-        'current_quantity' => 'decimal:3',
+        'original_quantity' => 'decimal:6',
+        'current_quantity' => 'decimal:6',
         'moved_at' => 'datetime',
     ];
 

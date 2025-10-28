@@ -1,6 +1,7 @@
 <script>
     // --- Config & Constants ---
     import CompanyLayout from '../../Layouts/CompanyLayout.svelte';
+    import Pagination from '../../Components/Pagination.svelte';
     import { onMount, onDestroy, tick } from 'svelte';
     import Select2 from '../../Components/Forms/Select2.svelte';
     import { page } from '@inertiajs/svelte';
@@ -23,6 +24,9 @@
     let machines = [];
     let loading = true;
     let fetchInterval = null;
+    let pagination = {};
+    let perPage = 10;
+    let currentPage = 1;
 
     let employeeSelectComponent = null;
 
@@ -81,13 +85,19 @@
         if(machines.length == 0) loading = true;
 
         try {
-            const response = await fetch(route('company.machines.index'), {
+            const params = new URLSearchParams({
+                page: currentPage,
+                perPage: perPage,
+            });
+
+            const response = await fetch(route('company.machines.index') + '?' + params.toString(), {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             });
             const data = await response.json();
             machines = data.machines;
+            pagination = data.pagination;
             await tick();
             if (window.KTMenu) {
                 window.KTMenu.init();
@@ -97,6 +107,23 @@
         } finally {
             loading = false;
         }
+    }
+
+    // Handle pagination
+    function goToPage(page) {
+        if (page && page !== currentPage) {
+            currentPage = page;
+            loading = true;
+            fetchMachines();
+        }
+    }
+
+    // Handle per page change
+    function handlePerPageChange(newPerPage) {
+        perPage = newPerPage;
+        currentPage = 1;
+        loading = true;
+        fetchMachines();
     }
 
     // --- Modal/Drawer Handlers ---
@@ -508,7 +535,7 @@
                                                 </div>
                                                 <div class="flex justify-between">
                                                     <span>Quality Factor:</span>
-                                                    <span class="font-medium">{companyMachine.quality_factor * 100}%</span>
+                                                    <span class="font-medium">{(companyMachine.quality_factor * 100).toFixed(2)}%</span>
                                                 </div>
                                                 <div class="flex justify-between">
                                                     <span>Operation Cost:</span>
@@ -550,12 +577,44 @@
                                                             <div class="flex-1 min-w-0">
                                                                 <h4 class="text-sm font-semibold text-mono mb-2 truncate">{companyMachine.ongoing_production_order.product.name}</h4>
                                                                 <p class="text-xs text-muted-foreground mb-2">x{companyMachine.ongoing_production_order.quantity}</p>
+                                                                <p class="text-xs text-blue-500 mb-2">
+                                                                    <i class="ki-filled ki-calendar text-blue-500 mr-1"></i>
+                                                                    Time needed: {companyMachine.ongoing_production_order.time_to_complete} days
+                                                                </p>
                                                                 <div class="w-full bg-gray-200 rounded-full h-2">
                                                                     <div class="kt-progress kt-progress-primary">
                                                                         <div class="kt-progress-indicator" style="width: {companyMachine.ongoing_production_order.producing_progress}%"></div>
                                                                     </div>
                                                                 </div>
                                                             </div>
+                                                    </div>
+                                                </div>
+                                            {:else}
+                                                <div class="mt-4 pt-3 border-t border-border">
+                                                    <h3 class="text-sm font-semibold text-mono mb-4">Output Products</h3>
+
+                                                    <div class="flex flex-wrap gap-4">  
+                                                        {#each companyMachine.machine.outputs as output}
+                                                            {#if output.product.is_researched}
+                                                            <!-- Product Image -->
+                                                            <div class="size-10 mb-4">
+                                                                <img 
+                                                                    class="rounded-lg w-full h-full object-cover bg-gray-100" 
+                                                                    src={output.product.image_url}
+                                                                    alt={output.product.name}
+                                                                    />
+                                                                </div>
+                                                            {:else} 
+                                                                <div class="flex items-center size-10">
+                                                                    <div class="flex-shrink-0 relative" style="width: 100%; height: 100%;">
+                                                                        <div class="rounded-lg bg-muted animate-pulse" style="width: 100%; height: 100%;"></div>
+                                                                        <div class="absolute inset-0 flex items-center justify-center" style="top: 50%; left: 50%; bottom: 50%; right: 50%;">
+                                                                            <i class="ki-filled ki-lock text-muted-foreground text-sm"></i>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            {/if}
+                                                        {/each}
                                                     </div>
                                                 </div>
                                             {/if}
@@ -715,6 +774,18 @@
                                 {/each}
                             </div>
                         </div>
+
+                        <!-- Pagination -->
+                        {#if pagination && pagination.total > 0}
+                            <div class="border-t border-gray-200">
+                                <Pagination 
+                                    {pagination} 
+                                    {perPage}
+                                    onPageChange={goToPage} 
+                                    onPerPageChange={handlePerPageChange}
+                                />
+                            </div>
+                        {/if}
                     {/if}
                 </div>
             </div>
@@ -774,7 +845,7 @@
                 <h3 class="text-sm font-semibold text-mono mb-3">Reliability</h3>
                 <div class="space-y-2">
                     <div class="flex items-center gap-2">
-                        <span class="text-xs font-medium">{(selectedMachine.current_reliability * 100).toFixed(0)}%</span>
+                        <span class="text-xs font-medium">{(selectedMachine.current_reliability * 100).toFixed(2)}%</span>
 
                         <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
                             <div class="kt-progress kt-progress-primary {selectedMachine.current_reliability > 0.7 ? 'kt-progress-primary' : selectedMachine.current_reliability > 0.4 ? 'kt-progress-warning' : 'kt-progress-destructive'}">
@@ -850,7 +921,7 @@
                         </div>
                         <div class="flex justify-between">
                             <span class="text-xs text-muted-foreground">Quality Factor:</span>
-                            <span class="text-xs font-medium">{selectedMachine.machine?.quality_factor * 100}%</span>
+                            <span class="text-xs font-medium">{(selectedMachine.machine?.quality_factor * 100).toFixed(2)}%</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-xs text-muted-foreground">Operation Cost:</span>
@@ -872,10 +943,80 @@
                     <div class="space-y-2">
                         <div class="flex justify-between">
                             <span class="text-xs text-muted-foreground">Reliability Decay:</span>
-                            <span class="text-xs font-medium">{selectedMachine.machine?.reliability_decay_days * 100}%/day</span>
+                            <span class="text-xs font-medium">{(selectedMachine.machine?.reliability_decay_days * 100).toFixed(2)}%/day</span>
                         </div>
                     </div>
                 </div>
+
+                <!-- Output Products Section -->
+                {#if selectedMachine.machine.outputs && selectedMachine.machine.outputs.length > 0}
+                <div class="border-t border-border pt-4">
+                    <h3 class="text-sm font-semibold text-mono mb-3">Output Products</h3>
+                    <div class="space-y-3">
+                        {#each selectedMachine.machine.outputs as output}
+                            {#if output.product.is_researched}
+                                <div class="kt-card">
+                                    <div class="kt-card-body p-3">
+                                        <div class="flex items-center gap-3">
+                                            <div class="flex-shrink-0 relative">
+                                                {#if output.product.image_url}
+                                                    <img 
+                                                        src={output.product.image_url} 
+                                                        alt={output.product.name}
+                                                        class="w-12 h-12 rounded-lg object-cover"
+                                                    />
+                                                {:else}
+                                                    <div class="w-12 h-12 rounded-lg bg-accent/50 flex items-center justify-center">
+                                                        <i class="ki-filled ki-abstract-26 text-lg text-muted-foreground"></i>
+                                                    </div>
+                                                {/if}
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <h4 class="text-sm font-semibold text-mono mb-1 truncate">{output.product.name}</h4>
+                                                <p class="text-xs text-muted-foreground mb-1">{output.product.type_name}</p>
+                                                <span class="text-xs text-green-500 font-medium">Researched</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {:else}
+                                <div class="kt-card">
+                                    <div class="kt-card-body p-3">
+                                        <div class="flex items-center gap-3">
+                                            <div class="flex-shrink-0 relative">
+                                                <div class="w-12 h-12 rounded-lg bg-muted animate-pulse"></div>
+                                                <div class="absolute inset-0 flex items-center justify-center" style="top: 50%; left: 50%; bottom: 50%; right: 50%;">
+                                                    <i class="ki-filled ki-lock text-muted-foreground text-sm"></i>
+                                                </div>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <div class="kt-skeleton h-4 w-24 mb-1"></div>
+                                                <div class="kt-skeleton h-3 w-16 mb-1"></div>
+                                                <div class="flex items-center gap-1">
+                                                    <i class="ki-filled ki-search text-orange-500 text-xs"></i>
+                                                    <span class="text-xs text-orange-500 font-medium">Need Research to Unlock</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {/if}
+                        {/each}
+                    </div>
+                </div>
+            {:else}
+                <div class="border-t border-border pt-4">
+                    <h3 class="text-sm font-semibold text-mono mb-3">Output Products</h3>
+                    <div class="kt-card">
+                        <div class="kt-card-body p-4">
+                            <div class="flex flex-col items-center justify-center text-center">
+                                <i class="ki-filled ki-abstract-26 text-2xl text-muted-foreground mb-2"></i>
+                                <p class="text-xs text-muted-foreground">No output products</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {/if}
             {/if}
         </div>
     </div>
@@ -929,8 +1070,22 @@
                             };
                         },
                         processResults: function(data) {
+                            // Filter employees: exclude those already assigned to a machine
+                            // and those whose profile doesn't match the machine's required profile
+                            const filteredEmployees = data.employees.filter(employee => {
+                                // Exclude employees already assigned to a machine
+                                if (employee.company_machine !== null) {
+                                    return false;
+                                }
+                                // Only include employees whose profile matches the machine's required profile
+                                if (selectedMachine && selectedMachine.machine && selectedMachine.machine.employee_profile_id) {
+                                    return employee.employee_profile_id === selectedMachine.machine.employee_profile_id;
+                                }
+                                return true;
+                            });
+
                             return {
-                                results: data.employees.map(employee => ({
+                                results: filteredEmployees.map(employee => ({
                                     id: employee.id,
                                     text: employee.name,
                                     name: employee.name,
@@ -1140,7 +1295,7 @@
                                     </div>
                                     <div class="flex justify-between items-center">
                                         <span class="text-sm font-normal text-secondary-foreground">Quality Factor:</span>
-                                        <span class="text-sm font-medium text-mono">{machineToProduce.machine?.quality_factor * 100}% (Expect as output: {productionQuantity * machineToProduce.machine?.quality_factor} units)</span>
+                                        <span class="text-sm font-medium text-mono">{(machineToProduce.machine?.quality_factor * 100).toFixed(2)}% (Expect as output: {productionQuantity * machineToProduce.machine?.quality_factor} units)</span>
                                     </div>
                                     <div class="flex justify-between items-center">
                                         <span class="text-sm font-normal text-secondary-foreground">Carbon Footprint:</span>

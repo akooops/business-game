@@ -310,7 +310,7 @@
                                             </td>
                                             <td>
                                                 <span class="text-sm font-medium text-secondary-foreground">
-                                                    {bank.loan_interest_rate * 100}%
+                                                    {(bank.loan_interest_rate * 100).toFixed(2)}%
                                                 </span>
                                             </td>
                                             <td>

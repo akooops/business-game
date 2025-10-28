@@ -7,6 +7,7 @@ use App\Models\Advertiser;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Http\Requests\Company\Ads\CreateAdRequest;
+use App\Services\IndexService;
 use App\Services\AdsService;
 
 class AdsController extends Controller
@@ -18,12 +19,18 @@ class AdsController extends Controller
      */
     public function index(Request $request)
     {
+        $perPage = IndexService::limitPerPage($request->query('perPage', 10));
+        $page = IndexService::checkPageIfNull($request->query('page', 1));
+
         $company = $request->company;
+
         $ads = $company->ads()->with(['advertiser', 'product'])->latest();       
+        $ads = $ads->paginate($perPage, ['*'], 'page', $page);
 
         if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
             return response()->json([
-                'ads' => $ads->get(),
+                'ads' => $ads->items(),
+                'pagination' => IndexService::handlePagination($ads)
             ]);
         }
 

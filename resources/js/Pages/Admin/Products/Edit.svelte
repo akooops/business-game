@@ -36,10 +36,14 @@
         description: product.description || '',
         type: product.type || 'raw_material',
         elasticity_coefficient: product.elasticity_coefficient || 0,
+        avg_demand: product.avg_demand || 0,
+        avg_market_price: product.avg_market_price || 0,
+        // Use nullish coalescing to preserve explicit false from backend
+        is_saleable: product.is_saleable ?? false,
         storage_cost: product.storage_cost || 0,
         shelf_life_days: product.shelf_life_days || '',
-        has_expiration: product.has_expiration || false,
-        needs_technology: product.technology_id || false,
+        has_expiration: product.has_expiration ?? false,
+        needs_technology: (product.needs_technology ?? false) || Boolean(product.technology_id),
         technology_id: product.technology_id || null,
         file: null
     };
@@ -106,14 +110,19 @@
         
         // Add form fields
         Object.keys(form).forEach(key => {
+            // Always include explicit values for boolean toggles
+            if (key === 'is_saleable' || key === 'has_expiration' || key === 'needs_technology') {
+                formData.append(key, form[key] ? '1' : '0');
+                return;
+            }
+
+            if (key === 'file') {
+                if (form.file) formData.append(key, form.file);
+                return;
+            }
+
             if (form[key] !== null && form[key] !== '') {
-                if (key === 'file' && form.file) {
-                    formData.append(key, form.file);
-                } else if (key === 'has_expiration' || key === 'needs_technology') {
-                    formData.append(key, form[key] ? '1' : '0');
-                } else if (key !== 'file') {
-                    formData.append(key, form[key]);
-                }
+                formData.append(key, form[key]);
             }
         });
 
@@ -256,6 +265,69 @@
                                 </p>
                                 {#if errors.elasticity_coefficient}
                                     <p class="text-sm text-destructive">{errors.elasticity_coefficient}</p>
+                                {/if}
+                            </div>
+
+                            <!-- Avg Demand -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-medium text-mono" for="avg_demand">
+                                    Avg Demand <span class="text-destructive">*</span>
+                                </label>
+                                <input
+                                    id="avg_demand"
+                                    type="number"
+                                    step="0.001"
+                                    class="kt-input {errors.avg_demand ? 'kt-input-error' : ''}"
+                                    placeholder="Enter avg demand"
+                                    bind:value={form.avg_demand}
+                                />
+                                <p class="text-xs text-secondary-foreground">
+                                    Average demand per week (this value is used if there were no min and max demand set for a week)
+                                </p>
+                                {#if errors.avg_demand}
+                                    <p class="text-sm text-destructive">{errors.avg_demand}</p>
+                                {/if}
+                            </div>
+
+                            <!-- Avg Market Price -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-medium text-mono" for="avg_market_price">
+                                    Avg Market Price <span class="text-destructive">*</span>
+                                </label>
+                                <input
+                                    id="avg_market_price"
+                                    type="number"
+                                    step="0.001"
+                                    class="kt-input {errors.avg_market_price ? 'kt-input-error' : ''}"
+                                    placeholder="Enter avg market price"
+                                    bind:value={form.avg_market_price}
+                                />
+                                <p class="text-xs text-secondary-foreground">
+                                    Average market price per week (this value is used if there were market price set for a week)
+                                </p>
+                                {#if errors.avg_market_price}
+                                    <p class="text-sm text-destructive">{errors.avg_market_price}</p>
+                                {/if}
+                            </div>
+
+                            <!-- Has Expiration -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-sm font-medium text-mono">
+                                    Product Saleability
+                                </label>
+                                <div class="flex items-center gap-3">
+                                    <input 
+                                        class="kt-switch" 
+                                        type="checkbox" 
+                                        id="is_saleable" 
+                                        bind:checked={form.is_saleable}
+                                    />
+                                    <label class="kt-label cursor-pointer" for="is_saleable">
+                                        This product is saleable
+                                    </label>
+                                </div>
+                                {#if errors.is_saleable}
+                                    <p class="text-sm text-destructive">{errors.is_saleable}</p>
                                 {/if}
                             </div>
 

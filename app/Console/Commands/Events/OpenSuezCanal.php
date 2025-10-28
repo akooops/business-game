@@ -33,8 +33,8 @@ class OpenSuezCanal extends Command
         $this->info('Queueing Suez canal opening job...');
 
         // Define the list of countries that will be affected by the Suez canal opening
-        $countries = ['Egypt', 'China'];
-        $rate = 1.5;
+        $countries = ['China', 'India'];
+        $rate = 0.2;
 
         // Get the target timestamp from settings
         $currentTimestamp = SettingsService::getCurrentTimestamp();
@@ -48,10 +48,10 @@ class OpenSuezCanal extends Command
             $supplier = Supplier::where('country_id', $country->id)->first();
 
             if($supplier){
-                $minShippingCost = $supplier->min_shipping_cost / $rate;
-                $maxShippingCost = $supplier->max_shipping_cost / $rate;
-                $minShippingTimeDays = $supplier->min_shipping_time_days / $rate;
-                $maxShippingTimeDays = $supplier->max_shipping_time_days / $rate;
+                $minShippingCost = $supplier->min_shipping_cost / (1 + $rate);
+                $maxShippingCost = $supplier->max_shipping_cost / (1 + $rate);
+                $minShippingTimeDays = $supplier->min_shipping_time_days / (1 + $rate);
+                $maxShippingTimeDays = $supplier->max_shipping_time_days / (1 + $rate);
 
                 $supplier->update([
                     'min_shipping_cost' => $minShippingCost,
@@ -66,6 +66,6 @@ class OpenSuezCanal extends Command
             }
         }
 
-        NotificationService::createSuezCanalOpenedNotification($countries, $rate);
+        NotificationService::createSuezCanalOpenedNotification($countries);
     }
 } 

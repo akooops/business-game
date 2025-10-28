@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin\ProductRecipes;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateProductRecipeRequest extends FormRequest
 {
@@ -16,13 +17,11 @@ class UpdateProductRecipeRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
-            'quantity' => 'required|numeric|min:0.001',
+            'quantity' => ['required', 'numeric', 'min:0.000001', 'max:999999999.999999'],
         ];
     }
 
@@ -47,6 +46,8 @@ class UpdateProductRecipeRequest extends FormRequest
     {
         return [
             'quantity.min' => 'Quantity must be greater than 0.',
+        ];
+    }
         ];
     }
 } 

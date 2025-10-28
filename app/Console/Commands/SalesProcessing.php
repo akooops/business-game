@@ -36,9 +36,6 @@ class SalesProcessing extends Command
 
             // Cancel sales that have exceeded their time limit
             SalesService::cancelSales($company);
-            
-            // Process delivered sales
-            SalesService::processDeliveredSale($company);
         }
         
         $this->info('Sales processing completed successfully!');

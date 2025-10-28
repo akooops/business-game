@@ -310,7 +310,7 @@
                                             </td>
                                             <td>
                                                 <span class="text-sm font-medium text-secondary-foreground">
-                                                    {advertiser.min_market_impact_percentage * 100} - {advertiser.max_market_impact_percentage * 100}%
+                                                    {(advertiser.min_market_impact_percentage * 100).toFixed(2)}% - {(advertiser.max_market_impact_percentage * 100).toFixed(2)}%
                                                 </span>
                                             </td>
                                             <td>

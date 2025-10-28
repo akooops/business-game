@@ -17,21 +17,21 @@ class StoreProductRecipeRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
-            'product_id' => 'required|exists:products,id',
+            'product_id' => ['required', 'integer', 'exists:products,id'],
             'material_id' => [
                 'required',
+                'integer',
                 'exists:products,id',
                 'different:product_id',
-                Rule::unique('product_recipes', 'material_id')
-                    ->where('product_id', $this->input('product_id'))
+                Rule::unique('product_recipes')
+                    ->where('product_id', $this->product_id)
+                    ->where('material_id', $this->material_id)
             ],
-            'quantity' => 'required|numeric|min:0.001'        
+            'quantity' => ['required', 'numeric', 'min:0.000001', 'max:999999999.999999'],
         ];
     }
 
@@ -60,6 +60,8 @@ class StoreProductRecipeRequest extends FormRequest
             'material_id.unique' => 'This material is already in the recipe.',
             'material_id.different' => 'A product cannot be a material of itself.',
             'quantity.min' => 'Quantity must be greater than 0.',
+        ];
+    }
         ];
     }
 } 

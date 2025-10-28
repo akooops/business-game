@@ -112,7 +112,7 @@
         }
         
         const totalCost = subtotal + shippingCost + customsDuties;
-        const carbonFootprint = supplier.carbon_footprint * quantity;
+        const carbonFootprint = supplier.carbon_footprint;
 
         purchaseData = {
             product: selectedProduct,
@@ -262,7 +262,7 @@
                                                 data: function(params) {
                                                     return {
                                                         search: params.term,
-                                                        perPage: 100
+                                                        perPage: 10
                                                     };
                                                 },
                                                 processResults: function(data) {
@@ -533,8 +533,8 @@
                                         <span class="font-medium">{purchaseData.shippingTime} days</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span class="text-sm text-muted-foreground">Carbon Footprint: ({purchaseData.supplier.carbon_footprint} kg CO2/unit)</span>
-                                        <span class="font-medium">{purchaseData.carbonFootprint.toFixed(3)} kg CO2</span>
+                                        <span class="text-sm text-muted-foreground">Carbon Footprint: ({purchaseData.supplier.carbon_footprint} kg CO2/purchase)</span>
+                                        <span class="font-medium">{purchaseData.carbonFootprint} kg CO2</span>
                                     </div>
                                 </div>
                             </div>
@@ -585,7 +585,7 @@
                                 {#if purchaseData.customsDuties > 0}
                                     <div class="flex justify-between items-center">
                                         <span class="text-sm font-normal text-secondary-foreground">
-                                            Customs Duties ({purchaseData.supplier.country.customs_duties_rate * 100}%)
+                                            Customs Duties ({(purchaseData.supplier.country.customs_duties_rate * 100).toFixed(2)}%)
                                         </span>
                                         <span class="text-sm font-medium text-mono">
                                             DZD {purchaseData.customsDuties.toFixed(2)}

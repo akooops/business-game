@@ -128,7 +128,7 @@
         }
         
         const totalCost = subtotal + shippingCost + customsDuties;
-        const carbonFootprint = purchaseSupplier.carbon_footprint * quantity;
+        const carbonFootprint = purchaseSupplier.carbon_footprint;
 
         purchaseData = {
             product: supplierProduct.product,
@@ -303,8 +303,8 @@
                                             </div>
 
                                             <div class="flex items-center gap-2.5">
-                                                <span class="kt-badge kt-badge-{supplier.is_international ? 'warning' : 'info'} kt-badge-sm">
-                                                    {supplier.is_international ? 'International' : 'Local'}
+                                                <span class="kt-badge kt-badge-{supplier.country_id ? 'warning' : 'info'} kt-badge-sm">
+                                                    {supplier.country_id ? 'International' : 'Local'}
                                                 </span>
 
                                                 <span>
@@ -335,7 +335,7 @@
                                                     </div>
                                                     <div class="flex justify-center gap-1">
                                                         <i class="ki-filled ki-dollar text-orange-500"></i>
-                                                        <span>Custom Duties: {supplier.country.customs_duties_rate * 100}%</span>
+                                                        <span>Custom Duties: {(supplier.country.customs_duties_rate * 100).toFixed(2)}%</span>
                                                     </div>
                                                 </div>
                                             {/if}
@@ -450,7 +450,7 @@
                             </span>
                             <div>
                                 <span class="text-xs font-medium text-foreground">
-                                    {selectedSupplier.country.customs_duties_rate * 100}%
+                                    {(selectedSupplier.country.customs_duties_rate * 100).toFixed(2)}%
                                 </span>
                             </div>
                         </div>
@@ -484,7 +484,7 @@
                         </span>
                         <div>
                             <span class="text-xs font-medium text-foreground">
-                                {selectedSupplier.carbon_footprint} kg CO2e / unit
+                                {selectedSupplier.carbon_footprint} kg CO2e / purchase
                             </span>
                         </div>
                     </div>
@@ -723,7 +723,7 @@
                                             Carbon Footprint
                                         </span>
                                         <span class="text-sm font-medium text-mono">
-                                            {purchaseData.carbonFootprint.toFixed(3)} kg CO2
+                                            {purchaseData.carbonFootprint} kg CO2
                                         </span>
                                     </div>
                                 </div>

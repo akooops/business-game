@@ -34,7 +34,7 @@ return new class extends Migration
             $table->decimal('amount', 10, 3);
             $table->timestamp('transaction_at')->nullable();
 
-            $table->foreignId('company_id')->constrained('companies');
+            $table->foreignId('company_id')->constrained('companies')->onDelete('cascade');
             $table->timestamps();
         });
     }

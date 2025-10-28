@@ -412,7 +412,7 @@
                                     <i class="ki-filled ki-chart-line text-4xl text-muted-foreground mb-4"></i>
                                     <h3 class="text-lg font-semibold text-mono mb-2">No demand data available</h3>
                                     <p class="text-sm text-secondary-foreground">
-                                        Add gameweek data to see the chart
+                                        No data to see the chart
                                     </p>
                                 </div>
                             {:else}
@@ -429,7 +429,7 @@
                                     <i class="ki-filled ki-row-horizontal text-4xl text-muted-foreground mb-4"></i>
                                     <h3 class="text-lg font-semibold text-mono mb-2">No demand data available</h3>
                                     <p class="text-sm text-secondary-foreground">
-                                        Add gameweek data to see the table
+                                        No data to see the table
                                     </p>
                                 </div>
                             {:else}

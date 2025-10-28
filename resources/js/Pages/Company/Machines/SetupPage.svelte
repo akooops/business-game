@@ -286,7 +286,7 @@
                                                 </div>
                                                 <div class="flex justify-between">
                                                     <span>Quality Factor:</span>
-                                                    <span class="font-medium">{machine.quality_factor * 100}%</span>
+                                                    <span class="font-medium">{(machine.quality_factor * 100).toFixed(2)}%</span>
                                                 </div>
                                                 <div class="flex justify-between">
                                                     <span>Operation Cost:</span>
@@ -302,7 +302,7 @@
                                                 </div>
                                                 <div class="flex justify-between">
                                                     <span>Value Loss Rate:</span>
-                                                    <span class="font-medium">{machine.loss_on_sale_days * 100}%/day</span>
+                                                    <span class="font-medium">{(machine.loss_on_sale_days * 100).toFixed(2)}%/day</span>
                                                 </div>
                                             </div>
 
@@ -424,7 +424,7 @@
                         </div>
                         <div class="flex justify-between">
                             <span class="text-xs text-muted-foreground">Quality Factor:</span>
-                            <span class="text-xs font-medium">{selectedMachine.quality_factor * 100}%</span>
+                            <span class="text-xs font-medium">{(selectedMachine.quality_factor * 100).toFixed(2)}%</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-xs text-muted-foreground">Operation Cost:</span>
@@ -447,11 +447,11 @@
                         </div>
                         <div class="flex justify-between">
                             <span class="text-xs text-muted-foreground">Reliability Decay:</span>
-                            <span class="text-xs font-medium">{selectedMachine.reliability_decay_days * 100}%/day</span>
+                            <span class="text-xs font-medium">{(selectedMachine.reliability_decay_days * 100).toFixed(2)}%/day</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-xs text-muted-foreground">Value Loss Rate:</span>
-                            <span class="text-xs font-medium">{selectedMachine.loss_on_sale_days * 100}%/day</span>
+                            <span class="text-xs font-medium">{(selectedMachine.loss_on_sale_days * 100).toFixed(2)}%/day</span>
                         </div>
                     </div>
                 </div>
@@ -638,11 +638,11 @@
                                     </div>
                                     <div class="flex justify-between">
                                         <span class="text-sm text-muted-foreground">Quality Factor:</span>
-                                        <span class="font-medium">{setupData.machine.quality_factor * 100}%</span>
+                                        <span class="font-medium">{(setupData.machine.quality_factor * 100).toFixed(2)}%</span>
                                     </div>
                                     <div class="flex justify-between">
                                         <span class="text-sm text-muted-foreground">Value Loss Rate:</span>
-                                        <span class="font-medium">{setupData.machine.loss_on_sale_days * 100}%/day of acquisition cost</span>
+                                        <span class="font-medium">{(setupData.machine.loss_on_sale_days * 100).toFixed(2)}%/day of acquisition cost</span>
                                     </div>
                                 </div>
                             </div>

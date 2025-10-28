@@ -24,6 +24,9 @@
     let loans = [];
     let loading = true;
     let fetchInterval = null;
+    let pagination = {};
+    let perPage = 10;
+    let currentPage = 1;
 
     // Modal state
     let selectedLoan = null;
@@ -39,7 +42,12 @@
         if(loans.length == 0) loading = true;
         
         try {
-            const response = await fetch(route('company.loans.index'), {
+            const params = new URLSearchParams({
+                page: currentPage,
+                perPage: perPage,
+            });
+
+            const response = await fetch(route('company.loans.index') + '?' + params.toString(), {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
@@ -47,6 +55,7 @@
             
             const data = await response.json();
             loans = data.loans;
+            pagination = data.pagination;
             
             // Wait for DOM to update, then initialize menus
             await tick();
@@ -58,6 +67,23 @@
         } finally {
             loading = false;
         }
+    }
+
+    // Handle pagination
+    function goToPage(page) {
+        if (page && page !== currentPage) {
+            currentPage = page;
+            loading = true;
+            fetchLoans();
+        }
+    }
+
+    // Handle per page change
+    function handlePerPageChange(newPerPage) {
+        perPage = newPerPage;
+        currentPage = 1;
+        loading = true;
+        fetchLoans();
     }
 
     // Open pay loan modal
@@ -323,7 +349,7 @@
                                                                 <span class="text-xs font-normal text-secondary-foreground uppercase">
                                                                     Interest Rate:
                                                                     <span class="text-xs font-medium text-foreground">
-                                                                        {loan.interest_rate * 100}%
+                                                                        {(loan.interest_rate * 100).toFixed(2)}%
                                                                     </span>
                                                                 </span>
                                                             </div>
@@ -365,6 +391,18 @@
                                 {/each}
                             </div>
                         </div>
+
+                        <!-- Pagination -->
+                        {#if pagination && pagination.total > 0}
+                            <div class="border-t border-gray-200">
+                                <Pagination 
+                                    {pagination} 
+                                    {perPage}
+                                    onPageChange={goToPage} 
+                                    onPerPageChange={handlePerPageChange}
+                                />
+                            </div>
+                        {/if}
                     {/if}
                 </div>
             </div>
@@ -430,7 +468,7 @@
                                 <p class="text-sm text-muted-foreground mb-1">Loan ID: #{selectedLoan.id}</p>
                                 <div class="flex gap-2">
                                     <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                                        {selectedLoan.interest_rate * 100}% Interest
+                                        {(selectedLoan.interest_rate * 100).toFixed(2)}% Interest
                                     </span>
                                     <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
                                         {selectedLoan.duration_months} months
@@ -606,7 +644,7 @@
                         </span>
                         <div>
                             <span class="text-xs font-medium text-foreground">
-                                {selectedLoanDetails.interest_rate * 100}%
+                                {(selectedLoanDetails.interest_rate * 100).toFixed(2)}%
                             </span>
                         </div>
                     </div>

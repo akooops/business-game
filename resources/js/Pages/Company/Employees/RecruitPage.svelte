@@ -142,13 +142,14 @@
                 // Show success toast
                 showToast(data.message || 'Employee recruited successfully!', 'success');
                 
+                // Store employee ID before closing modal (which sets recruitData to null)
+                const recruitedEmployeeId = recruitData.employee.id;
+                
                 // Close modal
                 closeRecruitModal();
                 
-                // Reset form
-                selectedEmployeeProfile = null;
-                selectedEmployeeProfileId = '';
-                availableEmployees = [];
+                // Remove recruited employee from the list
+                availableEmployees = availableEmployees.filter(emp => emp.id !== recruitedEmployeeId);
                 
                 // Refetch applied employees if we're on that tab
                 const appliedTab = document.getElementById('tab_applied');

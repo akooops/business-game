@@ -113,7 +113,12 @@
                 patchFormData.append('_token', document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'));
                 Object.keys(formData).forEach(key => {
                     if (formData[key] !== '') {
-                        patchFormData.append(key, formData[key]);
+                        // Ensure quantity is properly formatted as a number with up to 6 decimal places
+                        if (key === 'quantity') {
+                            patchFormData.append(key, parseFloat(formData[key]).toFixed(6));
+                        } else {
+                            patchFormData.append(key, formData[key]);
+                        }
                     }
                 });
                 requestBody = patchFormData;
@@ -122,10 +127,17 @@
                 };
             } else {
                 // For POST requests, use JSON
-                requestBody = JSON.stringify({
+                const postData = {
                     product_id: currentProduct.id,
                     ...formData
-                });
+                };
+                
+                // Ensure quantity is properly formatted as a number with up to 6 decimal places
+                if (postData.quantity) {
+                    postData.quantity = parseFloat(postData.quantity).toFixed(6);
+                }
+                
+                requestBody = JSON.stringify(postData);
                 headers = {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
@@ -635,8 +647,9 @@
                     <input 
                         type="number" 
                         bind:value={formData.quantity}
-                        min="0.001"
-                        step="0.001"
+                        min="0.000001"
+                        step="0.000001"
+                        placeholder="0.000001"
                         class="kt-input w-full {errors.quantity ? 'kt-input-error' : ''}"
                         required
                     />

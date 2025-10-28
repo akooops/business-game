@@ -10,20 +10,27 @@ use App\Http\Requests\Company\ProductionOrders\ProduceProductRequest;
 use App\Http\Requests\Company\ProductionOrders\CancelProductionOrderRequest;
 use App\Models\Product;
 use App\Models\ProductionOrder;
+use App\Services\IndexService;
 
 class ProductionOrdersController extends Controller
 {
 
     public function index(Request $request){
+        $perPage = IndexService::limitPerPage($request->query('perPage', 10));
+        $page = IndexService::checkPageIfNull($request->query('page', 1));
+
         $company = $request->company;   
         
         $productionOrders = ProductionOrder::whereHas('companyMachine', function($query) use ($company) {
             $query->where('company_id', $company->id);
         })->with(['product', 'companyMachine', 'companyMachine.machine'])->latest();
 
+        $productionOrders = $productionOrders->paginate($perPage, ['*'], 'page', $page);
+
         if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
             return response()->json([
-                'productionOrders' => $productionOrders->get(),
+                'productionOrders' => $productionOrders->items(),
+                'pagination' => IndexService::handlePagination($productionOrders)
             ]);
         }
 

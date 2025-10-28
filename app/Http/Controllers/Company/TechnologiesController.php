@@ -24,8 +24,8 @@ class TechnologiesController extends Controller
             return response()->json([
                 'technologies' => $technologies->get(),
                 'companyTechnologies' => $companyTechnologies,
-                'maxResearchLevel' => $technologies->max('level'),
-                'currentResearchLevel' => $company->research_level,
+                'maxResearchLevel' => (int) $technologies->max('level'),
+                'currentResearchLevel' => (int) $company->research_level,
             ]);
         }
 
