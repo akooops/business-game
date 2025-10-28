@@ -15,17 +15,14 @@ class Sale extends Model
     protected $casts = [
         'quantity' => 'decimal:3',
         'sale_price' => 'decimal:3',
-        'shipping_cost' => 'decimal:3',
         'initiated_at' => 'datetime',
-        'confirmed_at' => 'datetime',
         'delivered_at' => 'datetime',
     ];
 
-    protected $appends = ['total_sale_price', 'total_shipping_cost'];
+    protected $appends = ['total_sale_price'];
 
     // Statuses
     const STATUS_INITIATED = 'initiated';
-    const STATUS_CONFIRMED = 'confirmed';
     const STATUS_DELIVERED = 'delivered';
     const STATUS_CANCELLED = 'cancelled';
 
@@ -49,10 +46,5 @@ class Sale extends Model
     public function getTotalSalePriceAttribute()
     {
         return round($this->quantity * $this->sale_price, 3) ?? 0;
-    }
-
-    public function getTotalShippingCostAttribute()
-    {
-        return round($this->quantity * $this->shipping_cost, 3) ?? 0;
     }
 }

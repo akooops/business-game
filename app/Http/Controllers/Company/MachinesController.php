@@ -29,7 +29,7 @@ class MachinesController extends Controller
         $page = IndexService::checkPageIfNull($request->query('page', 1));
 
         $company = $request->company;   
-        $machines = $company->companyMachines()->with(['machine', 'machine.outputs', 'machine.outputs.product', 'machine.employeeProfile', 'employee', 'ongoingProductionOrder', 'ongoingProductionOrder.product'])->latest();
+        $machines = $company->companyMachines()->whereNot('status', CompanyMachine::STATUS_SOLD)->with(['machine', 'machine.outputs', 'machine.outputs.product', 'machine.employeeProfile', 'employee', 'ongoingProductionOrder', 'ongoingProductionOrder.product'])->latest();
 
         $machines = $machines->paginate($perPage, ['*'], 'page', $page);
 

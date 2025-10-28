@@ -171,6 +171,7 @@ class HrService
                 if($employee->companyMachine){
                     $employee->companyMachine->update([
                         'employee_id' => null,
+                        'status' => CompanyMachine::STATUS_INACTIVE,
                     ]);
 
                     $productionOrders = ProductionOrder::where([
@@ -224,9 +225,12 @@ class HrService
         ]);
 
         // Remove the employee from the machine
-        $employee->companyMachine->update([
-            'employee_id' => null,
-        ]);
+        if($employee->companyMachine){
+            $employee->companyMachine->update([
+                'employee_id' => null,
+            ]);
+        }
+
 
         // Decrease the mood of the other employees
         $companyEmployees = $employee->company->employees()->where('status', Employee::STATUS_ACTIVE)->get();

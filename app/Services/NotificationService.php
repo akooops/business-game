@@ -127,9 +127,6 @@ class NotificationService
         
         // Build detailed message
         $message = "New demand for {$totalSales} product(s):\n";
-        foreach($salesData as $data) {
-            $message .= "• {$data['product']->name}: {$data['quantity']} units to {$data['wilaya']}\n";
-        }
         
         return Notification::create([
             'type' => Notification::TYPE_SALE_INITIATED,
@@ -146,9 +143,6 @@ class NotificationService
         
         // Build detailed message
         $message = "{$totalCancelled} sale(s) cancelled due to time limit:\n";
-        foreach($cancelledData as $data) {
-            $message .= "• {$data['product']->name}: {$data['quantity']} units to {$data['wilaya']}\n";
-        }
         
         return Notification::create([
             'type' => Notification::TYPE_SALE_CANCELLED,

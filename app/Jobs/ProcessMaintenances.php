@@ -2,25 +2,38 @@
 
 namespace App\Jobs;
 
+use App\Models\Company;
+use App\Services\MaintenanceService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 
 class ProcessMaintenances implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * Execute the job.
-     */
+    public $companyId;
+
+    public function __construct($companyId)
+    {
+        $this->companyId = $companyId;
+    }
+
     public function handle(): void
     {
-        Log::info('Processing maintenances...');
-        Artisan::call('game:process-maintenances');
+        $company = Company::find($this->companyId);
+        
+        if (!$company) {
+            Log::warning("Company {$this->companyId} not found for maintenances processing");
+            return;
+        }
+
+        Log::info("Processing maintenances for company: {$company->name}");
+        
+        MaintenanceService::completeMaintenance($company);
     }
 }
 

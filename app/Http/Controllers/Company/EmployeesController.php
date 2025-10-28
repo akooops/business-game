@@ -24,7 +24,7 @@ class EmployeesController extends Controller
         if($status){
             $employees->where('status', $status);
         }else{
-            $employees->whereNotIn('status', [Employee::STATUS_APPLIED]);
+            $employees->where('status', Employee::STATUS_ACTIVE);
         }
 
         $employees = $employees->paginate($perPage, ['*'], 'page', $page);

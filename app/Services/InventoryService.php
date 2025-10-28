@@ -119,15 +119,17 @@ class InventoryService
 
             $totalCost = $product->storage_cost * $leftAvailableStock;
             
-            FinanceService::payInventoryCosts($company, $product, $totalCost);
-            NotificationService::createInventoryCostsPaidNotification($company, $product, $leftAvailableStock, $totalCost);
+            if($totalCost > 0){
+                FinanceService::payInventoryCosts($company, $product, $totalCost);
+                NotificationService::createInventoryCostsPaidNotification($company, $product, $leftAvailableStock, $totalCost);
+            }
         }
     }
 
     //-------------------------------------
     // Sales
     //-------------------------------------
-    public static function saleConfirmed($sale){
+    public static function saleDelivered($sale){
         $company = $sale->company;
         $product = $sale->product;
         $quantity = $sale->quantity;

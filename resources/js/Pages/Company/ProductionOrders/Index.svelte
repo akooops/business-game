@@ -181,14 +181,6 @@
         }
     }
 
-    // Calculate estimated completion date
-    function getEstimatedCompletionDate(productionOrder) {
-        const startDate = new Date(productionOrder.started_at);
-        const completionDate = new Date(startDate);
-        completionDate.setDate(startDate.getDate() + productionOrder.time_to_complete);
-        return completionDate.toISOString();
-    }
-
     onMount(() => {
         fetchProductionOrders();
         fetchInterval = setInterval(fetchProductionOrders, 60000);
@@ -238,7 +230,7 @@
                     {#if loading}
                         <!-- Loading skeleton -->
                         <div class="p-6">
-                            <div class="grid grid-cols-1 gap-6 p-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
                                 {#each Array(10) as _, i}
                                     <div class="kt-card animate-pulse">
                                         <div class="kt-card-header justify-start bg-muted/70 gap-9 h-auto py-5">
@@ -287,7 +279,7 @@
                     {:else}
                         <!-- Production Orders Grid -->
                         <div class="p-6">
-                            <div class="grid grid-cols-1 gap-6 p-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
                                 {#each productionOrders as productionOrder}
                                     <div class="kt-card kt-card-hover cursor-pointer" on:click={() => openProductionOrderDrawer(productionOrder)}>
                                         <div class="kt-card-header justify-start bg-muted/70 gap-9 h-auto py-5">
@@ -328,10 +320,10 @@
                                             {#if productionOrder.status === 'in_progress' && productionOrder.time_to_complete}
                                             <div class="flex flex-col gap-1.5">
                                                 <span class="text-xs font-normal text-secondary-foreground">
-                                                    Est. Completion
+                                                    Time needed
                                                 </span>
                                                 <span class="text-sm font-medium text-mono">
-                                                    {formatTimestamp(getEstimatedCompletionDate(productionOrder))}
+                                                    {productionOrder.time_to_complete} days
                                                 </span>
                                             </div>
                                             {/if}
@@ -552,14 +544,14 @@
                             </span>
                         </div>
                     </div>
-                    {#if selectedProductionOrder.status === 'in_progress' && selectedProductionOrder.time_to_complete}
+                    {#if selectedProductionOrder.status === 'in_progress'}
                         <div class="flex items-center gap-2.5">
                             <span class="text-xs font-normal text-foreground min-w-14 xl:min-w-24 shrink-0">
-                                Est. Completion
+                                Time needed
                             </span>
                             <div>
                                 <span class="text-xs font-medium text-foreground">
-                                    {formatDate(getEstimatedCompletionDate(selectedProductionOrder))}
+                                    {selectedProductionOrder.time_to_complete} days
                                 </span>
                             </div>
                         </div>
