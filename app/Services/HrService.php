@@ -6,6 +6,7 @@ use App\Models\CompanyMachine;
 use App\Models\Employee;
 use App\Models\ProductionOrder;
 use App\Services\SettingsService;
+use Illuminate\Support\Facades\DB;
 
 class HrService
 {
@@ -147,16 +148,18 @@ class HrService
         return $fullName;
     }
 
-    public static function recruitEmployee($employee){    
-        // Recruit the employee
-        $employee->update([
-            'status' => Employee::STATUS_ACTIVE,
-            'hired_at' => SettingsService::getCurrentTimestamp(),
-        ]);
+    public static function recruitEmployee($employee){
+        DB::transaction(function () use ($employee) {
+            // Recruit the employee
+            $employee->update([
+                'status' => Employee::STATUS_ACTIVE,
+                'hired_at' => SettingsService::getCurrentTimestamp(),
+            ]);
 
-        // Pay the recruitment cost
-        FinanceService::payEmployeeRecruitmentCost($employee->company, $employee);
-        NotificationService::createEmployeeHiredNotification($employee->company, $employee->employeeProfile, $employee);
+            // Pay the recruitment cost
+            FinanceService::payEmployeeRecruitmentCost($employee->company, $employee);
+            NotificationService::createEmployeeHiredNotification($employee->company, $employee->employeeProfile, $employee);
+        });
     }
 
     public static function paySalaries($company){

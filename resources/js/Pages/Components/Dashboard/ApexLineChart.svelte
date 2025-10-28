@@ -151,13 +151,12 @@
         {/if}
     </div>
     
-    <div class="kt-card-content">
+    <div class="kt-card-content relative">
+        <div bind:this={chartContainer}></div>
         {#if loading}
-            <div class="flex items-center justify-center" style="height: {height}px;">
+            <div class="absolute inset-0 flex items-center justify-center bg-white/80" style="height: {height}px;">
                 <div class="kt-skeleton w-full h-full rounded"></div>
             </div>
-        {:else}
-            <div bind:this={chartContainer}></div>
         {/if}
     </div>
 </div>

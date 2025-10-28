@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Purchase;
 use App\Models\SupplierProduct;
+use Illuminate\Support\Facades\DB;
 
 class ProcurementService
 {
@@ -55,53 +56,55 @@ class ProcurementService
 
     // Initiate a purchase
     public static function purchase($company, $supplier, $product, $quantity){
-        // Get the supplier product
-        $supplierProduct = SupplierProduct::where([
-            'supplier_id' => $supplier->id, 
-            'product_id' => $product->id
-        ])->first();
+        DB::transaction(function () use ($company, $supplier, $product, $quantity) {
+            // Get the supplier product
+            $supplierProduct = SupplierProduct::where([
+                'supplier_id' => $supplier->id, 
+                'product_id' => $product->id
+            ])->first();
 
-        // Get the real sale price of the product
-        $salePrice = $supplierProduct->real_sale_price;
+            // Get the real sale price of the product
+            $salePrice = $supplierProduct->real_sale_price;
 
-        // Get the real shipping cost of the supplier
-        $shippingCost = $supplier->real_shipping_cost;
+            // Get the real shipping cost of the supplier
+            $shippingCost = $supplier->real_shipping_cost;
 
-        // Get the customs duties rate of the supplier
-        $customsDuties = 0;
-        if($supplier->country && $supplier->country->customs_duties_rate > 0) {
-            $customsDuties = $supplier->country->customs_duties_rate;
-        }
+            // Get the customs duties rate of the supplier
+            $customsDuties = 0;
+            if($supplier->country && $supplier->country->customs_duties_rate > 0) {
+                $customsDuties = $supplier->country->customs_duties_rate;
+            }
 
-        // Calculate the total cost of the product
-        $totalCost = self::calcaulteTotalCost($supplier, $product, $quantity);
+            // Calculate the total cost of the product
+            $totalCost = self::calcaulteTotalCost($supplier, $product, $quantity);
 
-        // Get current timestamp
-        $orderedAt = SettingsService::getCurrentTimestamp();
+            // Get current timestamp
+            $orderedAt = SettingsService::getCurrentTimestamp();
 
-        // Create purchase
-        $purchase = Purchase::create([
-            'quantity' => $quantity,
-            'sale_price' => $salePrice,
-            'shipping_cost' => $shippingCost,
-            'customs_duties' => $customsDuties,
-            'total_cost' => $totalCost,
-            'carbon_footprint' => $supplier->carbon_footprint,
-            'shipping_time_days' => $supplier->real_shipping_time_days,
-            'status' => Purchase::STATUS_ORDERED,
-            'ordered_at' => $orderedAt,
-            'company_id' => $company->id,
-            'supplier_id' => $supplier->id,
-            'product_id' => $product->id,
-        ]);
+            // Create purchase
+            $purchase = Purchase::create([
+                'quantity' => $quantity,
+                'sale_price' => $salePrice,
+                'shipping_cost' => $shippingCost,
+                'customs_duties' => $customsDuties,
+                'total_cost' => $totalCost,
+                'carbon_footprint' => $supplier->carbon_footprint,
+                'shipping_time_days' => $supplier->real_shipping_time_days,
+                'status' => Purchase::STATUS_ORDERED,
+                'ordered_at' => $orderedAt,
+                'company_id' => $company->id,
+                'supplier_id' => $supplier->id,
+                'product_id' => $product->id,
+            ]);
 
-        // Release carbon footprint
-        $carbonFootprint = $supplier->carbon_footprint;
-        PollutionService::releaseCarbonFootprint($company, $carbonFootprint);
+            // Release carbon footprint
+            $carbonFootprint = $supplier->carbon_footprint;
+            PollutionService::releaseCarbonFootprint($company, $carbonFootprint);
 
-        // Pay for the purchase
-        FinanceService::payPurchase($company, $purchase);
-        NotificationService::createPurchaseOrderedNotification($company, $purchase, $supplier, $product, $quantity);
+            // Pay for the purchase
+            FinanceService::payPurchase($company, $purchase);
+            NotificationService::createPurchaseOrderedNotification($company, $purchase, $supplier, $product, $quantity);
+        });
     }   
 
     public static function processDeliveredPurchase($company){

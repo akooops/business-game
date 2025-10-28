@@ -7,6 +7,7 @@ use App\Models\Machine;
 use App\Models\CompanyMachine;
 use App\Models\Maintenance;
 use App\Models\ProductionOrder;
+use Illuminate\Support\Facades\DB;
 
 class ProductionService
 {
@@ -53,55 +54,57 @@ class ProductionService
     }
 
     public static function startProduction($companyMachine, $product, $quantity){
-        $machine = $companyMachine->machine;
+        DB::transaction(function () use ($companyMachine, $product, $quantity) {
+            $machine = $companyMachine->machine;
 
-        $realSpeed = $companyMachine->speed;
-        $realSpeed = $realSpeed * $companyMachine->employee_efficiency_factor;
+            $realSpeed = $companyMachine->speed;
+            $realSpeed = $realSpeed * $companyMachine->employee_efficiency_factor;
 
-        if($realSpeed < $machine->min_speed){
-            $realSpeed = $machine->min_speed;
-        }
+            if($realSpeed < $machine->min_speed){
+                $realSpeed = $machine->min_speed;
+            }
 
-        if($realSpeed > $machine->max_speed){
-            $realSpeed = $machine->max_speed;
-        }
+            if($realSpeed > $machine->max_speed){
+                $realSpeed = $machine->max_speed;
+            }
 
-        $timeToComplete = $quantity / $realSpeed;
+            $timeToComplete = $quantity / $realSpeed;
 
-        if($timeToComplete < 1){
-            $timeToComplete = 1;
-        }
+            if($timeToComplete < 1){
+                $timeToComplete = 1;
+            }
 
-        
-        $productionOrder = ProductionOrder::create([
-            'quantity' => $quantity,
-            'time_to_complete' => $timeToComplete,
-            'quality_factor' => $companyMachine->quality_factor,
-            'employee_efficiency_factor' => $companyMachine->employee->efficiency_factor,
-            'carbon_footprint' => $companyMachine->carbon_footprint,
-            'status' => ProductionOrder::STATUS_IN_PROGRESS,
-            'started_at' => SettingsService::getCurrentTimestamp(),
-            'company_machine_id' => $companyMachine->id,
-            'product_id' => $product->id,
-        ]);
+            
+            $productionOrder = ProductionOrder::create([
+                'quantity' => $quantity,
+                'time_to_complete' => $timeToComplete,
+                'quality_factor' => $companyMachine->quality_factor,
+                'employee_efficiency_factor' => $companyMachine->employee->efficiency_factor,
+                'carbon_footprint' => $companyMachine->carbon_footprint,
+                'status' => ProductionOrder::STATUS_IN_PROGRESS,
+                'started_at' => SettingsService::getCurrentTimestamp(),
+                'company_machine_id' => $companyMachine->id,
+                'product_id' => $product->id,
+            ]);
 
-        $companyMachine->update([
-            'status' => CompanyMachine::STATUS_ACTIVE,
-        ]);
-        
-        $productRecipes = $product->recipes;
+            $companyMachine->update([
+                'status' => CompanyMachine::STATUS_ACTIVE,
+            ]);
+            
+            $productRecipes = $product->recipes;
 
-        foreach($productRecipes as $recipe){
-            $material = $recipe->material;
-            $requiredQuantity = $recipe->quantity * $quantity;
+            foreach($productRecipes as $recipe){
+                $material = $recipe->material;
+                $requiredQuantity = $recipe->quantity * $quantity;
 
-            InventoryService::productionStarted($productionOrder, $material, $requiredQuantity);
-        }
+                InventoryService::productionStarted($productionOrder, $material, $requiredQuantity);
+            }
 
-        $carbonFootprint = $companyMachine->carbon_footprint * $quantity;
-        PollutionService::releaseCarbonFootprint($companyMachine->company, $carbonFootprint);
+            $carbonFootprint = $companyMachine->carbon_footprint * $quantity;
+            PollutionService::releaseCarbonFootprint($companyMachine->company, $carbonFootprint);
 
-        NotificationService::createMachineProductionStartedNotification($companyMachine->company, $companyMachine->machine, $product, $quantity);
+            NotificationService::createMachineProductionStartedNotification($companyMachine->company, $companyMachine->machine, $product, $quantity);
+        });
     }
 
     public static function completeProduction($company){

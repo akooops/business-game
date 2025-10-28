@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Sale;
 use App\Models\Wilaya;
+use Illuminate\Support\Facades\DB;
 
 class SalesService
 {
@@ -125,22 +126,24 @@ class SalesService
 
     // Confirm a sale
     public static function confirmSale($sale){
-        // Get current timestamp
-        $deliveredAt = SettingsService::getCurrentTimestamp();
+        DB::transaction(function () use ($sale) {
+            // Get current timestamp
+            $deliveredAt = SettingsService::getCurrentTimestamp();
 
-        $sale->update([
-            'status' => Sale::STATUS_DELIVERED,
-            'delivered_at' => $deliveredAt,
-        ]);
+            $sale->update([
+                'status' => Sale::STATUS_DELIVERED,
+                'delivered_at' => $deliveredAt,
+            ]);
 
-        // Update the inventory
-        InventoryService::saleDelivered($sale);
+            // Update the inventory
+            InventoryService::saleDelivered($sale);
 
-        // Receive the sale payment
-        FinanceService::receiveSalePayment($sale->company, $sale);
+            // Receive the sale payment
+            FinanceService::receiveSalePayment($sale->company, $sale);
 
-        // Create notification
-        NotificationService::createSaleDeliveredNotification($sale->company, $sale, $sale->product, $sale->quantity);
+            // Create notification
+            NotificationService::createSaleDeliveredNotification($sale->company, $sale, $sale->product, $sale->quantity);
+        });
     }
 
     // Cancel sales that have exceeded their time limit

@@ -15,9 +15,7 @@ class FinanceService
     // Technologies
     //-------------------------------------
     public static function payTechnologyResearch($company, $technology){
-        $funds = $company->funds;
-        $funds -= $technology->research_cost;
-        $company->update(['funds' => $funds]);
+        $company->decrement('funds', $technology->research_cost);
 
         Transaction::create([
             'company_id' => $company->id,
@@ -26,16 +24,14 @@ class FinanceService
             'transaction_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
-        return $funds;  
+        return $company->fresh()->funds;  
     }
 
     //-------------------------------------
     // Purchases
     //-------------------------------------
     public static function payPurchase($company, $purchase){
-        $funds = $company->funds;
-        $funds -= $purchase->total_cost;
-        $company->update(['funds' => $funds]);
+        $company->decrement('funds', $purchase->total_cost);
 
         Transaction::create([
             'company_id' => $company->id,
@@ -45,22 +41,20 @@ class FinanceService
         ]);
 
 
-        return $funds;
+        return $company->fresh()->funds;
     }
 
     //-------------------------------------
     // Inventory
     //-------------------------------------
     public static function payInventoryCosts($company, $product, $totalCost){
-        if($totalCost > $company->funds){
+        if($totalCost > $company->fresh()->funds){
             $randomBank = Bank::inRandomOrder()->first();
 
             LoansService::borrowMoney($company, $randomBank, $totalCost, "inventory costs");
         }
 
-        $funds = $company->funds;
-        $funds -= $totalCost;
-        $company->update(['funds' => $funds]);
+        $company->decrement('funds', $totalCost);
 
         Transaction::create([
             'company_id' => $company->id,
@@ -69,13 +63,11 @@ class FinanceService
             'transaction_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
-        return $funds;
+        return $company->fresh()->funds;
     }
 
     public static function receiveSalePayment($company, $sale){
-        $funds = $company->funds;
-        $funds += $sale->sale_price * $sale->quantity;
-        $company->update(['funds' => $funds]);
+        $company->increment('funds', $sale->sale_price * $sale->quantity);
 
         Transaction::create([
             'company_id' => $company->id,
@@ -84,16 +76,14 @@ class FinanceService
             'transaction_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
-        return $funds;
+        return $company->fresh()->funds;
     }
 
     //-------------------------------------
     // Employees
     //-------------------------------------
     public static function payEmployeeRecruitmentCost($company, $employee){
-        $funds = $company->funds;
-        $funds -= $employee->recruitment_cost;
-        $company->update(['funds' => $funds]);
+        $company->decrement('funds', $employee->recruitment_cost);
 
         Transaction::create([
             'company_id' => $company->id,
@@ -102,19 +92,17 @@ class FinanceService
             'transaction_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
-        return $funds;
+        return $company->fresh()->funds;
     }
 
     public static function payEmployeesSalary($company, $totalSalaries){
-        if($totalSalaries > $company->funds){
+        if($totalSalaries > $company->fresh()->funds){
             $randomBank = Bank::inRandomOrder()->first();
 
             LoansService::borrowMoney($company, $randomBank, $totalSalaries, "employee salaries");
         }
 
-        $funds = $company->funds;
-        $funds -= $totalSalaries;
-        $company->update(['funds' => $funds]);
+        $company->decrement('funds', $totalSalaries);
 
         Transaction::create([
             'company_id' => $company->id,
@@ -123,16 +111,14 @@ class FinanceService
             'transaction_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
-        return $funds;
+        return $company->fresh()->funds;
     }   
 
     //-------------------------------------
     // Machines
     //-------------------------------------
     public static function payMachineSetupCost($company, $machine){
-        $funds = $company->funds;
-        $funds -= $machine->cost_to_acquire;
-        $company->update(['funds' => $funds]);
+        $company->decrement('funds', $machine->cost_to_acquire);
 
         Transaction::create([
             'company_id' => $company->id,
@@ -141,19 +127,17 @@ class FinanceService
             'transaction_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
-        return $funds;
+        return $company->fresh()->funds;
     }
 
     public static function payMachineOperationCost($company, $totalCost){
-        if($totalCost > $company->funds){
+        if($totalCost > $company->fresh()->funds){
             $randomBank = Bank::inRandomOrder()->first();
 
             LoansService::borrowMoney($company, $randomBank, $totalCost, "machine operation costs");
         }
 
-        $funds = $company->funds;
-        $funds -= $totalCost;
-        $company->update(['funds' => $funds]);
+        $company->decrement('funds', $totalCost);
 
         Transaction::create([
             'company_id' => $company->id,
@@ -162,16 +146,14 @@ class FinanceService
             'transaction_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
-        return $funds;
+        return $company->fresh()->funds;
     }
 
     //-------------------------------------
     // Maintenance
     //-------------------------------------
     public static function payMaintenanceCost($company, $maintenance){
-        $funds = $company->funds;
-        $funds -= $maintenance->maintenances_cost;
-        $company->update(['funds' => $funds]);
+        $company->decrement('funds', $maintenance->maintenances_cost);
 
         Transaction::create([
             'company_id' => $company->id,
@@ -180,18 +162,15 @@ class FinanceService
             'transaction_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
-        return $funds;
+        return $company->fresh()->funds;
     }
 
     //-------------------------------------
     // Loans
     //-------------------------------------
     public static function receiveLoan($company, $loanAmount, $loanId = null){
-        $funds = $company->funds;
-        $funds += $loanAmount;
-        $unpaidLoans = $company->unpaid_loans;
-        $unpaidLoans += $loanAmount;
-        $company->update(['funds' => $funds, 'unpaid_loans' => $unpaidLoans]);
+        $company->increment('funds', $loanAmount);
+        $company->increment('unpaid_loans', $loanAmount);
 
         Transaction::create([
             'company_id' => $company->id,
@@ -200,15 +179,12 @@ class FinanceService
             'transaction_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
-        return $funds;
+        return $company->fresh()->funds;
     }
 
     public static function payLoan($company, $paymentAmount){
-        $funds = $company->funds;
-        $funds -= $paymentAmount;
-        $unpaidLoans = $company->unpaid_loans;
-        $unpaidLoans -= $paymentAmount;
-        $company->update(['funds' => $funds, 'unpaid_loans' => $unpaidLoans]);
+        $company->decrement('funds', $paymentAmount);
+        $company->decrement('unpaid_loans', $paymentAmount);
 
         Transaction::create([
             'company_id' => $company->id,
@@ -217,17 +193,14 @@ class FinanceService
             'transaction_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
-        return $funds;
+        return $company->fresh()->funds;
     }
 
     //-------------------------------------
     // Machines
     //-------------------------------------
     public static function receiveMachineSale($company, $soldPrice){
-        $funds = $company->funds;
-        $funds += $soldPrice;
-        
-        $company->update(['funds' => $funds]);
+        $company->increment('funds', $soldPrice);
 
         Transaction::create([
             'company_id' => $company->id,
@@ -236,16 +209,14 @@ class FinanceService
             'transaction_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
-        return $funds;
+        return $company->fresh()->funds;
     }
 
     //-------------------------------------
     // Advertisers
     //-------------------------------------
     public static function payAdPackage($company, $ad){
-        $funds = $company->funds;
-        $funds -= $ad->price;
-        $company->update(['funds' => $funds]);
+        $company->decrement('funds', $ad->price);
 
         Transaction::create([
             'company_id' => $company->id,
@@ -254,6 +225,6 @@ class FinanceService
             'transaction_at' => SettingsService::getCurrentTimestamp(),
         ]);
 
-        return $funds;
+        return $company->fresh()->funds;
     }
 }
