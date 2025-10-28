@@ -274,7 +274,7 @@
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
                                     {#each getTechnologiesByLevel(level) as technology}
-                                        {#if technology.is_researched}
+                                        {#if companyTechMap[technology.id]}
                                             <!-- CompanyTechnologyCard (researched) -->
                                             <div class="kt-card kt-card-hover cursor-pointer border-green-400 border-2" on:click={() => openCompanyTechnologyDrawer(companyTechMap[technology.id])}>
                                                 <div class="kt-card-body p-4">
@@ -296,32 +296,32 @@
                                                         <div class="flex items-center justify-between mb-2">
                                                             <span class="text-xs font-medium text-muted-foreground">Status</span>
                                                             <span class="kt-badge kt-badge-primary kt-badge-sm text-white">
-                                                                {companyTechMap[technology.id].is_researching ? 'Researching' : 'Completed'}
+                                                                {companyTechMap[technology.id]?.is_researching ? 'Researching' : 'Completed'}
                                                             </span>
                                                         </div>
                                                         <div class="w-full bg-gray-200 rounded-full h-2">
                                                             <div class="kt-progress kt-progress-primary">
-                                                                <div class="kt-progress-indicator" style="width: {companyTechMap[technology.id].research_progress}%"></div>
+                                                                <div class="kt-progress-indicator" style="width: {companyTechMap[technology.id]?.research_progress || 0}%"></div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="text-xs text-muted-foreground space-y-1">
                                                         <div class="flex justify-between">
                                                             <span>Paid Cost:</span>
-                                                            <span class="font-medium">DZD {companyTechMap[technology.id].research_cost}</span>
+                                                            <span class="font-medium">DZD {companyTechMap[technology.id]?.research_cost}</span>
                                                         </div>
                                                         <div class="flex justify-between">
                                                             <span>Research Time:</span>
-                                                            <span class="font-medium">{companyTechMap[technology.id].research_time_days} days</span>
+                                                            <span class="font-medium">{companyTechMap[technology.id]?.research_time_days} days</span>
                                                         </div>
                                                         <div class="flex justify-between">
                                                             <span>Started:</span>
-                                                            <span class="font-medium">{formatTimestamp(companyTechMap[technology.id].started_at)}</span>
+                                                            <span class="font-medium">{formatTimestamp(companyTechMap[technology.id]?.started_at)}</span>
                                                         </div>
-                                                        {#if !companyTechMap[technology.id].is_researching}
+                                                        {#if !companyTechMap[technology.id]?.is_researching}
                                                             <div class="flex justify-between">
                                                                 <span>Completed:</span>
-                                                                <span class="font-medium">{formatTimestamp(companyTechMap[technology.id].completed_at)}</span>
+                                                                <span class="font-medium">{formatTimestamp(companyTechMap[technology.id]?.completed_at)}</span>
                                                             </div>
                                                         {/if}
                                                     </div>

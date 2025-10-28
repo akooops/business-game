@@ -36,18 +36,4 @@ class UpdateProductRecipeRequest extends FormRequest
             'quantity' => 'quantity',
         ];
     }
-
-    /**
-     * Get custom validation messages.
-     *
-     * @return array
-     */
-    public function messages(): array
-    {
-        return [
-            'quantity.min' => 'Quantity must be greater than 0.',
-        ];
-    }
-        ];
-    }
 } 

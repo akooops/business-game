@@ -51,7 +51,7 @@ class HrService
             $efficiency_factor = $base_efficiency * $factor;
 
             $employee = Employee::create([
-                'name' => self::getRandomName(),
+                'name' => self::getRandomName($company),
                 'salary_month' => $realSalary,
                 'recruitment_cost' => $realRecruitmentCost,
                 'current_mood' => 1,
@@ -87,17 +87,64 @@ class HrService
         return $realRecruitmentCost;
     }
 
-    public static function getRandomName(){
-        $names = [
-            // Male names
+    public static function getRandomName($company){
+        $firstNames = [
+            // Male first names
             'Ahmed', 'Mohammed', 'Ali', 'Omar', 'Youssef', 'Karim', 'Samir', 'Nabil', 'Rachid', 'Hassan',
             'Abdelkader', 'Mustapha', 'Said', 'Brahim', 'Djamel', 'Farid', 'Hakim', 'Ibrahim', 'Jamal', 'Khalil',
             'Lamine', 'Malik', 'Nassim', 'Oussama', 'Riyad', 'Sofiane', 'Tarek', 'Wassim', 'Yacine', 'Zakaria',
             'Adel', 'Bilal', 'Chakib', 'Djamal', 'El Hadi', 'Fares', 'Ghassan', 'Hamza', 'Idris', 'Jawad',
-            'Kais', 'Lyes', 'Mounir', 'Nadir', 'Othman', 'Pascal', 'Qassim', 'Rachid', 'Salah', 'Tayeb'
+            'Kais', 'Lyes', 'Mounir', 'Nadir', 'Othman', 'Pascal', 'Qassim', 'Salah', 'Tayeb', 'Amine',
+            'Mehdi', 'Reda', 'Ramzi', 'Slimane', 'Hicham', 'Yazid', 'Walid', 'Nour', 'Aymen', 'Aziz',
+            'Abderrahmane', 'Abdelaziz', 'Abdelmalek', 'Abdenour', 'Abderrahim', 'Akram', 'Anes', 'Anis', 'Ayman', 'Badis',
+            'Billel', 'Boudjemaa', 'Boualem', 'Chouaib', 'Chafik', 'Djallil', 'Elias', 'Farouk', 'Fayçal', 'Fouad',
+            'Hocine', 'Houssam', 'Ishak', 'Ilyes', 'Imad', 'Ismail', 'Jugurtha', 'Khaled', 'Larbi', 'Lounis',
+            'Malek', 'Massinissa', 'Mourad', 'Nasser', 'Rafik', 'Raouf', 'Samy', 'Sami', 'Seif', 'Smail',
+            'Tahar', 'Toufik', 'Yanis', 'Yasser', 'Younes', 'Zinedine', 'Zoheir', 'Zaki',
+            // Female first names
+            'Amina', 'Fatima', 'Aicha', 'Khadija', 'Hafsa', 'Maryam', 'Salma', 'Yasmine', 'Leila', 'Nadia',
+            'Samia', 'Soraya', 'Souad', 'Malika', 'Karima', 'Farida', 'Naima', 'Latifa', 'Zohra', 'Houria',
+            'Sabrina', 'Sarah', 'Siham', 'Widad', 'Zahra', 'Zineb', 'Asma', 'Hanane', 'Ikram', 'Imane',
+            'Lamia', 'Nour', 'Rania', 'Sabah', 'Soumia', 'Wassila', 'Yamina', 'Meriem', 'Lydia', 'Kahina',
+            'Dalila', 'Djamila', 'Fadila', 'Ghania', 'Habiba', 'Hayat', 'Louisa', 'Lynda', 'Nawel', 'Nesrine',
+            'Ouarda', 'Rachida', 'Razika', 'Rima', 'Selma', 'Sonia', 'Wafa', 'Wardia', 'Zoulikha', 'Amira'
+        ];
+
+        $lastNames = [
+            'Benali', 'Benamar', 'Bensaid', 'Benyoucef', 'Boukhari', 'Boumediene', 'Brahimi', 'Cherif', 'Djelloul', 'Hamidi',
+            'Haddad', 'Kaddour', 'Madani', 'Mansouri', 'Mebarki', 'Mekki', 'Mokrani', 'Ould', 'Rahmani', 'Saadi',
+            'Slimani', 'Toumi', 'Youcef', 'Ziani', 'Abdelkader', 'Abdi', 'Adel', 'Aissa', 'Amari', 'Amrani',
+            'Arabi', 'Azzouz', 'Bachir', 'Baddou', 'Bahri', 'Bakir', 'Belhadj', 'Belgacem', 'Belkacem', 'Belloumi',
+            'Belmehdi', 'Belounis', 'Bencheikh', 'Bendjelloul', 'Benkhaled', 'Benmehdi', 'Benmokhtar', 'Bensalem', 'Bentahar', 'Benziane',
+            'Berber', 'Boudjenah', 'Bouguerra', 'Bouhafs', 'Boukhelifa', 'Boulahdour', 'Boulmerka', 'Boussouf', 'Chaoui', 'Charef',
+            'Cheikh', 'Cherifi', 'Dahmani', 'Daoudi', 'Djaballah', 'Drici', 'Fares', 'Fellah', 'Ghali', 'Ghezali',
+            'Guechi', 'Guellil', 'Guenifi', 'Guerrouj', 'Hadjadj', 'Hamdani', 'Hammoudi', 'Hamza', 'Hannachi', 'Hassani',
+            'Heddam', 'Idrissi', 'Kacimi', 'Kahoul', 'Kamel', 'Kechida', 'Khelifi', 'Khemisti', 'Khiari', 'Labed',
+            'Lachhab', 'Lakhdar', 'Lamari', 'Louail', 'Mabrouk', 'Mahmoudi', 'Mammeri', 'Mazouz', 'Mebarkia', 'Mehenni',
+            'Mekideche', 'Merabet', 'Meziane', 'Mokhtar', 'Mostefa', 'Nabi', 'Nacer', 'Nadir', 'Ouadah', 'Oulmi',
+            'Sahraoui', 'Sakri', 'Salhi', 'Saoudi', 'Seddik', 'Sedrati', 'Seghir', 'Taleb', 'Tlemcani', 'Zerrouki'
         ];
         
-        return $names[array_rand($names)];
+        // Get all existing employee names in this company
+        $existingNames = $company->employees()->pluck('name')->toArray();
+        
+        // Try to generate a unique name (max 100 attempts to avoid infinite loop)
+        $maxAttempts = 100;
+        $attempts = 0;
+        
+        do {
+            $firstName = $firstNames[array_rand($firstNames)];
+            $lastName = $lastNames[array_rand($lastNames)];
+            $fullName = $firstName . ' ' . $lastName;
+            $attempts++;
+            
+            // If we've tried too many times, just return the name (very unlikely to happen)
+            if ($attempts >= $maxAttempts) {
+                break;
+            }
+        } while (in_array($fullName, $existingNames));
+        
+        return $fullName;
     }
 
     public static function recruitEmployee($employee){    

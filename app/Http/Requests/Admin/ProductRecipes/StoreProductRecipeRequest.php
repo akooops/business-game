@@ -48,20 +48,4 @@ class StoreProductRecipeRequest extends FormRequest
             'quantity' => 'quantity',
         ];
     }
-
-    /**
-     * Get custom validation messages.
-     *
-     * @return array
-     */
-    public function messages(): array
-    {
-        return [
-            'material_id.unique' => 'This material is already in the recipe.',
-            'material_id.different' => 'A product cannot be a material of itself.',
-            'quantity.min' => 'Quantity must be greater than 0.',
-        ];
-    }
-        ];
-    }
 } 
