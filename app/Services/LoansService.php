@@ -47,20 +47,21 @@ class LoansService
             ->get();
 
         foreach($loans as $loan){
-            $loan->update(['remaining_amount' => $loan->remaining_amount - $loan->monthly_payment]);
-
+            $paymentAmount = min($loan->monthly_payment, $loan->remaining_amount);
+            $loan->update(['remaining_amount' => $loan->remaining_amount - $paymentAmount]);
+            
             if($loan->remaining_amount <= 0){
                 $loan->update([
                     'paid_at' => $currentTimestamp,
                 ]);
             }
 
-            if($company->funds < $loan->monthly_payment){
+            if($company->funds < $paymentAmount){
                 $randomBank = Bank::inRandomOrder()->first();
-                self::borrowMoney($company, $randomBank, $loan->monthly_payment, "existing monthly loan payments");
+                self::borrowMoney($company, $randomBank, $paymentAmount, "existing monthly loan payments");
             }
 
-            FinanceService::payLoan($company, $loan->monthly_payment);
+            FinanceService::payLoan($company, $paymentAmount);
             NotificationService::createLoanPaidNotification($company, $loan);
         }
     }
