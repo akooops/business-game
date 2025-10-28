@@ -16,12 +16,14 @@ class BanksController extends Controller
     {
         $banks = Bank::latest();       
 
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'banks' => $banks->get(),
             ]);
         }
 
-        return inertia('Company/Banks/Index');
+        return inertia('Company/Banks/Index', [
+            'banks' => $banks->get()
+        ]);
     }
 }

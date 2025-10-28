@@ -21,18 +21,21 @@ class PurchasesController extends Controller
         $purchases = $company->purchases()->with('supplier', 'product')->latest();
         $purchases = $purchases->paginate($perPage, ['*'], 'page', $page);
 
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'purchases' => $purchases->items(),
                 'pagination' => IndexService::handlePagination($purchases)
             ]);
         }
 
-        return inertia('Company/Purchases/Index');
+        return inertia('Company/Purchases/Index', [
+            'purchases' => $purchases->items(),
+            'pagination' => IndexService::handlePagination($purchases)
+        ]);
     }
 
     public function purchasePage(Request $request){
-        return inertia('Company/Purchases/PurchasePage');
+        return inertia('Company/Purchases/PurchasePage', []);
     }
 
     public function purchase(PurchaseProductRequest $request){

@@ -34,13 +34,15 @@ class ProductsController extends Controller
             });
         }
 
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'companyProducts' => $products->get(),
             ]);
         }
 
-        return inertia('Company/Products/Index');
+        return inertia('Company/Products/Index', [
+            'companyProducts' => $products->get()
+        ]);
     }
 
     public function fixProductSalePrice(FixProductSalePriceRequest $request, Product $product)

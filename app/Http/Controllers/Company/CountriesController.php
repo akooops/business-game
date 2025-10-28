@@ -32,13 +32,16 @@ class CountriesController extends Controller
 
         $countries = $countries->paginate($perPage, ['*'], 'page', $page);
 
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'countries' => $countries->items(),
                 'pagination' => IndexService::handlePagination($countries)
             ]);
         }
 
-        return inertia('Company/Countries/Index');
+        return inertia('Company/Countries/Index', [
+            'countries' => $countries->items(),
+            'pagination' => IndexService::handlePagination($countries)
+        ]);
     }
 } 

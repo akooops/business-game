@@ -42,14 +42,17 @@ class CompaniesController extends Controller
 
         $companies = $companies->paginate($perPage, ['*'], 'page', $page);
         
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'companies' => $companies->items(),
                 'pagination' => IndexService::handlePagination($companies)
             ]);
         }
 
-        return inertia('Admin/Companies/Index');
+        return inertia('Admin/Companies/Index', [
+            'companies' => $companies->items(),
+            'pagination' => IndexService::handlePagination($companies)
+        ]);
     }
     
     /**

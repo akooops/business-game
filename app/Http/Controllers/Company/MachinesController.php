@@ -33,27 +33,32 @@ class MachinesController extends Controller
 
         $machines = $machines->paginate($perPage, ['*'], 'page', $page);
 
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'machines' => $machines->items(),
                 'pagination' => IndexService::handlePagination($machines)
             ]);
         }
 
-        return inertia('Company/Machines/Index');
+        return inertia('Company/Machines/Index', [
+            'machines' => $machines->items(),
+            'pagination' => IndexService::handlePagination($machines)
+        ]);
     }
 
     public function setupPage(Request $request)
     {
         $machines = Machine::with(['outputs', 'outputs.product', 'employeeProfile'])->latest();
 
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'machines' => $machines->get(),
             ]);
         }
 
-        return inertia('Company/Machines/SetupPage');
+        return inertia('Company/Machines/SetupPage', [
+            'machines' => $machines->get()
+        ]);
     }
 
     public function setup(SetupMachineRequest $request, Machine $machine)

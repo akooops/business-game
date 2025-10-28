@@ -27,14 +27,17 @@ class ProductionOrdersController extends Controller
 
         $productionOrders = $productionOrders->paginate($perPage, ['*'], 'page', $page);
 
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'productionOrders' => $productionOrders->items(),
                 'pagination' => IndexService::handlePagination($productionOrders)
             ]);
         }
 
-        return inertia('Company/ProductionOrders/Index');
+        return inertia('Company/ProductionOrders/Index', [
+            'productionOrders' => $productionOrders->items(),
+            'pagination' => IndexService::handlePagination($productionOrders)
+        ]);
     }
 
     public function produce(ProduceProductRequest $request, CompanyMachine $companyMachine){

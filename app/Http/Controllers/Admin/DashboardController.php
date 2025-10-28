@@ -17,12 +17,14 @@ class DashboardController extends Controller
         $companies = LeaderboardService::getLeaderboard();
     
         // If it's an AJAX request, return JSON
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'companies' => $companies,
             ]);
         }
 
-        return Inertia::render('Admin/Dashboard/Index');
+        return Inertia::render('Admin/Dashboard/Index', [
+            'companies' => $companies
+        ]);
     }
 }

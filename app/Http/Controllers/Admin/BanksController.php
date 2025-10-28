@@ -37,14 +37,17 @@ class BanksController extends Controller
 
         $banks = $banks->paginate($perPage, ['*'], 'page', $page);
 
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'banks' => $banks->items(),
                 'pagination' => IndexService::handlePagination($banks)
             ]);
         }
 
-        return inertia('Admin/Banks/Index');
+        return inertia('Admin/Banks/Index', [
+            'banks' => $banks->items(),
+            'pagination' => IndexService::handlePagination($banks)
+        ]);
     }
     
     /**

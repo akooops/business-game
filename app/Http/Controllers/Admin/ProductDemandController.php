@@ -17,19 +17,25 @@ class ProductDemandController extends Controller
      */
     public function index(Request $request)
     {
+        $productDemands = [];
+        $product = null;
+        
         if($request->has('product_id')){
             $product = Product::findOrFail($request->product_id);
 
-            $productDemands = $product->demands()->latest();
+            $productDemands = $product->demands()->latest()->get();
 
-            if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+            if ($request->expectsJson() && !$request->header('X-Inertia')) {
                 return response()->json([
-                    'productDemands' => $productDemands->get()
+                    'productDemands' => $productDemands
                 ]);
             }
         }
 
-        return inertia('Admin/ProductDemand/Index');
+        return inertia('Admin/ProductDemand/Index', [
+            'productDemands' => $productDemands,
+            'product' => $product
+        ]);
     }
     
     /**

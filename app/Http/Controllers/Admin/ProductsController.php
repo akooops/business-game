@@ -36,14 +36,17 @@ class ProductsController extends Controller
 
         $products = $products->paginate($perPage, ['*'], 'page', $page);
 
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'products' => $products->items(),
                 'pagination' => IndexService::handlePagination($products)
             ]);
         }
 
-        return inertia('Admin/Products/Index');
+        return inertia('Admin/Products/Index', [
+            'products' => $products->items(),
+            'pagination' => IndexService::handlePagination($products)
+        ]);
     }
     
     /**

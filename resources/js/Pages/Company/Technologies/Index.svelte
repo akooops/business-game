@@ -19,12 +19,14 @@
     
     const pageTitle = 'My Technologies';
 
+    // Props from Inertia
+    export let technologies = [];
+    export let companyTechnologies = [];
+    export let maxResearchLevel = 0;
+    export let currentResearchLevel = 0;
+    
     // Reactive variables
-    let technologies = [];
-    let companyTechnologies = [];
-    let maxResearchLevel = 0;
-    let currentResearchLevel = 0;
-    let loading = true;
+    let loading = false;
     let fetchInterval = null;
 
     // Drawer state
@@ -156,7 +158,14 @@
     }
 
     onMount(() => {
-        fetchTechnologies();
+        // Initialize menus
+        tick().then(() => {
+            if (window.KTMenu) {
+                window.KTMenu.init();
+            }
+        });
+        
+        // Set up real-time updates every 60 seconds
         fetchInterval = setInterval(fetchTechnologies, 60000);
     });
     onDestroy(() => {

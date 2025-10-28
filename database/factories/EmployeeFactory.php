@@ -19,7 +19,15 @@ class EmployeeFactory extends Factory
     {
         return [
             'company_id' => Company::factory(),
-            'name' => fake()->name(),
+            // keep legacy name for compatibility, but fill firstname/lastname too
+            'firstname' => fake()->firstName(),
+            'lastname' => fake()->lastName(),
+            'name' => function (array $attrs) {
+                $first = $attrs['firstname'] ?? '';
+                $last = $attrs['lastname'] ?? '';
+                $full = trim($first . ' ' . $last);
+                return $full !== '' ? $full : fake()->name();
+            },
             'salary_month' => fake()->randomFloat(3, 2000, 8000),
             'recruitment_cost' => fake()->randomFloat(3, 1000, 5000),
             'current_mood' => fake()->randomFloat(3, 0.3, 1.0),

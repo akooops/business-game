@@ -19,12 +19,12 @@
     
     const pageTitle = 'Admin Dashboard';
 
-    // Reactive variables
+    // Inertia props for initial data
+    export let companies = [];
     let loading = false;
     let fetchInterval = null;
-    let companies = [];
 
-    // Fetch leaderboard data (for real-time updates)
+    // Background refresh leaderboard data (optional)
     async function fetchLeaderboard() {
         loading = true;
         try {
@@ -33,7 +33,6 @@
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             });
-            
             const data = await response.json();
             companies = data.companies;
         } catch (error) {
@@ -43,10 +42,8 @@
         }
     }
 
+    // Only set up interval for background updates, not initial fetch
     onMount(() => {
-        fetchLeaderboard();
-
-        // Set up real-time updates every 30 seconds
         fetchInterval = setInterval(fetchLeaderboard, 30000);
     });
 
@@ -58,7 +55,6 @@
 
     // Flash message handling
     export let success;
-
     $: if (success) {
         showToast(success, 'success');
     }

@@ -27,14 +27,17 @@ class LoansController extends Controller
 
         $loans = $loans->paginate($perPage, ['*'], 'page', $page);
 
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'loans' => $loans->items(),
                 'pagination' => IndexService::handlePagination($loans)
             ]);
         }
 
-        return inertia('Company/Loans/Index');
+        return inertia('Company/Loans/Index', [
+            'loans' => $loans->items(),
+            'pagination' => IndexService::handlePagination($loans)
+        ]);
     }
 
     public function store(BorrowMoneyRequest $request)

@@ -16,21 +16,27 @@ class ProductDemandController extends Controller
      */
     public function index(Request $request)
     {
+        $productDemands = [];
+        $product = null;
+        
         if($request->has('product_id')){
             $product = Product::findOrFail($request->product_id);
 
             $demandVisibilityAheadWeeks = SettingsService::getDemandVisibilityAheadWeeks();
             $currentGameWeek  = SettingsService::getCurrentGameWeek();
 
-            $productDemands = $product->demands()->where('gameweek', '<=', $currentGameWeek + $demandVisibilityAheadWeeks)->latest();
+            $productDemands = $product->demands()->where('gameweek', '<=', $currentGameWeek + $demandVisibilityAheadWeeks)->latest()->get();
 
-            if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+            if ($request->expectsJson() && !$request->header('X-Inertia')) {
                 return response()->json([
-                    'productDemands' => $productDemands->get()
+                    'productDemands' => $productDemands
                 ]);
             }
         }
 
-        return inertia('Company/ProductDemand/Index');
+        return inertia('Company/ProductDemand/Index', [
+            'productDemands' => $productDemands,
+            'product' => $product
+        ]);
     }
 } 

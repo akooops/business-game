@@ -20,10 +20,12 @@
     
     const pageTitle = 'Suppliers';
 
+    // Props from Inertia
+    export let suppliers = [];
+    export let pagination = {};
+    
     // Reactive variables
-    let suppliers = [];
-    let pagination = {};
-    let loading = true;
+    let loading = false;
     let search = '';
     let perPage = 10;
     let currentPage = 1;
@@ -141,7 +143,12 @@
     }
 
     onMount(() => {
-        fetchSuppliers();
+        // Initialize menus after DOM is ready
+        tick().then(() => {
+            if (window.KTMenu) {
+                window.KTMenu.init();
+            }
+        });
     });
 
     // Flash message handling
@@ -314,8 +321,8 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <span class={getSupplierTypeBadgeClass(supplier.country_id)}>
-                                                    {supplier.country_id ? 'International' : 'Local'} - { supplier.location_name}
+                                                <span class={getSupplierTypeBadgeClass(supplier.is_international)}>
+                                                    {supplier.is_international ? 'International' : 'Local'} - { supplier.location_name}
                                                 </span>
                                             </td>
                                             <td>

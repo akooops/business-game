@@ -35,14 +35,17 @@ class AdvertisersController extends Controller
 
         $advertisers = $advertisers->paginate($perPage, ['*'], 'page', $page);
 
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'advertisers' => $advertisers->items(),
                 'pagination' => IndexService::handlePagination($advertisers)
             ]);
         }
 
-        return inertia('Admin/Advertisers/Index');
+        return inertia('Admin/Advertisers/Index', [
+            'advertisers' => $advertisers->items(),
+            'pagination' => IndexService::handlePagination($advertisers)
+        ]);
     }
     
     /**

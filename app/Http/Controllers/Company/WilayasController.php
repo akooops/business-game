@@ -32,13 +32,16 @@ class WilayasController extends Controller
 
         $wilayas = $wilayas->paginate($perPage, ['*'], 'page', $page);
 
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'wilayas' => $wilayas->items(),
                 'pagination' => IndexService::handlePagination($wilayas)
             ]);
         }
 
-        return inertia('Company/Wilayas/Index');
+        return inertia('Company/Wilayas/Index', [
+            'wilayas' => $wilayas->items(),
+            'pagination' => IndexService::handlePagination($wilayas)
+        ]);
     }
 } 

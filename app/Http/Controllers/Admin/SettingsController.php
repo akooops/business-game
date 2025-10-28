@@ -32,14 +32,17 @@ class SettingsController extends Controller
 
         $settings = $settings->paginate($perPage, ['*'], 'page', $page);
 
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'settings' => $settings->items(),
                 'pagination' => $this->indexService->handlePagination($settings)
             ]);
         }
 
-        return inertia('Admin/Settings/Index');
+        return inertia('Admin/Settings/Index', [
+            'settings' => $settings->items(),
+            'pagination' => $this->indexService->handlePagination($settings)
+        ]);
     }
     
     /**

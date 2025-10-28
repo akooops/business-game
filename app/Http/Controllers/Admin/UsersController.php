@@ -39,14 +39,17 @@ class UsersController extends Controller
 
         $users = $users->paginate($perPage, ['*'], 'page', $page);
 
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'users' => $users->items(),
                 'pagination' => IndexService::handlePagination($users)
             ]);
         }
 
-        return inertia('Admin/Users/Index');
+        return inertia('Admin/Users/Index', [
+            'users' => $users->items(),
+            'pagination' => IndexService::handlePagination($users)
+        ]);
     }
     
     /**

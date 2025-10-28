@@ -35,13 +35,16 @@ class TransactionsController extends Controller
 
         $transactions = $transactions->paginate($perPage, ['*'], 'page', $page);
 
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'transactions' => $transactions->items(),
                 'pagination' => IndexService::handlePagination($transactions)
             ]);
         }
 
-        return inertia('Company/Transactions/Index');
+        return inertia('Company/Transactions/Index', [
+            'transactions' => $transactions->items(),
+            'pagination' => IndexService::handlePagination($transactions)
+        ]);
     }
 } 

@@ -17,10 +17,8 @@
     
     const pageTitle = 'Dashboard';
 
-    // Reactive variables
-    let loading = true;
-    let fetchInterval = null;
-    let stats = {
+    // Props from Inertia
+    export let stats = {
         basic: {},
         financial: {},
         operations: {},
@@ -28,6 +26,10 @@
         breakdowns: { revenue: {}, expenses: {} },
         leaderboard: []
     };
+    
+    // Reactive variables
+    let loading = false;
+    let fetchInterval = null;
 
     // Format currency
     function formatCurrency(amount) {
@@ -47,6 +49,7 @@
     // Fetch dashboard data
     async function fetchDashboardData() {
         try {
+            loading = true;
             const response = await fetch(route('company.dashboard.index'), {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
@@ -144,8 +147,7 @@
     } : { series: [], labels: [] };
 
     onMount(() => {
-        fetchDashboardData();
-        // Set up real-time updates every 60 seconds
+        // Initialize with data from Inertia, then set up real-time updates every 60 seconds
         fetchInterval = setInterval(fetchDashboardData, 60000);
     });
 

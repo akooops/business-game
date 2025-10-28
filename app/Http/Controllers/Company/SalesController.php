@@ -20,14 +20,17 @@ class SalesController extends Controller
         $sales = $company->sales()->with(['product', 'wilaya'])->latest();
         $sales = $sales->paginate($perPage, ['*'], 'page', $page);
         
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'sales' => $sales->items(),
                 'pagination' => IndexService::handlePagination($sales),
             ]);
         }
 
-        return inertia('Company/Sales/Index');
+        return inertia('Company/Sales/Index', [
+            'sales' => $sales->items(),
+            'pagination' => IndexService::handlePagination($sales)
+        ]);
     }
 
     public function confirm(ConfirmSaleRequest $request, Sale $sale){

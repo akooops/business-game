@@ -35,14 +35,17 @@ class EmployeeProfilesController extends Controller
 
         $employeeProfiles = $employeeProfiles->paginate($perPage, ['*'], 'page', $page);
 
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'employeeProfiles' => $employeeProfiles->items(),
                 'pagination' => IndexService::handlePagination($employeeProfiles)
             ]);
         }
 
-        return inertia('Admin/EmployeeProfiles/Index');
+        return inertia('Admin/EmployeeProfiles/Index', [
+            'employeeProfiles' => $employeeProfiles->items(),
+            'pagination' => IndexService::handlePagination($employeeProfiles)
+        ]);
     }
     
     /**

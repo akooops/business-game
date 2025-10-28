@@ -19,13 +19,15 @@ class EmployeeProfilesController extends Controller
     {
         $employeeProfiles = EmployeeProfile::latest();
 
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'employeeProfiles' => $employeeProfiles->get(),
             ]);
         }
 
-        return inertia('Company/EmployeeProfiles/Index');
+        return inertia('Company/EmployeeProfiles/Index', [
+            'employeeProfiles' => $employeeProfiles->get()
+        ]);
     }
 
     public function findEmployees(Request $request, EmployeeProfile $employeeProfile){

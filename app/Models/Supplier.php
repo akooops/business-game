@@ -103,4 +103,4 @@ class Supplier extends Model
             $model->real_shipping_time_days = CalculationsService::calcaulteRandomBetweenMinMax($model->min_shipping_time_days, $model->max_shipping_time_days);
         });
     }
-} 
+}
