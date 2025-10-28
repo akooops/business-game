@@ -13,6 +13,7 @@ class Maintenance extends Model
 
     protected $casts = [
         'maintenances_cost' => 'decimal:3',
+        'maintenance_time_days' => 'integer',
         'started_at' => 'datetime',
         'completed_at' => 'datetime',
     ];

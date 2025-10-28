@@ -14,10 +14,30 @@ class SalesController extends Controller
     {   
         $perPage = IndexService::limitPerPage($request->query('perPage', 10));
         $page = IndexService::checkPageIfNull($request->query('page', 1));
+        $search = IndexService::checkIfSearchEmpty($request->query('search'));
 
         $company = $request->company;
 
         $sales = $company->sales()->with(['product', 'wilaya'])->latest();
+
+        // Apply search filter
+        if ($search) {
+            $sales->where(function($query) use ($search) {
+                if (is_numeric($search)) {
+                    $query->where('id', $search);
+                }
+                $query->orWhere('status', 'like', '%' . $search . '%')
+                      ->orWhereHas('product', function($q) use ($search) {
+                          $q->where('name', 'like', '%' . $search . '%')
+                            ->orWhere('description', 'like', '%' . $search . '%')
+                            ->orWhere('type', 'like', '%' . $search . '%');
+                      })
+                      ->orWhereHas('wilaya', function($q) use ($search) {
+                          $q->where('name', 'like', '%' . $search . '%');
+                      });
+            });
+        }
+
         $sales = $sales->paginate($perPage, ['*'], 'page', $page);
         
         if ($request->expectsJson() && !$request->header('X-Inertia')) {

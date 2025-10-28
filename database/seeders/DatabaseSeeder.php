@@ -33,6 +33,11 @@ class DatabaseSeeder extends Seeder
             SuppliersSeeder::class,
             SupplierProductsSeeder::class,
             MachinesSeeder::class,
+            MachineOutputsSeeder::class,
+            
+            // Additional game data
+            ProductDemandsSeeder::class,
+            InventoryMovementsSeeder::class,
             
             // Test companies and users
             CompaniesSeeder::class,

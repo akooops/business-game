@@ -22,8 +22,19 @@ class ProductDemandController extends Controller
         
         if($request->has('product_id')){
             $product = Product::findOrFail($request->product_id);
+            $search = IndexService::checkIfSearchEmpty($request->query('search'));
 
             $productDemands = $product->demands()->latest()->get();
+
+            // Apply search filter
+            if ($search) {
+                $productDemands = $productDemands->filter(function($demand) use ($search) {
+                    if (is_numeric($search)) {
+                        return $demand->id == $search || $demand->gameweek == $search;
+                    }
+                    return strpos($demand->quantity, $search) !== false;
+                });
+            }
 
             if ($request->expectsJson() && !$request->header('X-Inertia')) {
                 return response()->json([

@@ -27,8 +27,10 @@ class TechnologiesController extends Controller
         // Apply search filter
         if ($search) {
             $technologies->where(function($query) use ($search) {
-                $query->where('id', $search)
-                      ->orWhere('name', 'like', '%' . $search . '%')
+                if (is_numeric($search)) {
+                    $query->where('id', $search);
+                }
+                $query->orWhere('name', 'like', '%' . $search . '%')
                       ->orWhere('description', 'like', '%' . $search . '%')
                       ->orWhere('level', 'like', '%' . $search . '%')
                       ->orWhere('research_cost', 'like', '%' . $search . '%')

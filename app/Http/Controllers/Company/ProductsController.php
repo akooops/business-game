@@ -24,9 +24,11 @@ class ProductsController extends Controller
 
         if ($search) {
             $products->where(function($query) use ($search) {
-                $query->where('id', $search)
-                      ->orWhere('product_id', $search)
-                      ->orWhereHas('product', function($query) use ($search) {
+                if (is_numeric($search)) {
+                    $query->where('id', $search)
+                          ->orWhere('product_id', $search);
+                }
+                $query->orWhereHas('product', function($query) use ($search) {
                         $query->where('name', 'like', '%' . $search . '%')
                               ->orWhere('description', 'like', '%' . $search . '%')
                               ->orWhere('type', 'like', '%' . $search . '%');

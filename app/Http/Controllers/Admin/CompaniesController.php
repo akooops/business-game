@@ -30,8 +30,10 @@ class CompaniesController extends Controller
 
         if ($search) {
             $companies->where(function($query) use ($search) {
-                $query->where('id', $search)
-                      ->orWhereHas('user', function($query) use ($search) {
+                if (is_numeric($search)) {
+                    $query->where('id', $search);
+                }
+                $query->orWhereHas('user', function($query) use ($search) {
                         $query->where('firstname', 'like', '%' . $search . '%')
                               ->orWhere('lastname', 'like', '%' . $search . '%')
                               ->orWhere('username', 'like', '%' . $search . '%')

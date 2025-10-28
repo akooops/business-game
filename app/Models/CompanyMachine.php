@@ -14,6 +14,13 @@ class CompanyMachine extends Model
     protected $guarded = ['id'];
 
     protected $casts = [
+        'speed' => 'decimal:3',
+        'quality_factor' => 'decimal:3',
+        'operations_cost' => 'decimal:3',
+        'carbon_footprint' => 'decimal:3',
+        'reliability_decay_days' => 'decimal:3',
+        'maintenance_cost' => 'decimal:3',
+        'maintenance_time_days' => 'integer',
         'current_reliability' => 'decimal:3',
         'loss_on_sale_days' => 'decimal:3',
         'acquisition_cost' => 'decimal:3',

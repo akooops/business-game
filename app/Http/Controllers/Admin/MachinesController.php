@@ -28,8 +28,10 @@ class MachinesController extends Controller
         // Apply search filter
         if ($search) {
             $machines->where(function($query) use ($search) {
-                $query->where('id', $search)
-                      ->orWhere('name', 'like', '%' . $search . '%')
+                if (is_numeric($search)) {
+                    $query->where('id', $search);
+                }
+                $query->orWhere('name', 'like', '%' . $search . '%')
                       ->orWhere('model', 'like', '%' . $search . '%')
                       ->orWhere('manufacturer', 'like', '%' . $search . '%')
                       ->orWhereHas('employeeProfile', function($q) use ($search) {

@@ -40,6 +40,12 @@
     let selectedProductId = currentProduct?.id || '';
     let productSelectComponent;
 
+    // Filtering variables
+    let searchTerm = '';
+    let filterType = '';
+    let sortBy = '';
+    let searchTimeout;
+
 
 
     // ApexCharts configuration
@@ -267,6 +273,49 @@
     // Reactive updates for chart
     $: if (chart && demandData) {
         updateChart();
+    }
+
+    // Filtering logic
+    $: filteredDemands = demandData ? demandData.filter(demand => {
+        // Search filter
+        if (searchTerm && !demand.product.name.toLowerCase().includes(searchTerm.toLowerCase())) {
+            return false;
+        }
+        
+        // Type filter
+        if (filterType && demand.product.type !== filterType) {
+            return false;
+        }
+        
+        return true;
+    }).sort((a, b) => {
+        if (!sortBy) return 0;
+        
+        switch (sortBy) {
+            case 'name_asc':
+                return a.product.name.localeCompare(b.product.name);
+            case 'name_desc':
+                return b.product.name.localeCompare(a.product.name);
+            case 'quantity_asc':
+                return a.quantity - b.quantity;
+            case 'quantity_desc':
+                return b.quantity - a.quantity;
+            case 'price_asc':
+                return a.price - b.price;
+            case 'price_desc':
+                return b.price - a.price;
+            default:
+                return 0;
+        }
+    }) : [];
+
+    // Search handler with debouncing
+    function handleSearch() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            // Trigger reactive update
+            filteredDemands = filteredDemands;
+        }, 300);
     }
 </script>
 

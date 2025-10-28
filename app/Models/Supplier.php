@@ -100,7 +100,7 @@ class Supplier extends Model
 
         static::saving(function ($model) {
             $model->real_shipping_cost = CalculationsService::calcaulteRandomBetweenMinMax($model->min_shipping_cost, $model->max_shipping_cost);
-            $model->real_shipping_time_days = CalculationsService::calcaulteRandomBetweenMinMax($model->min_shipping_time_days, $model->max_shipping_time_days);
+            $model->real_shipping_time_days = (int) round(CalculationsService::calcaulteRandomBetweenMinMax($model->min_shipping_time_days, $model->max_shipping_time_days));
         });
     }
 }

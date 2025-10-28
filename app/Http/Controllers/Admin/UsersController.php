@@ -26,8 +26,10 @@ class UsersController extends Controller
 
         if ($search) {
             $users->where(function($query) use ($search) {
-                $query->where('id', $search)
-                      ->orWhere('firstname', 'like', '%' . $search . '%')
+                if (is_numeric($search)) {
+                    $query->where('id', $search);
+                }
+                $query->orWhere('firstname', 'like', '%' . $search . '%')
                       ->orWhere('lastname', 'like', '%' . $search . '%')
                       ->orWhere('username', 'like', '%' . $search . '%')
                       ->orWhere('email', 'like', '%' . $search . '%')
