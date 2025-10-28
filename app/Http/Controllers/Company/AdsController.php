@@ -27,14 +27,17 @@ class AdsController extends Controller
         $ads = $company->ads()->with(['advertiser', 'product'])->latest();       
         $ads = $ads->paginate($perPage, ['*'], 'page', $page);
 
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'ads' => $ads->items(),
                 'pagination' => IndexService::handlePagination($ads)
             ]);
         }
 
-        return inertia('Company/Ads/Index');
+        return inertia('Company/Ads/Index', [
+            'ads' => $ads->items(),
+            'pagination' => IndexService::handlePagination($ads)
+        ]);
     }
 
     public function store(CreateAdRequest $request)

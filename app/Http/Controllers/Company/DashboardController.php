@@ -14,17 +14,16 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $company = $request->company;
+        $stats = StatsService::getCompanyStats($company);
         
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
-            $stats = StatsService::getCompanyStats($company);
-
-            return response()->json(
-                [
-                    'stats' => $stats
-                ]
-            );
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
+            return response()->json([
+                'stats' => $stats
+            ]);
         }
 
-        return inertia('Company/Dashboard/Index');
+        return inertia('Company/Dashboard/Index', [
+            'stats' => $stats
+        ]);
     }
 }

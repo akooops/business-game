@@ -27,13 +27,15 @@ class ProductRecipesController extends Controller
             $productRecipes->where('product_id', $productId);
         }
 
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'productRecipes' => $productRecipes->get()
             ]);
         }
 
-        return inertia('Admin/ProductRecipes/Index');
+        return inertia('Admin/ProductRecipes/Index', [
+            'productRecipes' => $productRecipes->get()
+        ]);
     }
     
     /**

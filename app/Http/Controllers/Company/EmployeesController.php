@@ -29,18 +29,21 @@ class EmployeesController extends Controller
 
         $employees = $employees->paginate($perPage, ['*'], 'page', $page);
 
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'employees' => $employees->items(),
                 'pagination' => IndexService::handlePagination($employees)
             ]);
         }
 
-        return inertia('Company/Employees/Index');
+        return inertia('Company/Employees/Index', [
+            'employees' => $employees->items(),
+            'pagination' => IndexService::handlePagination($employees)
+        ]);
     }
 
     public function recruitPage(Request $request){
-        return inertia('Company/Employees/RecruitPage');
+        return inertia('Company/Employees/RecruitPage', []);
     }
 
     public function recruit(RecruitEmployeeRequest $request, Employee $employee){

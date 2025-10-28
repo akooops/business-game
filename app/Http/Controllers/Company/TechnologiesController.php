@@ -20,7 +20,7 @@ class TechnologiesController extends Controller
         $technologies = Technology::with('products')->orderBy('level', 'asc');
         $companyTechnologies = $company->companyTechnologies()->with('technology', 'technology.products')->get();
 
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'technologies' => $technologies->get(),
                 'companyTechnologies' => $companyTechnologies,
@@ -29,7 +29,12 @@ class TechnologiesController extends Controller
             ]);
         }
 
-        return inertia('Company/Technologies/Index');
+        return inertia('Company/Technologies/Index', [
+            'technologies' => $technologies->get(),
+            'companyTechnologies' => $companyTechnologies,
+            'maxResearchLevel' => (int) $technologies->max('level'),
+            'currentResearchLevel' => (int) $company->research_level,
+        ]);
     }
     
     /**

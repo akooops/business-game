@@ -32,10 +32,10 @@ class LeaderboardService
 
         // Calculate scores and add to company collection
         foreach ($companies as $company) {            
-            // Normalize values (0-1 range)
-            $normalizedNetWorth = ($company->funds - $company->unpaid_loans) / $maxNetWorth;
-            $normalizedCarbon = $company->carbon_footprint / $maxCarbon;
-            $normalizedResearch = $company->research_level / $maxResearch;
+            // Normalize values (0-1 range) - avoid division by zero
+            $normalizedNetWorth = $maxNetWorth > 0 ? ($company->funds - $company->unpaid_loans) / $maxNetWorth : 0;
+            $normalizedCarbon = $maxCarbon > 0 ? $company->carbon_footprint / $maxCarbon : 0;
+            $normalizedResearch = $maxResearch > 0 ? $company->research_level / $maxResearch : 0;
             
             // Calculate final score: 50% net worth - 25% carbon + 25% research
             $score = ($normalizedNetWorth * 0.5) - ($normalizedCarbon * 0.25) + ($normalizedResearch * 0.25);

@@ -25,6 +25,8 @@ class Employee extends Model
         'last_promotion_at' => 'datetime',
     ];
 
+    protected $appends = ['fullname'];
+
     const STATUS_APPLIED = 'applied';
     const STATUS_ACTIVE = 'active';
     const STATUS_FIRED = 'fired';
@@ -44,5 +46,16 @@ class Employee extends Model
     public function companyMachine()
     {
         return $this->hasOne(CompanyMachine::class);
+    }
+
+    // Accessors
+    public function getFullnameAttribute(): string
+    {
+        $first = trim((string) ($this->firstname ?? ''));
+        $last = trim((string) ($this->lastname ?? ''));
+        if ($first !== '' || $last !== '') {
+            return trim($first . ' ' . $last);
+        }
+        return (string) ($this->name ?? '');
     }
 }

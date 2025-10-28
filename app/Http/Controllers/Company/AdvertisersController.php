@@ -16,12 +16,14 @@ class AdvertisersController extends Controller
     {
         $advertisers = Advertiser::latest();       
 
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'advertisers' => $advertisers->get(),
             ]);
         }
 
-        return inertia('Company/Advertisers/Index');
+        return inertia('Company/Advertisers/Index', [
+            'advertisers' => $advertisers->get()
+        ]);
     }
 }

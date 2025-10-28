@@ -22,7 +22,6 @@ class SupplierProductsSeeder extends Seeder
                 ['supplier_id' => $dz->id, 'product_id' => $steel->id],
                 [
                     'min_sale_price' => 5,
-                    'avg_sale_price' => 7,
                     'max_sale_price' => 10,
                     'real_sale_price' => 7,
                 ]
@@ -34,7 +33,6 @@ class SupplierProductsSeeder extends Seeder
                 ['supplier_id' => $fr->id, 'product_id' => $motor->id],
                 [
                     'min_sale_price' => 40,
-                    'avg_sale_price' => 55,
                     'max_sale_price' => 80,
                     'real_sale_price' => 55,
                 ]

@@ -36,12 +36,14 @@ class SuppliersController extends Controller
             $suppliers = $suppliers->get();
         }
 
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'suppliers' => $suppliers
             ]);
         }
 
-        return inertia('Company/Suppliers/Index');
+        return inertia('Company/Suppliers/Index', [
+            'suppliers' => $suppliers
+        ]);
     }
 }

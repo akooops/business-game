@@ -25,9 +25,12 @@
     
     const pageTitle = 'Product Demand Management';
 
+    // Props from Inertia
+    export let productDemands = [];
+    export let product = null;
+    
     // Reactive variables
-    let productDemands = [];
-    let currentProduct = null;
+    let currentProduct = product;
     let demandData = productDemands || [];
     let loading = false;
     let showTable = true; // Toggle between chart and table view
@@ -228,22 +231,14 @@
 
     // Initialize on mount
     onMount(async () => {
-        // Check if product_id is passed in URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const initialProductId = urlParams.get('product_id');
-        const initialProductName = urlParams.get('product_name');
-        
-        if (initialProductId) {
-            selectedProductId = initialProductId;
-            currentProduct = {
-                id: initialProductId,
-                name: initialProductName || `Product #${initialProductId}`
-            };
-            fetchDemandData();
+        // Initialize menus after DOM is ready
+        await tick();
+        if (window.KTMenu) {
+            window.KTMenu.init();
         }
         
+        // If we have a product from Inertia props, set it up
         if (currentProduct) {
-            // Set initial value for Select2 if product is already selected
             selectedProductId = currentProduct.id;
             if (productSelectComponent) {
                 // Add the selected product to Select2's options

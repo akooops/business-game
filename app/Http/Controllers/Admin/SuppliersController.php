@@ -44,14 +44,17 @@ class SuppliersController extends Controller
 
         $suppliers = $suppliers->paginate($perPage, ['*'], 'page', $page);
 
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'suppliers' => $suppliers->items(),
                 'pagination' => IndexService::handlePagination($suppliers)
             ]);
         }
 
-        return inertia('Admin/Suppliers/Index');
+        return inertia('Admin/Suppliers/Index', [
+            'suppliers' => $suppliers->items(),
+            'pagination' => IndexService::handlePagination($suppliers)
+        ]);
     }
     
     /**

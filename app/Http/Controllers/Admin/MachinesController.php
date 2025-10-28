@@ -43,14 +43,17 @@ class MachinesController extends Controller
 
         $machines = $machines->paginate($perPage, ['*'], 'page', $page);
 
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'machines' => $machines->items(),
                 'pagination' => IndexService::handlePagination($machines)
             ]);
         }
 
-        return inertia('Admin/Machines/Index');
+        return inertia('Admin/Machines/Index', [
+            'machines' => $machines->items(),
+            'pagination' => IndexService::handlePagination($machines)
+        ]);
     }
     
     /**

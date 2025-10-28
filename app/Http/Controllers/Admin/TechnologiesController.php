@@ -38,14 +38,17 @@ class TechnologiesController extends Controller
 
         $technologies = $technologies->paginate($perPage, ['*'], 'page', $page);
 
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'technologies' => $technologies->items(),
                 'pagination' => IndexService::handlePagination($technologies)
             ]);
         }
 
-        return inertia('Admin/Technologies/Index');
+        return inertia('Admin/Technologies/Index', [
+            'technologies' => $technologies->items(),
+            'pagination' => IndexService::handlePagination($technologies)
+        ]);
     }
     
     /**

@@ -33,7 +33,7 @@ class NotificationController extends Controller
 
         $notifications = $notifications->paginate($perPage, ['*'], 'notification', $page);
 
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'notifications' => $notifications->items(),
                 'pagination' => IndexService::handlePagination($notifications)

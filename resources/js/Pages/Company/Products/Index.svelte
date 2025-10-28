@@ -19,9 +19,11 @@
     
     const pageTitle = 'My Products';
 
+    // Props from Inertia
+    export let companyProducts = [];
+    
     // Reactive variables
-    let companyProducts = [];
-    let loading = true;
+    let loading = false;
     let fetchInterval = null;
 
     // Drawer state
@@ -149,7 +151,14 @@
     }
 
     onMount(() => {
-        fetchProducts();
+        // Initialize menus
+        tick().then(() => {
+            if (window.KTMenu) {
+                window.KTMenu.init();
+            }
+        });
+        
+        // Set up real-time updates every 60 seconds
         fetchInterval = setInterval(fetchProducts, 60000);
     });
     onDestroy(() => {

@@ -22,13 +22,16 @@ class InventoryController extends Controller
 
         $inventoryMovements = $inventoryMovements->paginate($perPage, ['*'], 'page', $page);
 
-        if ($request->expectsJson() || $request->hasHeader('X-Requested-With')) {
+        if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
                 'inventoryMovements' => $inventoryMovements->items(),
                 'pagination' => IndexService::handlePagination($inventoryMovements)
             ]);
         }
 
-        return inertia('Company/Inventory/Index');
+        return inertia('Company/Inventory/Index', [
+            'inventoryMovements' => $inventoryMovements->items(),
+            'pagination' => IndexService::handlePagination($inventoryMovements)
+        ]);
     }
 }
