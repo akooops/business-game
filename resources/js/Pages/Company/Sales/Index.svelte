@@ -29,6 +29,7 @@
     let currentPage = 1;
     let searchTerm = '';
     let searchTimeout = null;
+    let initialized = false;
 
     // Additional filtering variables
     let filterType = '';
@@ -116,16 +117,16 @@
         fetchSales();
     }
 
-    // Reactive updates for filters
-    $: if (filterType !== undefined) {
+    // Reactive updates for filters (only fire after initialization to prevent mount-time fetches)
+    $: if (initialized && filterType !== undefined) {
         handleFilterChange();
     }
 
-    $: if (filterStatus !== undefined) {
+    $: if (initialized && filterStatus !== undefined) {
         handleFilterChange();
     }
 
-    $: if (sortBy !== undefined) {
+    $: if (initialized && sortBy !== undefined) {
         handleFilterChange();
     }
 
@@ -234,6 +235,7 @@
 
     onMount(() => {
         fetchSales();
+        initialized = true;
         fetchInterval = setInterval(fetchSales, 60000);
     });
     

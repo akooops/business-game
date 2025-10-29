@@ -26,6 +26,7 @@
     let pagination = {};
     let perPage = 10;
     let currentPage = 1;
+    let initialized = false;
 
     let selectedMovement = null;
     let showMovementDrawer = false;
@@ -154,7 +155,9 @@
     }
 
     // Search handler with debouncing
-    function handleSearch() {
+    function handleSearch(event) {
+        searchTerm = event.target.value;
+        
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
             currentPage = 1;
@@ -168,21 +171,18 @@
         fetchInventoryMovements();
     }
 
-    // Reactive updates for filters
-    $: if (searchTerm !== undefined) {
-        handleSearch();
-    }
-
-    $: if (filterType !== undefined) {
+    // Reactive updates for filters (only filterType and sortBy need this, search is handled by event)
+    $: if (initialized && filterType !== undefined) {
         handleFilterChange();
     }
 
-    $: if (sortBy !== undefined) {
+    $: if (initialized && sortBy !== undefined) {
         handleFilterChange();
     }
 
     onMount(() => {
         fetchInventoryMovements();
+        initialized = true;
         fetchInterval = setInterval(fetchInventoryMovements, 60000);
     });
 

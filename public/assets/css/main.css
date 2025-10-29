@@ -114,13 +114,6 @@
     background-color: #256b6b08;
 }
 
-/* Navbar from Figma Design */
-.navbar {
-    background: #193D39 !important;
-    border-radius: 145px !important;
-    padding: 12px 0;
-}
-
 .navbar .kt-container-fixed {
     display: flex;
     justify-content: center;
