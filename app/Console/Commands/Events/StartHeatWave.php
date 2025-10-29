@@ -76,7 +76,7 @@ class StartHeatWave extends Command
                             continue;
                         }
 
-                        $damagedQuantity = $leftAvailableStock + $leftAvailableStock * $rate;
+                        $damagedQuantity = $leftAvailableStock * $rate;
 
                         $inventory->update([
                             'current_quantity' => $inventory->current_quantity - $damagedQuantity,
@@ -120,7 +120,6 @@ class StartHeatWave extends Command
             $supplierProduct->update([
                 'min_sale_price' => $supplierProduct->min_sale_price + $supplierProduct->min_sale_price * $rate,
                 'max_sale_price' => $supplierProduct->max_sale_price + $supplierProduct->max_sale_price * $rate,
-                'real_sale_price' => CalculationsService::calcaulteRandomBetweenMinMax($supplierProduct->min_sale_price, $supplierProduct->max_sale_price),
             ]);
         }
 
