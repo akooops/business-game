@@ -33,7 +33,7 @@ class ExpireOldJobApplications implements ShouldQueue
 
         Log::info("Expiring old job applications for company: {$company->name}");
         
-        HrService::expireOldJobApplications($company);
+        HrService::processAppliedEmployees($company);
     }
 }
 
