@@ -25,30 +25,13 @@
     // Reactive variables
     let loading = false;
     let fetchInterval = null;
+    let initialized = false;
     
-    // Filtering
+    // Filtering (server-side)
     let searchTerm = '';
     let sortBy = '';
     let filterType = ''; // '', 'raw_material', 'component', 'finished_product'
     let searchTimeout = null;
-    
-    // Computed filtered products
-    $: filteredProducts = (companyProducts || [])
-        .filter(product => {
-            if (!product || !product.product || !product.product.name) return false;
-            const matchesSearch = searchTerm === '' || product.product.name.toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesFilter = filterType === '' || product.product.type === filterType;
-            return matchesSearch && matchesFilter;
-        })
-        .sort((a, b) => {
-            if (sortBy === 'name_asc') return a.product.name.localeCompare(b.product.name);
-            if (sortBy === 'name_desc') return b.product.name.localeCompare(a.product.name);
-            if (sortBy === 'stock_asc') return (a.available_stock || 0) - (b.available_stock || 0);
-            if (sortBy === 'stock_desc') return (b.available_stock || 0) - (a.available_stock || 0);
-            if (sortBy === 'price_asc') return (a.sale_price || 0) - (b.sale_price || 0);
-            if (sortBy === 'price_desc') return (b.sale_price || 0) - (a.sale_price || 0);
-            return 0;
-        });
 
     // Drawer state
     let selectedProduct = null;
@@ -60,14 +43,21 @@
     let newSalePrice = 0;
     let loadingPriceUpdate = false;
 
-    // Fetch products data
+    // Fetch products data (server-side filtering)
     async function fetchProducts() {
         if(companyProducts.length == 0) loading = true;
 
         try {
             const params = new URLSearchParams();
+            
             if (searchTerm) {
                 params.append('search', searchTerm);
+            }
+            if (filterType) {
+                params.append('type', filterType);
+            }
+            if (sortBy) {
+                params.append('sort', sortBy);
             }
             
             const url = route('company.products.index') + (params.toString() ? '?' + params.toString() : '');
@@ -110,7 +100,7 @@
         selectedProduct = null;
     }
     
-    // Handle search
+    // Handle search (with debouncing)
     function handleSearch(event) {
         searchTerm = event.target.value;
         
@@ -119,6 +109,20 @@
         searchTimeout = setTimeout(() => {
             fetchProducts();
         }, 300);
+    }
+    
+    // Handle filter changes
+    function handleFilterChange() {
+        fetchProducts();
+    }
+    
+    // Reactive updates for filters (only fire after initialization)
+    $: if (initialized && filterType !== undefined) {
+        handleFilterChange();
+    }
+    
+    $: if (initialized && sortBy !== undefined) {
+        handleFilterChange();
     }
 
     // Open price modal
@@ -198,6 +202,8 @@
                 window.KTMenu.init();
             }
         });
+        
+        initialized = true;
         
         // Set up real-time updates every 60 seconds
         fetchInterval = setInterval(fetchProducts, 60000);
@@ -358,7 +364,7 @@
                         
                         <!-- Products Grid -->
                         <div class="p-6">
-                            {#if filteredProducts.length === 0 && companyProducts.length > 0}
+                            {#if companyProducts.length === 0 && (searchTerm || filterType)}
                                 <div class="flex flex-col items-center justify-center h-48 text-center">
                                     <i class="ki-filled ki-search text-4xl text-muted-foreground mb-4"></i>
                                     <h3 class="text-lg font-semibold text-mono mb-2">No products found</h3>
@@ -384,7 +390,7 @@
                                 </div>
                             {:else}
                                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-                                    {#each filteredProducts as companyProduct}
+                                    {#each companyProducts as companyProduct}
                                     <div class="kt-card kt-card-hover cursor-pointer" on:click={() => openProductDrawer(companyProduct)}>
                                         <div class="kt-card-body p-4">
                                             <!-- Product Image -->

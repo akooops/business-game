@@ -17,9 +17,11 @@ class InventoryController extends Controller
         $perPage = IndexService::limitPerPage($request->query('perPage', 10));
         $page = IndexService::checkPageIfNull($request->query('page', 1));
         $search = IndexService::checkIfSearchEmpty($request->query('search'));
+        $type = $request->query('type');
+        $sort = $request->query('sort');
 
         $company = $request->company;
-        $inventoryMovements = $company->inventoryMovements()->with(['product'])->latest();
+        $inventoryMovements = $company->inventoryMovements()->with(['product']);
 
         // Apply search filter
         if ($search) {
@@ -35,6 +37,43 @@ class InventoryController extends Controller
                             ->orWhere('type', 'like', '%' . $search . '%');
                       });
             });
+        }
+
+        // Apply movement type filter
+        if ($type) {
+            $inventoryMovements->where('movement_type', $type);
+        }
+
+        // Apply sorting
+        if ($sort) {
+            switch ($sort) {
+                case 'date_desc':
+                    $inventoryMovements->orderBy('moved_at', 'desc');
+                    break;
+                case 'date_asc':
+                    $inventoryMovements->orderBy('moved_at', 'asc');
+                    break;
+                case 'quantity_desc':
+                    $inventoryMovements->orderBy('original_quantity', 'desc');
+                    break;
+                case 'quantity_asc':
+                    $inventoryMovements->orderBy('original_quantity', 'asc');
+                    break;
+                case 'product_asc':
+                    $inventoryMovements->join('products', 'inventory_movements.product_id', '=', 'products.id')
+                                      ->orderBy('products.name', 'asc')
+                                      ->select('inventory_movements.*');
+                    break;
+                case 'product_desc':
+                    $inventoryMovements->join('products', 'inventory_movements.product_id', '=', 'products.id')
+                                      ->orderBy('products.name', 'desc')
+                                      ->select('inventory_movements.*');
+                    break;
+                default:
+                    $inventoryMovements->latest();
+            }
+        } else {
+            $inventoryMovements->latest();
         }
 
         $inventoryMovements = $inventoryMovements->paginate($perPage, ['*'], 'page', $page);

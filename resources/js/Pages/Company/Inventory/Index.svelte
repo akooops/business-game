@@ -31,7 +31,7 @@
     let selectedMovement = null;
     let showMovementDrawer = false;
 
-    // Filtering variables
+    // Filtering variables (server-side)
     let searchTerm = '';
     let filterType = '';
     let sortBy = '';
@@ -53,7 +53,7 @@
         }
     }
 
-    // Fetch inventory movements data
+    // Fetch inventory movements data (server-side filtering)
     async function fetchInventoryMovements() {
         if(inventoryMovements.length == 0) loading = true;
         
@@ -106,6 +106,32 @@
         loading = true;
         fetchInventoryMovements();
     }
+    
+    // Search handler with debouncing
+    function handleSearch(event) {
+        searchTerm = event.target.value;
+        
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            currentPage = 1;
+            fetchInventoryMovements();
+        }, 300);
+    }
+
+    // Handle filter changes
+    function handleFilterChange() {
+        currentPage = 1;
+        fetchInventoryMovements();
+    }
+
+    // Reactive updates for filters (only fire after initialization)
+    $: if (initialized && filterType !== undefined) {
+        handleFilterChange();
+    }
+
+    $: if (initialized && sortBy !== undefined) {
+        handleFilterChange();
+    }
 
     // Open movement drawer
     function openMovementDrawer(movement) {
@@ -138,11 +164,9 @@
                 targetUrl = route('company.purchases.index') + '?search=' + movement.reference_id;
                 break;
             case 'sale':
-                // Assuming you have a sales page, adjust the route as needed
                 targetUrl = route('company.sales.index') + '?search=' + movement.reference_id;
                 break;
             case 'production':
-                // Assuming you have a production page, adjust the route as needed
                 targetUrl = route('company.production.index') + '?search=' + movement.reference_id;
                 break;
             default:
@@ -152,32 +176,6 @@
         if (targetUrl) {
             window.open(targetUrl, '_blank');
         }
-    }
-
-    // Search handler with debouncing
-    function handleSearch(event) {
-        searchTerm = event.target.value;
-        
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            currentPage = 1;
-            fetchInventoryMovements();
-        }, 300);
-    }
-
-    // Handle filter changes
-    function handleFilterChange() {
-        currentPage = 1;
-        fetchInventoryMovements();
-    }
-
-    // Reactive updates for filters (only filterType and sortBy need this, search is handled by event)
-    $: if (initialized && filterType !== undefined) {
-        handleFilterChange();
-    }
-
-    $: if (initialized && sortBy !== undefined) {
-        handleFilterChange();
     }
 
     onMount(() => {
@@ -282,9 +280,9 @@
                                     type="text"
                                     class="h-10 pl-14 pr-14 text-sm font-normal text-center bg-gradient-to-r from-white to-gray-50 border-2 border-gray-200 rounded-xl hover:border-blue-300 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 placeholder-gray-400 shadow-sm hover:shadow-md focus:shadow-lg"
                                     style="width: 300px; min-width: 300px;"
-                                    placeholder="Search movements..."
-                                    value={searchTerm}
-                                    on:input={handleSearch}
+                                        placeholder="Search movements..."
+                                        value={searchTerm}
+                                        on:input={handleSearch}
                                 />
                                 {#if searchTerm}
                                     <button 

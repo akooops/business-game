@@ -31,7 +31,7 @@
     let searchTimeout = null;
     let initialized = false;
 
-    // Additional filtering variables
+    // Additional filtering variables (server-side)
     let filterType = '';
     let filterStatus = '';
     let sortBy = '';
@@ -45,7 +45,7 @@
     let selectedDeliveredSale = null;
     let showSaleDrawer = false;
 
-    // Fetch sales data
+    // Fetch sales data (server-side filtering)
     async function fetchSales() {
         if(sales.length == 0) loading = true;
         

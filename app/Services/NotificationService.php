@@ -126,7 +126,7 @@ class NotificationService
         $totalSales = count($salesData);
         
         // Build detailed message
-        $message = "New demand for {$totalSales} product(s):\n";
+        $message = "New demand for {$totalSales} product(s).";
         
         return Notification::create([
             'type' => Notification::TYPE_SALE_INITIATED,
@@ -142,7 +142,7 @@ class NotificationService
         $totalCancelled = count($cancelledData);
         
         // Build detailed message
-        $message = "{$totalCancelled} sale(s) cancelled due to time limit:\n";
+        $message = "{$totalCancelled} sale(s) cancelled due to time limit.";
         
         return Notification::create([
             'type' => Notification::TYPE_SALE_CANCELLED,
