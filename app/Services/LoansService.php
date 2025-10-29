@@ -28,7 +28,7 @@ class LoansService
                 'bank_id' => $bank->id,
             ]);
 
-            FinanceService::receiveLoan($company, $amount, $loan->id);
+            FinanceService::receiveLoan($company, $amount, $totalAmount, $loan->id);
 
             if($reason){
                 NotificationService::createLoanBorrowedInsufficientFundsNotification($company, $loan, $reason);

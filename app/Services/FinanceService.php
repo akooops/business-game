@@ -168,13 +168,13 @@ class FinanceService
     //-------------------------------------
     // Loans
     //-------------------------------------
-    public static function receiveLoan($company, $loanAmount, $loanId = null){
-        $company->increment('funds', $loanAmount);
-        $company->increment('unpaid_loans', $loanAmount);
+    public static function receiveLoan($company, $loanBorrowedAmount, $loanTotalAmount, $loanId = null){
+        $company->increment('funds', $loanBorrowedAmount);
+        $company->increment('unpaid_loans', $loanTotalAmount);
 
         Transaction::create([
             'company_id' => $company->id,
-            'amount' => $loanAmount,
+            'amount' => $loanBorrowedAmount,
             'type' => Transaction::TYPE_LOAN_RECEIVED,
             'transaction_at' => SettingsService::getCurrentTimestamp(),
         ]);
