@@ -160,7 +160,7 @@ class NotificationService
         return Notification::create([
             'type' => Notification::TYPE_EMPLOYEE_HIRED,
             'title' => 'Employee Hired',
-            'message' => "Employee {$employeeProfile->name} hired for {$employee->salary_month}.",
+            'message' => "Employee {$employeeProfile->name} hired for a salary of {$employee->salary_month} and recruitment cost of {$employee->recruitment_cost}.",
             'url' => route('company.employees.index'),
             'user_id' => $company->user_id,
         ]);
