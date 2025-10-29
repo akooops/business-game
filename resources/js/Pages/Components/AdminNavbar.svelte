@@ -3,23 +3,23 @@
 </script>
 
 <!-- Navbar -->
-<div class="navbar bg-muted hidden lg:flex lg:items-stretch border-y border-input lg:mb-10 [--kt-drawer-enable:true] lg:[--kt-drawer-enable:false]" data-kt-drawer="true" data-kt-drawer-class="kt-drawer kt-drawer-start fixed z-10 top-0 bottom-0 w-full me-5 max-w-[250px] p-5 lg:p-0 overflow-auto" id="navbar">
+<div class="navbar bg-[#193D39] hidden lg:flex lg:items-stretch border-y border-[#193D39] lg:mb-10 [--kt-drawer-enable:true] lg:[--kt-drawer-enable:false]" data-kt-drawer="true" data-kt-drawer-class="kt-drawer kt-drawer-start fixed z-10 top-0 bottom-0 w-full me-5 max-w-[250px] p-5 lg:p-0 overflow-auto" id="navbar">
     <!-- Container -->
     <div class="kt-container-fixed lg:flex lg:flex-wrap lg:justify-center lg:items-center gap-2 px-0 lg:px-7.5">
         <!-- Mega Menu -->
         <div class="kt-menu items-stretch flex-col lg:flex-row gap-0.5 lg:gap-1 grow lg:grow-0" data-kt-menu="true" id="mega_menu">
-            <div class="kt-menu-item active px-4 lg:px-5 rounded-md shadow-md bg-gradient-to-b from-muted/40 to-muted/20">
-                <a class="kt-menu-link lg:py-3.5 border-b border-b-transparent kt-menu-item-active:border-b-mono text-foreground kt-menu-item-hover:text-mono kt-menu-item-active:text-mono kt-menu-item-here:border-b-mono kt-menu-item-here:text-mono" 
+            <div class="kt-menu-item {$page.url.startsWith(route('admin.dashboard.index')) ? 'active px-6 py-2 rounded-full bg-[#E2A673]' : 'px-6 py-2 rounded-full'}">
+                <a class="kt-menu-link lg:py-3.5 border-b border-b-transparent {$page.url.startsWith(route('admin.dashboard.index')) ? 'text-black font-bold' : 'text-white hover:text-white'}" 
                     href={route('admin.dashboard.index')}>
-                    <span class="kt-menu-title font-medium text-foreground text-sm">
+                    <span class="kt-menu-title font-medium text-sm">
                         Dashboard
                     </span>
                 </a>
             </div>
             
-            <div class="kt-menu-item px-4 lg:px-5 rounded-md shadow-sm bg-gradient-to-b from-muted/30 to-muted/10" data-kt-menu-item-offset="0,0|lg:-20px, 0" data-kt-menu-item-offset-rtl="0,0|lg:20px, 0" data-kt-menu-item-overflow="true" data-kt-menu-item-placement="bottom-start" data-kt-menu-item-placement-rtl="bottom-end" data-kt-menu-item-toggle="dropdown" data-kt-menu-item-trigger="click|lg:hover">
-                <div class="kt-menu-link lg:py-3.5 border-b border-b-transparent kt-menu-item-active:border-b-mono text-foreground kt-menu-item-hover:text-mono kt-menu-item-active:text-mono kt-menu-item-here:border-b-mono kt-menu-item-here:text-mono">
-                    <span class="kt-menu-title font-medium text-foreground text-sm">
+            <div class="kt-menu-item {$page.url.startsWith(route('admin.users.index')) || $page.url.startsWith(route('admin.companies.index')) ? 'active px-6 py-2 rounded-full bg-[#E2A673]' : 'px-6 py-2 rounded-full'}" data-kt-menu-item-offset="0,0|lg:-20px, 0" data-kt-menu-item-offset-rtl="0,0|lg:20px, 0" data-kt-menu-item-overflow="true" data-kt-menu-item-placement="bottom-start" data-kt-menu-item-placement-rtl="bottom-end" data-kt-menu-item-toggle="dropdown" data-kt-menu-item-trigger="click|lg:hover">
+                <div class="kt-menu-link lg:py-3.5 border-b border-b-transparent {$page.url.startsWith(route('admin.users.index')) || $page.url.startsWith(route('admin.companies.index')) ? 'text-black font-bold' : 'text-white hover:text-white'}">
+                    <span class="kt-menu-title font-medium text-sm">
                         Users
                     </span>
                     <span class="kt-menu-arrow flex lg:hidden">
@@ -58,9 +58,9 @@
                 </div>
             </div>
 
-            <div class="kt-menu-item" data-kt-menu-item-offset="0,0|lg:-20px, 0" data-kt-menu-item-offset-rtl="0,0|lg:20px, 0" data-kt-menu-item-overflow="true" data-kt-menu-item-placement="bottom-start" data-kt-menu-item-placement-rtl="bottom-end" data-kt-menu-item-toggle="dropdown" data-kt-menu-item-trigger="click|lg:hover">
-                <div class="kt-menu-link lg:py-3.5 border-b border-b-transparent kt-menu-item-active:border-b-mono text-foreground kt-menu-item-hover:text-mono kt-menu-item-active:text-mono kt-menu-item-here:border-b-mono kt-menu-item-here:text-mono">
-                    <span class="kt-menu-title font-medium text-foreground text-sm">
+            <div class="kt-menu-item {$page.url.startsWith(route('admin.technologies.index')) ? 'active px-6 py-2 rounded-full bg-[#E2A673]' : 'px-6 py-2 rounded-full'}" data-kt-menu-item-offset="0,0|lg:-20px, 0" data-kt-menu-item-offset-rtl="0,0|lg:20px, 0" data-kt-menu-item-overflow="true" data-kt-menu-item-placement="bottom-start" data-kt-menu-item-placement-rtl="bottom-end" data-kt-menu-item-toggle="dropdown" data-kt-menu-item-trigger="click|lg:hover">
+                <div class="kt-menu-link lg:py-3.5 border-b border-b-transparent {$page.url.startsWith(route('admin.technologies.index')) ? 'text-black font-bold' : 'text-white hover:text-white'}">
+                    <span class="kt-menu-title font-medium text-sm">
                         R&D
                     </span>
                     <span class="kt-menu-arrow flex lg:hidden">
@@ -89,7 +89,7 @@
             </div>
 
             <div class="kt-menu-item" data-kt-menu-item-offset="0,0|lg:-20px, 0" data-kt-menu-item-offset-rtl="0,0|lg:20px, 0" data-kt-menu-item-overflow="true" data-kt-menu-item-placement="bottom-start" data-kt-menu-item-placement-rtl="bottom-end" data-kt-menu-item-toggle="dropdown" data-kt-menu-item-trigger="click|lg:hover">
-                <div class="kt-menu-link lg:py-3.5 border-b border-b-transparent kt-menu-item-active:border-b-mono text-foreground kt-menu-item-hover:text-mono kt-menu-item-active:text-mono kt-menu-item-here:border-b-mono kt-menu-item-here:text-mono">
+                <div class="kt-menu-link lg:py-3.5 border-b border-b-transparent text-white hover:text-white">
                     <span class="kt-menu-title font-medium text-foreground text-sm">
                         Production
                     </span>
@@ -152,7 +152,7 @@
             </div>
 
             <div class="kt-menu-item" data-kt-menu-item-offset="0,0|lg:-20px, 0" data-kt-menu-item-offset-rtl="0,0|lg:20px, 0" data-kt-menu-item-overflow="true" data-kt-menu-item-placement="bottom-start" data-kt-menu-item-placement-rtl="bottom-end" data-kt-menu-item-toggle="dropdown" data-kt-menu-item-trigger="click|lg:hover">
-                <div class="kt-menu-link lg:py-3.5 border-b border-b-transparent kt-menu-item-active:border-b-mono text-foreground kt-menu-item-hover:text-mono kt-menu-item-active:text-mono kt-menu-item-here:border-b-mono kt-menu-item-here:text-mono">
+                <div class="kt-menu-link lg:py-3.5 border-b border-b-transparent text-white hover:text-white">
                     <span class="kt-menu-title font-medium text-foreground text-sm">
                         HR
                     </span>
@@ -173,7 +173,7 @@
             </div>
 
             <div class="kt-menu-item" data-kt-menu-item-offset="0,0|lg:-20px, 0" data-kt-menu-item-offset-rtl="0,0|lg:20px, 0" data-kt-menu-item-overflow="true" data-kt-menu-item-placement="bottom-start" data-kt-menu-item-placement-rtl="bottom-end" data-kt-menu-item-toggle="dropdown" data-kt-menu-item-trigger="click|lg:hover">
-                <div class="kt-menu-link lg:py-3.5 border-b border-b-transparent kt-menu-item-active:border-b-mono text-foreground kt-menu-item-hover:text-mono kt-menu-item-active:text-mono kt-menu-item-here:border-b-mono kt-menu-item-here:text-mono">
+                <div class="kt-menu-link lg:py-3.5 border-b border-b-transparent text-white hover:text-white">
                     <span class="kt-menu-title font-medium text-foreground text-sm">
                         Procurement
                     </span>
@@ -225,7 +225,7 @@
             </div>
 
             <div class="kt-menu-item" data-kt-menu-item-offset="0,0|lg:-20px, 0" data-kt-menu-item-offset-rtl="0,0|lg:20px, 0" data-kt-menu-item-overflow="true" data-kt-menu-item-placement="bottom-start" data-kt-menu-item-placement-rtl="bottom-end" data-kt-menu-item-toggle="dropdown" data-kt-menu-item-trigger="click|lg:hover">
-                <div class="kt-menu-link lg:py-3.5 border-b border-b-transparent kt-menu-item-active:border-b-mono text-foreground kt-menu-item-hover:text-mono kt-menu-item-active:text-mono kt-menu-item-here:border-b-mono kt-menu-item-here:text-mono">
+                <div class="kt-menu-link lg:py-3.5 border-b border-b-transparent text-white hover:text-white">
                     <span class="kt-menu-title font-medium text-foreground text-sm">
                         Banks
                     </span>
@@ -255,7 +255,7 @@
             </div>
 
             <div class="kt-menu-item" data-kt-menu-item-offset="0,0|lg:-20px, 0" data-kt-menu-item-offset-rtl="0,0|lg:20px, 0" data-kt-menu-item-overflow="true" data-kt-menu-item-placement="bottom-start" data-kt-menu-item-placement-rtl="bottom-end" data-kt-menu-item-toggle="dropdown" data-kt-menu-item-trigger="click|lg:hover">
-                <div class="kt-menu-link lg:py-3.5 border-b border-b-transparent kt-menu-item-active:border-b-mono text-foreground kt-menu-item-hover:text-mono kt-menu-item-active:text-mono kt-menu-item-here:border-b-mono kt-menu-item-here:text-mono">
+                <div class="kt-menu-link lg:py-3.5 border-b border-b-transparent text-white hover:text-white">
                     <span class="kt-menu-title font-medium text-foreground text-sm">
                         Advertising
                     </span>
@@ -285,7 +285,7 @@
             </div>
 
             <div class="kt-menu-item" data-kt-menu-item-offset="0,0|lg:-20px, 0" data-kt-menu-item-offset-rtl="0,0|lg:20px, 0" data-kt-menu-item-overflow="true" data-kt-menu-item-placement="bottom-start" data-kt-menu-item-placement-rtl="bottom-end" data-kt-menu-item-toggle="dropdown" data-kt-menu-item-trigger="click|lg:hover">
-                <div class="kt-menu-link lg:py-3.5 border-b border-b-transparent kt-menu-item-active:border-b-mono text-foreground kt-menu-item-hover:text-mono kt-menu-item-active:text-mono kt-menu-item-here:border-b-mono kt-menu-item-here:text-mono">
+                <div class="kt-menu-link lg:py-3.5 border-b border-b-transparent text-white hover:text-white">
                     <span class="kt-menu-title font-medium text-foreground text-sm">
                         Events
                     </span>
@@ -315,7 +315,7 @@
             </div>
 
             <div class="kt-menu-item" data-kt-menu-item-offset="0,0|lg:-20px, 0" data-kt-menu-item-offset-rtl="0,0|lg:20px, 0" data-kt-menu-item-overflow="true" data-kt-menu-item-placement="bottom-start" data-kt-menu-item-placement-rtl="bottom-end" data-kt-menu-item-toggle="dropdown" data-kt-menu-item-trigger="click|lg:hover">
-                <div class="kt-menu-link lg:py-3.5 border-b border-b-transparent kt-menu-item-active:border-b-mono text-foreground kt-menu-item-hover:text-mono kt-menu-item-active:text-mono kt-menu-item-here:border-b-mono kt-menu-item-here:text-mono">
+                <div class="kt-menu-link lg:py-3.5 border-b border-b-transparent text-white hover:text-white">
                     <span class="kt-menu-title font-medium text-foreground text-sm">
                         Settings
                     </span>

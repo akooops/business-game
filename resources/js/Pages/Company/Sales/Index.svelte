@@ -263,133 +263,118 @@
     <div class="kt-container-fixed">
         <div class="grid gap-5 lg:gap-7.5">
             <!-- Sales Header -->
-            <div class="flex flex-col gap-4">
-                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                    <div class="flex flex-col gap-1">
-                        <h1 class="text-2xl font-bold text-mono">My Sales</h1>
-                        <p class="text-sm text-secondary-foreground">
-                            Track your sales orders and deliveries
-                        </p>
-                    </div>   
-                </div>
-                
-                <!-- Filter Controls -->
-                <div class="kt-card">
-                    <div class="kt-card-content">
-                        <div class="space-y-4">
-                            <!-- Filter Buttons -->
-                            <div class="flex flex-wrap gap-2">
-                                <button 
-                                    class="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 {filterType === '' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}"
-                                    on:click={() => filterType = ''}
-                                >
-                                    All Products
-                                </button>
-                                <button 
-                                    class="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 {filterType === 'raw_material' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}"
-                                    on:click={() => filterType = 'raw_material'}
-                                >
-                                    Raw Materials
-                                </button>
-                                <button 
-                                    class="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 {filterType === 'component' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}"
-                                    on:click={() => filterType = 'component'}
-                                >
-                                    Components
-                                </button>
-                                <button 
-                                    class="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 {filterType === 'finished_product' ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}"
-                                    on:click={() => filterType = 'finished_product'}
-                                >
-                                    Finished Products
-                                </button>
-                            </div>
-                            
-                            <!-- Status Filter Buttons -->
-                            <div class="flex flex-wrap gap-2">
-                                <button 
-                                    class="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 {filterStatus === '' ? 'bg-green-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}"
-                                    on:click={() => filterStatus = ''}
-                                >
-                                    All Status
-                                </button>
-                                <button 
-                                    class="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 {filterStatus === 'initiated' ? 'bg-green-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}"
-                                    on:click={() => filterStatus = 'initiated'}
-                                >
-                                    Initiated
-                                </button>
-                                <button 
-                                    class="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 {filterStatus === 'confirmed' ? 'bg-green-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}"
-                                    on:click={() => filterStatus = 'confirmed'}
-                                >
-                                    Confirmed
-                                </button>
-                                <button 
-                                    class="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 {filterStatus === 'delivered' ? 'bg-green-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}"
-                                    on:click={() => filterStatus = 'delivered'}
-                                >
-                                    Delivered
-                                </button>
-                                <button 
-                                    class="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 {filterStatus === 'cancelled' ? 'bg-green-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}"
-                                    on:click={() => filterStatus = 'cancelled'}
-                                >
-                                    Cancelled
-                                </button>
-                            </div>
-                            
-                            <!-- Search and Sort Row -->
-                            <div class="flex gap-3 justify-end items-center">
-                                <!-- Sort Dropdown -->
-                                <div class="relative">
-                                    <select 
-                                        class="h-10 px-4 pr-8 text-sm bg-white border border-gray-300 rounded-lg hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 cursor-pointer appearance-none shadow-sm" 
-                                        style="width: 140px; min-width: 140px;" 
-                                        bind:value={sortBy}
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div class="flex flex-col gap-1">
+                    <h1 class="text-2xl font-bold text-mono">My Sales</h1>
+                    <p class="text-sm text-secondary-foreground">
+                        Track your sales orders and deliveries
+                    </p>
+                </div>   
+            </div>
+
+            <!-- Sales Grid -->
+            <div class="kt-card">
+                <div class="kt-card-header">
+                    <div class="kt-card-toolbar">
+                        <div class="flex flex-col gap-2 w-full">
+                            <!-- Filter Buttons Row -->
+                            <div class="flex items-center gap-2 justify-between flex-wrap">
+                                <!-- Product Type Filters -->
+                                <div class="flex gap-2 flex-wrap">
+                                    <button 
+                                        class="kt-btn kt-btn-sm {filterType === '' ? 'kt-btn-primary' : 'kt-btn-light'}"
+                                        on:click={() => filterType = ''}
                                     >
-                                        <option value="">Sort by...</option>
-                                        <option value="date_desc">Newest First</option>
-                                        <option value="date_asc">Oldest First</option>
-                                        <option value="quantity_desc">Quantity ↓</option>
-                                        <option value="quantity_asc">Quantity ↑</option>
-                                        <option value="price_desc">Price ↓</option>
-                                        <option value="price_asc">Price ↑</option>
-                                        <option value="status_asc">Status A-Z</option>
-                                        <option value="status_desc">Status Z-A</option>
-                                    </select>
+                                        All
+                                    </button>
+                                    <button 
+                                        class="kt-btn kt-btn-sm {filterType === 'raw_material' ? 'kt-btn-primary' : 'kt-btn-light'}"
+                                        on:click={() => filterType = 'raw_material'}
+                                    >
+                                        Raw
+                                    </button>
+                                    <button 
+                                        class="kt-btn kt-btn-sm {filterType === 'component' ? 'kt-btn-primary' : 'kt-btn-light'}"
+                                        on:click={() => filterType = 'component'}
+                                    >
+                                        Component
+                                    </button>
+                                    <button 
+                                        class="kt-btn kt-btn-sm {filterType === 'finished_product' ? 'kt-btn-primary' : 'kt-btn-light'}"
+                                        on:click={() => filterType = 'finished_product'}
+                                    >
+                                        Finished
+                                    </button>
                                 </div>
                                 
-                                <!-- Search Bar -->
-                                <div class="relative group">
-                                    <div class="absolute left-6 top-1/2 transform -translate-y-1/2 pointer-events-none transition-colors duration-200 group-focus-within:text-blue-500">
-                                        <i class="fa-solid fa-search text-base text-gray-400"></i>
-                                    </div>
-                                    <input
-                                        type="text"
-                                        class="h-10 pl-14 pr-14 text-sm font-normal text-center bg-gradient-to-r from-white to-gray-50 border-2 border-gray-200 rounded-xl hover:border-blue-300 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 placeholder-gray-400 shadow-sm hover:shadow-md focus:shadow-lg"
-                                        style="width: 300px; min-width: 300px;"
-                                        placeholder="Search sales..."
-                                        value={searchTerm}
+                                <!-- Status Filters -->
+                                <div class="flex gap-2 flex-wrap">
+                                    <button 
+                                        class="kt-btn kt-btn-sm {filterStatus === '' ? 'kt-btn-success' : 'kt-btn-light'}"
+                                        on:click={() => filterStatus = ''}
+                                    >
+                                        All Status
+                                    </button>
+                                    <button 
+                                        class="kt-btn kt-btn-sm {filterStatus === 'initiated' ? 'kt-btn-success' : 'kt-btn-light'}"
+                                        on:click={() => filterStatus = 'initiated'}
+                                    >
+                                        Initiated
+                                    </button>
+                                    <button 
+                                        class="kt-btn kt-btn-sm {filterStatus === 'confirmed' ? 'kt-btn-success' : 'kt-btn-light'}"
+                                        on:click={() => filterStatus = 'confirmed'}
+                                    >
+                                        Confirmed
+                                    </button>
+                                    <button 
+                                        class="kt-btn kt-btn-sm {filterStatus === 'delivered' ? 'kt-btn-success' : 'kt-btn-light'}"
+                                        on:click={() => filterStatus = 'delivered'}
+                                    >
+                                        Delivered
+                                    </button>
+                                    <button 
+                                        class="kt-btn kt-btn-sm {filterStatus === 'cancelled' ? 'kt-btn-success' : 'kt-btn-light'}"
+                                        on:click={() => filterStatus = 'cancelled'}
+                                    >
+                                        Cancelled
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Sort and Search Row -->
+                            <div class="flex items-center gap-2 justify-end">
+                                <!-- Sort Dropdown - Compact -->
+                                <select 
+                                    class="kt-input h-8 text-xs px-2" 
+                                    style="width: 70px;"
+                                    bind:value={sortBy}
+                                >
+                                    <option value="">Sort</option>
+                                    <option value="date_desc">New</option>
+                                    <option value="date_asc">Old</option>
+                                    <option value="quantity_desc">Qty ↓</option>
+                                    <option value="quantity_asc">Qty ↑</option>
+                                    <option value="price_desc">Price ↓</option>
+                                    <option value="price_asc">Price ↑</option>
+                                </select>
+                                
+                                <!-- Search Bar - Compact -->
+                                <div class="kt-input" style="width: 180px;">
+                                    <i class="ki-filled ki-magnifier text-xs"></i>
+                                    <input 
+                                        type="text" 
+                                        class="kt-input h-8 text-xs" 
+                                        placeholder="Search..." 
+                                        bind:value={searchTerm}
                                         on:input={handleSearch}
                                     />
-                                    {#if searchTerm}
-                                        <button 
-                                            class="absolute right-5 top-1/2 transform -translate-y-1/2 p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700 transition-all duration-200 hover:scale-110"
-                                            on:click={() => searchTerm = ''}
-                                        >
-                                            <i class="fa-solid fa-times text-xs"></i>
-                                        </button>
-                                    {/if}
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Sales Grid -->
-            <div class="kt-card">
+                
                 <div class="kt-card-content p-0">
                     {#if loading}
                         <!-- Loading skeleton -->
