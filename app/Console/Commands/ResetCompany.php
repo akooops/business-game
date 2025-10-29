@@ -70,7 +70,15 @@ class ResetCompany extends Command
             $this->info('🗑️  Deleting company-related data...');
             
             $this->deleteWithCountForCompany(Ad::class, 'Ads', $companyId);
-            $this->deleteWithCountForCompany(Notification::class, 'Notifications', $companyId);
+            
+            // Notifications use user_id, not company_id
+            $userId = $company->user_id;
+            if ($userId) {
+                $notificationCount = Notification::where('user_id', $userId)->count();
+                Notification::where('user_id', $userId)->delete();
+                $this->line("   Deleted {$notificationCount} Notifications");
+            }
+            
             $this->deleteWithCountForCompany(Transaction::class, 'Transactions', $companyId);
             $this->deleteWithCountForCompany(Sale::class, 'Sales', $companyId);
             $this->deleteWithCountForCompany(Purchase::class, 'Purchases', $companyId);
