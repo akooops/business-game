@@ -82,8 +82,19 @@ class ResetCompany extends Command
             $this->deleteWithCountForCompany(Transaction::class, 'Transactions', $companyId);
             $this->deleteWithCountForCompany(Sale::class, 'Sales', $companyId);
             $this->deleteWithCountForCompany(Purchase::class, 'Purchases', $companyId);
-            $this->deleteWithCountForCompany(ProductionOrder::class, 'Production Orders', $companyId);
-            $this->deleteWithCountForCompany(Maintenance::class, 'Maintenances', $companyId);
+            
+            // Production Orders and Maintenances use company_machine_id
+            $companyMachineIds = CompanyMachine::where('company_id', $companyId)->pluck('id')->toArray();
+            if (count($companyMachineIds) > 0) {
+                $productionOrderCount = ProductionOrder::whereIn('company_machine_id', $companyMachineIds)->count();
+                ProductionOrder::whereIn('company_machine_id', $companyMachineIds)->delete();
+                $this->line("   Deleted {$productionOrderCount} Production Orders");
+                
+                $maintenanceCount = Maintenance::whereIn('company_machine_id', $companyMachineIds)->count();
+                Maintenance::whereIn('company_machine_id', $companyMachineIds)->delete();
+                $this->line("   Deleted {$maintenanceCount} Maintenances");
+            }
+            
             $this->deleteWithCountForCompany(Loan::class, 'Loans', $companyId);
             $this->deleteWithCountForCompany(InventoryMovement::class, 'Inventory Movements', $companyId);
             $this->deleteWithCountForCompany(Employee::class, 'Employees', $companyId);
