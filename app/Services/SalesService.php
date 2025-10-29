@@ -92,7 +92,7 @@ class SalesService
 
             // Get the current gameweek and the timelimit days
             $gameWeek = SettingsService::getCurrentGameWeek();
-            $timelimit_days = CalculationsService::calcaulteRandomBetweenMinMax(2, 10);
+            $timelimit_days = CalculationsService::calcaulteRandomBetweenMinMax(6, 15);
 
             // Create the sale
             $sale = Sale::create([
