@@ -22,7 +22,7 @@ class LeaderboardService
                 'sales',
                 'purchases',
                 'productionOrders' => function($query) {
-                    $query->where('status', 'completed');
+                    $query->where('production_orders.status', 'completed');
                 },
                 'employees' => function($query) {
                     $query->where('status', 'active');
