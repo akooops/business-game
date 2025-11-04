@@ -116,4 +116,12 @@ class SettingsService
         
         return ($setting) ? $setting->value : 0.35;
     }
+
+    // Get the inital funds
+    public static function getInitalFunds()
+    {
+        $setting = Setting::where('key', 'inital_funds')->first();
+        
+        return ($setting) ? $setting->value : 5000000;
+    }
 }

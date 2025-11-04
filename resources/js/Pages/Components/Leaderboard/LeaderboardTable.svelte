@@ -10,7 +10,7 @@
             Company Leaderboard
         </h3>
         <div class="kt-card-subtitle">
-            Ranked by performance score: Net Worth (50%) - Carbon Impact (25%) + Research Level (25%)
+            Ranked by performance score: Revenue (25%) + Expenses Inverse (20%) + Unpaid Loans Inverse (15%) + Activity (20%) + Research (10%) + Carbon Inverse (10%)
         </div>
     </div>
     
@@ -36,22 +36,32 @@
                         </th>
                         <th>
                             <span class="kt-table-col">
-                                <span class="kt-table-col-label">Funds</span>
+                                <span class="kt-table-col-label">Revenue</span>
                             </span>
                         </th>
                         <th>
                             <span class="kt-table-col">
-                                <span class="kt-table-col-label">Loans</span>
+                                <span class="kt-table-col-label">Expenses</span>
                             </span>
                         </th>
                         <th>
                             <span class="kt-table-col">
-                                <span class="kt-table-col-label">Carbon</span>
+                                <span class="kt-table-col-label">Unpaid Loans</span>
+                            </span>
+                        </th>
+                        <th>
+                            <span class="kt-table-col">
+                                <span class="kt-table-col-label">Activity</span>
                             </span>
                         </th>
                         <th>
                             <span class="kt-table-col">
                                 <span class="kt-table-col-label">Research</span>
+                            </span>
+                        </th>
+                        <th>
+                            <span class="kt-table-col">
+                                <span class="kt-table-col-label">Carbon</span>
                             </span>
                         </th>
                     </tr>
@@ -61,7 +71,7 @@
                         <!-- Loading skeleton rows -->
                         {#each Array(10) as _, i}
                             <tr>
-                                {#each Array(9) as _, j}
+                                {#each Array(8) as _, j}
                                     <td class="p-4">
                                         <div class="kt-skeleton w-16 h-4 rounded"></div>
                                     </td>
@@ -71,7 +81,7 @@
                     {:else if companies.length === 0}
                         <!-- Empty state -->
                         <tr>
-                            <td colspan="9" class="p-10">
+                            <td colspan="8" class="p-10">
                                 <div class="flex flex-col items-center justify-center text-center">
                                     <div class="mb-4">
                                         <i class="ki-filled ki-information-2 text-4xl text-muted-foreground"></i>
@@ -119,33 +129,40 @@
                                 <td>
                                     <div class="flex flex-col gap-1">
                                         <span class="text-sm font-bold text-mono {company.score >= 0 ? 'text-success' : 'text-danger'}">
-                                            {company.score}
+                                            {company.score?.toFixed(2) || '0.00'}
                                         </span>
                                     </div>
                                 </td>
 
-                                <!-- Funds -->
+                                <!-- Revenue -->
                                 <td>
                                     <span class="text-sm font-medium text-success">
-                                        {(company.funds || 0)} DZD
+                                        {(company.revenue || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} DZD
                                     </span>
                                 </td>
 
-                                <!-- Loans -->
+                                <!-- Expenses -->
                                 <td>
                                     <span class="text-sm font-medium text-danger">
-                                        {(company.unpaid_loans || 0)} DZD
+                                        {(company.expenses || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} DZD
                                     </span>
                                 </td>
 
-                                <!-- Carbon -->
+                                <!-- Unpaid Loans -->
+                                <td>
+                                    <span class="text-sm font-medium text-warning">
+                                        {(company.unpaid_loans || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} DZD
+                                    </span>
+                                </td>
+
+                                <!-- Activity -->
                                 <td>
                                     <div class="flex flex-col gap-1">
-                                        <span class="text-sm font-medium text-warning">
-                                            {(company.carbon_footprint || 0)}
+                                        <span class="text-sm font-medium text-info">
+                                            {(company.activity_score || 0).toFixed(2)}
                                         </span>
                                         <span class="text-xs text-secondary-foreground">
-                                            Kg CO₂
+                                            activity
                                         </span>
                                     </div>
                                 </td>
@@ -158,6 +175,18 @@
                                         </span>
                                         <span class="text-xs text-secondary-foreground">
                                             level
+                                        </span>
+                                    </div>
+                                </td>
+
+                                <!-- Carbon -->
+                                <td>
+                                    <div class="flex flex-col gap-1">
+                                        <span class="text-sm font-medium text-warning">
+                                            {(company.carbon_footprint || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </span>
+                                        <span class="text-xs text-secondary-foreground">
+                                            Kg CO₂
                                         </span>
                                     </div>
                                 </td>

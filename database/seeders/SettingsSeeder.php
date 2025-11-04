@@ -87,6 +87,15 @@ class SettingsSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            [
+                'key' => 'inital_funds',
+                'name' => 'Inital Funds',
+                'type' => 'number',
+                'value' => 5000000,
+                'description' => 'The initial funds of the company',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ];
 
         foreach ($settings as $setting) {

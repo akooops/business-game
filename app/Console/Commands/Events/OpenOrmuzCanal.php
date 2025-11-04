@@ -4,6 +4,7 @@ namespace App\Console\Commands\Events;
 
 use Illuminate\Console\Command;
 use App\Services\SettingsService;
+use App\Models\Bank;
 use App\Models\Supplier;
 use App\Models\SupplierProduct;
 use App\Models\Wilaya;
@@ -78,6 +79,16 @@ class OpenOrmuzCanal extends Command
                 'max_sale_price' => $supplierProduct->max_sale_price / (1 + $rate),
                 'real_sale_price' => CalculationsService::calcaulteRandomBetweenMinMax($supplierProduct->min_sale_price, $supplierProduct->max_sale_price),
             ]);
+        }
+
+        // Update all banks loan interest rates (decrease by rate - inverse)
+        $banks = Bank::all();
+        foreach($banks as $bank){
+            $newInterestRate = $bank->loan_interest_rate / (1 + $rate);
+            $bank->update([
+                'loan_interest_rate' => $newInterestRate,
+            ]);
+            $this->info('Bank ' . $bank->name . ' loan interest rate decreased to ' . $newInterestRate);
         }
 
         NotificationService::createOrmuzCanalOpenedNotification($products, $countries);
