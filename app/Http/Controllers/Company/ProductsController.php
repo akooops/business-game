@@ -78,14 +78,34 @@ class ProductsController extends Controller
             $products->latest();
         }
 
+        // Get the products after filters and sorting are applied
+        $companyProducts = $products->get();
+        
+        // Load company product stocks for recipe materials
+        $companyProducts->each(function($companyProduct) use ($company) {
+            if ($companyProduct->product && $companyProduct->product->recipes) {
+                foreach ($companyProduct->product->recipes as $recipe) {
+                    if ($recipe->material) {
+                        // Get company's stock for this material
+                        $materialCompanyProduct = $company->companyProducts()
+                            ->where('product_id', $recipe->material->id)
+                            ->first();
+                        
+                        // Add stock information to the recipe
+                        $recipe->material_stock = $materialCompanyProduct ? $materialCompanyProduct->available_stock : 0;
+                    }
+                }
+            }
+        });
+
         if ($request->expectsJson() && !$request->header('X-Inertia')) {
             return response()->json([
-                'companyProducts' => $products->get(),
+                'companyProducts' => $companyProducts,
             ]);
         }
 
         return inertia('Company/Products/Index', [
-            'companyProducts' => $products->get()
+            'companyProducts' => $companyProducts
         ]);
     }
 

@@ -590,9 +590,14 @@
                                                 <h4 class="text-sm font-semibold text-mono mb-1 truncate">
                                                     {recipe.material ? recipe.material.name : 'Unknown Material'}
                                                 </h4>
-                                                <p class="text-xs text-muted-foreground">
-                                                    Quantity: {recipe.quantity}
-                                                </p>
+                                                <div class="space-y-1">
+                                                    <p class="text-xs text-muted-foreground">
+                                                        Quantity Needed: {recipe.quantity}
+                                                    </p>
+                                                    <p class="text-xs text-muted-foreground">
+                                                        Available Stock: {recipe.material_stock || 0}
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

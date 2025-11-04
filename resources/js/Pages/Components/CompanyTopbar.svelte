@@ -48,9 +48,9 @@
       <!-- Topbar -->
       <div class="flex items-center gap-2 lg:gap-3.5 lg:w-[400px] justify-end">
           <div class="flex items-center gap-2 me-0.5">
-                <!-- Timer -->
-                <Timer />
-                <!-- End of Timer -->
+              <!-- Date and Week -->
+              <Timer />
+              <!-- End of Date and Week -->
 
               <!-- Company Transactions -->
               <CompanyOverview />
