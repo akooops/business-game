@@ -4,11 +4,24 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\Admin\Companies\UpdateCompanyRequest;
 use App\Http\Requests\Admin\Companies\StoreCompanyRequest;
+use App\Models\Ad;
 use App\Models\Company;
-use App\Models\Product;
+use App\Models\CompanyMachine;
 use App\Models\CompanyProduct;
-use Illuminate\Http\Request;
+use App\Models\CompanyTechnology;
+use App\Models\Employee;
+use App\Models\InventoryMovement;
+use App\Models\Loan;
+use App\Models\Maintenance;
+use App\Models\Notification;
+use App\Models\Product;
+use App\Models\ProductionOrder;
+use App\Models\Purchase;
+use App\Models\Sale;
+use App\Models\Transaction;
 use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Services\FileService;
 use App\Services\IndexService;
 use App\Services\SalesService;
@@ -221,9 +234,77 @@ class CompaniesController extends Controller
      */
     public function destroy(Company $company)
     {
-        $company->user->delete();
+        $companyId = $company->id;
+        $userId = $company->user_id;
 
-        return redirect()->route('admin.companies.index')
-                        ->with('success','Company deleted successfully');
+        DB::beginTransaction();
+
+        try {
+            // Delete all company-related data (same logic as ResetCompany command)
+            
+            // Delete Ads
+            Ad::where('company_id', $companyId)->delete();
+            
+            // Delete Notifications (use user_id)
+            if ($userId) {
+                Notification::where('user_id', $userId)->delete();
+            }
+            
+            // Delete Transactions
+            Transaction::where('company_id', $companyId)->delete();
+            
+            // Delete Sales
+            Sale::where('company_id', $companyId)->delete();
+            
+            // Delete Purchases
+            Purchase::where('company_id', $companyId)->delete();
+            
+            // Delete Production Orders and Maintenances (use company_machine_id)
+            $companyMachineIds = CompanyMachine::where('company_id', $companyId)->pluck('id')->toArray();
+            if (count($companyMachineIds) > 0) {
+                ProductionOrder::whereIn('company_machine_id', $companyMachineIds)->delete();
+                Maintenance::whereIn('company_machine_id', $companyMachineIds)->delete();
+            }
+            
+            // Delete Loans
+            Loan::where('company_id', $companyId)->delete();
+            
+            // Delete Inventory Movements
+            InventoryMovement::where('company_id', $companyId)->delete();
+            
+            // Delete Employees
+            Employee::where('company_id', $companyId)->delete();
+            
+            // Delete Company Technologies
+            CompanyTechnology::where('company_id', $companyId)->delete();
+            
+            // Delete Company Products
+            CompanyProduct::where('company_id', $companyId)->delete();
+            
+            // Delete Company Machines
+            CompanyMachine::where('company_id', $companyId)->delete();
+            
+            // Delete the company
+            $company->delete();
+            
+            // Delete the user
+            if ($userId) {
+                $user = User::find($userId);
+                if ($user) {
+                    $user->delete();
+                }
+            }
+
+            DB::commit();
+
+            return redirect()->route('admin.companies.index')
+                            ->with('success', 'Company deleted successfully');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            return redirect()->route('admin.companies.index')
+                            ->with('error', 'Failed to delete company: ' . $e->getMessage());
+        }
     }
 }

@@ -174,12 +174,18 @@ class ProductionService
 
             $timeSinceSetup = $currentTimestamp->diffInDays($setupAt);
 
+            $minLossOnSaleDaysPercentage = SettingsService::getMinLossOnSaleDaysPercentage();
+            
+            // Calculate minimum value based on acquisition cost
+            $minValue = $companyMachine->acquisition_cost * $minLossOnSaleDaysPercentage;
+
             if($timeSinceSetup > 0){
                 $valueLoss = $currentValue * $lossOnSaleDays * $timeSinceSetup;
                 $currentValue -= $valueLoss;
 
-                if($currentValue < 0){
-                    $currentValue = 0;
+                // Don't let value go below acquisition_cost * minLossOnSaleDaysPercentage
+                if($currentValue < $minValue){
+                    $currentValue = $minValue;
                 }
 
                 $companyMachine->update([

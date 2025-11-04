@@ -64,6 +64,29 @@ class SettingsSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            [
+                'key' => 'ability_to_sell_machines',
+                'name' => 'Ability to Sell Machines',
+                'type' => 'select',
+                'value' => 'yes',
+                'description' => 'Whether the company can sell machines',
+                'options' => ['yes', 'no'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'key' => 'min_loss_on_sale_days_percentage',
+                'name' => 'Min Loss on Sale Days Percentage',
+                'type' => 'number',
+                'value' => 0.35,
+                'description' => 'The minimum loss on sale days percentage',
+                'options' => [
+                    'min' => 0,
+                    'step' => 1,
+                ],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ];
 
         foreach ($settings as $setting) {

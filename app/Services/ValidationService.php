@@ -309,6 +309,10 @@ class ValidationService
             $errors['machine'] = 'This machine is already sold.';
         }
 
+        if(!SettingsService::getAbilityToSellMachines()){
+            $errors['machine'] = 'The system blocks the selling of machines.';
+        }
+
         return $errors;
     }
 

@@ -31,6 +31,24 @@ class ChangeDemand extends Seeder
             'Women\'s Perfume (100 mL)' => ['min' => 224, 'avg' => 249, 'max' => 274],
         ];
 
+        // Product market price data with min, avg, and max values
+        $pricesData = [
+            'Moisturizing Cream (120 mL)' => ['min' => 2300, 'avg' => 2530, 'max' => 2783],
+            'Serum (30 mL)' => ['min' => 2100, 'avg' => 2310, 'max' => 2541],
+            'Face Scrub (150 mL)' => ['min' => 2000, 'avg' => 2200, 'max' => 2420],
+            'Shower Gel (250 ml)' => ['min' => 2200, 'avg' => 2420, 'max' => 2662],
+            'Soap (100g)' => ['min' => 1810, 'avg' => 1991, 'max' => 2190.1],
+            'Shampoo (250 mL)' => ['min' => 1800, 'avg' => 1980, 'max' => 2178],
+            'Conditioner (250 mL)' => ['min' => 2000, 'avg' => 2200, 'max' => 2420],
+            'Deodorant (200 mL)' => ['min' => 2200, 'avg' => 2420, 'max' => 2662],
+            'Liquid Foundation (30 mL)' => ['min' => 2400, 'avg' => 2640, 'max' => 2904],
+            'BB Cream (30 mL)' => ['min' => 4000, 'avg' => 4400, 'max' => 4840],
+            'Lip Balm (10 mL)' => ['min' => 1310, 'avg' => 1441, 'max' => 1585.1],
+            'Mascara (100g)' => ['min' => 2000, 'avg' => 2200, 'max' => 2420],
+            'Men\'s Perfume (100 mL)' => ['min' => 14800, 'avg' => 16280, 'max' => 17908],
+            'Women\'s Perfume (100 mL)' => ['min' => 12200, 'avg' => 13420, 'max' => 14762],
+        ];
+
         // Assign unique demand patterns to each product (smoothed)
         $productPatterns = [
             'Moisturizing Cream (120 mL)' => ['type' => 'winter_peak', 'volatility' => 'low', 'trend' => 'stable'],
@@ -61,6 +79,9 @@ class ChangeDemand extends Seeder
             $this->command->info("Processing product: {$productName}");
             
             $pattern = $productPatterns[$productName];
+
+            // Get price data for this product
+            $priceData = $pricesData[$productName] ?? null;
 
             // Create demand data for weeks 1 to 52
             for ($week = 1; $week <= 52; $week++) {
@@ -109,6 +130,14 @@ class ChangeDemand extends Seeder
                         // Very minimal variation
                         $seasonalFactor = 1 + (mt_rand(-3, 3) / 100);
                         break;
+                    case 'growing':
+                        // Growing pattern - similar to steady but with upward trend
+                        $seasonalFactor = 1 + (mt_rand(-3, 3) / 100);
+                        break;
+                    default:
+                        // Default to steady pattern for unknown types
+                        $seasonalFactor = 1 + (mt_rand(-3, 3) / 100);
+                        break;
                 }
 
                 // 3. Add volatility (random noise)
@@ -122,7 +151,7 @@ class ChangeDemand extends Seeder
                         break;
                 }
 
-                // 4. Apply all factors
+                // 4. Apply all factors for demand
                 $combinedFactor = $trendFactor * $seasonalFactor * $volatilityFactor;
                 
                 $adjustedMin = round($minDemand * $combinedFactor);
@@ -137,6 +166,94 @@ class ChangeDemand extends Seeder
                 $adjustedMin = max(1, $adjustedMin);
                 $adjustedMax = max(2, $adjustedMax);
 
+                // 5. Calculate market price with variation (inverse relationship with demand)
+                // When demand is high, prices tend to be lower, and vice versa
+                $marketPrice = null;
+                if ($priceData) {
+                    $minPrice = $priceData['min'];
+                    $avgPrice = $priceData['avg'];
+                    $maxPrice = $priceData['max'];
+                    
+                    // Use inverse seasonal factor for price (opposite of demand)
+                    // But keep trend and volatility similar
+                    $priceSeasonalFactor = 1.0;
+                    switch ($pattern['type']) {
+                        case 'summer_peak':
+                            // Prices lower in summer (demand higher)
+                            $priceSeasonalFactor = 1 - (0.10 * sin(2 * M_PI * ($week - 13) / 52));
+                            break;
+                        case 'winter_peak':
+                            // Prices higher in winter (demand higher)
+                            $priceSeasonalFactor = 1 - (0.10 * cos(2 * M_PI * $week / 52));
+                            break;
+                        case 'spring_peak':
+                            // Prices lower in spring (demand higher)
+                            $priceSeasonalFactor = 1 - (0.08 * sin(2 * M_PI * ($week - 26) / 52));
+                            break;
+                        case 'seasonal_dual':
+                            // Two cycles per year
+                            $priceSeasonalFactor = 1 - (0.08 * sin(4 * M_PI * $week / 52));
+                            break;
+                        case 'holiday_spikes':
+                            // Prices spike during holidays (demand spikes)
+                            $isHolidayWeek = in_array($week, [1, 12, 24, 48, 52]);
+                            $priceSeasonalFactor = $isHolidayWeek ? 1.15 : 1.0;
+                            break;
+                        case 'steady':
+                            // Very minimal variation
+                            $priceSeasonalFactor = 1 + (mt_rand(-2, 2) / 100);
+                            break;
+                        case 'growing':
+                            // Growing pattern - similar to steady
+                            $priceSeasonalFactor = 1 + (mt_rand(-2, 2) / 100);
+                            break;
+                        default:
+                            // Default to steady pattern for unknown types
+                            $priceSeasonalFactor = 1 + (mt_rand(-2, 2) / 100);
+                            break;
+                    }
+                    
+                    // Price trend (opposite of demand trend for some products)
+                    $priceTrendFactor = 1.0;
+                    switch ($pattern['trend']) {
+                        case 'upward':
+                            // Slight price increase but slower than demand
+                            $priceTrendFactor = 1 + ($week / 52 * 0.05);
+                            break;
+                        case 'downward':
+                            // Prices may increase as demand decreases
+                            $priceTrendFactor = 1 + ($week / 52 * 0.03);
+                            break;
+                        case 'stable':
+                            $priceTrendFactor = 1.0;
+                            break;
+                    }
+                    
+                    // Price volatility (similar to demand)
+                    $priceVolatilityFactor = 1.0;
+                    switch ($pattern['volatility']) {
+                        case 'medium':
+                            $priceVolatilityFactor = 1 + (mt_rand(-8, 8) / 100);
+                            break;
+                        case 'low':
+                            $priceVolatilityFactor = 1 + (mt_rand(-4, 4) / 100);
+                            break;
+                    }
+                    
+                    // Combine factors for price
+                    $priceCombinedFactor = $priceTrendFactor * $priceSeasonalFactor * $priceVolatilityFactor;
+                    
+                    // Calculate market price (between min and max based on avg)
+                    $basePrice = $avgPrice * $priceCombinedFactor;
+                    
+                    // Ensure price stays within reasonable bounds
+                    $marketPrice = max($minPrice * 0.9, min($maxPrice * 1.1, $basePrice));
+                    $marketPrice = round($marketPrice, 2);
+                } else {
+                    // Fallback to product's avg_market_price if no price data
+                    $marketPrice = $product->avg_market_price ?? 0;
+                }
+
                 ProductDemand::updateOrCreate(
                     [
                         'product_id' => $product->id,
@@ -145,14 +262,15 @@ class ChangeDemand extends Seeder
                     [
                         'min_demand' => $adjustedMin,
                         'max_demand' => $adjustedMax,
+                        'market_price' => $marketPrice,
                     ]
                 );
             }
 
-            $this->command->info("Completed 52 weeks of demand for: {$productName} (Pattern: {$pattern['type']}, Trend: {$pattern['trend']})");
+            $this->command->info("Completed 52 weeks of demand and market price data for: {$productName} (Pattern: {$pattern['type']}, Trend: {$pattern['trend']})");
         }
 
-        $this->command->info('Product demands seeding completed!');
+        $this->command->info('Product demands and market prices seeding completed!');
     }
 }
 

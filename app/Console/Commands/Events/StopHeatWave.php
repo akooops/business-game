@@ -32,7 +32,7 @@ class StopHeatWave extends Command
     {
         $this->info('Queueing stop heat wave job...');
 
-        $rate = 0.08;
+        $rate = 0.4;
         
         $products = [
             "Moisturizing cream (120 mL)",
@@ -66,7 +66,6 @@ class StopHeatWave extends Command
             $supplierProduct->update([
                 'min_sale_price' => $supplierProduct->min_sale_price / (1 + $rate),
                 'max_sale_price' => $supplierProduct->max_sale_price / (1 + $rate),
-                'real_sale_price' => CalculationsService::calcaulteRandomBetweenMinMax($supplierProduct->min_sale_price, $supplierProduct->max_sale_price),
             ]);
         }
 

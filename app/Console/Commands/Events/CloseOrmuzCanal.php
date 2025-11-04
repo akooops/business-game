@@ -34,14 +34,14 @@ class CloseOrmuzCanal extends Command
         $this->info('Queueing Ormuz canal closing job...');
 
         // Define the list of countries to block
-        $rate = 0.15;
+        $rate = 0.2;
 
         // Get the target timestamp from settings
         $currentTimestamp = SettingsService::getCurrentTimestamp();
 
         $this->info('Current timestamp: ' . $currentTimestamp->format('Y-m-d H:i:s'));
 
-        $products = ["Silicones", "Surfactants", "Preservatives", "Thickener / Gelling Agent", "Packaging"];
+        $products = ["Silicones (L)", "Surfactants (L)", "Preservatives (Kg)", "Thickener / Gelling Agent (Kg)", "Packaging (unity)"];
         $countries = ["United Arab Emirates"];
 
         $suppliers = Supplier::whereHas('country', function($query) use ($countries){

@@ -100,4 +100,20 @@ class SettingsService
         
         return ($setting) ? $setting->value : 1;
     }
+
+    // Get the ability to sell machines
+    public static function getAbilityToSellMachines()
+    {
+        $setting = Setting::where('key', 'ability_to_sell_machines')->first();
+        
+        return ($setting) ? ($setting->value == 'yes') : true;
+    }
+
+    // Get the min loss on sale days percentage
+    public static function getMinLossOnSaleDaysPercentage()
+    {
+        $setting = Setting::where('key', 'min_loss_on_sale_days_percentage')->first();
+        
+        return ($setting) ? $setting->value : 0.35;
+    }
 }

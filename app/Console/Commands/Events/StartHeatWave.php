@@ -37,7 +37,7 @@ class StartHeatWave extends Command
         $this->info('Queueing start heat wave job...');
 
         $companies = Company::all();
-        $rate = 0.08;
+        $rate = 0.4;
 
         $products = [
             "Moisturizing cream (120 mL)",
