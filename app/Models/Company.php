@@ -80,6 +80,11 @@ class Company extends Model
             ->withTimestamps();
     }
 
+    public function productionOrders()
+    {
+        return $this->hasManyThrough(ProductionOrder::class, CompanyMachine::class);
+    }
+
     public function loans()
     {
         return $this->hasMany(Loan::class);
