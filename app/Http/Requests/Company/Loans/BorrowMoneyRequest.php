@@ -36,7 +36,7 @@ class BorrowMoneyRequest extends FormRequest
             $bank = Bank::find($this->input('bank_id'));
             $amount = $this->input('amount');
 
-            $errors = ValidationService::validateBorrowMoney($bank, $amount);
+            $errors = ValidationService::validateBorrowMoney($bank, $amount, $company);
 
             if($errors) {
                 foreach($errors as $key => $error) {

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Ad;
 use App\Models\Employee;
 use App\Models\CompanyMachine;
+use App\Models\Loan;
 use App\Models\Sale;
 use App\Models\SupplierProduct;
 use App\Models\ProductionOrder;
@@ -319,15 +320,24 @@ class ValidationService
     //-------------------------------------
     // Loans
     //-------------------------------------
-    public static function validateBorrowMoney($bank, $amount){
+    public static function validateBorrowMoney($bank, $amount, $company){
         $errors = [];
 
         if(!$bank){
             $errors['bank'] = 'Bank not found.';
         }
 
-        if($amount > $bank->loan_max_amount){
-            $errors['amount'] = 'This bank can not lend you more than his maximum loan amount.';
+        // Calculate total loans from this bank for this company
+        $existingLoansTotal = Loan::where('company_id', $company->id)
+            ->where('bank_id', $bank->id)
+            ->sum('amount');
+
+        // Check if new loan amount + existing loans exceeds bank's max
+        $totalAfterLoan = $existingLoansTotal + $amount;
+
+        if($totalAfterLoan > $bank->loan_max_amount){
+            $remaining = $bank->loan_max_amount - $existingLoansTotal;
+            $errors['amount'] = 'This bank can not lend you more than his maximum loan amount. You already have ' . number_format($existingLoansTotal, 2) . ' DZD from this bank. Maximum remaining: ' . number_format($remaining, 2) . ' DZD.';
         }
 
         return $errors;
