@@ -279,13 +279,19 @@ class ValidationService
         foreach($productRecipes as $recipe){
             $material = $recipe->material;
             $requiredQuantity = $recipe->quantity * $quantity;
+            
+            // Round to 3 decimals to match available_stock precision (users purchase in 3 decimals)
+            $requiredQuantity = round($requiredQuantity, 3);
 
             // Get available stock
             $companyProduct = $companyMachine->company->companyProducts()->where('product_id', $material->id)->first();
             $availableStock = $companyProduct ? $companyProduct->available_stock : 0;
-
-            if($availableStock < $requiredQuantity){
-                $missingQuantity = $requiredQuantity - $availableStock;
+            
+            // Allow 0.001 tolerance (3 digits) to handle precision differences
+            $missingQuantity = $requiredQuantity - $availableStock;
+            
+            // Only show error if missing more than 0.001
+            if($missingQuantity > 0.001){
                 $missingMaterials[] = $material->name . ' (missing: ' . number_format($missingQuantity, 3) . ', have: ' . number_format($availableStock, 3) . ', need: ' . number_format($requiredQuantity, 3) . ')';
             }
         }

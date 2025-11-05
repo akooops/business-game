@@ -186,32 +186,50 @@ class InventoryService
             $quantity = $requiredQuantity;
 
             // Use lockForUpdate to prevent race conditions on FIFO inventory
+            // Filter to only batches with available stock
             $companyInventory = $company->inventoryMovements()->where([
                 'product_id' => $material->id,
                 'movement_type' => InventoryMovement::MOVEMENT_TYPE_IN,
-            ])->lockForUpdate()->get();
+            ])->where('current_quantity', '>', 0)
+              ->orderBy('moved_at', 'asc') // FIFO order
+              ->lockForUpdate()
+              ->get();
 
             $remainingQuantity = $quantity;
+            $actualQuantityConsumed = 0;
 
             foreach($companyInventory as $inventory){
-                $availableInThisBatch = $inventory->current_quantity;
+                if($remainingQuantity <= 0){
+                    break; // We've consumed all needed
+                }
+
+                $availableInThisBatch = max(0, $inventory->current_quantity); // Ensure non-negative
                 $quantityToSubtract = min($remainingQuantity, $availableInThisBatch);
 
-                $inventory->decrement('current_quantity', $quantityToSubtract);
-
-                $remainingQuantity -= $quantityToSubtract;
+                // Only decrement if there's something to subtract
+                if($quantityToSubtract > 0){
+                    // Ensure we don't go below 0
+                    $newQuantity = max(0, $inventory->current_quantity - $quantityToSubtract);
+                    $inventory->update(['current_quantity' => $newQuantity]);
+                    
+                    $actualQuantityConsumed += $quantityToSubtract;
+                    $remainingQuantity -= $quantityToSubtract;
+                }
             }
 
             $companyProduct = $company->companyProducts()->where('product_id', $material->id)->first();
-
-            $companyProduct->decrement('available_stock', $quantity);
+            
+            // Use actual quantity consumed, not the full quantity, and ensure it doesn't go below 0
+            $stockToDecrement = min($actualQuantityConsumed, $companyProduct->available_stock);
+            $newAvailableStock = max(0, $companyProduct->available_stock - $stockToDecrement);
+            $companyProduct->update(['available_stock' => $newAvailableStock]);
 
             $inventoryMovement = InventoryMovement::create([
                 'company_id' => $company->id,
                 'product_id' => $material->id,
                 'movement_type' => InventoryMovement::MOVEMENT_TYPE_OUT,
                 'original_quantity' => $quantity,
-                'current_quantity' => $quantity,
+                'current_quantity' => $actualQuantityConsumed, // Use actual consumed amount
                 'reference_type' => 'production',
                 'reference_id' => $productionOrder->id,
                 'moved_at' => SettingsService::getCurrentTimestamp(),
