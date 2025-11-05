@@ -13,7 +13,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // Game time loop - runs every minute (dispatches jobs to queue)
-        $schedule->command('game:time-loop')->everyMinute()->withoutOverlapping()->runInBackground();
+        $schedule->command('game:time-loop')->everyMinute()->runInBackground();
     }
 
     /**

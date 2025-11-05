@@ -280,9 +280,13 @@ class ValidationService
             $material = $recipe->material;
             $requiredQuantity = $recipe->quantity * $quantity;
 
-            $hasSufficientStock = InventoryService::haveSufficientStock($companyMachine->company, $material, $requiredQuantity);
-            if(!$hasSufficientStock){
-                $missingMaterials[] = $material->name;
+            // Get available stock
+            $companyProduct = $companyMachine->company->companyProducts()->where('product_id', $material->id)->first();
+            $availableStock = $companyProduct ? $companyProduct->available_stock : 0;
+
+            if($availableStock < $requiredQuantity){
+                $missingQuantity = $requiredQuantity - $availableStock;
+                $missingMaterials[] = $material->name . ' (missing: ' . number_format($missingQuantity, 3) . ', have: ' . number_format($availableStock, 3) . ', need: ' . number_format($requiredQuantity, 3) . ')';
             }
         }
 
