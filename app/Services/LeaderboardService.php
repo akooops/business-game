@@ -165,11 +165,10 @@ class LeaderboardService
             // Calculate final score
             // Revenue × 25% + Expenses Inverse × 20% + Unpaid Loans Inverse × 15% 
             // + Activity × 20% + Research × 10% + Carbon Inverse × 10%
-            $score = ($normalizedRevenue * 0.25)
-                   + ($expensesInverse * 0.20)
+            $score = ($normalizedRevenue * 0.35)
                    + ($unpaidLoansInverse * 0.15)
-                   + ($normalizedActivity * 0.20)
-                   + ($normalizedResearch * 0.10)
+                   + ($normalizedActivity * 0.25)
+                   + ($normalizedResearch * 0.15)
                    + ($carbonInverse * 0.10);
             
             // Multiply by 10 for final score (0-10 range)
