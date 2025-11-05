@@ -38,13 +38,7 @@
         }
     });
 
-    // Toggle drawer
-    function toggleDrawer() {
-        // This function is handled by the data-kt-drawer-toggle attribute
-        // No additional logic needed
-    }
-
-    // Format timestamp
+    // Format timestamp (original function kept for compatibility)
     function formatTimestamp(timestamp) {
         if (!timestamp) return 'Loading...';
         return new Date(timestamp).toLocaleDateString('en-US', {
@@ -55,53 +49,22 @@
             minute: '2-digit'
         });
     }
+
+    // Format date as DD/MM/YYYY for display
+    function formatDate(timestamp) {
+        if (!timestamp) return '--/--/----';
+        const date = new Date(timestamp);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    }
 </script>
 
-<!-- Timer -->
-<button 
-    class="kt-btn kt-btn-primary kt-btn-icon size-9 rounded-full relative" 
-    data-kt-drawer-toggle="#timer_drawer"
-    on:click={toggleDrawer}
->
-    <i class="fa-regular fa-clock text-lg"></i>
-    
-    <!-- Unread count badge -->
-
-</button>
-
-<!-- Notifications Drawer -->
-<div 
-    class="hidden kt-drawer kt-drawer-end card flex-col max-w-[90%] w-[450px] top-5 bottom-5 end-5 rounded-xl border border-border" 
-    data-kt-drawer="true" 
-    data-kt-drawer-container="body" 
-    id="timer_drawer"
->
-    <div class="flex items-center justify-between gap-2.5 text-sm text-mono font-semibold px-5 py-2.5 border-b border-b-border" id="timer_header">
-        Timer
-        <button class="kt-btn kt-btn-sm kt-btn-icon kt-btn-dim shrink-0" data-kt-drawer-dismiss="true">
-            <i class="ki-filled ki-cross"></i>
-        </button>
+<!-- Date and Week Display (elliptical badge only) -->
+{#if formatDate(currentTimestamp) !== '--/--/----'}
+    <div class="bg-primary text-white text-[10px] font-semibold px-3 h-9 rounded-full whitespace-nowrap flex items-center justify-center gap-1.5" title="Date: {formatDate(currentTimestamp)} | Week: {currentGameWeek || '--'}">
+        <span>{formatDate(currentTimestamp)}</span>
+        <span class="text-[9px] opacity-90">W{currentGameWeek || '--'}</span>
     </div>
-
-    <!-- Game Timer Display -->
-    <div class="flex items-center gap-2 px-3 py-2 bg-background border border-border rounded-lg">
-        <i class="fa-regular fa-clock text-primary text-sm"></i>
-        <div class="flex flex-col">
-            <span class="text-xs text-muted-foreground font-medium">Game Time</span>
-            <span class="text-sm font-semibold text-foreground">
-                {formatTimestamp(currentTimestamp)}
-            </span>
-        </div>
-    </div>
-
-    <!-- Game Week Display -->
-    <div class="flex items-center gap-2 px-3 py-2 bg-background border border-border rounded-lg">
-        <i class="fa-regular fa-calendar-days text-primary text-sm"></i>
-        <div class="flex flex-col">
-            <span class="text-xs text-muted-foreground font-medium">Game Week</span>
-            <span class="text-sm font-semibold text-foreground">
-                {currentGameWeek}
-            </span>
-        </div>
-    </div>
-</div>
+{/if}

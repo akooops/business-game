@@ -41,6 +41,7 @@
                 <img class="dark:hidden w-8 shrink-0" src="/assets/images/logo.png" style="width: 50px; height: 50px;"/>
                 <img class="hidden dark:inline-block w-8 shrink-0" src="/assets/images/logo.png" style="width: 50px; height: 50px;"/>
               </a>
+              <img class="dark:hidden w-8 shrink-0" src="/assets/images/ramy.svg" style="width: 50px; height: 50px;"/>
           </div>
       </div>
       <!-- End of Logo -->
@@ -48,9 +49,9 @@
       <!-- Topbar -->
       <div class="flex items-center gap-2 lg:gap-3.5 lg:w-[400px] justify-end">
           <div class="flex items-center gap-2 me-0.5">
-                <!-- Timer -->
-                <Timer />
-                <!-- End of Timer -->
+              <!-- Date and Week -->
+              <Timer />
+              <!-- End of Date and Week -->
 
               <!-- Company Transactions -->
               <CompanyOverview />

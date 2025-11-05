@@ -9,9 +9,9 @@ class LeaderboardService
 {
     /**
      * Get companies with normalized scores
-     * Formula: (Revenue × 25%) + (Expenses Inverse × 20%) + (Unpaid Loans Inverse × 15%) 
-     *          + (Activity × 20%) + (Research × 10%) + (Carbon Inverse × 10%)
-     * Revenue and Expenses exclude loans (operational only)
+     * Formula: (Revenue × 35%) + (Unpaid Loans Inverse × 15%) 
+     *          + (Activity × 25%) + (Research × 15%) + (Carbon Inverse × 10%)
+     * Revenue excludes loans (operational only)
      * Final Score = Score × 10
      */
     public static function getLeaderboard()
@@ -39,7 +39,6 @@ class LeaderboardService
 
         // Calculate all metrics first
         $revenues = [];
-        $expenses = [];
         $unpaidLoans = [];
         $activityScores = [];
         $researchLevels = [];
@@ -54,23 +53,6 @@ class LeaderboardService
                 ])
                 ->sum('amount');
             
-            // Expenses (without loans)
-            $totalExpenses = Transaction::where('company_id', $company->id)
-                ->whereIn('type', [
-                    Transaction::TYPE_TECHNOLOGY,
-                    Transaction::TYPE_PURCHASE,
-                    Transaction::TYPE_INVENTORY,
-                    Transaction::TYPE_SALE_SHIPPING,
-                    Transaction::TYPE_EMPLOYEE_RECRUITMENT,
-                    Transaction::TYPE_EMPLOYEE_SALARY,
-                    Transaction::TYPE_MACHINE_SETUP,
-                    Transaction::TYPE_MACHINE_OPERATIONS,
-                    Transaction::TYPE_MAINTENANCE,
-                    Transaction::TYPE_MARKETING
-                    // Excluding loan_payment and loan_received
-                ])
-                ->sum('amount');
-            
             // Activity score (weighted combination)
             $activityScore = (
                 ($company->sales_count * 0.30) +
@@ -81,7 +63,6 @@ class LeaderboardService
             );
             
             $revenues[] = $totalRevenue;
-            $expenses[] = $totalExpenses;
             $unpaidLoans[] = $company->unpaid_loans;
             $activityScores[] = $activityScore;
             $researchLevels[] = $company->research_level;
@@ -92,10 +73,6 @@ class LeaderboardService
         $minRevenue = min($revenues);
         $maxRevenue = max($revenues);
         $revenueRange = $maxRevenue - $minRevenue;
-        
-        $minExpenses = min($expenses);
-        $maxExpenses = max($expenses);
-        $expensesRange = $maxExpenses - $minExpenses;
         
         $minUnpaidLoans = min($unpaidLoans);
         $maxUnpaidLoans = max($unpaidLoans);
@@ -115,22 +92,6 @@ class LeaderboardService
                 ])
                 ->sum('amount');
             
-            // Expenses (without loans)
-            $totalExpenses = Transaction::where('company_id', $company->id)
-                ->whereIn('type', [
-                    Transaction::TYPE_TECHNOLOGY,
-                    Transaction::TYPE_PURCHASE,
-                    Transaction::TYPE_INVENTORY,
-                    Transaction::TYPE_SALE_SHIPPING,
-                    Transaction::TYPE_EMPLOYEE_RECRUITMENT,
-                    Transaction::TYPE_EMPLOYEE_SALARY,
-                    Transaction::TYPE_MACHINE_SETUP,
-                    Transaction::TYPE_MACHINE_OPERATIONS,
-                    Transaction::TYPE_MAINTENANCE,
-                    Transaction::TYPE_MARKETING
-                ])
-                ->sum('amount');
-            
             // Activity score
             $activityScore = (
                 ($company->sales_count * 0.30) +
@@ -143,10 +104,6 @@ class LeaderboardService
             // Normalize values (0-1 range)
             // Revenue: offset normalization to handle negatives
             $normalizedRevenue = $revenueRange > 0 ? ($totalRevenue - $minRevenue) / $revenueRange : 0.5;
-            
-            // Expenses: inverse (lower is better)
-            $normalizedExpenses = $expensesRange > 0 ? ($totalExpenses - $minExpenses) / $expensesRange : 0.5;
-            $expensesInverse = 1 - $normalizedExpenses;
             
             // Unpaid Loans: inverse (lower is better)
             $normalizedUnpaidLoans = $unpaidLoansRange > 0 ? ($company->unpaid_loans - $minUnpaidLoans) / $unpaidLoansRange : 0.5;
@@ -163,8 +120,8 @@ class LeaderboardService
             $carbonInverse = 1 - $normalizedCarbon;
             
             // Calculate final score
-            // Revenue × 25% + Expenses Inverse × 20% + Unpaid Loans Inverse × 15% 
-            // + Activity × 20% + Research × 10% + Carbon Inverse × 10%
+            // Revenue × 35% + Unpaid Loans Inverse × 15% 
+            // + Activity × 25% + Research × 15% + Carbon Inverse × 10%
             $score = ($normalizedRevenue * 0.35)
                    + ($unpaidLoansInverse * 0.15)
                    + ($normalizedActivity * 0.25)
@@ -177,10 +134,8 @@ class LeaderboardService
             // Add all calculated fields to company object for display
             $company->score = round($finalScore, 4);
             $company->revenue = round($totalRevenue, 2);
-            $company->expenses = round($totalExpenses, 2);
             $company->activity_score = round($activityScore, 2);
             $company->normalized_revenue = round($normalizedRevenue, 4);
-            $company->normalized_expenses_inverse = round($expensesInverse, 4);
             $company->normalized_unpaid_loans_inverse = round($unpaidLoansInverse, 4);
             $company->normalized_activity = round($normalizedActivity, 4);
             $company->normalized_research = round($normalizedResearch, 4);
