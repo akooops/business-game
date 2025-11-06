@@ -39,7 +39,7 @@
                 <img class="dark:hidden w-8 shrink-0" src="/assets/images/logo.png" style="width: 50px; height: 50px;"/>
                 <img class="hidden dark:inline-block w-8 shrink-0" src="/assets/images/logo.png" style="width: 50px; height: 50px;"/>
               </a>
-              <img class="dark:hidden w-8 shrink-0" src="/assets/images/ramy.svg" style="width: 50px; height: 50px;"/>
+              <img class="dark:hidden" src="/assets/images/ramy.svg" style="height: 80px;"/>
           </div>
       </div>
       <!-- End of Logo -->
