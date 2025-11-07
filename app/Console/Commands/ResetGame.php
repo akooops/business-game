@@ -127,7 +127,6 @@ class ResetGame extends Command
         $this->deleteWithCountForCompany(InventoryMovement::class, 'Inventory Movements', $companyId);
         $this->deleteWithCountForCompany(Employee::class, 'Employees', $companyId);
         $this->deleteWithCountForCompany(CompanyTechnology::class, 'Company Technologies', $companyId);
-        $this->deleteWithCountForCompany(CompanyProduct::class, 'Company Products', $companyId);
         $this->deleteWithCountForCompany(CompanyMachine::class, 'Company Machines', $companyId);
 
         $this->line('   Company and user records retained.');
