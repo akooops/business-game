@@ -189,9 +189,7 @@ class CompaniesController extends Controller
             'research_level' => $request->research_level,
         ]);
 
-        $products = Product::where('technology_id', null)->orWhereHas('technology', function($query) use ($company) {
-            $query->where('level', '<=', $company->research_level);
-        })->get();
+        $products = Product::where('technology_id', null)->get();
 
         foreach($products as $product){
             // Check if product already exists
