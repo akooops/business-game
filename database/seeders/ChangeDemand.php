@@ -51,19 +51,19 @@ class ChangeDemand extends Seeder
 
         // Assign unique demand patterns to each product (smoothed)
         $productPatterns = [
-            'Moisturizing Cream (120 mL)' => ['type' => 'winter_peak', 'volatility' => 'low', 'trend' => 'stable'],
+            'Moisturizing Cream (120 mL)' => ['type' => 'seasonal_dual', 'volatility' => 'medium', 'trend' => 'upward'],
             'Serum (30 mL)' => ['type' => 'growing', 'volatility' => 'medium', 'trend' => 'upward'],
             'Face Scrub (150 mL)' => ['type' => 'summer_peak', 'volatility' => 'low', 'trend' => 'stable'],
-            'Shower Gel (250 ml)' => ['type' => 'summer_peak', 'volatility' => 'low', 'trend' => 'stable'],
-            'Soap (100g)' => ['type' => 'steady', 'volatility' => 'low', 'trend' => 'downward'],
-            'Shampoo (250 mL)' => ['type' => 'steady', 'volatility' => 'medium', 'trend' => 'stable'],
-            'Conditioner (250 mL)' => ['type' => 'winter_peak', 'volatility' => 'low', 'trend' => 'upward'],
+            'Shower Gel (250 ml)' => ['type' => 'steady', 'volatility' => 'medium', 'trend' => 'upward'],
+            'Soap (100g)' => ['type' => 'spring_peak', 'volatility' => 'medium', 'trend' => 'stable'],
+            'Shampoo (250 mL)' => ['type' => 'spring_peak', 'volatility' => 'medium', 'trend' => 'downward'],
+            'Conditioner (250 mL)' => ['type' => 'steady', 'volatility' => 'medium', 'trend' => 'upward'],
             'Deodorant (200 mL)' => ['type' => 'summer_peak', 'volatility' => 'medium', 'trend' => 'stable'],
-            'Liquid Foundation (30 mL)' => ['type' => 'seasonal_dual', 'volatility' => 'low', 'trend' => 'stable'],
+            'Liquid Foundation (30 mL)' => ['type' => 'seasonal_dual', 'volatility' => 'low', 'trend' => 'downward'],
             'BB Cream (30 mL)' => ['type' => 'spring_peak', 'volatility' => 'low', 'trend' => 'upward'],
             'Lip Balm (10 mL)' => ['type' => 'winter_peak', 'volatility' => 'medium', 'trend' => 'stable'],
-            'Mascara (100g)' => ['type' => 'steady', 'volatility' => 'low', 'trend' => 'stable'],
-            'Men\'s Perfume (100 mL)' => ['type' => 'holiday_spikes', 'volatility' => 'low', 'trend' => 'downward'],
+            'Mascara (100g)' => ['type' => 'steady', 'volatility' => 'low', 'trend' => 'downward'],
+            'Men\'s Perfume (100 mL)' => ['type' => 'seasonal_dual', 'volatility' => 'medium', 'trend' => 'stable'],
             'Women\'s Perfume (100 mL)' => ['type' => 'holiday_spikes', 'volatility' => 'low', 'trend' => 'upward'],
         ];
 
@@ -83,19 +83,21 @@ class ChangeDemand extends Seeder
             // Get price data for this product
             $priceData = $pricesData[$productName] ?? null;
 
+            $demandReductionFactor = 0.94;
+
             // Create demand data for weeks 1 to 52
             for ($week = 1; $week <= 52; $week++) {
-                $minDemand = $demandRange['min'];
-                $maxDemand = $demandRange['max'];
+                $minDemand = round($demandRange['min'] * $demandReductionFactor);
+                $maxDemand = round($demandRange['max'] * $demandReductionFactor);
 
                 // 1. Calculate trend factor (upward, downward, or stable)
                 $trendFactor = 1.0;
                 switch ($pattern['trend']) {
                     case 'upward':
-                        $trendFactor = 1 + ($week / 52 * 0.12); // 12% growth over year
+                        $trendFactor = 1 + ($week / 52 * 0.10); // 12% growth over year
                         break;
                     case 'downward':
-                        $trendFactor = 1 - ($week / 52 * 0.08); // 8% decline over year
+                        $trendFactor = 1 - ($week / 52 * 0.11); // 8% decline over year
                         break;
                     case 'stable':
                         $trendFactor = 1.0;
@@ -141,7 +143,7 @@ class ChangeDemand extends Seeder
                 }
 
                 // 3. Add volatility (random noise)
-                $volatilityFactor = 1.0;
+                $volatilityFactor = 1.1;
                 switch ($pattern['volatility']) {
                     case 'medium':
                         $volatilityFactor = 1 + (mt_rand(-10, 10) / 100);
