@@ -10,7 +10,7 @@
             Company Leaderboard
         </h3>
         <div class="kt-card-subtitle">
-            Ranked by performance score: Revenue (35%) + Unpaid Loans Inverse (15%) + Activity (25%) + Research (15%) + Carbon Inverse (10%)
+            Ranked by performance score: Revenue (30%) + Expenses Inverse (5%) + Unpaid Loans Inverse (15%) + Activity (25%) + Research (15%) + Carbon Inverse (10%)
         </div>
     </div>
     
@@ -41,6 +41,11 @@
                         </th>
                         <th>
                             <span class="kt-table-col">
+                                <span class="kt-table-col-label">Expenses</span>
+                            </span>
+                        </th>
+                        <th>
+                            <span class="kt-table-col">
                                 <span class="kt-table-col-label">Unpaid Loans</span>
                             </span>
                         </th>
@@ -66,7 +71,7 @@
                         <!-- Loading skeleton rows -->
                         {#each Array(10) as _, i}
                             <tr>
-                                {#each Array(7) as _, j}
+                                {#each Array(8) as _, j}
                                     <td class="p-4">
                                         <div class="kt-skeleton w-16 h-4 rounded"></div>
                                     </td>
@@ -76,7 +81,7 @@
                     {:else if companies.length === 0}
                         <!-- Empty state -->
                         <tr>
-                            <td colspan="7" class="p-10">
+                            <td colspan="8" class="p-10">
                                 <div class="flex flex-col items-center justify-center text-center">
                                     <div class="mb-4">
                                         <i class="ki-filled ki-information-2 text-4xl text-muted-foreground"></i>
@@ -133,6 +138,13 @@
                                 <td>
                                     <span class="text-sm font-medium text-success">
                                         {(company.revenue || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} DZD
+                                    </span>
+                                </td>
+
+                                <!-- Expenses -->
+                                <td>
+                                    <span class="text-sm font-medium text-danger">
+                                        {(company.expenses || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} DZD
                                     </span>
                                 </td>
 

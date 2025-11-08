@@ -264,7 +264,7 @@ class ChangeDemand extends Seeder
                     $basePrice = $avgPrice * $priceCombinedFactor;
 
                     // Apply additional downward pressure on price (2% to 7%)
-                    $basePrice *= 1 - (mt_rand(2, 10) / 100);
+                    $basePrice *= 1 - (mt_rand(1, 2) / 100);
                     
                     // Ensure price stays within reasonable bounds
                     $marketPrice = max($minPrice * 0.9, min($maxPrice * 1.1, $basePrice));
