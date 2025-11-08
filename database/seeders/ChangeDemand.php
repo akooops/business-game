@@ -290,7 +290,39 @@ class ChangeDemand extends Seeder
             $this->command->info("Completed 52 weeks of demand and market price data for: {$productName} (Pattern: {$pattern['type']}, Trend: {$pattern['trend']})");
         }
 
+        $this->adjustRawMaterialBaseMetrics();
+
         $this->command->info('Product demands and market prices seeding completed!');
+    }
+
+    private function adjustRawMaterialBaseMetrics(): void
+    {
+        Product::where('type', Product::TYPE_RAW_MATERIAL)
+            ->where('is_saleable', true)
+            ->chunkById(100, function ($products) {
+                foreach ($products as $product) {
+                    $demandFactor = 0.94 * (1 + mt_rand(-20, 5) / 100);
+                    $priceFactor = 1 - (mt_rand(1, 2) / 100);
+
+                    $newAvgDemand = max(1, round(($product->avg_demand ?? 0) * $demandFactor));
+                    $newAvgMarketPrice = round(($product->avg_market_price ?? 0) * $priceFactor, 2);
+
+                    $product->updateQuietly([
+                        'avg_demand' => $newAvgDemand,
+                        'avg_market_price' => $newAvgMarketPrice,
+                    ]);
+
+                    $this->command?->line(
+                        sprintf(
+                            "Raw material %s (ID %d) adjusted: avg_demand=%d, avg_market_price=%.2f",
+                            $product->name,
+                            $product->id,
+                            $newAvgDemand,
+                            $newAvgMarketPrice
+                        )
+                    );
+                }
+            });
     }
 }
 
