@@ -165,8 +165,8 @@ class LeaderboardService
             // Calculate final score
             // Revenue × 30% + Expenses Inverse × 5% + Unpaid Loans Inverse × 15% 
             // + Activity × 25% + Research × 15% + Carbon Inverse × 10%
-            $score = ($normalizedRevenue * 0.25)
-                   + ($expensesInverse * 0.10)
+            $score = ($normalizedRevenue * 0.27)
+                   + ($expensesInverse * 0.08)
                    + ($unpaidLoansInverse * 0.15)
                    + ($normalizedActivity * 0.25)
                    + ($normalizedResearch * 0.15)
