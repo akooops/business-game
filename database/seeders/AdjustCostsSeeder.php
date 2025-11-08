@@ -28,7 +28,7 @@ class AdjustCostsSeeder extends Seeder
                     continue;
                 }
 
-                $multiplier = mt_rand(150, 800) / 100;
+                $multiplier = mt_rand(200, 300) / 100;
                 $newCost = round($product->storage_cost * $multiplier, 3);
 
                 $product->updateQuietly([
@@ -55,7 +55,7 @@ class AdjustCostsSeeder extends Seeder
                     continue;
                 }
 
-                $multiplier = mt_rand(50, 125) / 100;
+                $multiplier = mt_rand(100, 125) / 100;
                 $newCost = round($machine->operations_cost * $multiplier, 3);
 
                 $machine->updateQuietly([
