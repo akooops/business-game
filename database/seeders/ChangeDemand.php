@@ -84,9 +84,19 @@ class ChangeDemand extends Seeder
             $priceData = $pricesData[$productName] ?? null;
 
             $demandReductionFactor = 0.94;
+            $trendDirection = 1;
+            $trendWindowRemaining = 0;
 
             // Create demand data for weeks 1 to 52
             for ($week = 1; $week <= 52; $week++) {
+                if ($trendWindowRemaining <= 0) {
+                    $trendWindowRemaining = mt_rand(1, 5);
+                    if ($week > 1) {
+                        $trendDirection *= -1;
+                    }
+                }
+                $trendWindowRemaining--;
+
                 $minDemand = round($demandRange['min'] * $demandReductionFactor);
                 $maxDemand = round($demandRange['max'] * $demandReductionFactor);
 
@@ -94,10 +104,12 @@ class ChangeDemand extends Seeder
                 $trendFactor = 1.0;
                 switch ($pattern['trend']) {
                     case 'upward':
-                        $trendFactor = 1 + ($week / 52 * 0.10); // 12% growth over year
+                        $trendGrowth = ($week / 52 * 0.10);
+                        $trendFactor = 1 + ($trendDirection === 1 ? $trendGrowth : -0.6 * $trendGrowth);
                         break;
                     case 'downward':
-                        $trendFactor = 1 - ($week / 52 * 0.11); // 8% decline over year
+                        $trendGrowth = ($week / 52 * -0.11);
+                        $trendFactor = 1 + ($trendDirection === 1 ? $trendGrowth : -0.6 * $trendGrowth);
                         break;
                     case 'stable':
                         $trendFactor = 1.0;
@@ -143,7 +155,7 @@ class ChangeDemand extends Seeder
                 }
 
                 // 3. Add volatility (random noise)
-                $volatilityFactor = 1.1;
+                $volatilityFactor = 1.0;
                 switch ($pattern['volatility']) {
                     case 'medium':
                         $volatilityFactor = 1 + (mt_rand(-10, 10) / 100);
@@ -152,6 +164,9 @@ class ChangeDemand extends Seeder
                         $volatilityFactor = 1 + (mt_rand(-5, 5) / 100);
                         break;
                 }
+
+                // Additional demand swing to keep things unpredictable (-20% to +5%)
+                $volatilityFactor *= 1 + (mt_rand(-20, 5) / 100);
 
                 // 4. Apply all factors for demand
                 $combinedFactor = $trendFactor * $seasonalFactor * $volatilityFactor;
@@ -247,6 +262,9 @@ class ChangeDemand extends Seeder
                     
                     // Calculate market price (between min and max based on avg)
                     $basePrice = $avgPrice * $priceCombinedFactor;
+
+                    // Apply additional downward pressure on price (2% to 7%)
+                    $basePrice *= 1 - (mt_rand(2, 10) / 100);
                     
                     // Ensure price stays within reasonable bounds
                     $marketPrice = max($minPrice * 0.9, min($maxPrice * 1.1, $basePrice));
