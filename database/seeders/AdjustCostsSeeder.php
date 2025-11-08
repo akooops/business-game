@@ -17,6 +17,9 @@ class AdjustCostsSeeder extends Seeder
         DB::transaction(function () {
             $this->updateProductStorageCosts();
             $this->updateMachineOperationCosts();
+            $this->updateMachineLossOnSale();
+            $this->updateMachineReliabilityDecay();
+            $this->updateMachineMaintenanceCosts();
         });
     }
 
@@ -68,6 +71,90 @@ class AdjustCostsSeeder extends Seeder
                         $machine->id,
                         $multiplier,
                         $newCost
+                    )
+                );
+            }
+        });
+    }
+
+    private function updateMachineLossOnSale(): void
+    {
+        Machine::chunkById(100, function ($machines) {
+            foreach ($machines as $machine) {
+                if (is_null($machine->loss_on_sale_days)) {
+                    continue;
+                }
+
+                $multiplier = mt_rand(150, 200) / 100;
+                $newValue = round($machine->loss_on_sale_days * $multiplier, 3);
+
+                $machine->updateQuietly([
+                    'loss_on_sale_days' => $newValue,
+                ]);
+
+                $this->command?->line(
+                    sprintf(
+                        "Machine #%d loss_on_sale_days adjusted by %.2fx to %.3f",
+                        $machine->id,
+                        $multiplier,
+                        $newValue
+                    )
+                );
+            }
+        });
+    }
+
+    private function updateMachineReliabilityDecay(): void
+    {
+        Machine::chunkById(100, function ($machines) {
+            foreach ($machines as $machine) {
+                if (is_null($machine->reliability_decay_days)) {
+                    continue;
+                }
+
+                $multiplier = mt_rand(195, 205) / 100;
+                $newValue = round($machine->reliability_decay_days * $multiplier, 3);
+
+                $machine->updateQuietly([
+                    'reliability_decay_days' => $newValue,
+                ]);
+
+                $this->command?->line(
+                    sprintf(
+                        "Machine #%d reliability_decay_days adjusted by %.2fx to %.3f",
+                        $machine->id,
+                        $multiplier,
+                        $newValue
+                    )
+                );
+            }
+        });
+    }
+
+    private function updateMachineMaintenanceCosts(): void
+    {
+        Machine::chunkById(100, function ($machines) {
+            foreach ($machines as $machine) {
+                if (is_null($machine->min_maintenance_cost) || is_null($machine->max_maintenance_cost)) {
+                    continue;
+                }
+
+                $multiplier = mt_rand(120, 130) / 100;
+                $newMin = round($machine->min_maintenance_cost * $multiplier, 3);
+                $newMax = round($machine->max_maintenance_cost * $multiplier, 3);
+
+                $machine->updateQuietly([
+                    'min_maintenance_cost' => $newMin,
+                    'max_maintenance_cost' => $newMax,
+                ]);
+
+                $this->command?->line(
+                    sprintf(
+                        "Machine #%d maintenance costs adjusted by %.2fx to min %.3f / max %.3f",
+                        $machine->id,
+                        $multiplier,
+                        $newMin,
+                        $newMax
                     )
                 );
             }
