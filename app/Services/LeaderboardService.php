@@ -111,10 +111,8 @@ class LeaderboardService
             // Revenue (without loans)
             $totalRevenue = Transaction::where('company_id', $company->id)
                 ->whereIn('type', [
-                    Transaction::TYPE_SALE_PAYMENT,
-                    Transaction::TYPE_MACHINE_SOLD
-                ])
-                ->sum('amount');
+                    Transaction::TYPE_SALE_PAYMENT                
+            ])->sum('amount');
 
             $totalExpenses = Transaction::where('company_id', $company->id)
                 ->whereIn('type', [
